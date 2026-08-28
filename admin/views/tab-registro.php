@@ -1,0 +1,115 @@
+<?php
+namespace WOOKB;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+require_once WOOKB_DIR . 'admin/class-registry-table.php';
+
+$table = new Registry_Table();
+$table->prepare_items();
+?>
+<?php if ( isset( $_GET['wookb_regen_error'] ) ) : // phpcs:ignore ?>
+	<div class="notice notice-error is-dismissible"><p><?php echo esc_html( urldecode( wp_unslash( $_GET['wookb_regen_error'] ) ) ); // phpcs:ignore ?></p></div>
+<?php endif; ?>
+<?php if ( isset( $_GET['wookb_queue_remaining'] ) ) : // phpcs:ignore ?>
+	<div class="notice notice-warning is-dismissible">
+		<p>
+			<?php
+			printf(
+				/* translators: %d: numero de documentos que quedan por procesar en la cola */
+				esc_html__( 'Lote de %1$d procesado. Quedan %2$d documentos en cola: continuando automáticamente…', 'woo-kb-generator' ),
+				(int) Admin::RESET_QUEUE_BATCH,
+				(int) $_GET['wookb_queue_remaining'] // phpcs:ignore
+			);
+			?>
+		</p>
+	</div>
+	<script>
+		// Auto-continuar la cola: en vez de esperar un clic manual, se
+		// reenvia el mismo formulario de "Reiniciar cola" solo, con un
+		// pequeño margen (2s) para no saturar el servidor con peticiones
+		// seguidas. Cada peticion sigue procesando solo <?php echo (int) Admin::RESET_QUEUE_BATCH; ?>
+		// de golpe (limite de tiempo de ejecucion de PHP, sin tocar eso);
+		// lo unico que cambia es que ya no hace falta pulsar el boton cada vez.
+		setTimeout( function () {
+			var form = document.getElementById( 'wookb-reset-queue-form' );
+			if ( form ) {
+				form.submit();
+			}
+		}, 2000 );
+	</script>
+<?php endif; ?>
+
+<div class="wookb-toolbar-row">
+	<form method="get" class="wookb-toolbar-form">
+		<input type="hidden" name="page" value="woo-kb-generator" />
+		<input type="hidden" name="tab" value="registro" />
+		<select name="status">
+			<option value=""><?php esc_html_e( 'Todos los estados', 'woo-kb-generator' ); ?></option>
+			<?php foreach ( array( 'queued', 'generating', 'synced', 'error', 'orphan' ) as $s ) : ?>
+				<option value="<?php echo esc_attr( $s ); ?>" <?php selected( isset( $_GET['status'] ) && $_GET['status'] === $s ); // phpcs:ignore ?>><?php echo esc_html( Registry_Table::status_label( $s ) ); ?></option>
+			<?php endforeach; ?>
+		</select>
+		<select name="lang">
+			<option value=""><?php esc_html_e( 'Todos los idiomas', 'woo-kb-generator' ); ?></option>
+			<?php foreach ( Wpml::active_languages() as $l ) : ?>
+				<option value="<?php echo esc_attr( $l ); ?>" <?php selected( isset( $_GET['lang'] ) && $_GET['lang'] === $l ); // phpcs:ignore ?>><?php echo esc_html( strtoupper( $l ) ); ?></option>
+			<?php endforeach; ?>
+		</select>
+		<input type="search" name="s" value="<?php echo isset( $_GET['s'] ) ? esc_attr( wp_unslash( $_GET['s'] ) ) : ''; // phpcs:ignore ?>" placeholder="<?php esc_attr_e( 'Buscar por título…', 'woo-kb-generator' ); ?>" />
+		<?php submit_button( __( 'Filtrar', 'woo-kb-generator' ), '', '', false ); ?>
+	</form>
+
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wookb-toolbar-form" onsubmit="return confirm('<?php echo esc_js( __( 'Vas a BORRAR todos los documentos que cumplen el filtro actual (o TODOS si no hay filtro puesto): sus archivos .md y sus posts en Support Genix. Esto NO se puede deshacer. ¿Seguro que quieres continuar?', 'woo-kb-generator' ) ); ?>');">
+		<input type="hidden" name="action" value="wookb_delete_all" />
+		<input type="hidden" name="status" value="<?php echo isset( $_GET['status'] ) ? esc_attr( wp_unslash( $_GET['status'] ) ) : ''; // phpcs:ignore ?>" />
+		<input type="hidden" name="lang" value="<?php echo isset( $_GET['lang'] ) ? esc_attr( wp_unslash( $_GET['lang'] ) ) : ''; // phpcs:ignore ?>" />
+		<input type="hidden" name="s" value="<?php echo isset( $_GET['s'] ) ? esc_attr( wp_unslash( $_GET['s'] ) ) : ''; // phpcs:ignore ?>" />
+		<?php wp_nonce_field( 'wookb_delete_all' ); ?>
+		<button class="button button-link-delete"><?php esc_html_e( 'Borrar todos', 'woo-kb-generator' ); ?></button>
+	</form>
+
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wookb-toolbar-form" id="wookb-reset-queue-form">
+		<input type="hidden" name="action" value="wookb_reset_queue" />
+		<?php wp_nonce_field( 'wookb_reset_queue' ); ?>
+		<button class="button"><?php esc_html_e( 'Reiniciar cola', 'woo-kb-generator' ); ?></button>
+	</form>
+</div>
+
+<hr />
+<h2><?php esc_html_e( 'Generar por ID o URL', 'woo-kb-generator' ); ?></h2>
+<p class="description">
+	<?php esc_html_e( 'Para un producto/página que ya no tiene fila en el Registro (por ejemplo, tras borrarlo aquí): genera de nuevo, en todos los idiomas activos, de forma inmediata y sin esperar al cron.', 'woo-kb-generator' ); ?>
+</p>
+<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+	<input type="hidden" name="action" value="wookb_force_generate" />
+	<?php wp_nonce_field( 'wookb_force_generate' ); ?>
+	<input type="text" name="force_id_or_url" placeholder="<?php esc_attr_e( 'ID del producto/página, o su URL', 'woo-kb-generator' ); ?>" style="width:320px" />
+	<?php submit_button( __( 'Generar ahora', 'woo-kb-generator' ), 'secondary', '', false ); ?>
+</form>
+<hr />
+<!--
+	Bulk actions: el formulario se autoenvia a esta misma pagina (sin action=
+	explicito), NO a admin-post.php. WP_List_Table::display() ya renderiza su
+	propio <select name="action">/"action2" para el desplegable de bulk
+	actions y su propio nonce (accion 'bulk-documentos', segun el 'plural' del
+	constructor de Registry_Table). Un campo oculto name="action" adicional
+	aqui colisionaria con ese <select> bajo la misma clave POST -- ver
+	Admin::maybe_handle_bulk_action() (enganchada a load-{hook} de esta
+	pagina de menu) para el procesamiento real y la explicacion completa.
+	row_ids[] lo rellena Registry_Table::column_cb().
+-->
+<form method="post">
+	<?php $table->display(); ?>
+</form>
+<?php
+// Formularios de fila (Generar/Borrar) impresos AQUI, fuera del <form> de
+// arriba a proposito: no se pueden anidar <form> dentro de otro <form> (HTML
+// invalido -- el navegador cierra el exterior en el primer </form> interior,
+// rompiendo la seleccion multiple de filas posteriores). Los botones de cada
+// fila usan el atributo form="..." para enviarse a estos formularios aunque
+// esten fuera de ellos en el DOM. Ver Registry_Table::row_actions_markup().
+echo $table->render_out_of_band_forms(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+?>

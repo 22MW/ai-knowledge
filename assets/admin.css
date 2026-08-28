@@ -1,0 +1,12 @@
+.wookb-wrap .form-table th { width: 260px; }
+.wookb-wrap select[multiple] { padding: 4px; }
+
+/* Tabla de Registro: columnas de datos cortos (lang/status/bridge/hash) no
+   necesitan tanto ancho como el navegador les da por defecto -- eso dejaba
+   la columna "Acciones" (input + 2 botones) apretada contra el borde. */
+.wookb-wrap .wp-list-table .column-lang { width: 60px; }
+.wookb-wrap .wp-list-table .column-status { width: 90px; }
+.wookb-wrap .wp-list-table .column-bridge { width: 70px; }
+.wookb-wrap .wp-list-table .column-hash { width: 90px; }
+.wookb-wrap .wp-list-table .column-updated { width: 140px; }
+.wookb-wrap .wp-list-table .column-actions { width: 220px; }

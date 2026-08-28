@@ -1,0 +1,110 @@
+<?php
+/**
+ * Plugin Name: WOO Knowledge Base Generator
+ * Plugin URI: https://22mw.online/
+ * Description: Genera documentos de base de conocimiento (.md + posts sgkb-docs de Support Genix) a partir de productos WooCommerce u otros CPTs, con cola, límite diario, WPML y publicación pública GEO vía llms.txt.
+ * Version: 1.0.7
+ * Author: 22MW
+ * Author URI: https://22mw.online/
+ * Text Domain: woo-kb-generator
+ * Requires PHP: 7.4
+ *
+ * Dependencias: ninguna dura. WooCommerce, Support Genix y WPML se detectan en runtime.
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+define( 'WOOKB_VERSION', '1.0.7' );
+define( 'WOOKB_FILE', __FILE__ );
+define( 'WOOKB_DIR', plugin_dir_path( __FILE__ ) );
+define( 'WOOKB_URL', plugin_dir_url( __FILE__ ) );
+define( 'WOOKB_TABLE_DOCUMENTS', 'wookb_documents' );
+
+/**
+ * Autoload muy simple por convención de nombre de archivo (class-xxx.php).
+ */
+spl_autoload_register(
+	function ( $class ) {
+		if ( 0 !== strpos( $class, 'WOOKB\\' ) ) {
+			return;
+		}
+		$relative = substr( $class, strlen( 'WOOKB\\' ) );
+		$parts    = explode( '\\', $relative );
+		$name     = array_pop( $parts );
+		$subdir   = $parts ? strtolower( implode( '/', $parts ) ) . '/' : '';
+		$filename = 'class-' . strtolower( str_replace( '_', '-', $name ) ) . '.php';
+
+		$candidates = array(
+			WOOKB_DIR . 'includes/' . $subdir . $filename,
+			WOOKB_DIR . 'admin/' . $filename,
+		);
+
+		foreach ( $candidates as $path ) {
+			if ( file_exists( $path ) ) {
+				require_once $path;
+				return;
+			}
+		}
+	}
+);
+
+/**
+ * Activación: crea la tabla de registro y la carpeta wp-content/llm/.
+ */
+function wookb_activate() {
+	require_once WOOKB_DIR . 'includes/class-registry.php';
+	\WOOKB\Registry::create_table();
+
+	$llm_dir = WP_CONTENT_DIR . '/llm';
+	if ( ! file_exists( $llm_dir ) ) {
+		wp_mkdir_p( $llm_dir );
+	}
+	if ( ! file_exists( $llm_dir . '/index.php' ) ) {
+		file_put_contents( $llm_dir . '/index.php', "<?php\n// Silence is golden.\n" );
+	}
+
+	// Flush de reglas de rewrite para llms.txt.
+	if ( class_exists( '\WOOKB\Llms_Txt' ) ) {
+		\WOOKB\Llms_Txt::add_rewrite_rule();
+	}
+	flush_rewrite_rules();
+}
+register_activation_hook( __FILE__, 'wookb_activate' );
+
+function wookb_deactivate() {
+	flush_rewrite_rules();
+}
+register_deactivation_hook( __FILE__, 'wookb_deactivate' );
+
+/**
+ * Migraciones de esquema: dbDelta es idempotente, así que basta con
+ * volver a ejecutar create_table() cuando cambia la versión del plugin
+ * para que añada columnas nuevas sin perder datos existentes (p.ej.
+ * product_trid/doc_trid añadidas en 1.0.1 para el fix WPML de documentos).
+ */
+add_action(
+	'plugins_loaded',
+	function () {
+		if ( get_option( 'wookb_db_version' ) === WOOKB_VERSION ) {
+			return;
+		}
+		require_once WOOKB_DIR . 'includes/class-registry.php';
+		\WOOKB\Registry::create_table();
+		update_option( 'wookb_db_version', WOOKB_VERSION, false );
+	},
+	5
+);
+
+/**
+ * Bootstrap principal, tras cargar todos los plugins (para detectar Woo/Genix/WPML).
+ */
+add_action(
+	'plugins_loaded',
+	function () {
+		require_once WOOKB_DIR . 'includes/class-plugin.php';
+		\WOOKB\Plugin::instance()->init();
+	},
+	20
+);
