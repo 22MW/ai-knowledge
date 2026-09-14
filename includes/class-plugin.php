@@ -34,6 +34,7 @@ class Plugin {
 		require_once WOOKB_DIR . 'includes/class-queue.php';
 		require_once WOOKB_DIR . 'includes/class-llms-txt.php';
 		require_once WOOKB_DIR . 'includes/class-rest-guard.php';
+		require_once WOOKB_DIR . 'includes/class-rest-content.php';
 		require_once WOOKB_DIR . 'includes/class-sync.php';
 		require_once WOOKB_DIR . 'includes/class-doc-redirect.php';
 		require_once WOOKB_DIR . 'includes/class-markdown-discovery.php';
@@ -47,6 +48,7 @@ class Plugin {
 		Sync::init();
 		Doc_Redirect::init();
 		Markdown_Discovery::init();
+		Rest_Content::init();
 		Chatbot_Language_Fix::init();
 		Chatbot_Relevance_Guard::init();
 		Genix_Hooks_Guard::init();
