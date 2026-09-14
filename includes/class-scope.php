@@ -34,6 +34,12 @@ class Scope {
 			// Editor_Metabox::allowed_post_types(), para que cubra tambien
 			// CPTs de terceros registrados despues de instalar el plugin.
 			'editor_button_post_types' => null,
+			// Fase 2, pestaña WooCommerce, sección "Rellenar a mano": datos que
+			// WooCommerce no puede saber por sí solo. El contacto/horario NO se
+			// duplica aquí: se reutiliza tal cual desde Chatbot_Prompt_Builder::
+			// get_saved_answers()['contacto'] (ver Store_Info_Doc::build_store_info_body()).
+			'delivery_time_note' => '',
+			'legal_notes_extra'  => '',
 		);
 		$saved = get_option( 'wookb_settings', array() );
 		return wp_parse_args( $saved, $defaults );

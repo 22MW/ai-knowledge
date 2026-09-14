@@ -298,17 +298,16 @@ class Store_Info_Doc {
 		}
 		$lines[] = '';
 
-		// Plazos de entrega: se buscó un dato real de texto libre (campo tipo
-		// "delivery_time" en los métodos de envío activos, o un plugin de
-		// estimación de entrega) y no existe ninguno en este sitio -- solo hay
-		// "Envío gratuito"/"Mallorca" (flat_rate) sin campo de plazo, verificado
-		// por MCP execute-php inspeccionando WC_Shipping_Zones::get_zones() y los
-		// plugins activos. La sección técnica de zonas/costes que había antes se
-		// retira (el usuario no la quería); se deja pendiente en vez de redactar
-		// un plazo aproximado que nadie ha confirmado.
-		$lines[] = '## ' . self::label( $lang, 'heading_delivery_times' );
-		$lines[] = self::label( $lang, 'delivery_times_pending' );
-		$lines[] = '';
+		// Plazos de entrega: WooCommerce no expone un campo de plazo en los
+		// métodos de envío activos (verificado por MCP execute-php inspeccionando
+		// WC_Shipping_Zones::get_zones()), así que es un dato de texto libre que
+		// el propio negocio rellena a mano (Fase 2, pestaña WooCommerce, sección
+		// "Rellenar a mano"). Si no lo ha rellenado todavía, se marca
+		// [pendiente]/[pending] en vez de inventar un plazo que nadie confirmó.
+		$delivery_note = trim( (string) Scope::settings()['delivery_time_note'] );
+		$lines[]       = '## ' . self::label( $lang, 'heading_delivery_times' );
+		$lines[]       = '' !== $delivery_note ? $delivery_note : self::label( $lang, 'delivery_times_pending' );
+		$lines[]       = '';
 
 		// Contacto y horario: dato ya recogido por el negocio en el cuestionario
 		// del chatbot (Chatbot_Prompt_Builder), texto libre y ya validado por el
@@ -334,6 +333,37 @@ class Store_Info_Doc {
 			$lines[] = self::label( $lang, 'payment_not_configured' );
 		}
 		$lines[] = '';
+
+		// Impuestos/IVA (Fase 2, nuevo): tipos configurados de verdad en
+		// WooCommerce (Ajustes > Impuestos), no inventados. Si los impuestos
+		// estan desactivados en WooCommerce, o activados pero sin ningun tipo
+		// dado de alta, se marca [pendiente]/[pending] en vez de asumir un
+		// porcentaje.
+		$lines[] = '## ' . self::label( $lang, 'heading_tax' );
+		if ( ! function_exists( 'wc_tax_enabled' ) || ! wc_tax_enabled() ) {
+			$lines[] = self::label( $lang, 'tax_disabled' );
+		} else {
+			$tax_lines = self::tax_summary_lines( $lang );
+			if ( $tax_lines ) {
+				$lines = array_merge( $lines, $tax_lines );
+				$lines[] = '';
+				$lines[] = function_exists( 'wc_prices_include_tax' ) && wc_prices_include_tax()
+					? self::label( $lang, 'tax_prices_include' )
+					: self::label( $lang, 'tax_prices_exclude' );
+			} else {
+				$lines[] = self::label( $lang, 'tax_not_configured' );
+			}
+		}
+		$lines[] = '';
+
+		// Notas legales adicionales (Fase 2, "Rellenar a mano"): texto libre
+		// del negocio, no inventado. Sin seccion si no se ha rellenado nada.
+		$legal_notes = trim( (string) Scope::settings()['legal_notes_extra'] );
+		if ( '' !== $legal_notes ) {
+			$lines[] = '## ' . self::label( $lang, 'heading_legal_notes' );
+			$lines[] = $legal_notes;
+			$lines[] = '';
+		}
 
 		if ( function_exists( 'get_woocommerce_currency' ) ) {
 			$lines[] = self::label( $lang, 'label_currency' ) . ': ' . get_woocommerce_currency();
@@ -432,7 +462,12 @@ class Store_Info_Doc {
 	 * Pasarelas de pago realmente habilitadas (WC()->payment_gateways()
 	 * expone TODAS las instaladas; se filtra por enabled === 'yes').
 	 */
-	protected static function payment_summary() {
+	/**
+	 * Fase 2: publica (no protected) para que la pestaña WooCommerce
+	 * (admin/views/tab-woocommerce.php) reutilice exactamente el mismo dato
+	 * en su sección "Detectado automáticamente" sin duplicar la lógica.
+	 */
+	public static function payment_summary() {
 		if ( ! function_exists( 'WC' ) || ! WC()->payment_gateways() ) {
 			return array();
 		}
@@ -443,6 +478,46 @@ class Store_Info_Doc {
 				continue;
 			}
 			$lines[] = '- ' . $gateway->get_title();
+		}
+
+		return $lines;
+	}
+
+	/**
+	 * Fase 2: tipos de impuesto/IVA realmente configurados en WooCommerce
+	 * (Ajustes > Impuestos), uno por clase fiscal (Standard + clases
+	 * personalizadas). NO usa WC_Tax::get_rates(): esa función calcula los
+	 * tipos que aplicarían a un pedido/cliente concreto según su ubicación
+	 * (pensada para el checkout), no para listar "lo que hay configurado" --
+	 * el mismo patrón que usa la propia pantalla de ajustes de impuestos de
+	 * WooCommerce es WC_Tax::get_rates_for_tax_class() por cada clase fiscal
+	 * (WC_Tax::get_tax_rate_classes()), así que se reutiliza ese.
+	 */
+	public static function tax_summary_lines( $lang ) {
+		if ( ! class_exists( 'WC_Tax' ) ) {
+			return array();
+		}
+
+		$classes = array( (object) array( 'slug' => '', 'name' => 'Standard' ) );
+		foreach ( \WC_Tax::get_tax_rate_classes() as $class_obj ) {
+			$classes[] = $class_obj;
+		}
+
+		$lines = array();
+		foreach ( $classes as $class_obj ) {
+			$rates = \WC_Tax::get_rates_for_tax_class( $class_obj->slug );
+			if ( empty( $rates ) || is_wp_error( $rates ) ) {
+				continue;
+			}
+			foreach ( $rates as $rate ) {
+				$country = ! empty( $rate->tax_rate_country ) ? $rate->tax_rate_country : self::label( $lang, 'tax_all_countries' );
+				$percent = rtrim( rtrim( number_format( (float) $rate->tax_rate, 4, '.', '' ), '0' ), '.' );
+				$line    = '- ' . $class_obj->name . ' (' . $country . '): ' . $percent . '%';
+				if ( ! empty( $rate->tax_rate_shipping ) && 'yes' === $rate->tax_rate_shipping ) {
+					$line .= ' · ' . self::label( $lang, 'tax_applies_shipping' );
+				}
+				$lines[] = $line;
+			}
 		}
 
 		return $lines;
@@ -549,6 +624,14 @@ class Store_Info_Doc {
 				'heading_contact'         => 'Contacto y horario',
 				'heading_payment'         => 'Métodos de pago',
 				'payment_not_configured'  => '[pendiente] No hay pasarelas de pago habilitadas todavía.',
+				'heading_tax'             => 'Impuestos / IVA',
+				'tax_disabled'            => '[pendiente] Esta tienda tiene los impuestos desactivados en WooCommerce (Ajustes > Impuestos).',
+				'tax_not_configured'      => '[pendiente] Los impuestos están activados en WooCommerce pero todavía no hay ningún tipo dado de alta (Ajustes > Impuestos).',
+				'tax_prices_include'      => 'Los precios mostrados en la tienda ya incluyen impuestos.',
+				'tax_prices_exclude'      => 'Los precios mostrados en la tienda NO incluyen impuestos; se añaden en el proceso de pago.',
+				'tax_all_countries'       => 'Todos los países',
+				'tax_applies_shipping'    => 'aplica también al envío',
+				'heading_legal_notes'     => 'Notas legales adicionales',
 				'label_currency'          => 'Moneda',
 				'title_store_info'        => 'Cómo comprar, condiciones, envío y pago',
 				'desc_store_info'         => 'Proceso de compra, condiciones de venta, métodos de envío y de pago de la tienda.',
@@ -581,6 +664,14 @@ class Store_Info_Doc {
 				'heading_contact'         => 'Contact and opening hours',
 				'heading_payment'         => 'Payment methods',
 				'payment_not_configured'  => '[pending] No payment gateways are enabled yet.',
+				'heading_tax'             => 'Tax / VAT',
+				'tax_disabled'            => '[pending] This store has taxes disabled in WooCommerce (Settings > Tax).',
+				'tax_not_configured'      => '[pending] Taxes are enabled in WooCommerce but no tax rate has been set up yet (Settings > Tax).',
+				'tax_prices_include'      => 'Prices shown in the store already include tax.',
+				'tax_prices_exclude'      => 'Prices shown in the store do NOT include tax; it is added at checkout.',
+				'tax_all_countries'       => 'All countries',
+				'tax_applies_shipping'    => 'also applies to shipping',
+				'heading_legal_notes'     => 'Additional legal notes',
 				'label_currency'          => 'Currency',
 				'title_store_info'        => 'How to buy, terms, shipping and payment',
 				'desc_store_info'         => 'Purchase process, terms of sale, shipping and payment methods of the store.',
@@ -613,6 +704,14 @@ class Store_Info_Doc {
 				'heading_contact'         => 'Kontakt und Öffnungszeiten',
 				'heading_payment'         => 'Zahlungsmethoden',
 				'payment_not_configured'  => '[ausstehend] Es sind noch keine Zahlungsmethoden aktiviert.',
+				'heading_tax'             => 'Steuern / MwSt.',
+				'tax_disabled'            => '[ausstehend] Dieser Shop hat Steuern in WooCommerce deaktiviert (Einstellungen > Steuern).',
+				'tax_not_configured'      => '[ausstehend] Steuern sind in WooCommerce aktiviert, aber es ist noch kein Steuersatz angelegt (Einstellungen > Steuern).',
+				'tax_prices_include'      => 'Die im Shop angezeigten Preise enthalten bereits die Steuer.',
+				'tax_prices_exclude'      => 'Die im Shop angezeigten Preise enthalten KEINE Steuer; sie wird beim Checkout hinzugefügt.',
+				'tax_all_countries'       => 'Alle Länder',
+				'tax_applies_shipping'    => 'gilt auch für den Versand',
+				'heading_legal_notes'     => 'Zusätzliche rechtliche Hinweise',
 				'label_currency'          => 'Währung',
 				'title_store_info'        => 'Einkauf, Bedingungen, Versand und Zahlung',
 				'desc_store_info'         => 'Kaufvorgang, Verkaufsbedingungen, Versand- und Zahlungsmethoden des Shops.',

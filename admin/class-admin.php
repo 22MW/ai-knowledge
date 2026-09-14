@@ -38,6 +38,7 @@ class Admin
 		add_action('admin_post_wookb_set_char_limit', array(__CLASS__, 'set_char_limit'));
 		add_action('admin_post_wookb_resolve_stale', array(__CLASS__, 'resolve_stale'));
 		add_action('admin_post_wookb_back_to_auto', array(__CLASS__, 'back_to_auto'));
+		add_action('admin_post_wookb_save_woocommerce_settings', array(__CLASS__, 'save_woocommerce_settings'));
 		add_action('admin_enqueue_scripts', array(__CLASS__, 'assets'));
 		add_action('admin_notices', array(__CLASS__, 'maybe_stale_notice'));
 		add_action('admin_bar_menu', array(__CLASS__, 'admin_bar_stale_node'), 100);
@@ -92,9 +93,15 @@ class Admin
 			'exclusiones'  => __('Exclusiones', 'ai-knowledge'),
 			'registro'     => __('Registro', 'ai-knowledge'),
 			'prompt'       => __('Prompt', 'ai-knowledge'),
-			'ajustes'      => __('Ajustes', 'ai-knowledge'),
-			'carga-inicial' => __('Carga inicial', 'ai-knowledge'),
 		);
+		// Fase 2: pestaña "WooCommerce" solo si WooCommerce esta activo -- sin
+		// el, no hay nada real que detectar (moneda, envios, impuestos, pagos)
+		// y la pestaña quedaria vacia/confusa.
+		if (class_exists('WooCommerce')) {
+			$tabs['woocommerce'] = __('WooCommerce', 'ai-knowledge');
+		}
+		$tabs['ajustes']       = __('Ajustes', 'ai-knowledge');
+		$tabs['carga-inicial'] = __('Carga inicial', 'ai-knowledge');
 
 		echo '<div class="wookb-wrap">';
 		// Fase 1, arreglo del salto de tema: script inline SINCRONO, impreso
@@ -657,12 +664,13 @@ class Admin
 	/**
 	 * Genera/actualiza los documentos compuestos de tienda (Tarea 1 y 1.1 de
 	 * Store_Info_Doc) para todos los idiomas activos de WPML. Se dispara a
-	 * mano desde el admin (botón en la pestaña Ajustes) en vez de encolarse
-	 * automáticamente como las fichas de producto: no dependen de ningún hook
-	 * de guardado de post (no hay "post" que editar), así que no hay un evento
-	 * natural que los dispare -- se regeneran cuando el admin lo pide, o se
-	 * podría añadir un cron propio más adelante si conviene mantenerlos al día
-	 * solos (fuera del alcance de esta tarea).
+	 * mano desde el admin (botón en la pestaña WooCommerce, movido ahí en la
+	 * Fase 2 -- antes vivía en Ajustes) en vez de encolarse automáticamente
+	 * como las fichas de producto: no dependen de ningún hook de guardado de
+	 * post (no hay "post" que editar), así que no hay un evento natural que
+	 * lo dispare -- se regeneran cuando el admin lo pide, o se podría añadir
+	 * un cron propio más adelante si conviene mantenerlos al día solos (fuera
+	 * del alcance de esta tarea).
 	 */
 	public static function sync_store_docs()
 	{
@@ -676,8 +684,28 @@ class Admin
 			delete_transient('wookb_store_docs_error');
 		}
 
-		wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=ajustes&wookb_notice=1'));
+		wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=woocommerce&wookb_notice=1'));
 		exit;
+	}
+
+	/**
+	 * Fase 2: guarda la sección "Rellenar a mano" de la pestaña WooCommerce
+	 * (plazo de entrega en texto libre, notas legales adicionales). El
+	 * contacto/horario NO se guarda aquí -- se reutiliza tal cual desde
+	 * Chatbot_Prompt_Builder (ver tab-woocommerce.php), no se duplica.
+	 */
+	public static function save_woocommerce_settings()
+	{
+		self::verify('wookb_save_woocommerce_settings');
+
+		Scope::update_settings(
+			array(
+				'delivery_time_note' => isset($_POST['delivery_time_note']) ? sanitize_textarea_field(wp_unslash($_POST['delivery_time_note'])) : '', // phpcs:ignore
+				'legal_notes_extra'  => isset($_POST['legal_notes_extra']) ? sanitize_textarea_field(wp_unslash($_POST['legal_notes_extra'])) : '', // phpcs:ignore
+			)
+		);
+
+		self::redirect('woocommerce');
 	}
 
 	/**

@@ -428,3 +428,16 @@
   background: var(--tblr-secondary-bg, #e5e7eb);
   color: var(--tblr-body-color);
 }
+
+/* Fase 2 -- pestaña WooCommerce: separa visualmente "Detectado
+   automáticamente" (solo lectura) de "Rellenar a mano" con un borde lateral
+   sutil, reusando las variables de color ya definidas por Tabler (sin
+   introducir ningún color nuevo). */
+.wookb-wrap .wookb-wc-detected {
+  border-left: 3px solid var(--tblr-border-color, #e5e7eb);
+  padding-left: 12px;
+}
+.wookb-wrap .wookb-wc-manual {
+  border-left: 3px solid var(--tblr-primary, #206bc4);
+  padding-left: 12px;
+}

@@ -7,7 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $settings        = Scope::settings();
 $ai_cfg          = Generator::ai_config();
-$store_docs_err  = get_transient( 'wookb_store_docs_error' );
 $faq_content     = class_exists( '\WOOKB\Llms_Faq' ) ? Llms_Faq::read() : '';
 ?>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
@@ -122,20 +121,18 @@ $faq_content     = class_exists( '\WOOKB\Llms_Faq' ) ? Llms_Faq::read() : '';
 
 <hr />
 
-<h2><?php esc_html_e( 'Documentos de información de tienda', 'ai-knowledge' ); ?></h2>
+<?php if ( class_exists( 'WooCommerce' ) ) : ?>
 <p class="description">
-	<?php esc_html_e( 'Genera (o regenera) los documentos compuestos de "cómo comprar / condiciones de venta / envío y pago" y "catálogo de tienda", uno por idioma activo, a partir de la configuración real de WooCommerce. No dependen de ningún post concreto, así que se generan a mano con este botón — no se disparan solos al cambiar los ajustes de WooCommerce.', 'ai-knowledge' ); ?>
+	<?php
+	printf(
+		/* translators: %s: enlace a la pestaña WooCommerce */
+		esc_html__( 'Los documentos de información de tienda (cómo comprar, condiciones, envío, pago, impuestos) se generan desde la pestaña %s.', 'ai-knowledge' ),
+		'<a href="' . esc_url( admin_url( 'admin.php?page=woo-kb-generator&tab=woocommerce' ) ) . '">' . esc_html__( 'WooCommerce', 'ai-knowledge' ) . '</a>'
+	);
+	?>
 </p>
-<?php if ( $store_docs_err ) : ?>
-	<div class="notice notice-error inline"><p><?php echo esc_html( $store_docs_err ); ?></p></div>
-<?php endif; ?>
-<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-	<input type="hidden" name="action" value="wookb_sync_store_docs" />
-	<?php wp_nonce_field( 'wookb_sync_store_docs' ); ?>
-	<?php submit_button( __( 'Generar/actualizar ahora', 'ai-knowledge' ), 'secondary' ); ?>
-</form>
-
 <hr />
+<?php endif; ?>
 
 <h2><?php esc_html_e( 'FAQ pública (llms.txt)', 'ai-knowledge' ); ?></h2>
 <p class="description">
