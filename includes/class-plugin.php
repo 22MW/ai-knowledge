@@ -36,6 +36,7 @@ class Plugin {
 		require_once WOOKB_DIR . 'includes/class-rest-guard.php';
 		require_once WOOKB_DIR . 'includes/class-sync.php';
 		require_once WOOKB_DIR . 'includes/class-doc-redirect.php';
+		require_once WOOKB_DIR . 'includes/class-markdown-discovery.php';
 		require_once WOOKB_DIR . 'includes/class-chatbot-language-fix.php';
 		require_once WOOKB_DIR . 'includes/class-chatbot-prompt.php';
 		require_once WOOKB_DIR . 'includes/class-chatbot-prompt-builder.php';
@@ -45,6 +46,7 @@ class Plugin {
 		Queue::init();
 		Sync::init();
 		Doc_Redirect::init();
+		Markdown_Discovery::init();
 		Chatbot_Language_Fix::init();
 		Chatbot_Relevance_Guard::init();
 		Genix_Hooks_Guard::init();
