@@ -68,7 +68,7 @@ class Rest_Guard {
 		if ( '1' === get_post_meta( $post_id, self::META_KEY, true ) ) {
 			return new \WP_Error(
 				'rest_post_invalid_id',
-				__( 'Invalid post ID.', 'woo-kb-generator' ),
+				__( 'Invalid post ID.', 'ai-knowledge' ),
 				array( 'status' => 404 )
 			);
 		}

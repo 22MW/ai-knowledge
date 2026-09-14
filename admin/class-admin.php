@@ -34,7 +34,13 @@ class Admin
 		add_action('admin_post_wookb_force_generate', array(__CLASS__, 'force_generate'));
 		add_action('admin_post_wookb_delete_all', array(__CLASS__, 'delete_all'));
 		add_action('admin_post_wookb_reset_queue', array(__CLASS__, 'reset_queue'));
+		add_action('admin_post_wookb_set_manual', array(__CLASS__, 'set_manual'));
+		add_action('admin_post_wookb_set_char_limit', array(__CLASS__, 'set_char_limit'));
+		add_action('admin_post_wookb_resolve_stale', array(__CLASS__, 'resolve_stale'));
+		add_action('admin_post_wookb_back_to_auto', array(__CLASS__, 'back_to_auto'));
 		add_action('admin_enqueue_scripts', array(__CLASS__, 'assets'));
+		add_action('admin_notices', array(__CLASS__, 'maybe_stale_notice'));
+		add_action('admin_bar_menu', array(__CLASS__, 'admin_bar_stale_node'), 100);
 	}
 
 	public static function capability()
@@ -45,8 +51,8 @@ class Admin
 	public static function menu()
 	{
 		$hook = add_menu_page(
-			__('Base de conocimiento IA', 'woo-kb-generator'),
-			__('Base de conocimiento IA', 'woo-kb-generator'),
+			__('Base de conocimiento IA', 'ai-knowledge'),
+			__('Base de conocimiento IA', 'ai-knowledge'),
 			self::capability(),
 			'woo-kb-generator',
 			array(__CLASS__, 'render'),
@@ -77,29 +83,38 @@ class Admin
 	public static function render()
 	{
 		if (! current_user_can(self::capability())) {
-			wp_die(esc_html__('No tienes permisos suficientes.', 'woo-kb-generator'));
+			wp_die(esc_html__('No tienes permisos suficientes.', 'ai-knowledge'));
 		}
 
 		$tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'alcance'; // phpcs:ignore
 		$tabs = array(
-			'alcance'      => __('Alcance', 'woo-kb-generator'),
-			'exclusiones'  => __('Exclusiones', 'woo-kb-generator'),
-			'registro'     => __('Registro', 'woo-kb-generator'),
-			'prompt'       => __('Prompt', 'woo-kb-generator'),
-			'ajustes'      => __('Ajustes', 'woo-kb-generator'),
-			'carga-inicial' => __('Carga inicial', 'woo-kb-generator'),
+			'alcance'      => __('Alcance', 'ai-knowledge'),
+			'exclusiones'  => __('Exclusiones', 'ai-knowledge'),
+			'registro'     => __('Registro', 'ai-knowledge'),
+			'prompt'       => __('Prompt', 'ai-knowledge'),
+			'ajustes'      => __('Ajustes', 'ai-knowledge'),
+			'carga-inicial' => __('Carga inicial', 'ai-knowledge'),
 		);
 
 		echo '<div class="wookb-wrap">';
-		echo '<div class="wookb-header-row"><h3>' . esc_html__('Base de conocimiento IA', 'woo-kb-generator') . '</h3>';
-		echo '<button type="button" class="wookb-theme-toggle"> ' . esc_html__('Modo oscuro', 'woo-kb-generator') . '</button></div>';
+		// Fase 1, arreglo del salto de tema: script inline SINCRONO, impreso
+		// justo al abrir .wookb-wrap, antes de que se pinte el resto del
+		// contenido. Pone data-bs-theme en este mismo elemento leyendo
+		// localStorage/prefers-color-scheme -- misma logica y mismo orden de
+		// preferencia que applyTheme()/detectDefaultTheme() en admin.js, pero
+		// ejecutado ya (admin.js va en el footer y solo se ejecutaba en
+		// $(document).ready, demasiado tarde: se veia primero claro y luego
+		// oscuro en cada carga).
+		echo '<script>(function(){var w=document.currentScript.parentNode;var t=null;try{t=window.localStorage.getItem("wookb_theme");}catch(e){}if("dark"!==t&&"light"!==t){if(window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches){t="light";}else{t="dark";}}w.setAttribute("data-bs-theme",t);})();</script>';
+		echo '<div class="wookb-header-row"><h3>' . esc_html__('Base de conocimiento IA', 'ai-knowledge') . '</h3>';
+		echo '<button type="button" class="wookb-theme-toggle"> ' . esc_html__('Modo oscuro', 'ai-knowledge') . '</button></div>';
 
 		if ('registro' === $tab) {
 			self::render_registry_summary();
 		}
 
 		if (isset($_GET['wookb_notice'])) { // phpcs:ignore
-			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Guardado.', 'woo-kb-generator') . '</p></div>';
+			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Guardado.', 'ai-knowledge') . '</p></div>';
 		}
 
 		echo '<h2 class="nav-tab-wrapper">';
@@ -144,7 +159,7 @@ class Admin
 		}
 
 		echo '<p>';
-		echo '<strong>' . esc_html__('Total de documentos:', 'woo-kb-generator') . '</strong> ' . (int) $summary['total'];
+		echo '<strong>' . esc_html__('Total de documentos:', 'ai-knowledge') . '</strong> ' . (int) $summary['total'];
 		echo '&nbsp;&nbsp;·&nbsp;&nbsp;' . implode('&nbsp;&nbsp;&nbsp;', $parts_lang); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
 		echo '&nbsp;&nbsp;·&nbsp;&nbsp;' . implode('&nbsp;&nbsp;&nbsp;', $parts_status); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
 		echo '</p>';
@@ -153,7 +168,7 @@ class Admin
 	protected static function verify($action)
 	{
 		if (! current_user_can(self::capability())) {
-			wp_die(esc_html__('No tienes permisos suficientes.', 'woo-kb-generator'));
+			wp_die(esc_html__('No tienes permisos suficientes.', 'ai-knowledge'));
 		}
 		check_admin_referer($action);
 	}
@@ -243,6 +258,13 @@ class Admin
 				'own_model'        => isset($_POST['own_model']) ? sanitize_text_field(wp_unslash($_POST['own_model'])) : 'gpt-4o-mini', // phpcs:ignore
 				'extra_prompt'     => isset($_POST['extra_prompt']) ? sanitize_textarea_field(wp_unslash($_POST['extra_prompt'])) : '', // phpcs:ignore
 				'chatbot_docs_list_limit' => max(0, (int) ($_POST['chatbot_docs_list_limit'] ?? Chatbot_Relevance_Guard::DOCS_LIST_LIMIT_DEFAULT)), // phpcs:ignore
+				// Fase 1: post_types donde se muestra el meta box del editor.
+				// Se guarda siempre que llegue el campo oculto 'editor_button_post_types_submitted'
+				// (ver tab-ajustes.php) para poder distinguir "ningun CPT marcado"
+				// (array vacio real) de "ajuste nunca guardado" (null, ver Scope::settings()).
+				'editor_button_post_types' => isset($_POST['editor_button_post_types_submitted'])
+					? (isset($_POST['editor_button_post_types']) ? array_map('sanitize_key', (array) wp_unslash($_POST['editor_button_post_types'])) : array()) // phpcs:ignore
+					: Scope::settings()['editor_button_post_types'],
 			)
 		);
 
@@ -349,12 +371,12 @@ class Admin
 		}
 
 		if (! $post_id || ! get_post($post_id)) {
-			wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=registro&wookb_regen_error=' . rawurlencode(__('No se encontró ningún producto o página con ese ID/URL.', 'woo-kb-generator'))));
+			wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=registro&wookb_regen_error=' . rawurlencode(__('No se encontró ningún producto o página con ese ID/URL.', 'ai-knowledge'))));
 			exit;
 		}
 
 		if (! Scope::is_included($post_id)) {
-			wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=registro&wookb_regen_error=' . rawurlencode(__('Ese contenido no está dentro del alcance configurado del plugin (pestaña Alcance/Exclusiones).', 'woo-kb-generator'))));
+			wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=registro&wookb_regen_error=' . rawurlencode(__('Ese contenido no está dentro del alcance configurado del plugin (pestaña Alcance/Exclusiones).', 'ai-knowledge'))));
 			exit;
 		}
 
@@ -508,6 +530,7 @@ class Admin
 		check_admin_referer('bulk-documentos');
 
 		$row_ids = array_map('intval', wp_unslash($_POST['row_ids'])); // phpcs:ignore
+		$skipped_manual = 0;
 
 		foreach ($row_ids as $row_id) {
 			$row = Registry::find_by_id($row_id);
@@ -520,6 +543,14 @@ class Admin
 				// fila del Registro + .md + post sgkb-docs de Genix.
 				Sync::delete_documents_for($row->source_id);
 			} elseif ('regenerate' === $action) {
+				// Fase 1: las filas en modo manual no se tocan en la regeneracion
+				// en bloque -- su texto lo fijo el admin a mano, "Regenerar
+				// seleccionados" no debe pisarlo. Se cuentan para avisar cuantas
+				// se saltaron.
+				if ('manual' === $row->override_mode) {
+					$skipped_manual++;
+					continue;
+				}
 				// Regeneracion MASIVA: cambiado de Queue::enqueue() (asincrono, via
 				// Action Scheduler/WP-Cron con debounce) a llamada sincrona directa,
 				// por peticion explicita del usuario: encolar dejaba la fila en
@@ -534,7 +565,11 @@ class Admin
 			}
 		}
 
-		wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=registro&wookb_notice=1'));
+		$redirect = admin_url('admin.php?page=woo-kb-generator&tab=registro&wookb_notice=1');
+		if ($skipped_manual > 0) {
+			$redirect = add_query_arg('wookb_skipped_manual', $skipped_manual, $redirect);
+		}
+		wp_safe_redirect($redirect);
 		exit;
 	}
 
@@ -658,5 +693,262 @@ class Admin
 		Llms_Faq::save($content);
 
 		self::redirect('ajustes');
+	}
+
+	/**
+	 * Fase 1: pasa una fila del Registro a modo manual (o guarda un nuevo
+	 * texto en una fila que ya estaba en modo manual: es la MISMA accion,
+	 * pedido explicito -- "pasar a manual" y "editar el texto manual" no son
+	 * dos acciones distintas, siempre guarda + publica). Guarda tal cual el
+	 * texto que el admin dejo en el textarea Y lo publica de verdad: reescribe
+	 * el .md publico y, si Support Genix esta activo, el post sgkb-docs -- sin
+	 * pasar por Generator ni por IA en ningun momento (ver publish_manual_text()).
+	 * stale se reinicia a 0: se acaba de fijar el texto a mano, todavia no hay
+	 * divergencia que avisar.
+	 */
+	public static function set_manual()
+	{
+		self::verify('wookb_set_manual');
+
+		$id   = isset($_POST['row_id']) ? (int) $_POST['row_id'] : 0; // phpcs:ignore
+		$text = isset($_POST['override_text']) ? sanitize_textarea_field(wp_unslash($_POST['override_text'])) : ''; // phpcs:ignore
+
+		$row = Registry::find_by_id($id);
+		if ($row) {
+			self::publish_manual_text($row, $text);
+		}
+
+		self::redirect('registro');
+	}
+
+	/**
+	 * Publica de verdad el texto manual de una fila: reescribe el .md publico
+	 * (Markdown_Store::write(), mismo slug y mismos campos de front matter que
+	 * usa Document_Pipeline::process() para esta misma fila) y, si Support
+	 * Genix esta disponible, actualiza el post sgkb-docs existente reutilizando
+	 * doc_post_id/doc_trid ya guardados (mismo patron que el pipeline). NO pasa
+	 * por Generator ni llama a ninguna IA: $text es el contenido final tal
+	 * cual lo dejo el admin.
+	 *
+	 * source_hash de la fila NO se toca aqui a proposito: sigue siendo el hash
+	 * del ORIGEN (producto/pagina) calculado la ultima vez que se generó o se
+	 * comprobó -- es el valor contra el que Document_Pipeline::process()
+	 * compara para decidir si marca 'stale', y debe seguir reflejando el
+	 * origen, no el texto manual.
+	 */
+	protected static function publish_manual_text($row, $text)
+	{
+		$post        = get_post($row->source_id);
+		$product_url = $post ? get_permalink($row->source_id) : '';
+
+		// Fallback si el origen ya no resuelve a un post real (source_id
+		// centinela de documentos compuestos, o post borrado): reutiliza la
+		// URL que ya quedo guardada en el front matter del .md anterior, si lo
+		// hay, en vez de dejarla vacia.
+		if ('' === $product_url && $row->md_path) {
+			$raw = Markdown_Store::read($row->md_path);
+			if ($raw && preg_match('/^product_url:\s*"?([^"\n]*)"?\s*$/m', $raw, $m)) {
+				$product_url = trim($m[1], '" ');
+			}
+		}
+
+		$slug     = Markdown_Store::slug_for($row->source_id, $row->lang);
+		$relative = Markdown_Store::write(
+			$row->lang,
+			$slug,
+			$text,
+			array(
+				'source_id'    => $row->source_id,
+				'source_type'  => $row->source_type,
+				'lang'         => $row->lang,
+				'source_hash'  => $row->source_hash,
+				'generated_at' => current_time('mysql'),
+				'product_url'  => $product_url,
+				'bridge'       => (bool) $row->is_bridge,
+			)
+		);
+
+		$doc_post_id = $row->doc_post_id;
+		if (Genix_Bridge::is_available()) {
+			$data = array(
+				'title' => $post ? get_the_title($row->source_id) : ($row->source_type . ' #' . $row->source_id),
+				'id'    => $row->source_id,
+				'url'   => $product_url,
+			);
+			$result = Genix_Bridge::upsert_document(
+				$row->doc_post_id,
+				$data,
+				$text,
+				$row->lang,
+				$row->doc_trid
+			);
+			if (! is_wp_error($result)) {
+				$doc_post_id = $result;
+			}
+		}
+
+		Registry::upsert(
+			array(
+				'source_id'     => $row->source_id,
+				'lang'          => $row->lang,
+				'override_mode' => 'manual',
+				'override_text' => $text,
+				'stale'         => 0,
+				'md_path'       => $relative,
+				'doc_post_id'   => $doc_post_id,
+				'status'        => 'synced',
+				'generated_at'  => current_time('mysql'),
+			)
+		);
+
+		Llms_Txt::invalidate();
+	}
+
+	/**
+	 * Fase 1: guarda el limite de caracteres propio de una fila (vacio/0 =
+	 * usa el limite general de Generator::BODY_CHAR_LIMIT). Mismo freno de
+	 * seguridad 100-10000 que ya usa regenerate_single(): el input HTML ya lo
+	 * limita, pero el POST puede manipularse a mano.
+	 */
+	public static function set_char_limit()
+	{
+		self::verify('wookb_set_char_limit');
+
+		$id         = isset($_POST['row_id']) ? (int) $_POST['row_id'] : 0; // phpcs:ignore
+		$char_limit = isset($_POST['char_limit']) ? (int) $_POST['char_limit'] : 0; // phpcs:ignore
+		if ($char_limit > 0) {
+			$char_limit = max(100, min(10000, $char_limit));
+		} else {
+			$char_limit = null;
+		}
+
+		$row = Registry::find_by_id($id);
+		if ($row) {
+			Registry::upsert(
+				array(
+					'source_id'  => $row->source_id,
+					'lang'       => $row->lang,
+					'char_limit' => $char_limit,
+				)
+			);
+		}
+
+		self::redirect('registro');
+	}
+
+	/**
+	 * Fase 1: el admin revisa el aviso de "origen actualizado" (stale) y
+	 * decide mantener el texto manual tal cual, sin regenerar. Solo apaga el
+	 * aviso, no toca override_mode ni override_text.
+	 */
+	public static function resolve_stale()
+	{
+		self::verify('wookb_resolve_stale');
+
+		$id  = isset($_POST['row_id']) ? (int) $_POST['row_id'] : 0; // phpcs:ignore
+		$row = Registry::find_by_id($id);
+		if ($row) {
+			Registry::upsert(
+				array(
+					'source_id' => $row->source_id,
+					'lang'      => $row->lang,
+					'stale'     => 0,
+				)
+			);
+		}
+
+		self::redirect('registro');
+	}
+
+	/**
+	 * Fase 1: vuelve una fila a modo automatico y fuerza una regeneracion
+	 * inmediata con IA (force=true, mismo motivo que regenerate_single():
+	 * es una accion manual explicita del admin, no debe saltarse por hash sin
+	 * cambios). El cambio a 'auto' se guarda ANTES de llamar a
+	 * Document_Pipeline::process(), para que esa llamada ya no se tope con la
+	 * comprobacion de modo manual del propio pipeline.
+	 */
+	public static function back_to_auto()
+	{
+		self::verify('wookb_back_to_auto');
+
+		$id  = isset($_POST['row_id']) ? (int) $_POST['row_id'] : 0; // phpcs:ignore
+		$row = Registry::find_by_id($id);
+		if ($row) {
+			Registry::upsert(
+				array(
+					'source_id'     => $row->source_id,
+					'lang'          => $row->lang,
+					'override_mode' => 'auto',
+					'override_text' => null,
+					'stale'         => 0,
+				)
+			);
+			$result = Document_Pipeline::process($row->source_id, $row->lang, null, true);
+			if (is_wp_error($result)) {
+				wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=registro&wookb_regen_error=' . rawurlencode($result->get_error_message())));
+				exit;
+			}
+		}
+
+		self::redirect('registro');
+	}
+
+	/**
+	 * Aviso de "stale" (Fase 1): banner en cualquier pantalla del propio
+	 * plugin si hay al menos una fila con el origen cambiado en modo manual.
+	 */
+	public static function maybe_stale_notice()
+	{
+		if (! current_user_can(self::capability())) {
+			return;
+		}
+		$screen = function_exists('get_current_screen') ? get_current_screen() : null;
+		if (! $screen || false === strpos((string) $screen->id, 'woo-kb-generator')) {
+			return;
+		}
+
+		$count = Registry::count(array('stale' => 1));
+		if ($count < 1) {
+			return;
+		}
+
+		$url = admin_url('admin.php?page=woo-kb-generator&tab=registro&stale=1');
+		echo '<div class="notice notice-warning"><p>';
+		printf(
+			/* translators: %d: numero de documentos con el origen actualizado desde que se fijaron a mano */
+			esc_html(_n('%d documento en modo manual tiene el origen actualizado desde que se fijó el texto. %s', '%d documentos en modo manual tienen el origen actualizado desde que se fijó el texto. %s', $count, 'ai-knowledge')),
+			(int) $count,
+			'<a href="' . esc_url($url) . '">' . esc_html__('Revisar en el Registro', 'ai-knowledge') . '</a>'
+		);
+		echo '</p></div>';
+	}
+
+	/**
+	 * Nodo en la barra de admin (Fase 1) con el contador de filas 'stale',
+	 * visible solo para quien tiene la capability del plugin.
+	 */
+	public static function admin_bar_stale_node($wp_admin_bar)
+	{
+		if (! current_user_can(self::capability())) {
+			return;
+		}
+
+		$count = Registry::count(array('stale' => 1));
+		if ($count < 1) {
+			return;
+		}
+
+		$wp_admin_bar->add_node(
+			array(
+				'id'    => 'wookb-stale',
+				'title' => sprintf(
+					/* translators: %d: numero de documentos con el origen actualizado desde que se fijaron a mano */
+					esc_html__('KB IA: %d desactualizado(s)', 'ai-knowledge'),
+					(int) $count
+				),
+				'href'  => admin_url('admin.php?page=woo-kb-generator&tab=registro&stale=1'),
+			)
+		);
 	}
 }

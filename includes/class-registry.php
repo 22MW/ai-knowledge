@@ -37,6 +37,10 @@ class Registry {
 			last_error TEXT NULL,
 			generated_at DATETIME NULL,
 			updated_at DATETIME NOT NULL,
+			override_mode VARCHAR(8) NOT NULL DEFAULT 'auto',
+			override_text LONGTEXT NULL,
+			char_limit INT UNSIGNED NULL,
+			stale TINYINT(1) NOT NULL DEFAULT 0,
 			UNIQUE KEY source_lang (source_id, lang),
 			KEY status (status),
 			KEY source_type (source_type),
@@ -80,11 +84,15 @@ class Registry {
 		}
 
 		$defaults = array(
-			'md_path'      => '',
-			'source_hash'  => '',
-			'status'       => 'queued',
-			'is_bridge'    => 0,
-			'doc_post_id'  => null,
+			'md_path'       => '',
+			'source_hash'   => '',
+			'status'        => 'queued',
+			'is_bridge'     => 0,
+			'doc_post_id'   => null,
+			'override_mode' => 'auto',
+			'override_text' => null,
+			'char_limit'    => null,
+			'stale'         => 0,
 		);
 		$data = wp_parse_args( $data, $defaults );
 		$wpdb->insert( $table, $data ); // phpcs:ignore
@@ -156,6 +164,10 @@ class Registry {
 			$where[] = 'source_type = %s';
 			$vals[]  = $args['source_type'];
 		}
+		if ( isset( $args['stale'] ) && '' !== $args['stale'] ) {
+			$where[] = 'stale = %d';
+			$vals[]  = (int) $args['stale'];
+		}
 		if ( ! empty( $args['search'] ) ) {
 			list( $where, $vals ) = self::apply_search( $where, $vals, $args['search'] );
 		}
@@ -216,6 +228,10 @@ class Registry {
 		if ( ! empty( $args['lang'] ) ) {
 			$where[] = 'lang = %s';
 			$vals[]  = $args['lang'];
+		}
+		if ( isset( $args['stale'] ) && '' !== $args['stale'] ) {
+			$where[] = 'stale = %d';
+			$vals[]  = (int) $args['stale'];
 		}
 		if ( ! empty( $args['search'] ) ) {
 			list( $where, $vals ) = self::apply_search( $where, $vals, $args['search'] );

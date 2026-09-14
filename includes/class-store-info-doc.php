@@ -94,7 +94,7 @@ class Store_Info_Doc {
 	 */
 	public static function generate_store_info( $lang ) {
 		if ( ! class_exists( 'WooCommerce' ) ) {
-			return new \WP_Error( 'wookb_no_woocommerce', __( 'WooCommerce no está activo.', 'woo-kb-generator' ) );
+			return new \WP_Error( 'wookb_no_woocommerce', __( 'WooCommerce no está activo.', 'ai-knowledge' ) );
 		}
 
 		$body = self::build_store_info_body( $lang );
@@ -120,7 +120,7 @@ class Store_Info_Doc {
 	 */
 	public static function generate_shop_catalog( $lang ) {
 		if ( ! class_exists( 'WooCommerce' ) ) {
-			return new \WP_Error( 'wookb_no_woocommerce', __( 'WooCommerce no está activo.', 'woo-kb-generator' ) );
+			return new \WP_Error( 'wookb_no_woocommerce', __( 'WooCommerce no está activo.', 'ai-knowledge' ) );
 		}
 
 		$body = self::build_shop_catalog_body( $lang );

@@ -40,33 +40,33 @@ class Chatbot_Prompt_Builder {
 	public static function questions() {
 		return array(
 			'tono'            => array(
-				'label'       => __( 'Tono de la marca', 'woo-kb-generator' ),
-				'placeholder' => __( 'Ej: cercano, profesional, cálido — bodega familiar, sin lenguaje robótico.', 'woo-kb-generator' ),
+				'label'       => __( 'Tono de la marca', 'ai-knowledge' ),
+				'placeholder' => __( 'Ej: cercano, profesional, cálido — bodega familiar, sin lenguaje robótico.', 'ai-knowledge' ),
 				'type'        => 'text',
 			),
 			'negocio'         => array(
-				'label'       => __( 'Dirección / enfoque del negocio', 'woo-kb-generator' ),
-				'placeholder' => __( 'Ej: bodega familiar en Mallorca, vende vino propio y experiencias enoturísticas (visitas, catas, eventos).', 'woo-kb-generator' ),
+				'label'       => __( 'Dirección / enfoque del negocio', 'ai-knowledge' ),
+				'placeholder' => __( 'Ej: bodega familiar en Mallorca, vende vino propio y experiencias enoturísticas (visitas, catas, eventos).', 'ai-knowledge' ),
 				'type'        => 'textarea',
 			),
 			'sin_respuesta'   => array(
-				'label'       => __( 'Qué hacer cuando no hay información', 'woo-kb-generator' ),
-				'placeholder' => __( 'Ej: no inventar ni dar largas, decir que no se tiene esa información y dar el contacto directo.', 'woo-kb-generator' ),
+				'label'       => __( 'Qué hacer cuando no hay información', 'ai-knowledge' ),
+				'placeholder' => __( 'Ej: no inventar ni dar largas, decir que no se tiene esa información y dar el contacto directo.', 'ai-knowledge' ),
 				'type'        => 'textarea',
 			),
 			'idioma_principal' => array(
-				'label'       => __( 'Idioma principal del negocio', 'woo-kb-generator' ),
-				'placeholder' => __( 'Ej: español, aunque la web está también en inglés y alemán.', 'woo-kb-generator' ),
+				'label'       => __( 'Idioma principal del negocio', 'ai-knowledge' ),
+				'placeholder' => __( 'Ej: español, aunque la web está también en inglés y alemán.', 'ai-knowledge' ),
 				'type'        => 'text',
 			),
 			'limites'         => array(
-				'label'       => __( 'Qué NO debe hacer nunca el chatbot', 'woo-kb-generator' ),
-				'placeholder' => __( 'Ej: no gestionar pagos ni reclamaciones directamente, no prometer descuentos, no inventar precios ni stock.', 'woo-kb-generator' ),
+				'label'       => __( 'Qué NO debe hacer nunca el chatbot', 'ai-knowledge' ),
+				'placeholder' => __( 'Ej: no gestionar pagos ni reclamaciones directamente, no prometer descuentos, no inventar precios ni stock.', 'ai-knowledge' ),
 				'type'        => 'textarea',
 			),
 			'contacto'        => array(
-				'label'       => __( 'Datos de contacto directo (si difieren de los ya usados)', 'woo-kb-generator' ),
-				'placeholder' => __( 'Teléfono, WhatsApp, email... deja vacío para mantener los que ya haya en el prompt actual.', 'woo-kb-generator' ),
+				'label'       => __( 'Datos de contacto directo (si difieren de los ya usados)', 'ai-knowledge' ),
+				'placeholder' => __( 'Teléfono, WhatsApp, email... deja vacío para mantener los que ya haya en el prompt actual.', 'ai-knowledge' ),
 				'type'        => 'textarea',
 			),
 		);
@@ -167,7 +167,7 @@ class Chatbot_Prompt_Builder {
 	public static function generate_draft( array $answers, array $reference_pages = array() ) {
 		$config = Generator::ai_config();
 		if ( ! $config ) {
-			return new \WP_Error( 'wookb_no_ai_key', __( 'No hay clave de IA configurada (ni Genix ni propia).', 'woo-kb-generator' ) );
+			return new \WP_Error( 'wookb_no_ai_key', __( 'No hay clave de IA configurada (ni Genix ni propia).', 'ai-knowledge' ) );
 		}
 
 		$prompt  = "Genera el PROMPT DE SISTEMA de un chatbot de atención al cliente para un negocio real, a partir de estas respuestas del propio negocio:\n\n";
@@ -224,12 +224,12 @@ class Chatbot_Prompt_Builder {
 	public static function normalize( $text ) {
 		$text = trim( (string) $text );
 		if ( '' === $text ) {
-			return new \WP_Error( 'wookb_empty_prompt', __( 'No hay texto que normalizar.', 'woo-kb-generator' ) );
+			return new \WP_Error( 'wookb_empty_prompt', __( 'No hay texto que normalizar.', 'ai-knowledge' ) );
 		}
 
 		$config = Generator::ai_config();
 		if ( ! $config ) {
-			return new \WP_Error( 'wookb_no_ai_key', __( 'No hay clave de IA configurada (ni Genix ni propia).', 'woo-kb-generator' ) );
+			return new \WP_Error( 'wookb_no_ai_key', __( 'No hay clave de IA configurada (ni Genix ni propia).', 'ai-knowledge' ) );
 		}
 
 		$prompt  = "Pule la redacción del siguiente prompt de sistema de un chatbot (gramática, claridad, consistencia de formato y tono), SIN cambiar ninguna decisión de fondo: no añadas reglas nuevas, no quites ninguna instrucción existente, no cambies datos de contacto, precios ni condiciones. Solo mejora cómo está escrito.\n\n";
@@ -280,7 +280,7 @@ class Chatbot_Prompt_Builder {
 
 		$content = isset( $json['choices'][0]['message']['content'] ) ? trim( $json['choices'][0]['message']['content'] ) : '';
 		if ( '' === $content ) {
-			return new \WP_Error( 'wookb_openai_empty', __( 'Respuesta vacía de la IA.', 'woo-kb-generator' ) );
+			return new \WP_Error( 'wookb_openai_empty', __( 'Respuesta vacía de la IA.', 'ai-knowledge' ) );
 		}
 
 		return $content;
@@ -318,13 +318,13 @@ class Chatbot_Prompt_Builder {
 
 		printf(
 			'<div class="notice notice-info is-dismissible"><p><strong>%1$s</strong> %2$s</p></div>',
-			esc_html__( 'WOO Knowledge Base Generator:', 'woo-kb-generator' ),
+			esc_html__( 'WOO Knowledge Base Generator:', 'ai-knowledge' ),
 			sprintf(
 				/* translators: 1: longitud actual en caracteres, 2: mínimo recomendado, 3: enlace a la pestaña Prompt */
-				esc_html__( 'El resumen del negocio (pestaña Prompt, "Dirección / enfoque del negocio") tiene %1$d caracteres. Se usa como cita de apertura en /llms.txt: ampliarlo a al menos %2$d caracteres da más contexto útil a los crawlers de IA. %3$s', 'woo-kb-generator' ),
+				esc_html__( 'El resumen del negocio (pestaña Prompt, "Dirección / enfoque del negocio") tiene %1$d caracteres. Se usa como cita de apertura en /llms.txt: ampliarlo a al menos %2$d caracteres da más contexto útil a los crawlers de IA. %3$s', 'ai-knowledge' ),
 				(int) $length,
 				(int) self::SUMMARY_MIN_LENGTH_RECOMMENDED,
-				'<a href="' . esc_url( $prompt_tab_url ) . '">' . esc_html__( 'Ir a la pestaña Prompt', 'woo-kb-generator' ) . '</a>'
+				'<a href="' . esc_url( $prompt_tab_url ) . '">' . esc_html__( 'Ir a la pestaña Prompt', 'ai-knowledge' ) . '</a>'
 			)
 		);
 	}

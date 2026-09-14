@@ -28,21 +28,19 @@
 		$btn.text( 'dark' === theme ? '☀️ Modo claro' : '🌙 Modo oscuro' );
 	}
 
+	// El tema inicial YA se fija con un <script> inline sincrono impreso por
+	// Admin::render() al abrir .wookb-wrap (antes de que este archivo, en el
+	// footer, llegue a ejecutarse) -- evita el salto claro->oscuro visible en
+	// cada carga. Aqui solo queda actualizar el texto del boton acorde al
+	// tema ya puesto, y gestionar el clic.
 	$( function () {
 		var $wrap = $( '.wookb-wrap' );
 		if ( ! $wrap.length ) {
 			return;
 		}
 
-		var saved = null;
-		try {
-			saved = window.localStorage.getItem( STORAGE_KEY );
-		} catch ( e ) {
-			// localStorage no disponible (privado/bloqueado): se sigue sin recordar la eleccion.
-		}
-
-		var theme = ( 'dark' === saved || 'light' === saved ) ? saved : detectDefaultTheme();
-		applyTheme( $wrap, theme );
+		var current = $wrap.attr( 'data-bs-theme' );
+		applyTheme( $wrap, ( 'dark' === current || 'light' === current ) ? current : detectDefaultTheme() );
 
 		$wrap.on( 'click', '.wookb-theme-toggle', function ( e ) {
 			e.preventDefault();

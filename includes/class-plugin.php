@@ -62,6 +62,9 @@ class Plugin {
 		if ( is_admin() ) {
 			require_once WOOKB_DIR . 'admin/class-admin.php';
 			Admin::init();
+
+			require_once WOOKB_DIR . 'includes/class-editor-metabox.php';
+			Editor_Metabox::init();
 		}
 	}
 

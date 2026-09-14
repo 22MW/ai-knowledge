@@ -13,13 +13,26 @@ $table->prepare_items();
 <?php if ( isset( $_GET['wookb_regen_error'] ) ) : // phpcs:ignore ?>
 	<div class="notice notice-error is-dismissible"><p><?php echo esc_html( urldecode( wp_unslash( $_GET['wookb_regen_error'] ) ) ); // phpcs:ignore ?></p></div>
 <?php endif; ?>
+<?php if ( isset( $_GET['wookb_skipped_manual'] ) ) : // phpcs:ignore ?>
+	<div class="notice notice-warning is-dismissible">
+		<p>
+			<?php
+			printf(
+				/* translators: %d: numero de documentos en modo manual que se saltaron */
+				esc_html( _n( '%d documento en modo manual se saltó (no se regenera).', '%d documentos en modo manual se saltaron (no se regeneran).', (int) $_GET['wookb_skipped_manual'], 'ai-knowledge' ) ), // phpcs:ignore
+				(int) $_GET['wookb_skipped_manual'] // phpcs:ignore
+			);
+			?>
+		</p>
+	</div>
+<?php endif; ?>
 <?php if ( isset( $_GET['wookb_queue_remaining'] ) ) : // phpcs:ignore ?>
 	<div class="notice notice-warning is-dismissible">
 		<p>
 			<?php
 			printf(
 				/* translators: %d: numero de documentos que quedan por procesar en la cola */
-				esc_html__( 'Lote de %1$d procesado. Quedan %2$d documentos en cola: continuando automáticamente…', 'woo-kb-generator' ),
+				esc_html__( 'Lote de %1$d procesado. Quedan %2$d documentos en cola: continuando automáticamente…', 'ai-knowledge' ),
 				(int) Admin::RESET_QUEUE_BATCH,
 				(int) $_GET['wookb_queue_remaining'] // phpcs:ignore
 			);
@@ -47,47 +60,47 @@ $table->prepare_items();
 		<input type="hidden" name="page" value="woo-kb-generator" />
 		<input type="hidden" name="tab" value="registro" />
 		<select name="status">
-			<option value=""><?php esc_html_e( 'Todos los estados', 'woo-kb-generator' ); ?></option>
+			<option value=""><?php esc_html_e( 'Todos los estados', 'ai-knowledge' ); ?></option>
 			<?php foreach ( array( 'queued', 'generating', 'synced', 'error', 'orphan' ) as $s ) : ?>
 				<option value="<?php echo esc_attr( $s ); ?>" <?php selected( isset( $_GET['status'] ) && $_GET['status'] === $s ); // phpcs:ignore ?>><?php echo esc_html( Registry_Table::status_label( $s ) ); ?></option>
 			<?php endforeach; ?>
 		</select>
 		<select name="lang">
-			<option value=""><?php esc_html_e( 'Todos los idiomas', 'woo-kb-generator' ); ?></option>
+			<option value=""><?php esc_html_e( 'Todos los idiomas', 'ai-knowledge' ); ?></option>
 			<?php foreach ( Wpml::active_languages() as $l ) : ?>
 				<option value="<?php echo esc_attr( $l ); ?>" <?php selected( isset( $_GET['lang'] ) && $_GET['lang'] === $l ); // phpcs:ignore ?>><?php echo esc_html( strtoupper( $l ) ); ?></option>
 			<?php endforeach; ?>
 		</select>
-		<input type="search" name="s" value="<?php echo isset( $_GET['s'] ) ? esc_attr( wp_unslash( $_GET['s'] ) ) : ''; // phpcs:ignore ?>" placeholder="<?php esc_attr_e( 'Buscar por título…', 'woo-kb-generator' ); ?>" />
-		<?php submit_button( __( 'Filtrar', 'woo-kb-generator' ), '', '', false ); ?>
+		<input type="search" name="s" value="<?php echo isset( $_GET['s'] ) ? esc_attr( wp_unslash( $_GET['s'] ) ) : ''; // phpcs:ignore ?>" placeholder="<?php esc_attr_e( 'Buscar por título…', 'ai-knowledge' ); ?>" />
+		<?php submit_button( __( 'Filtrar', 'ai-knowledge' ), '', '', false ); ?>
 	</form>
 
-	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wookb-toolbar-form" onsubmit="return confirm('<?php echo esc_js( __( 'Vas a BORRAR todos los documentos que cumplen el filtro actual (o TODOS si no hay filtro puesto): sus archivos .md y sus posts en Support Genix. Esto NO se puede deshacer. ¿Seguro que quieres continuar?', 'woo-kb-generator' ) ); ?>');">
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wookb-toolbar-form" onsubmit="return confirm('<?php echo esc_js( __( 'Vas a BORRAR todos los documentos que cumplen el filtro actual (o TODOS si no hay filtro puesto): sus archivos .md y sus posts en Support Genix. Esto NO se puede deshacer. ¿Seguro que quieres continuar?', 'ai-knowledge' ) ); ?>');">
 		<input type="hidden" name="action" value="wookb_delete_all" />
 		<input type="hidden" name="status" value="<?php echo isset( $_GET['status'] ) ? esc_attr( wp_unslash( $_GET['status'] ) ) : ''; // phpcs:ignore ?>" />
 		<input type="hidden" name="lang" value="<?php echo isset( $_GET['lang'] ) ? esc_attr( wp_unslash( $_GET['lang'] ) ) : ''; // phpcs:ignore ?>" />
 		<input type="hidden" name="s" value="<?php echo isset( $_GET['s'] ) ? esc_attr( wp_unslash( $_GET['s'] ) ) : ''; // phpcs:ignore ?>" />
 		<?php wp_nonce_field( 'wookb_delete_all' ); ?>
-		<button class="button button-link-delete"><?php esc_html_e( 'Borrar todos', 'woo-kb-generator' ); ?></button>
+		<button class="button button-link-delete"><?php esc_html_e( 'Borrar todos', 'ai-knowledge' ); ?></button>
 	</form>
 
 	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wookb-toolbar-form" id="wookb-reset-queue-form">
 		<input type="hidden" name="action" value="wookb_reset_queue" />
 		<?php wp_nonce_field( 'wookb_reset_queue' ); ?>
-		<button class="button"><?php esc_html_e( 'Reiniciar cola', 'woo-kb-generator' ); ?></button>
+		<button class="button"><?php esc_html_e( 'Reiniciar cola', 'ai-knowledge' ); ?></button>
 	</form>
 </div>
 
 <hr />
-<h2><?php esc_html_e( 'Generar por ID o URL', 'woo-kb-generator' ); ?></h2>
+<h2><?php esc_html_e( 'Generar por ID o URL', 'ai-knowledge' ); ?></h2>
 <p class="description">
-	<?php esc_html_e( 'Para un producto/página que ya no tiene fila en el Registro (por ejemplo, tras borrarlo aquí): genera de nuevo, en todos los idiomas activos, de forma inmediata y sin esperar al cron.', 'woo-kb-generator' ); ?>
+	<?php esc_html_e( 'Para un producto/página que ya no tiene fila en el Registro (por ejemplo, tras borrarlo aquí): genera de nuevo, en todos los idiomas activos, de forma inmediata y sin esperar al cron.', 'ai-knowledge' ); ?>
 </p>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 	<input type="hidden" name="action" value="wookb_force_generate" />
 	<?php wp_nonce_field( 'wookb_force_generate' ); ?>
-	<input type="text" name="force_id_or_url" placeholder="<?php esc_attr_e( 'ID del producto/página, o su URL', 'woo-kb-generator' ); ?>" style="width:320px" />
-	<?php submit_button( __( 'Generar ahora', 'woo-kb-generator' ), 'secondary', '', false ); ?>
+	<input type="text" name="force_id_or_url" placeholder="<?php esc_attr_e( 'ID del producto/página, o su URL', 'ai-knowledge' ); ?>" style="width:320px" />
+	<?php submit_button( __( 'Generar ahora', 'ai-knowledge' ), 'secondary', '', false ); ?>
 </form>
 <hr />
 <!--

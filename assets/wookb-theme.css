@@ -400,3 +400,31 @@
   border-color: var(--tblr-primary, #206bc4);
   color: #fff;
 }
+
+/* Fase 1 -- control manual de documentos: badges pequeños reusando los
+   mismos colores solidos + texto blanco que ya usan los .notice de arriba
+   (warning para "desactualizado", igual en claro/oscuro porque las
+   variables de Tabler cambian solas). Sin badge nuevo para "auto"/"manual":
+   se diferencian por texto plano, mismo criterio que la columna Estado. */
+.wookb-wrap .wookb-badge-stale,
+.wookb-wrap .wookb-badge-manual,
+.wookb-wrap .wookb-badge-auto {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-right: 6px;
+}
+.wookb-wrap .wookb-badge-stale {
+  background: var(--tblr-warning, #f76707);
+  color: #fff;
+}
+.wookb-wrap .wookb-badge-manual {
+  background: var(--tblr-primary, #206bc4);
+  color: #fff;
+}
+.wookb-wrap .wookb-badge-auto {
+  background: var(--tblr-secondary-bg, #e5e7eb);
+  color: var(--tblr-body-color);
+}

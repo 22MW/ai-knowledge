@@ -1,12 +1,12 @@
 <?php
 /**
- * Plugin Name: WOO Knowledge Base Generator
+ * Plugin Name: AI Knowledge & Visibility
  * Plugin URI: https://22mw.online/
  * Description: Genera documentos de base de conocimiento (.md + posts sgkb-docs de Support Genix) a partir de productos WooCommerce u otros CPTs, con cola, límite diario, WPML y publicación pública GEO vía llms.txt.
- * Version: 1.0.7
+ * Version: 1.0.8
  * Author: 22MW
  * Author URI: https://22mw.online/
- * Text Domain: woo-kb-generator
+ * Text Domain: ai-knowledge
  * Requires PHP: 7.4
  *
  * Dependencias: ninguna dura. WooCommerce, Support Genix y WPML se detectan en runtime.
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WOOKB_VERSION', '1.0.7' );
+define( 'WOOKB_VERSION', '1.0.8' );
 define( 'WOOKB_FILE', __FILE__ );
 define( 'WOOKB_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WOOKB_URL', plugin_dir_url( __FILE__ ) );

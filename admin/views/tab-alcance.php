@@ -12,10 +12,10 @@ $public_post_types = get_post_types( array( 'public' => true ), 'objects' );
 	<input type="hidden" name="action" value="wookb_save_scope" />
 	<?php wp_nonce_field( 'wookb_save_scope' ); ?>
 
-	<h2><?php esc_html_e( 'Tipos de contenido a incluir', 'woo-kb-generator' ); ?></h2>
+	<h2><?php esc_html_e( 'Tipos de contenido a incluir', 'ai-knowledge' ); ?></h2>
 	<table class="form-table">
 		<tr>
-			<th><?php esc_html_e( 'CPTs', 'woo-kb-generator' ); ?></th>
+			<th><?php esc_html_e( 'CPTs', 'ai-knowledge' ); ?></th>
 			<td>
 				<div class="wookb-chip-group">
 				<?php foreach ( $public_post_types as $pt ) : ?>
@@ -30,7 +30,7 @@ $public_post_types = get_post_types( array( 'public' => true ), 'objects' );
 			</td>
 		</tr>
 		<tr>
-			<th><?php esc_html_e( 'Taxonomías / términos', 'woo-kb-generator' ); ?></th>
+			<th><?php esc_html_e( 'Taxonomías / términos', 'ai-knowledge' ); ?></th>
 			<td>
 				<?php foreach ( (array) $settings['post_types'] as $pt ) : ?>
 					<?php foreach ( get_object_taxonomies( $pt, 'objects' ) as $tax ) : ?>
@@ -49,23 +49,23 @@ $public_post_types = get_post_types( array( 'public' => true ), 'objects' );
 							<?php endforeach; ?>
 							</div>
 							<?php if ( ! $terms ) : ?>
-								<p class="description"><?php esc_html_e( 'Sin términos.', 'woo-kb-generator' ); ?></p>
+								<p class="description"><?php esc_html_e( 'Sin términos.', 'ai-knowledge' ); ?></p>
 							<?php endif; ?>
 						</div>
-						<p class="description"><?php esc_html_e( 'Nada marcado = todos los términos.', 'woo-kb-generator' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Nada marcado = todos los términos.', 'ai-knowledge' ); ?></p>
 					<?php endforeach; ?>
 				<?php endforeach; ?>
 			</td>
 		</tr>
 		<tr>
-			<th><?php esc_html_e( 'IDs sueltos adicionales', 'woo-kb-generator' ); ?></th>
+			<th><?php esc_html_e( 'IDs sueltos adicionales', 'ai-knowledge' ); ?></th>
 			<td>
 				<input type="text" name="extra_ids" class="regular-text" value="<?php echo esc_attr( implode( ',', (array) $settings['extra_ids'] ) ); ?>" placeholder="123,456" />
-				<p class="description"><?php esc_html_e( 'IDs separados por comas, independiente de CPT/taxonomía.', 'woo-kb-generator' ); ?></p>
+				<p class="description"><?php esc_html_e( 'IDs separados por comas, independiente de CPT/taxonomía.', 'ai-knowledge' ); ?></p>
 			</td>
 		</tr>
 		<tr>
-			<th><?php esc_html_e( 'Campos custom a incluir por CPT', 'woo-kb-generator' ); ?></th>
+			<th><?php esc_html_e( 'Campos custom a incluir por CPT', 'ai-knowledge' ); ?></th>
 			<td>
 				<?php foreach ( (array) $settings['post_types'] as $pt ) : ?>
 					<p><strong><?php echo esc_html( $pt ); ?></strong></p>
@@ -86,11 +86,11 @@ $public_post_types = get_post_types( array( 'public' => true ), 'objects' );
 					<?php endforeach; ?>
 					</div>
 					<?php if ( ! $keys ) : ?>
-						<p class="description"><?php esc_html_e( 'No se detectaron campos custom en los productos analizados.', 'woo-kb-generator' ); ?></p>
+						<p class="description"><?php esc_html_e( 'No se detectaron campos custom en los productos analizados.', 'ai-knowledge' ); ?></p>
 					<?php endif; ?>
 				<?php endforeach; ?>
 			</td>
 		</tr>
 	</table>
-	<?php submit_button( __( 'Guardar alcance', 'woo-kb-generator' ) ); ?>
+	<?php submit_button( __( 'Guardar alcance', 'ai-knowledge' ) ); ?>
 </form>

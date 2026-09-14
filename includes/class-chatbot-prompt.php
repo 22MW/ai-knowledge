@@ -68,11 +68,11 @@ class Chatbot_Prompt {
 	public static function sync( $force = false ) {
 		$content = self::read();
 		if ( '' === $content ) {
-			return array( 'status' => 'empty', 'message' => __( 'chatbot-system-prompt.md está vacío o no existe.', 'woo-kb-generator' ) );
+			return array( 'status' => 'empty', 'message' => __( 'chatbot-system-prompt.md está vacío o no existe.', 'ai-knowledge' ) );
 		}
 
 		if ( ! self::is_genix_ready() ) {
-			return array( 'status' => 'unavailable', 'message' => __( 'Support Genix no está activo o su módulo de Knowledge Base aún no se ha cargado.', 'woo-kb-generator' ) );
+			return array( 'status' => 'unavailable', 'message' => __( 'Support Genix no está activo o su módulo de Knowledge Base aún no se ha cargado.', 'ai-knowledge' ) );
 		}
 
 		$hash = md5( $content );
@@ -84,18 +84,18 @@ class Chatbot_Prompt {
 		// Si el ajuste de Genix ya coincide y no hay force, no hacer nada (evita
 		// escrituras de opcion en cada carga de admin_init).
 		if ( ! $force && $hash === $synced_hash && $current_genix_value === $content ) {
-			return array( 'status' => 'skipped', 'message' => __( 'Ya estaba sincronizado.', 'woo-kb-generator' ) );
+			return array( 'status' => 'skipped', 'message' => __( 'Ya estaba sincronizado.', 'ai-knowledge' ) );
 		}
 
 		$ok = $instance->AddOption( self::GENIX_OPTION, $content );
 
 		if ( false === $ok ) {
-			return array( 'status' => 'error', 'message' => __( 'Genix rechazó guardar la opción (AddOption devolvió false).', 'woo-kb-generator' ) );
+			return array( 'status' => 'error', 'message' => __( 'Genix rechazó guardar la opción (AddOption devolvió false).', 'ai-knowledge' ) );
 		}
 
 		update_option( self::SYNCED_HASH_OPTION, $hash, false );
 
-		return array( 'status' => 'synced', 'message' => __( 'Prompt sincronizado con Support Genix.', 'woo-kb-generator' ) );
+		return array( 'status' => 'synced', 'message' => __( 'Prompt sincronizado con Support Genix.', 'ai-knowledge' ) );
 	}
 
 	/**

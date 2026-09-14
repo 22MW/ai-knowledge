@@ -13,11 +13,11 @@ class Registry_Table extends \WP_List_Table {
 
 	public static function status_label( $status ) {
 		$labels = array(
-			'queued'     => __( 'En cola', 'woo-kb-generator' ),
-			'generating' => __( 'Generando', 'woo-kb-generator' ),
-			'synced'     => __( 'Listo', 'woo-kb-generator' ),
-			'error'      => __( 'Error', 'woo-kb-generator' ),
-			'orphan'     => __( 'Sin origen', 'woo-kb-generator' ),
+			'queued'     => __( 'En cola', 'ai-knowledge' ),
+			'generating' => __( 'Generando', 'ai-knowledge' ),
+			'synced'     => __( 'Listo', 'ai-knowledge' ),
+			'error'      => __( 'Error', 'ai-knowledge' ),
+			'orphan'     => __( 'Sin origen', 'ai-knowledge' ),
 		);
 		return isset( $labels[ $status ] ) ? $labels[ $status ] : $status;
 	}
@@ -35,14 +35,15 @@ class Registry_Table extends \WP_List_Table {
 	public function get_columns() {
 		return array(
 			'cb'     => '<input type="checkbox" />',
-			'source' => __( 'Origen', 'woo-kb-generator' ),
-			'lang'   => __( 'Idioma', 'woo-kb-generator' ),
-			'status' => __( 'Estado', 'woo-kb-generator' ),
-			'bridge' => __( 'Puente', 'woo-kb-generator' ),
-			'hash'   => __( 'Hash', 'woo-kb-generator' ),
-			'updated' => __( 'Actualizado', 'woo-kb-generator' ),
-			'links'  => __( 'Enlaces', 'woo-kb-generator' ),
-			'actions' => __( 'Acciones', 'woo-kb-generator' ),
+			'source' => __( 'Origen', 'ai-knowledge' ),
+			'lang'   => __( 'Idioma', 'ai-knowledge' ),
+			'status' => __( 'Estado', 'ai-knowledge' ),
+			'bridge' => __( 'Puente', 'ai-knowledge' ),
+			'hash'   => __( 'Hash', 'ai-knowledge' ),
+			'updated' => __( 'Actualizado', 'ai-knowledge' ),
+			'links'  => __( 'Enlaces', 'ai-knowledge' ),
+			'manual' => __( 'Control manual', 'ai-knowledge' ),
+			'actions' => __( 'Acciones', 'ai-knowledge' ),
 		);
 	}
 
@@ -52,19 +53,21 @@ class Registry_Table extends \WP_List_Table {
 
 		$status = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : ''; // phpcs:ignore
 		$lang   = isset( $_GET['lang'] ) ? sanitize_key( wp_unslash( $_GET['lang'] ) ) : ''; // phpcs:ignore
+		$stale  = isset( $_GET['stale'] ) && '' !== $_GET['stale'] ? (int) $_GET['stale'] : ''; // phpcs:ignore
 		// 's' es el nombre de parametro nativo que usa WP_List_Table::search_box().
 		$search = isset( $_REQUEST['s'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['s'] ) ) : ''; // phpcs:ignore
 
 		$args = array(
 			'status' => $status,
 			'lang'   => $lang,
+			'stale'  => $stale,
 			'search' => $search,
 			'limit'  => $per_page,
 			'offset' => ( $current_page - 1 ) * $per_page,
 		);
 
 		$this->items = Registry::query( $args );
-		$total       = Registry::count( array( 'status' => $status, 'lang' => $lang, 'search' => $search ) );
+		$total       = Registry::count( array( 'status' => $status, 'lang' => $lang, 'stale' => $stale, 'search' => $search ) );
 
 		$this->set_pagination_args(
 			array(
@@ -92,8 +95,8 @@ class Registry_Table extends \WP_List_Table {
 	 */
 	public function get_bulk_actions() {
 		return array(
-			'delete'     => __( 'Borrar seleccionados', 'woo-kb-generator' ),
-			'regenerate' => __( 'Regenerar seleccionados', 'woo-kb-generator' ),
+			'delete'     => __( 'Borrar seleccionados', 'ai-knowledge' ),
+			'regenerate' => __( 'Regenerar seleccionados', 'ai-knowledge' ),
 		);
 	}
 
@@ -121,7 +124,7 @@ class Registry_Table extends \WP_List_Table {
 				// usuario (mismo aspecto que la columna Idioma).
 				return esc_html( self::status_label( $item->status ) );
 			case 'bridge':
-				return $item->is_bridge ? esc_html__( 'Sí', 'woo-kb-generator' ) : '—';
+				return $item->is_bridge ? esc_html__( 'Sí', 'ai-knowledge' ) : '—';
 			case 'hash':
 				return esc_html( substr( $item->source_hash, 0, 8 ) );
 			case 'updated':
@@ -138,6 +141,8 @@ class Registry_Table extends \WP_List_Table {
 					}
 				}
 				return implode( ' · ', $out );
+			case 'manual':
+				return $this->manual_control_markup( $item );
 			case 'actions':
 				return $this->row_actions_markup( $item );
 			default:
@@ -165,6 +170,98 @@ class Registry_Table extends \WP_List_Table {
 		return implode( '', $this->out_of_band_forms );
 	}
 
+	/**
+	 * Fase 1: control manual por fila -- textarea con el Markdown actual
+	 * (override_text si ya esta en modo manual, si no el .md real via
+	 * Markdown_Store), limite de caracteres propio, y los botones Pasar a
+	 * manual / Volver a Auto / Marcar revisado. Colapsado en <details> para no
+	 * romper el ancho de la tabla existente.
+	 */
+	protected function manual_control_markup( $item ) {
+		$is_manual = 'manual' === $item->override_mode;
+
+		if ( $is_manual && null !== $item->override_text && '' !== $item->override_text ) {
+			$current_text = $item->override_text;
+		} else {
+			$raw          = $item->md_path ? Markdown_Store::read( $item->md_path ) : null;
+			$current_text = $raw ? Markdown_Store::body_only( $raw ) : '';
+		}
+
+		$set_manual_form_id = 'wookb-set-manual-' . (int) $item->id;
+		$char_limit_form_id = 'wookb-char-limit-' . (int) $item->id;
+		$back_auto_form_id  = 'wookb-back-auto-' . (int) $item->id;
+		$resolve_form_id    = 'wookb-resolve-stale-' . (int) $item->id;
+
+		ob_start();
+		?>
+		<form id="<?php echo esc_attr( $set_manual_form_id ); ?>" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:none">
+			<input type="hidden" name="action" value="wookb_set_manual" />
+			<input type="hidden" name="row_id" value="<?php echo esc_attr( $item->id ); ?>" />
+			<?php wp_nonce_field( 'wookb_set_manual' ); ?>
+		</form>
+		<form id="<?php echo esc_attr( $char_limit_form_id ); ?>" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:none">
+			<input type="hidden" name="action" value="wookb_set_char_limit" />
+			<input type="hidden" name="row_id" value="<?php echo esc_attr( $item->id ); ?>" />
+			<?php wp_nonce_field( 'wookb_set_char_limit' ); ?>
+		</form>
+		<form id="<?php echo esc_attr( $back_auto_form_id ); ?>" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:none" onsubmit="return confirm('<?php echo esc_js( __( 'Vuelve a modo automatico y regenera este documento con IA ahora mismo. ¿Continuar?', 'ai-knowledge' ) ); ?>');">
+			<input type="hidden" name="action" value="wookb_back_to_auto" />
+			<input type="hidden" name="row_id" value="<?php echo esc_attr( $item->id ); ?>" />
+			<?php wp_nonce_field( 'wookb_back_to_auto' ); ?>
+		</form>
+		<form id="<?php echo esc_attr( $resolve_form_id ); ?>" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:none">
+			<input type="hidden" name="action" value="wookb_resolve_stale" />
+			<input type="hidden" name="row_id" value="<?php echo esc_attr( $item->id ); ?>" />
+			<?php wp_nonce_field( 'wookb_resolve_stale' ); ?>
+		</form>
+		<?php
+		$this->out_of_band_forms[] = ob_get_clean();
+
+		ob_start();
+		?>
+		<div>
+			<?php if ( $is_manual ) : ?>
+				<span class="wookb-badge-manual"><?php esc_html_e( 'Manual', 'ai-knowledge' ); ?></span>
+			<?php else : ?>
+				<span class="wookb-badge-auto"><?php esc_html_e( 'Auto', 'ai-knowledge' ); ?></span>
+			<?php endif; ?>
+			<?php if ( ! empty( $item->stale ) ) : ?>
+				<span class="wookb-badge-stale"><?php esc_html_e( 'Origen actualizado', 'ai-knowledge' ); ?></span>
+				<button type="submit" form="<?php echo esc_attr( $resolve_form_id ); ?>" class="button button-small"><?php esc_html_e( 'Marcar revisado', 'ai-knowledge' ); ?></button>
+			<?php endif; ?>
+		</div>
+		<details>
+			<summary><?php esc_html_e( 'Ver/editar Markdown', 'ai-knowledge' ); ?></summary>
+			<textarea form="<?php echo esc_attr( $set_manual_form_id ); ?>" name="override_text" rows="6" style="width:100%;"><?php echo esc_textarea( $current_text ); ?></textarea>
+			<p>
+				<label>
+					<?php esc_html_e( 'Límite de caracteres', 'ai-knowledge' ); ?>
+					<input
+						type="number"
+						form="<?php echo esc_attr( $char_limit_form_id ); ?>"
+						name="char_limit"
+						min="100"
+						max="10000"
+						step="50"
+						value="<?php echo esc_attr( $item->char_limit ? $item->char_limit : '' ); ?>"
+						placeholder="<?php echo esc_attr( Generator::BODY_CHAR_LIMIT ); ?>"
+						style="width:6em"
+					/>
+				</label>
+				<button type="submit" form="<?php echo esc_attr( $char_limit_form_id ); ?>" class="button button-small"><?php esc_html_e( 'Guardar límite', 'ai-knowledge' ); ?></button>
+			</p>
+			<p>
+				<?php if ( $is_manual ) : ?>
+					<button type="submit" form="<?php echo esc_attr( $back_auto_form_id ); ?>" class="button button-small"><?php esc_html_e( 'Volver a Auto', 'ai-knowledge' ); ?></button>
+				<?php else : ?>
+					<button type="submit" form="<?php echo esc_attr( $set_manual_form_id ); ?>" class="button button-small"><?php esc_html_e( 'Pasar a manual', 'ai-knowledge' ); ?></button>
+				<?php endif; ?>
+			</p>
+		</details>
+		<?php
+		return ob_get_clean();
+	}
+
 	protected function row_actions_markup( $item ) {
 		$regen_form_id   = 'wookb-regen-' . (int) $item->id;
 		$delete_form_id  = 'wookb-delete-' . (int) $item->id;
@@ -176,7 +273,7 @@ class Registry_Table extends \WP_List_Table {
 			<input type="hidden" name="row_id" value="<?php echo esc_attr( $item->id ); ?>" />
 			<?php wp_nonce_field( 'wookb_regenerate_single' ); ?>
 		</form>
-		<form id="<?php echo esc_attr( $delete_form_id ); ?>" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:none" onsubmit="return confirm('<?php echo esc_js( __( '¿Borrar documento y post asociado?', 'woo-kb-generator' ) ); ?>');">
+		<form id="<?php echo esc_attr( $delete_form_id ); ?>" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:none" onsubmit="return confirm('<?php echo esc_js( __( '¿Borrar documento y post asociado?', 'ai-knowledge' ) ); ?>');">
 			<input type="hidden" name="action" value="wookb_row_action" />
 			<input type="hidden" name="row_id" value="<?php echo esc_attr( $item->id ); ?>" />
 			<input type="hidden" name="row_op" value="delete" />
@@ -188,7 +285,7 @@ class Registry_Table extends \WP_List_Table {
 		ob_start();
 		?>
 		<label>
-			<span class="screen-reader-text"><?php esc_html_e( 'Límite de caracteres', 'woo-kb-generator' ); ?></span>
+			<span class="screen-reader-text"><?php esc_html_e( 'Límite de caracteres', 'ai-knowledge' ); ?></span>
 			<input
 				type="number"
 				name="char_limit"
@@ -199,11 +296,11 @@ class Registry_Table extends \WP_List_Table {
 				value="<?php echo esc_attr( Generator::BODY_CHAR_LIMIT ); ?>"
 				placeholder="<?php echo esc_attr( Generator::BODY_CHAR_LIMIT ); ?>"
 				style="width:5.5em"
-				title="<?php esc_attr_e( 'Límite de caracteres para esta generación (uso único, no se guarda)', 'woo-kb-generator' ); ?>"
+				title="<?php esc_attr_e( 'Límite de caracteres para esta generación (uso único, no se guarda)', 'ai-knowledge' ); ?>"
 			/>
 		</label>
-		<button type="submit" form="<?php echo esc_attr( $regen_form_id ); ?>" class="button button-small"><?php esc_html_e( 'Generar', 'woo-kb-generator' ); ?></button>
-		<button type="submit" form="<?php echo esc_attr( $delete_form_id ); ?>" class="button button-small button-link-delete"><?php esc_html_e( 'Borrar', 'woo-kb-generator' ); ?></button>
+		<button type="submit" form="<?php echo esc_attr( $regen_form_id ); ?>" class="button button-small"><?php esc_html_e( 'Generar', 'ai-knowledge' ); ?></button>
+		<button type="submit" form="<?php echo esc_attr( $delete_form_id ); ?>" class="button button-small button-link-delete"><?php esc_html_e( 'Borrar', 'ai-knowledge' ); ?></button>
 		<?php
 		return ob_get_clean();
 	}

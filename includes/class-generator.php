@@ -59,7 +59,7 @@ class Generator {
 	public static function generate( array $data, array $links = array(), $char_limit = null ) {
 		$config = self::ai_config();
 		if ( ! $config ) {
-			return new \WP_Error( 'wookb_no_ai_key', __( 'No hay clave de IA configurada (ni Genix ni propia).', 'woo-kb-generator' ) );
+			return new \WP_Error( 'wookb_no_ai_key', __( 'No hay clave de IA configurada (ni Genix ni propia).', 'ai-knowledge' ) );
 		}
 
 		$char_limit = self::resolve_char_limit( $char_limit );
@@ -231,7 +231,7 @@ class Generator {
 
 		$content = isset( $json['choices'][0]['message']['content'] ) ? $json['choices'][0]['message']['content'] : '';
 		if ( '' === trim( $content ) ) {
-			return new \WP_Error( 'wookb_openai_empty', __( 'Respuesta vacía de la IA.', 'woo-kb-generator' ) );
+			return new \WP_Error( 'wookb_openai_empty', __( 'Respuesta vacía de la IA.', 'ai-knowledge' ) );
 		}
 
 		return $content;

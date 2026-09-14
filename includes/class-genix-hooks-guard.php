@@ -75,7 +75,7 @@ class Genix_Hooks_Guard {
 		if ( ! empty( $result['error'] ) ) {
 			printf(
 				'<div class="notice notice-error is-dismissible"><p><strong>%1$s</strong> %2$s</p></div>',
-				esc_html__( 'WOO Knowledge Base Generator:', 'woo-kb-generator' ),
+				esc_html__( 'WOO Knowledge Base Generator:', 'ai-knowledge' ),
 				esc_html( $result['error'] )
 			);
 			return;
@@ -83,8 +83,8 @@ class Genix_Hooks_Guard {
 
 		printf(
 			'<div class="notice notice-success is-dismissible"><p><strong>%1$s</strong> %2$s</p></div>',
-			esc_html__( 'WOO Knowledge Base Generator:', 'woo-kb-generator' ),
-			esc_html__( 'Filtros del chatbot reinstalados correctamente en Support Genix.', 'woo-kb-generator' )
+			esc_html__( 'WOO Knowledge Base Generator:', 'ai-knowledge' ),
+			esc_html__( 'Filtros del chatbot reinstalados correctamente en Support Genix.', 'ai-knowledge' )
 		);
 	}
 
@@ -170,8 +170,8 @@ class Genix_Hooks_Guard {
 		);
 
 		$labels = array(
-			'lite' => __( 'Support Genix Lite', 'woo-kb-generator' ),
-			'pro'  => __( 'Support Genix Pro', 'woo-kb-generator' ),
+			'lite' => __( 'Support Genix Lite', 'ai-knowledge' ),
+			'pro'  => __( 'Support Genix Pro', 'ai-knowledge' ),
 		);
 		$affected_names = array();
 		foreach ( array_keys( $affected ) as $label ) {
@@ -180,14 +180,14 @@ class Genix_Hooks_Guard {
 
 		printf(
 			'<div class="notice notice-warning"><p><strong>%1$s</strong> %2$s</p><p><a href="%3$s" class="button button-primary">%4$s</a></p></div>',
-			esc_html__( 'WOO Knowledge Base Generator:', 'woo-kb-generator' ),
+			esc_html__( 'WOO Knowledge Base Generator:', 'ai-knowledge' ),
 			sprintf(
 				/* translators: %s: nombres de los plugins afectados (Support Genix Lite y/o Pro) */
-				esc_html__( '%s ha perdido los filtros que conectan nuestras mejoras del chatbot (probablemente por una actualización del plugin). El chatbot sigue funcionando, pero sin relevancia mejorada, idiomas no soportados, límite de documentos relacionados, ni el prompt personalizado del sitio.', 'woo-kb-generator' ),
+				esc_html__( '%s ha perdido los filtros que conectan nuestras mejoras del chatbot (probablemente por una actualización del plugin). El chatbot sigue funcionando, pero sin relevancia mejorada, idiomas no soportados, límite de documentos relacionados, ni el prompt personalizado del sitio.', 'ai-knowledge' ),
 				esc_html( implode( ' / ', $affected_names ) )
 			),
 			esc_url( $url ),
-			esc_html__( 'Reinstalar filtros ahora', 'woo-kb-generator' )
+			esc_html__( 'Reinstalar filtros ahora', 'ai-knowledge' )
 		);
 	}
 
@@ -204,7 +204,7 @@ class Genix_Hooks_Guard {
 	public static function reinstall() {
 		$paths = self::existing_trait_paths();
 		if ( empty( $paths ) ) {
-			return new \WP_Error( 'wookb_genix_missing', __( 'No se encuentra el archivo de Support Genix (ni Lite ni Pro).', 'woo-kb-generator' ) );
+			return new \WP_Error( 'wookb_genix_missing', __( 'No se encuentra el archivo de Support Genix (ni Lite ni Pro).', 'ai-knowledge' ) );
 		}
 
 		$results = array();
@@ -221,7 +221,7 @@ class Genix_Hooks_Guard {
 	 */
 	protected static function reinstall_single( $path ) {
 		if ( ! is_writable( $path ) ) {
-			return new \WP_Error( 'wookb_genix_not_writable', __( 'El archivo de Support Genix no tiene permisos de escritura.', 'woo-kb-generator' ) . ' (' . $path . ')' );
+			return new \WP_Error( 'wookb_genix_not_writable', __( 'El archivo de Support Genix no tiene permisos de escritura.', 'ai-knowledge' ) . ' (' . $path . ')' );
 		}
 
 		$content = file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
@@ -238,7 +238,7 @@ class Genix_Hooks_Guard {
 		if ( false === strpos( $content, self::FILTER_SEARCH_RESULTS ) ) {
 			$anchor = '$docs = $is_smalltalk ? [] : $this->search_chatbot_docs($query);';
 			if ( false === strpos( $content, $anchor ) ) {
-				return new \WP_Error( 'wookb_genix_anchor1_missing', __( 'No se encontró el punto de anclaje para el primer filtro (search-results). Genix pudo cambiar de estructura; revisar manualmente.', 'woo-kb-generator' ) . ' (' . $path . ')' );
+				return new \WP_Error( 'wookb_genix_anchor1_missing', __( 'No se encontró el punto de anclaje para el primer filtro (search-results). Genix pudo cambiar de estructura; revisar manualmente.', 'ai-knowledge' ) . ' (' . $path . ')' );
 			}
 			$content = str_replace(
 				$anchor,
@@ -251,7 +251,7 @@ class Genix_Hooks_Guard {
 		if ( false === strpos( $content, self::FILTER_DOCS_LIST ) ) {
 			$anchor = '$history->docs_list = $docs;';
 			if ( false === strpos( $content, $anchor ) ) {
-				return new \WP_Error( 'wookb_genix_anchor2_missing', __( 'No se encontró el punto de anclaje para el segundo filtro (docs-list). Genix pudo cambiar de estructura; revisar manualmente.', 'woo-kb-generator' ) . ' (' . $path . ')' );
+				return new \WP_Error( 'wookb_genix_anchor2_missing', __( 'No se encontró el punto de anclaje para el segundo filtro (docs-list). Genix pudo cambiar de estructura; revisar manualmente.', 'ai-knowledge' ) . ' (' . $path . ')' );
 			}
 			$content = str_replace(
 				$anchor,
@@ -264,7 +264,7 @@ class Genix_Hooks_Guard {
 		if ( false === strpos( $content, self::CUSTOM_INSTRUCTIONS_MARKER ) ) {
 			$anchor = '// Reasoning is switched off on every request. A model built to think can';
 			if ( false === strpos( $content, $anchor ) ) {
-				return new \WP_Error( 'wookb_genix_anchor3_missing', __( 'No se encontró el punto de anclaje para el tercer parche (custom-instructions). Genix pudo cambiar de estructura; revisar manualmente.', 'woo-kb-generator' ) . ' (' . $path . ')' );
+				return new \WP_Error( 'wookb_genix_anchor3_missing', __( 'No se encontró el punto de anclaje para el tercer parche (custom-instructions). Genix pudo cambiar de estructura; revisar manualmente.', 'ai-knowledge' ) . ' (' . $path . ')' );
 			}
 			// Mismo bloque que ya trae Pro de fabrica (mismas 5 lineas de texto,
 			// mismo nombre de variable temporal para no chocar con nada del
@@ -295,7 +295,7 @@ class Genix_Hooks_Guard {
 
 		$ok = file_put_contents( $path, $content ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_put_contents
 		if ( false === $ok ) {
-			return new \WP_Error( 'wookb_genix_write_failed', __( 'No se pudo escribir el archivo de Support Genix.', 'woo-kb-generator' ) . ' (' . $path . ')' );
+			return new \WP_Error( 'wookb_genix_write_failed', __( 'No se pudo escribir el archivo de Support Genix.', 'ai-knowledge' ) . ' (' . $path . ')' );
 		}
 
 		return array( 'status' => 'reinstalled', 'backup' => $backup_path );
@@ -325,7 +325,7 @@ class Genix_Hooks_Guard {
 			if ( false !== strpos( $output, 'Arrays are not allowed in class constants' ) ) {
 				return true;
 			}
-			return new \WP_Error( 'wookb_genix_syntax_error', __( 'La comprobación de sintaxis PHP falló tras insertar los filtros. No se ha escrito nada.', 'woo-kb-generator' ) . ' ' . $output );
+			return new \WP_Error( 'wookb_genix_syntax_error', __( 'La comprobación de sintaxis PHP falló tras insertar los filtros. No se ha escrito nada.', 'ai-knowledge' ) . ' ' . $output );
 		}
 
 		return true;
@@ -333,7 +333,7 @@ class Genix_Hooks_Guard {
 
 	public static function handle_reinstall() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'No autorizado.', 'woo-kb-generator' ) );
+			wp_die( esc_html__( 'No autorizado.', 'ai-knowledge' ) );
 		}
 		check_admin_referer( self::REINSTALL_ACTION );
 

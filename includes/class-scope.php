@@ -28,6 +28,12 @@ class Scope {
 			'own_model'        => 'gpt-4o-mini',
 			'extra_prompt'     => '',
 			'chatbot_docs_list_limit' => Chatbot_Relevance_Guard::DOCS_LIST_LIMIT_DEFAULT,
+			// Fase 1: post_types donde aparece el meta box "Base de conocimiento
+			// IA" en el editor. Null = no guardado todavia -> default real
+			// (todos los post_types publicos) resuelto en tiempo de uso por
+			// Editor_Metabox::allowed_post_types(), para que cubra tambien
+			// CPTs de terceros registrados despues de instalar el plugin.
+			'editor_button_post_types' => null,
 		);
 		$saved = get_option( 'wookb_settings', array() );
 		return wp_parse_args( $saved, $defaults );

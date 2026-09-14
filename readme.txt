@@ -1,4 +1,4 @@
-=== WOO Knowledge Base Generator ===
+=== AI Knowledge & Visibility ===
 Contributors: 22mw
 Tags: woocommerce, chatbot, ia, llms.txt, wpml, support genix
 Requires at least: 5.8
@@ -12,7 +12,7 @@ Genera automáticamente una base de conocimiento en Markdown a partir de tu cat�
 
 == Description ==
 
-**WOO Knowledge Base Generator** convierte tus productos, páginas y contenidos de WooCommerce en documentos de conocimiento estructurados, listos para dos usos:
+**AI Knowledge & Visibility** convierte tus productos, páginas y contenidos de WooCommerce en documentos de conocimiento estructurados, listos para dos usos:
 
 1. **Alimentar el chatbot de Support Genix** con información real y actualizada de tu tienda, en vez de depender de que el chatbot "adivine" o de mantener un prompt manual interminable.
 2. **Publicar `/llms.txt`**, el archivo estándar que los motores de búsqueda de IA (ChatGPT, Perplexity, Claude y similares) usan para entender de qué trata tu web — lo que hoy se conoce como optimización GEO (Generative Engine Optimization), el equivalente a SEO para inteligencias artificiales.
@@ -45,7 +45,7 @@ No hace falta configurar nada más para que `/llms.txt` empiece a publicarse: se
 
 = Conexión con Support Genix (opcional) =
 
-Si tienes instalado y activo el plugin Support Genix (Pro o Lite), WOO Knowledge Base Generator detecta su presencia automáticamente y:
+Si tienes instalado y activo el plugin Support Genix (Pro o Lite), AI Knowledge & Visibility detecta su presencia automáticamente y:
 
 * Crea/actualiza los documentos internos (`sgkb-docs`) que el chatbot usa como fuente de respuestas.
 * Ofrece, en la pestaña **Prompt**, un asistente para redactar y sincronizar el prompt de sistema del chatbot.

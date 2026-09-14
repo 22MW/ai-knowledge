@@ -44,13 +44,32 @@ class Document_Pipeline {
 			$is_bridge = true;
 			$data      = $extractor->extract( $source_id );
 			if ( ! $data ) {
-				return new \WP_Error( 'wookb_no_source', __( 'No se pudo extraer el origen.', 'woo-kb-generator' ) );
+				return new \WP_Error( 'wookb_no_source', __( 'No se pudo extraer el origen.', 'ai-knowledge' ) );
 			}
 		}
 
 		$hash = self::compute_hash( $data );
 
 		$existing = Registry::find( $translated_id ? $translated_id : $source_id, $lang );
+
+		// Modo manual (Fase 1): el texto lo fija el admin a mano, nunca se
+		// regenera con IA. Solo se comprueba si el origen cambio desde que se
+		// fijo el modo manual (marcando 'stale'), sin tocar override_text ni
+		// el .md ya escrito. Esta comprobacion es incondicional (no depende de
+		// $force): $force existe para el flujo automatico, no para saltarse el
+		// modo manual -- "Volver a Auto" cambia override_mode a 'auto' en BD
+		// ANTES de volver a llamar a process(), asi que ese caso no pasa por aqui.
+		if ( $existing && 'manual' === $existing->override_mode ) {
+			Registry::upsert(
+				array(
+					'source_id' => $existing->source_id,
+					'lang'      => $existing->lang,
+					'stale'     => ( $existing->source_hash === $hash ) ? 0 : 1,
+				)
+			);
+			return true;
+		}
+
 		if ( ! $force && $existing && $existing->source_hash === $hash && 'synced' === $existing->status ) {
 			// Nada cambió: no se llama a la IA (segunda capa de ahorro). $force
 			// salta esta comprobacion a proposito para regeneraciones manuales.
@@ -58,6 +77,13 @@ class Document_Pipeline {
 		}
 
 		$real_source_id = $translated_id ? $translated_id : $source_id;
+
+		// char_limit propio de la fila (Fase 1): si no se paso uno explicito
+		// para esta llamada, usa el guardado en la fila; si tampoco hay,
+		// Generator cae a BODY_CHAR_LIMIT (ver Generator::resolve_char_limit()).
+		if ( null === $char_limit && $existing && ! empty( $existing->char_limit ) ) {
+			$char_limit = (int) $existing->char_limit;
+		}
 
 		Registry::update_status(
 			$existing ? $existing->id : Registry::upsert(

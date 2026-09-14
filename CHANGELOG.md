@@ -2,6 +2,12 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [1.0.8] - 2026-09-15
+
+### Cambiado
+- Renombrado de identidad (Fase 0): nombre visible del plugin de "WOO Knowledge Base Generator" a **"AI Knowledge & Visibility"**, y Text Domain de `woo-kb-generator` a `ai-knowledge`. El slug interno de la página de admin (`page=woo-kb-generator`), las constantes `WOOKB_*` y el namespace `WOOKB\` se mantienen sin cambios (decisión explícita: no tocar identificadores internos sin necesidad).
+- Fase 1: control manual de documentos (modo manual con texto fijado a mano, límite de caracteres por documento, aviso de "origen actualizado") y botón "Añadir a la base de conocimiento" en el editor de cualquier post/CPT.
+
 ## [1.0.7] - 2026-08-22
 
 ### Añadido

@@ -38,7 +38,7 @@ class Genix_Bridge {
 	 */
 	public static function upsert_document( $existing_post_id, array $data, $markdown, $lang, $trid = null ) {
 		if ( ! self::is_available() ) {
-			return new \WP_Error( 'wookb_genix_unavailable', __( 'Support Genix no está activo o no expone sgkb-docs.', 'woo-kb-generator' ) );
+			return new \WP_Error( 'wookb_genix_unavailable', __( 'Support Genix no está activo o no expone sgkb-docs.', 'ai-knowledge' ) );
 		}
 
 		$html = self::markdown_to_html( $markdown );

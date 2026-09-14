@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $settings = Scope::settings();
 ?>
 <p class="description">
-	<?php esc_html_e( 'La exclusión actúa en el origen: un elemento excluido no genera .md, ni documento privado, ni entrada en llms.txt.', 'woo-kb-generator' ); ?>
+	<?php esc_html_e( 'La exclusión actúa en el origen: un elemento excluido no genera .md, ni documento privado, ni entrada en llms.txt.', 'ai-knowledge' ); ?>
 </p>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 	<input type="hidden" name="action" value="wookb_save_exclusions" />
@@ -16,13 +16,13 @@ $settings = Scope::settings();
 
 	<table class="form-table">
 		<tr>
-			<th><?php esc_html_e( 'IDs individuales excluidos', 'woo-kb-generator' ); ?></th>
+			<th><?php esc_html_e( 'IDs individuales excluidos', 'ai-knowledge' ); ?></th>
 			<td>
 				<input type="text" name="exclude_ids" class="regular-text" value="<?php echo esc_attr( implode( ',', (array) $settings['exclude_ids'] ) ); ?>" placeholder="789,1011" />
 			</td>
 		</tr>
 		<tr>
-			<th><?php esc_html_e( 'Taxonomías / términos excluidos', 'woo-kb-generator' ); ?></th>
+			<th><?php esc_html_e( 'Taxonomías / términos excluidos', 'ai-knowledge' ); ?></th>
 			<td>
 				<?php foreach ( (array) $settings['post_types'] as $pt ) : ?>
 					<?php foreach ( get_object_taxonomies( $pt, 'objects' ) as $tax ) : ?>
@@ -41,14 +41,14 @@ $settings = Scope::settings();
 							<?php endforeach; ?>
 							</div>
 							<?php if ( ! $terms ) : ?>
-								<p class="description"><?php esc_html_e( 'Sin términos.', 'woo-kb-generator' ); ?></p>
+								<p class="description"><?php esc_html_e( 'Sin términos.', 'ai-knowledge' ); ?></p>
 							<?php endif; ?>
 						</div>
-						<p class="description"><?php esc_html_e( 'Nada marcado = ningún término excluido.', 'woo-kb-generator' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Nada marcado = ningún término excluido.', 'ai-knowledge' ); ?></p>
 					<?php endforeach; ?>
 				<?php endforeach; ?>
 			</td>
 		</tr>
 	</table>
-	<?php submit_button( __( 'Guardar exclusiones', 'woo-kb-generator' ) ); ?>
+	<?php submit_button( __( 'Guardar exclusiones', 'ai-knowledge' ) ); ?>
 </form>
