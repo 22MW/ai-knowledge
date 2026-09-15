@@ -19,7 +19,7 @@ mantiene sin reescribir. Todas las fases se añaden encima o al lado.
 
 ---
 
-## Fase 0 — Identidad
+## Fase 0 — Identidad — HECHO
 
 **Qué hace:** el plugin pasa a llamarse AI Knowledge & Visibility.
 
@@ -31,7 +31,7 @@ mantiene sin reescribir. Todas las fases se añaden encima o al lado.
 
 ---
 
-## Fase 1 — Control manual de documentos + botón en el editor
+## Fase 1 — Control manual de documentos + botón en el editor — HECHO
 
 **Qué hace:** permite fijar a mano el texto de un documento (sin que se
 regenere solo), controlar el límite de caracteres por documento, avisar
@@ -66,7 +66,7 @@ columnas sin borrar datos).
 
 ---
 
-## Fase 2 — Pestaña propia "WooCommerce" (tienda, envíos, IVA, pagos)
+## Fase 2 — Pestaña propia "WooCommerce" (tienda, envíos, IVA, pagos) — HECHO (rediseño UX pendiente, ver qa-resultados)
 
 **Qué hace:** hoy la información de tienda (`Store_Info_Doc`) se genera con
 un solo botón perdido en Ajustes, sin ver qué detecta el plugin ni poder
@@ -107,7 +107,7 @@ WooCommerce, confirmar que aparecen en la vista previa del documento.
 
 ---
 
-## Fase 3 — JSON estructurado (sin IA)
+## Fase 3 — JSON estructurado (sin IA) — HECHO
 
 **Qué hace:** expone el contenido real de WordPress/WooCommerce en JSON, sin
 pasar por IA — dato tal cual existe, para que crawlers/agentes lo lean sin
@@ -121,7 +121,7 @@ procesar HTML.
 
 ---
 
-## Fase 4 — Markdown público con descubrimiento automático
+## Fase 4 — Markdown público con descubrimiento automático — HECHO
 
 **Qué hace:** el mismo `.md` que ya se genera para el chatbot se anuncia
 también a buscadores/agentes IA, con una ruta estable y un enlace en el
@@ -133,7 +133,7 @@ también a buscadores/agentes IA, con una ruta estable y un enlace en el
 
 ---
 
-## Fase 5 — JSON-LD (Schema.org)
+## Fase 5 — JSON-LD (Schema.org) — HECHO
 
 **Qué hace:** añade datos estructurados Schema.org por tipo de contenido,
 para que buscadores entiendan qué es cada página sin adivinarlo.
@@ -145,7 +145,7 @@ para que buscadores entiendan qué es cada página sin adivinarlo.
 
 ---
 
-## Fase 6 — Panel de visibilidad y diagnóstico
+## Fase 6 — Panel de visibilidad y diagnóstico — PENDIENTE
 
 **Qué hace:** una pestaña nueva en el admin ya existente que resume si el
 contenido está bien expuesto a IA/buscadores.
@@ -157,7 +157,7 @@ contenido está bien expuesto a IA/buscadores.
 
 ---
 
-## Fase 7 — API pública documentada
+## Fase 7 — API pública documentada — PENDIENTE
 
 **Qué hace:** describe la API de la Fase 2 para que un agente pueda
 descubrirla solo.
@@ -167,7 +167,7 @@ descubrirla solo.
 
 ---
 
-## Fase 8 — Aviso a buscadores en tiempo real (IndexNow)
+## Fase 8 — Aviso a buscadores en tiempo real (IndexNow) — PENDIENTE
 
 **Qué hace:** cuando se crea, actualiza o borra contenido del alcance, avisa
 a los buscadores compatibles con IndexNow en vez de esperar a que rastreen.
@@ -179,7 +179,7 @@ a los buscadores compatibles con IndexNow en vez de esperar a que rastreen.
 
 ---
 
-## Fase 9 — Feeds especializados
+## Fase 9 — Feeds especializados — PENDIENTE
 
 **Qué hace:** exporta el catálogo en formatos que ya esperan otras
 plataformas (comparadores, Google Merchant).
@@ -190,7 +190,7 @@ plataformas (comparadores, Google Merchant).
 
 ---
 
-## Fase 10 — Campos personalizados de ACF / Meta Box / Pods
+## Fase 10 — Campos personalizados de ACF / Meta Box / Pods — PENDIENTE
 
 **Qué hace:** además de `post_meta` plano (ya soportado hoy en
 `Scope::custom_fields_for()`), detecta campos definidos con esos plugins
@@ -202,7 +202,7 @@ para poder seleccionarlos igual que los nativos.
 
 ---
 
-## Fase 11 — Gestión de crawlers de IA
+## Fase 11 — Gestión de crawlers de IA — PENDIENTE
 
 **Qué hace:** distingue crawlers de búsqueda/retrieval (OpenAI, Claude,
 Perplexity, Google, Bing) de crawlers de entrenamiento, y deja ver/ajustar

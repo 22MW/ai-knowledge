@@ -33,8 +33,8 @@
   <main>
     <header>
       <h1>AI Knowledge & Visibility — Estado</h1>
-      <p class="muted">Última actualización: 2026-09-15 · antes "woo-kb-generator"</p>
-      <span class="badge warn">En desarrollo — QA en curso</span>
+      <p class="muted">Última actualización: 2026-09-16 · antes "woo-kb-generator"</p>
+      <span class="badge ok">Fases 0-5 hechas y probadas. CSS/UX del admin rediseñado y confirmado visualmente.</span>
     </header>
 
     <section class="grid">
@@ -51,7 +51,13 @@
           <tr><td><code>tests-qa-fase-0-a-5.md</code></td><td>La lista de pruebas en sí (checklist), con tus anotaciones al probar.</td></tr>
           <tr><td><code>estado-plugin-informe.md</code></td><td>Foto fija de auditoría del código original, de cuando se empezó. Ya no cambia.</td></tr>
           <tr><td><code>analisis-jet-geo.md</code></td><td>Ideas de un plugin competidor (JetGEO) que se pueden reutilizar, mapeadas a fases del roadmap.</td></tr>
+          <tr><td><code>guia-estilo-visual.html</code></td><td>Fuente de verdad visual: carga el CSS real del plugin, botones/colores/badges en claro y oscuro. Mirar antes de crear cualquier estilo nuevo.</td></tr>
         </table>
+      </article>
+
+      <article class="card wide">
+        <h2>Rediseño de CSS/UX del admin (2026-09-16)</h2>
+        <p>Tras varias rondas de feedback visual real, se fijó un sistema único: 6 variantes de botón con variables reales de Tabler (no colores inventados), sin bordes decorativos (solo color de fondo sólido), hover forzado con <code>!important</code> (WordPress core gana el empate si no se fuerza), y la tabla del Registro con el layout arreglado. Todo documentado como regla permanente en <code>decisiones.md</code>.</p>
       </article>
 
       <article class="card wide">
@@ -59,11 +65,11 @@
         <table>
           <tr><th>Fase</th><th>Qué es</th><th>Estado</th></tr>
           <tr><td>0</td><td>Identidad (renombrado a AI Knowledge & Visibility)</td><td><span class="badge ok">Hecho</span></td></tr>
-          <tr><td>1</td><td>Control manual de documentos + botón en editor</td><td><span class="badge warn">Hecho, con bugs de QA en curso de arreglo</span></td></tr>
-          <tr><td>2</td><td>Pestaña WooCommerce (tienda/envíos/IVA/pagos)</td><td><span class="badge warn">Hecho, pendiente rediseño UX pedido en QA</span></td></tr>
+          <tr><td>1</td><td>Control manual de documentos + botón en editor</td><td><span class="badge ok">Hecho. Bugs de QA arreglados (char_limit, tabla rota, margen)</span></td></tr>
+          <tr><td>2</td><td>Pestaña WooCommerce (tienda/envíos/IVA/pagos)</td><td><span class="badge warn">Hecho. Rediseño UX pedido (selección tipo checkbox) sin abordar</span></td></tr>
           <tr><td>3</td><td>API REST de contenido (JSON sin IA)</td><td><span class="badge ok">Hecho y probado (QA sin fallos)</span></td></tr>
-          <tr><td>4</td><td>Markdown público descubrible (<code>&lt;link rel="alternate"&gt;</code>)</td><td><span class="badge warn">Hecho, pendiente arreglo de descarga vs apertura del .md</span></td></tr>
-          <tr><td>5</td><td>JSON-LD (Schema.org)</td><td><span class="badge bad">Bug confirmado en arreglo: duplicado con el schema nativo de WooCommerce</span></td></tr>
+          <tr><td>4</td><td>Markdown público descubrible (<code>&lt;link rel="alternate"&gt;</code>)</td><td><span class="badge ok">Hecho. Descarga vs apertura arreglado (ruta virtual Markdown_Server)</span></td></tr>
+          <tr><td>5</td><td>JSON-LD (Schema.org)</td><td><span class="badge ok">Hecho. Duplicado con WooCommerce/RankMath/Yoast/AIOSEO resuelto</span></td></tr>
           <tr><td>6</td><td>Panel de visibilidad y diagnóstico</td><td><span class="badge warn">Pendiente</span></td></tr>
           <tr><td>7</td><td>API pública documentada (OpenAPI)</td><td><span class="badge warn">Pendiente</span></td></tr>
           <tr><td>8</td><td>Aviso a buscadores en tiempo real (IndexNow)</td><td><span class="badge warn">Pendiente</span></td></tr>
@@ -74,21 +80,17 @@
       </article>
 
       <article class="card">
-        <h2>Urgente (en curso ahora)</h2>
+        <h2>Urgente</h2>
         <ul>
-          <li>Arreglar JSON-LD duplicado con WooCommerce nativo (Fase 5).</li>
-          <li>Botón "Generar" de fila no refleja el límite de caracteres guardado.</li>
-          <li>Borde/zona negra visual tras el fix del salto de tema.</li>
+          <li>Ninguno abierto. Todos los bugs de la primera ronda de QA están arreglados y pusheados.</li>
         </ul>
       </article>
 
       <article class="card">
-        <h2>Pendiente de tu decisión</h2>
+        <h2>Pendiente de confirmar</h2>
         <ul>
-          <li>¿Confirmar repetición del botón del editor (Fase 1) con más detalle? (posible bug sin diagnosticar del todo)</li>
-          <li>¿Automatizar que <code>.md</code> se abra en vez de descargarse, o dejarlo manual?</li>
-          <li>¿Cambiar también el slug del menú (<code>page=woo-kb-generator</code>) a <code>ai-knowledge</code>?</li>
-          <li>¿Enlazar el catálogo de tienda desde archivos/categoría (Fase 4 ampliada)?</li>
+          <li>Verificar en el navegador que la tabla del Registro ya no se rompe (arreglo recién pusheado, sin confirmación visual todavía).</li>
+          <li>Confirmar si el botón del editor (Fase 1) daba feedback suficiente — quedó sin repetir la prueba con detalle.</li>
         </ul>
       </article>
 
@@ -113,7 +115,7 @@
 
       <article class="card wide">
         <h2>Próximo paso</h2>
-        <p>1. Cerrar los 3 bugs urgentes en curso. 2. Confirmar contigo las 4 decisiones pendientes. 3. Seguir con Fase 6 o abordar el rediseño de UX — a decidir cuál primero.</p>
+        <p>Verificar en el navegador el arreglo de la tabla del Registro. Después: Fase 6 (panel de diagnóstico) o rediseño de UX de WooCommerce/Carga inicial — a decidir cuál primero.</p>
       </article>
 
     </section>

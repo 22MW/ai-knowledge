@@ -216,7 +216,7 @@ class Registry_Table extends \WP_List_Table {
 			<?php endif; ?>
 			<?php if ( ! empty( $item->stale ) ) : ?>
 				<span class="wookb-badge-stale"><?php esc_html_e( 'Origen actualizado', 'ai-knowledge' ); ?></span>
-				<button type="submit" form="<?php echo esc_attr( $resolve_form_id ); ?>" class="button button-small"><?php esc_html_e( 'Marcar revisado', 'ai-knowledge' ); ?></button>
+				<button type="submit" form="<?php echo esc_attr( $resolve_form_id ); ?>" class="button button-small wookb-btn-success"><?php esc_html_e( 'Marcar revisado', 'ai-knowledge' ); ?></button>
 			<?php endif; ?>
 		</div>
 		<?php
@@ -274,7 +274,7 @@ class Registry_Table extends \WP_List_Table {
 		<details>
 			<summary><?php esc_html_e( 'Ver/editar Markdown', 'ai-knowledge' ); ?></summary>
 			<textarea form="<?php echo esc_attr( $set_manual_form_id ); ?>" name="override_text" rows="15" class="wookb-manual-textarea" style="width:100%;"><?php echo esc_textarea( $current_text ); ?></textarea>
-			<p>
+			<p class="wookb-manual-actions">
 				<label>
 					<?php esc_html_e( 'Límite de caracteres', 'ai-knowledge' ); ?>
 					<input
@@ -290,8 +290,6 @@ class Registry_Table extends \WP_List_Table {
 					/>
 				</label>
 				<button type="submit" form="<?php echo esc_attr( $char_limit_form_id ); ?>" class="button"><?php esc_html_e( 'Guardar límite', 'ai-knowledge' ); ?></button>
-			</p>
-			<p>
 				<?php if ( $is_manual ) : ?>
 					<button type="submit" form="<?php echo esc_attr( $back_auto_form_id ); ?>" class="button"><?php esc_html_e( 'Volver a Auto', 'ai-knowledge' ); ?></button>
 				<?php else : ?>
@@ -346,23 +344,24 @@ class Registry_Table extends \WP_List_Table {
 
 		ob_start();
 		?>
-		<label>
-			<span class="screen-reader-text"><?php esc_html_e( 'Límite de caracteres', 'ai-knowledge' ); ?></span>
-			<input
-				type="number"
-				name="char_limit"
-				form="<?php echo esc_attr( $regen_form_id ); ?>"
-				min="100"
-				max="10000"
-				step="50"
-				value="<?php echo esc_attr( $item->char_limit ? $item->char_limit : Generator::BODY_CHAR_LIMIT ); ?>"
-				placeholder="<?php echo esc_attr( Generator::BODY_CHAR_LIMIT ); ?>"
-				style="width:5.5em"
-				title="<?php esc_attr_e( 'Límite de caracteres para esta generación (uso único, no se guarda)', 'ai-knowledge' ); ?>"
-			/>
-		</label>
-		<button type="submit" form="<?php echo esc_attr( $regen_form_id ); ?>" class="button button-small"><?php esc_html_e( 'Generar', 'ai-knowledge' ); ?></button>
-		<button type="submit" form="<?php echo esc_attr( $delete_form_id ); ?>" class="button button-small button-link-delete"><?php esc_html_e( 'Borrar', 'ai-knowledge' ); ?></button>
+		<div class="wookb-row-actions-stack">
+			<label>
+				<span class="screen-reader-text"><?php esc_html_e( 'Límite de caracteres', 'ai-knowledge' ); ?></span>
+				<input
+					type="number"
+					name="char_limit"
+					form="<?php echo esc_attr( $regen_form_id ); ?>"
+					min="100"
+					max="10000"
+					step="50"
+					value="<?php echo esc_attr( $item->char_limit ? $item->char_limit : Generator::BODY_CHAR_LIMIT ); ?>"
+					placeholder="<?php echo esc_attr( Generator::BODY_CHAR_LIMIT ); ?>"
+					title="<?php esc_attr_e( 'Límite de caracteres para esta generación (uso único, no se guarda)', 'ai-knowledge' ); ?>"
+				/>
+			</label>
+			<button type="submit" form="<?php echo esc_attr( $regen_form_id ); ?>" class="button button-small"><?php esc_html_e( 'Generar', 'ai-knowledge' ); ?></button>
+			<button type="submit" form="<?php echo esc_attr( $delete_form_id ); ?>" class="button button-small button-link-delete"><?php esc_html_e( 'Borrar', 'ai-knowledge' ); ?></button>
+		</div>
 		<?php
 		return ob_get_clean();
 	}

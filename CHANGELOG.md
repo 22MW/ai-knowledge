@@ -2,11 +2,32 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
-## [1.0.8] - 2026-09-15
+## [1.0.8] - 2026-09-15/16
 
 Ver `_dev/roadmap.md` para el plan completo por fases y `_dev/decisiones.md`
 para el porqué de la identidad/alcance. Este plugin sigue orientado a IA +
 Support Genix como núcleo; todo lo de abajo es capa añadida encima.
+
+### Rediseño de CSS/admin (2026-09-16)
+
+- Sistema único de 6 variantes de botón (neutro, primario, peligro, éxito,
+  info), todas con variables reales de Tabler y mismo tamaño
+  (`padding: .5625rem 1rem; font-size: .875rem`, valor real de `.btn` de
+  Tabler). Cubre también la clase `delete` que genera `submit_button()` de
+  WordPress core, para no tener dos convenciones de "botón rojo".
+- Sin bordes decorativos en cajas/paneles/botones/chips — se diferencian
+  por color de fondo sólido. Bordes solo en campos de formulario y
+  separadores de fila de tabla (funcionales).
+- Hover/foco de botones con `filter: invert(1)` y `!important`: WordPress
+  core (`.wp-core-ui .button:hover`) empata en especificidad y puede ganar
+  si no se fuerza explícitamente.
+- Tabla del Registro: fila expandida "Ver/editar Markdown" ligada
+  visualmente a su fila (mismo fondo, sin línea divisoria entre ambas);
+  columna Acciones (límite/Generar/Borrar) apilada en vertical, mismo ancho.
+- Nuevo `_dev/guia-estilo-visual.html`: carga el CSS real del plugin
+  (`tabler.min.css` + `wookb-theme.css`), no una copia — única fuente de
+  verdad visual, en claro y oscuro. Regla permanente documentada en
+  `_dev/decisiones.md`: ningún color/estilo nuevo sin pasar antes por ahí.
 
 ### Cambiado
 - Renombrado de identidad (Fase 0): nombre visible del plugin de "WOO Knowledge Base Generator" a **"AI Knowledge & Visibility"**, y Text Domain de `woo-kb-generator` a `ai-knowledge`. El slug interno de la página de admin (`page=woo-kb-generator`), las constantes `WOOKB_*` y el namespace `WOOKB\` se mantienen sin cambios (decisión explícita: no tocar identificadores internos sin necesidad).

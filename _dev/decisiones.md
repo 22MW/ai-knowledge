@@ -36,3 +36,40 @@ ni el flujo de generación existente.
 
 (Sustituye la identidad aprobada antes: "AI Visibility for WordPress" /
 `ai-visibility`, que asumía el pivote a normalizador puro, descartado.)
+
+## 2026-09-16 — Diseño visual del admin (decisión permanente)
+
+Guía completa con ejemplos claro/oscuro en `_dev/guia-estilo-visual.html`.
+Antes de crear cualquier color/estilo nuevo en el plugin: mirar ahí primero,
+no inventar por pantalla.
+
+- **Sin bordes decorativos** en cajas, paneles, botones, chips. La jerarquía
+  visual se marca con color de fondo sólido + contraste de texto. Excepción:
+  campos de formulario y separadores de fila de tabla (bordes funcionales).
+- **Paleta de 6 variantes de botón**, mismo tamaño siempre
+  (`padding:6px 14px; font-size:14px`), solo cambia color de fondo/texto:
+  neutro, primario, peligro, éxito, aviso, info. Hover/foco: oscurecer el
+  propio fondo (`filter: brightness(0.92)`), nunca añadir un color ni un
+  contorno nuevo.
+- Motivo: tras varias rondas de ajustes puntuales de CSS sin una referencia
+  común, cada pantalla del plugin había terminado con su propio criterio de
+  color/tamaño (botones de distinto tamaño entre sí, colores inventados por
+  bloque). Se corrige fijando una única fuente de verdad visual.
+- **Regla permanente: ningún botón/color/estilo nuevo se inventa.** Se usa
+  siempre una variable real de Tabler (`--tblr-*`, ver `assets/tabler.min.css`)
+  y una de las 6 clases ya definidas en `assets/wookb-theme.css`
+  (`.button`, `.button-primary`, `.button-link-delete`/`.delete`,
+  `.wookb-btn-success`, `.wookb-btn-info`). No crear una clase de botón
+  nueva sin añadirla antes a `_dev/guia-estilo-visual.html` y a esta lista.
+- `_dev/guia-estilo-visual.html` carga el CSS real del plugin
+  (`tabler.min.css` + `wookb-theme.css`) con los mismos elementos HTML, no
+  una copia a mano — si algo se ve distinto ahí que en wp-admin de verdad,
+  es un bug de la guía, no una diferencia aceptable.
+- **Hover/foco de botones: siempre con `!important`.** WordPress core
+  (`.wp-core-ui .button:hover`) fuerza su propio `background`/`border-color`/
+  `color` con la misma especificidad que cualquier regla nuestra de 3
+  clases — en un empate de especificidad gana quien cargue después en el
+  DOM, y no es fiable asumir que siempre seamos nosotros. Motivo confirmado
+  por el usuario inspeccionando el navegador. Por eso el bloque de hover de
+  botones en `wookb-theme.css` usa `!important` a propósito (único sitio
+  del archivo donde se usa) — no quitarlo pensando que "no hace falta".

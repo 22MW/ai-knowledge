@@ -1,26 +1,26 @@
 /*
- * Skin Tabler para el admin de woo-kb-generator (Fase 1: solo aspecto, cero
- * cambios de funcionalidad). Todo bajo .wookb-wrap para no afectar al resto
- * de wp-admin: Tabler define sus variables de color via el selector generico
- * [data-bs-theme=dark]/[data-bs-theme=light], que se aplica sobre CUALQUIER
- * elemento con ese atributo -- lo ponemos en el propio div.wookb-wrap (no en
- * <html>/<body>), asi el modo oscuro/claro queda encapsulado a estas paginas.
+ * Skin Tabler para el admin de AI Knowledge & Visibility. Todo bajo
+ * .wookb-wrap para no afectar al resto de wp-admin. Guía de referencia
+ * visual (paleta de botones, regla de bordes, fondos): _dev/guia-estilo-visual.html
+ * -- antes de crear un color/estilo nuevo, mirar ahí primero.
+ *
+ * Regla de bordes del proyecto: nada de bordes como recurso decorativo en
+ * cajas/paneles/botones. La jerarquia se marca con color de fondo solido y
+ * contraste de texto. Excepcion: campos de formulario y separadores de fila
+ * de tabla (funcionales, no decorativos).
+ *
+ * Orden de este archivo: 1) Base y layout general. 2) Botones (paleta
+ * unica). 3) Badges y chips. 4) Notices. 5) Tabla del Registro. 6) Checkbox
+ * de seleccion. 7) Bloques especificos (WooCommerce, fila expandida manual).
  */
 
-/* Ya NO lleva la clase generica "wrap" de wp-admin (ver class-admin.php):
-   ese "wrap" es el selector que usa wp-admin/js/common.js (y otros plugins,
-   ej. WooCommerce/Newsletter) para localizar "el" contenedor de la pagina y
-   mover ahi sus propios avisos (admin_notices), colandose dentro de nuestra
-   caja con el tema oscuro aplicado. Quitando la clase, dejan de vernos como
-   destino. Se replica aqui el margen lateral que aportaba "wrap" (20px a la
-   derecha) para no perder el respiro visual frente al borde de la ventana. */
-/* Color de marca: Tabler trae su azul por defecto (--tblr-primary: #066fd1)
-   con varias variables derivadas (rgb, "lt" para fondos claros, fg para
-   texto sobre el color). Se sobreescriben todas aqui, en el mismo selector
-   que ya gana la cascada sobre las de Tabler (nuestra hoja se carga despues
-   -- ver class-admin.php), para que TODO lo que usa "primary" en toda la
-   pagina (botones, badges bg-primary-lt, chips, checkbox marcado, pestaña
-   activa) cambie de un solo sitio. */
+/* ==========================================================================
+   1. BASE Y LAYOUT GENERAL
+   ========================================================================== */
+
+/* Color de marca: se sobreescribe aqui, en el mismo selector que gana la
+   cascada sobre Tabler, para que TODO lo que usa "primary" en toda la
+   pagina cambie de un solo sitio. */
 .wookb-wrap {
   --tblr-primary: #007cab;
   --tblr-primary-rgb: 0, 124, 171;
@@ -29,18 +29,6 @@
   --tblr-primary-fg: #fff;
 }
 
-/* QA (bug B, preexistente desde el commit inicial -- confirmado con
-   `git log -p -- assets/wookb-theme.css`, no es regresion de la Fase 1):
-   el margen lateral (20px derecha, 2px izquierda) queda FUERA del area
-   donde se pinta "background", asi que en modo oscuro se veia una franja
-   sin colorear (fondo por defecto de wp-admin) flanqueando la caja
-   coloreada -- un "borde" de otro color. Se sustituye el margen lateral
-   por padding extra (mismo hueco visual exacto de antes: el contenido
-   interior queda exactamente igual de separado del borde de la ventana),
-   para que el "background" del propio .wookb-wrap cubra tambien esa zona.
-   El margen superior (1rem) se mantiene: separa de las pestañas/avisos de
-   arriba, que ya son zona sin tema por diseño (fuera de .wookb-wrap), no
-   parte de la caja coloreada. */
 .wookb-wrap {
   background: var(--tblr-body-bg);
   color: var(--tblr-body-color);
@@ -53,29 +41,25 @@
 .wookb-wrap h3 {
   color: var(--tblr-emphasis-color, inherit);
   font-weight: 600;
-  font-size: 1.75rem; /* el reset de Tabler deja los h1/h3 muy pequenos por defecto */
+  font-size: 1.75rem;
   margin: 0;
 }
 
-/* Fila de la barra de herramientas del Registro (filtros + borrar todos +
-   reiniciar cola): los 3 <form> van en línea con espacio entre ellos, sin
-   el salto de línea feo que daba display:inline-block suelto. */
 .wookb-toolbar-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: var(--tblr-spacer-2, 0.5rem);
   margin-bottom: 16px;
 }
 .wookb-toolbar-form {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--tblr-spacer-1, 0.25rem);
   flex-wrap: wrap;
   margin: 0;
 }
 
-/* Cabecera con resumen + boton de tema, en una fila */
 .wookb-header-row {
   display: flex;
   align-items: center;
@@ -87,49 +71,50 @@
 .wookb-theme-toggle {
   background: var(--tblr-secondary-bg, #e5e7eb);
   color: var(--tblr-body-color);
-  border: 1px solid var(--tblr-border-color, #d1d5db);
+  border: none;
   border-radius: 6px;
   padding: 6px 12px;
   cursor: pointer;
   font-size: 13px;
 }
+.wookb-theme-toggle:hover {
+  filter: invert(1);
+}
 
 .wookb-summary {
-  background: var(--tblr-card-bg, var(--tblr-secondary-bg, #fff));
-  border: 1px solid var(--tblr-border-color, #e5e7eb);
+  background: var(--tblr-secondary-bg, #f3f4f6);
   border-radius: 8px;
   padding: 10px 16px;
   margin: 12px 0 20px;
   font-size: 13px;
 }
 
-/* Pestañas -> estilo Tabler nav-tabs */
+/* Pestañas: activa marcada por fondo solido, no por linea inferior. */
 .wookb-wrap .nav-tab-wrapper {
-  border-bottom: 1px solid var(--tblr-border-color, #e5e7eb);
   padding-bottom: 0;
   margin-bottom: 1.25rem;
 }
 .wookb-wrap .nav-tab {
   background: transparent;
   border: none;
-  border-bottom: 2px solid transparent;
   color: var(--tblr-secondary-color, #6b7280);
-  padding: 10px 14px;
-  margin: 0 4px 0 0;
+  padding: 8px 14px;
+  margin: 0 4px 4px 0;
+  border-radius: 6px;
   font-weight: 500;
+}
+.wookb-wrap .nav-tab:hover {
+  background: var(--tblr-secondary-bg, #e5e7eb);
 }
 .wookb-wrap .nav-tab-active,
 .wookb-wrap .nav-tab-active:focus,
 .wookb-wrap .nav-tab-active:hover {
-  background: transparent;
-  border-bottom: 2px solid var(--tblr-primary, #206bc4);
-  color: var(--tblr-primary, #206bc4);
+  background: var(--tblr-primary, #206bc4);
+  color: #fff;
 }
 
-/* Envoltorio tipo "card" para el contenido de cada pestaña */
 .wookb-card {
   background: var(--tblr-card-bg, var(--tblr-body-bg));
-  border: 1px solid var(--tblr-border-color, #e5e7eb);
   border-radius: 8px;
   padding: 20px 24px;
   margin-bottom: 20px;
@@ -141,11 +126,11 @@
   color: var(--tblr-emphasis-color, inherit);
 }
 .wookb-card hr {
-  border-color: var(--tblr-border-color, #e5e7eb);
+  border: none;
+  border-top: 1px solid var(--tblr-border-color, #e5e7eb);
   margin: 20px 0;
 }
 
-/* Formularios: campos y tablas de opciones */
 .wookb-wrap .form-table th {
   width: 260px;
   color: var(--tblr-body-color);
@@ -169,44 +154,179 @@
   border-radius: 6px;
 }
 
-/* Botones nativos de WP -> aspecto boton Tabler, sin cambiar su markup */
+/* ==========================================================================
+   2. BOTONES -- paleta unica de 6 variantes (ver guia). Mismo tamaño
+   siempre; solo cambia color de fondo/texto. Hover/foco: oscurecer el
+   propio fondo, nunca un color ni un contorno añadido.
+   ========================================================================== */
+
+/* Tamaño real de .btn de Tabler (var(--tblr-btn-padding-y/x), no
+   inventado): 0.5625rem 1rem, font-size 0.875rem, line-height 1.25rem. */
 .wookb-wrap .button,
-.wookb-wrap .button-secondary {
-  background: var(--tblr-secondary-bg, #fff);
+.wookb-wrap .button-secondary,
+.wookb-wrap .button.button-small {
+  background: var(--tblr-secondary-bg, #e5e7eb);
   color: var(--tblr-body-color);
-  border: 1px solid var(--tblr-border-color, #d1d5db);
-  border-radius: 6px;
+  border: none;
+  border-radius: var(--tblr-border-radius, 6px);
+  padding: 0.5625rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
   box-shadow: none;
   text-shadow: none;
 }
+/* Primario: la accion principal del bloque. */
 .wookb-wrap .button-primary {
   background: var(--tblr-primary, #206bc4);
-  border-color: var(--tblr-primary, #206bc4);
   color: #fff;
+  border: none;
   box-shadow: none;
   text-shadow: none;
 }
-.wookb-wrap .button-link-delete {
-  color: var(--tblr-danger, #d63939);
+/* Peligro: destructivo (Borrar). Fondo solido fuerte, texto blanco -- nada
+   de texto de color sobre fondo transparente del mismo tono. ".delete" es
+   la clase que genera submit_button($text,'delete') de WP core -- misma
+   variante, mismo aspecto, para no tener dos convenciones distintas de
+   "boton rojo" en el plugin. */
+.wookb-wrap .button.button-link-delete,
+.wookb-wrap .button.delete {
+  background: var(--tblr-danger, #d63939);
+  color: #fff;
+}
+/* Exito: confirmar/resolver algo (Marcar revisado). --tblr-cyan (variable
+   real de Tabler, no color inventado): no verde puro (junto al rojo de
+   "peligro" quedaba mal) ni azul (se confundia con "info"). */
+.wookb-wrap .button.wookb-btn-success {
+  background: var(--tblr-cyan, #17a2b8);
+  color: #fff;
+}
+/* Info: enlaces/acciones secundarias no urgentes. */
+.wookb-wrap .button.wookb-btn-info {
+  background: var(--tblr-azure, #4299e1);
+  color: #fff;
+}
+/* Hover/foco de cualquier boton: oscurece su propio fondo, sin color ni
+   contorno añadido. WP core (.wp-core-ui .button:hover) fuerza su propio
+   background/border-color/color con la MISMA especificidad que cualquier
+   regla nuestra de 3 clases -- en un empate gana quien cargue despues, y
+   no es fiable asumir que siempre seamos nosotros. Se restablece cada
+   variante de forma explicita con !important: unico punto del archivo
+   donde se usa, a proposito, para no depender del orden de carga frente a
+   wp-core-ui. */
+.wookb-wrap .button:hover,
+.wookb-wrap .button:focus,
+.wookb-wrap .button:focus-visible {
+  background: var(--tblr-secondary-bg, #e5e7eb) !important;
+  color: var(--tblr-body-color) !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  filter: invert(1);
+}
+.wookb-wrap .button-primary:hover,
+.wookb-wrap .button-primary:focus {
+  background: var(--tblr-primary, #206bc4) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.wookb-wrap .button.button-link-delete:hover,
+.wookb-wrap .button.delete:hover {
+  background: var(--tblr-danger, #d63939) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.wookb-wrap .button.wookb-btn-success:hover {
+  background: var(--tblr-cyan, #17a2b8) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.wookb-wrap .button.wookb-btn-info:hover {
+  background: var(--tblr-azure, #4299e1) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
-/* Notices: en modo oscuro se veian invisibles -- el texto de WordPress core
-   es negro fijo (sin variable de tema) y quedaba negro sobre negro, solo se
-   distinguia la barra de color del borde izquierdo. Se fuerza el color de
-   texto y se quita el borde (pedido explicito: solo la caja con fondo, sin
-   linea lateral de color). */
+/* ==========================================================================
+   3. BADGES Y CHIPS
+   ========================================================================== */
+
+.wookb-wrap .wookb-badge-stale,
+.wookb-wrap .wookb-badge-manual,
+.wookb-wrap .wookb-badge-auto {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-right: 6px;
+}
+.wookb-wrap .wookb-badge-stale {
+  background: var(--tblr-warning, #f76707);
+  color: #000;
+}
+.wookb-wrap .wookb-badge-manual {
+  background: var(--tblr-primary, #206bc4);
+  color: #fff;
+}
+.wookb-wrap .wookb-badge-auto {
+  background: var(--tblr-secondary-bg, #e5e7eb);
+  color: var(--tblr-body-color);
+}
+
+/* Los badges de estado (columna "status") usan .badge + .bg-X-lt REALES de
+   Tabler directamente en el HTML -- Tabler ya los resuelve solo, sin CSS
+   propio aqui. */
+
+.wookb-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tblr-spacer-2, 0.5rem);
+}
+.wookb-wrap .wookb-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tblr-spacer-1, 0.25rem);
+  padding: 5px 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--tblr-secondary-bg, #e5e7eb);
+  color: var(--tblr-body-color);
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+.wookb-wrap .wookb-chip input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  pointer-events: none;
+}
+.wookb-wrap .wookb-chip:hover {
+  filter: invert(1);
+}
+.wookb-wrap .wookb-chip:has(input:checked) {
+  background: var(--tblr-primary, #206bc4);
+  color: #fff;
+}
+
+/* ==========================================================================
+   4. NOTICES
+   ========================================================================== */
+
 .wookb-wrap .notice {
   border-radius: 6px;
   border: none;
-  border-left: none;
 }
 .wookb-wrap .notice p {
   color: #fff;
 }
-/* Fondo solido por tipo (no depende de si --tblr-card-bg se acerca demasiado
-   al fondo de la pagina y "desaparece" el aviso): mismo criterio que los
-   badges de estado, color de marca solido + texto blanco, funciona igual en
-   claro y oscuro porque las variables de color de Tabler ya cambian solas. */
 .wookb-wrap .notice-success {
   background: #13b7f6;
 }
@@ -220,29 +340,22 @@
   background: var(--tblr-azure, #4299e1);
 }
 
-/* Tabla del Registro (WP_List_Table): SOLO CSS, sin tocar su HTML/JS -- ver
-   plan-tabler-admin.md, riesgo de romper bulk actions ya arregladas hoy. */
+/* ==========================================================================
+   5. TABLA DEL REGISTRO (WP_List_Table)
+   ========================================================================== */
+
 .wookb-wrap .wp-list-table {
   background: var(--tblr-card-bg, var(--tblr-body-bg));
-  border: 1px solid var(--tblr-border-color, #e5e7eb);
+  border: none;
   color: var(--tblr-body-color);
 }
 /* QA (bug A): WP_List_Table::get_table_classes() añade la clase "fixed" por
-   defecto (Registry_Table no la sobreescribe), y wp-admin/css/list-tables.css
-   pone table-layout:fixed para cualquier tabla ".fixed". En fixed layout el
-   ancho de cada columna sin "width" propio se decide SOLO por el contenido de
-   la fila de CABECERA -- nunca por el contenido real de las filas de datos.
-   Todas las columnas de ancho variable (Origen, Control manual, Enlaces,
-   casilla) no tenian "width" fijo aqui (a diferencia de lang/status/bridge/
-   hash/updated/actions, que si lo tienen mas abajo): la cabecera "Control
-   manual" (mas texto que "Origen") se llevaba mas ancho fijo que "Origen",
-   y el titulo real de cada fila (mucho mas largo que cualquier cabecera)
-   quedaba forzado a partirse letra por letra en una columna demasiado
-   estrecha para el. Se vuelve a table-layout:auto (como una tabla HTML
-   normal): cada columna se mide por su contenido real, no por el de la
-   cabecera. Los "width" explicitos de las columnas cortas de mas abajo
-   siguen funcionando en auto layout, ahi actuan como sugerencia/minimo en
-   vez de valor estricto, sin conflicto. */
+   defecto, y wp-admin/css/list-tables.css pone table-layout:fixed. En fixed
+   layout el ancho de cada columna sin "width" propio se decide SOLO por la
+   fila de CABECERA, nunca por el contenido real -- causaba que "Origen" se
+   partiera letra por letra. table-layout:auto: cada columna mide su
+   contenido real; los "width" de las columnas cortas siguen actuando como
+   sugerencia/minimo, sin conflicto. */
 .wookb-wrap .wp-list-table.fixed {
   table-layout: auto;
 }
@@ -259,23 +372,12 @@
 .wookb-wrap .wp-list-table tbody tr:hover {
   background: var(--tblr-secondary-bg, #f9fafb);
 }
-/* WordPress core fija el color de las filas impares a un gris claro fijo
-   (#f6f7f7) vía ".striped > tbody > :nth-child(odd)", sin mirar ningun tema.
-   Pedido explicito: sin rayado, todas las filas del mismo color -- se iguala
-   al fondo normal de la tabla (el mismo que usan las filas pares), en vez de
-   a --tblr-secondary-bg (ese es el color que usa la cabecera, y se pidio
-   que las filas no compartan color con la cabecera). */
+/* Sin rayado: todas las filas al mismo color que la tabla (WordPress fija
+   un gris claro fijo por defecto en las filas impares, sin mirar el tema). */
 .wookb-wrap .wp-list-table.striped > tbody > :nth-child(odd),
 .wookb-wrap .wp-list-table > tbody > tr.alternate {
   background-color: var(--tblr-card-bg, var(--tblr-body-bg));
 }
-/* El vertical-align:middle de la celda centra la linea dentro de la celda,
-   pero el badge/input/boton (elementos inline/inline-block) se alinean por
-   defecto a "baseline" DENTRO de esa linea, no entre si -- con alturas
-   distintas (badge vs input number vs boton) el resultado se ve descuadrado
-   aunque la celda este bien centrada. display:flex en el <td> se evita a
-   proposito (rompe el algoritmo de layout de tabla y desalinea columnas
-   entre filas); en su lugar se iguala el vertical-align de cada elemento. */
 .wookb-wrap .wp-list-table .button,
 .wookb-wrap .wp-list-table .button-small,
 .wookb-wrap .wp-list-table input[type="number"] {
@@ -287,15 +389,9 @@
 .wookb-wrap .wp-list-table .column-status {
   width: 90px;
 }
-/* La causa real del "badge fantasma" en Estado: WordPress pone de forma
-   nativa class="status column-status" en esa celda (WP_List_Table::
-   single_row_columns(), no lo genera este plugin), y Tabler trae su PROPIO
-   componente ".status" (una pastilla con fondo, padding y altura fija,
-   pensado para indicadores tipo "en linea/desconectado"). Chocan por
-   coincidencia de nombre. No se quita la clase del HTML -- eso exigiria
-   reimplementar single_row_columns() del core a ciegas, con riesgo real de
-   romper las acciones de fila -- se anula aqui el componente de Tabler para
-   esa celda en concreto, dejando el texto plano que se pidio. */
+/* Tabler trae su propio componente ".status" (pastilla con fondo/altura
+   fija) que choca por coincidencia de nombre con la clase nativa de WP en
+   esa celda -- se anula aqui, dejando texto plano. */
 .wookb-wrap .wp-list-table td.status {
   display: table-cell;
   height: auto;
@@ -320,14 +416,29 @@
 .wookb-wrap .wp-list-table .column-actions {
   width: 220px;
 }
+/* Columna Acciones: limite, Generar y Borrar apilados, mismo ancho todos
+   (pedido explicito), en vez de en fila. */
+.wookb-wrap .wookb-row-actions-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tblr-spacer-1, 0.25rem);
+  width: 140px;
+}
+.wookb-wrap .wookb-row-actions-stack label,
+.wookb-wrap .wookb-row-actions-stack input,
+.wookb-wrap .wookb-row-actions-stack .button {
+  width: 100%;
+  box-sizing: border-box;
+}
 
-/* Checkbox de seleccion (columna "cb"): accent-color no basta en modo
-   oscuro -- el cuadrado sin marcar lo sigue pintando el navegador con su
-   fondo nativo (blanco), independientemente del tema. Se sustituye por un
-   checkbox propio (appearance:none + marca de check dibujada con CSS) que
-   respeta las variables de Tabler en ambos estados, marcado y sin marcar.
-   Incluye los "seleccionar todo" de cabecera/pie (#cb-select-all-1/2), que
-   no llevan la clase .form-check-input en el HTML nativo de WP_List_Table. */
+/* ==========================================================================
+   6. CHECKBOX DE SELECCION (columna "cb")
+   ========================================================================== */
+
+/* Borde funcional (indica el area del control), no decorativo -- se
+   mantiene. accent-color no basta en modo oscuro (el cuadrado sin marcar
+   lo pinta el navegador con fondo nativo blanco); se sustituye por un
+   checkbox propio. */
 .wookb-wrap .check-column .form-check-input,
 .wookb-wrap #cb-select-all-1,
 .wookb-wrap #cb-select-all-2 {
@@ -338,9 +449,6 @@
   float: none;
   width: 18px;
   height: 18px;
-  /* Borde con contraste fijo (no la variable de tema, que en oscuro es casi
-	   tan oscura como el propio fondo y dejaba el checkbox invisible) y fondo
-	   ligeramente distinto al de la fila para que se distinga sin marcar. */
   border: 1.5px solid rgba(140, 140, 150, 0.65);
   border-radius: 4px;
   background: var(--tblr-secondary-bg, #fff);
@@ -372,126 +480,43 @@
   text-align: center;
 }
 
-/* Los badges de estado (columna "status") usan .badge + .bg-X-lt REALES de
-   Tabler directamente en el HTML (ver Registry_Table::column_default()) --
-   no hace falta CSS propio aqui, Tabler ya los resuelve via sus variables
-   --tblr-success/--tblr-warning/etc, que a su vez cambian solas entre modo
-   claro y oscuro porque van dentro de .wookb-wrap[data-bs-theme]. */
+/* ==========================================================================
+   7. BLOQUES ESPECIFICOS
+   ========================================================================== */
 
-/* Chips para las listas de checkboxes de Alcance/Exclusiones (CPTs,
-   taxonomias/terminos, tipos de producto, campos custom): en vez de una
-   lista vertical de "checkbox + texto" uno debajo de otro, se muestran en
-   fila, uno al lado del otro, saltando de linea cuando no caben (flex-wrap).
-   Cada chip es clicable en toda su superficie (es un <label>, el click en
-   cualquier punto marca/desmarca el checkbox real que lleva dentro, oculto
-   visualmente pero funcional -- no se ha tocado ningun name=/value= del PHP,
-   solo la clase del <label> y el contenedor que lo envuelve). */
-.wookb-chip-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.wookb-wrap .wookb-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 14px;
-  border: 1px solid var(--tblr-border-color, #d1d5db);
-  border-radius: 999px;
-  background: var(--tblr-card-bg, var(--tblr-body-bg));
-  color: var(--tblr-body-color);
-  font-size: 13px;
-  cursor: pointer;
-  user-select: none;
-  transition:
-    background 0.1s ease,
-    border-color 0.1s ease,
-    color 0.1s ease;
-}
-/* El checkbox real se mantiene en el DOM (accesibilidad, sigue siendo el
-   input que el formulario envia), pero se oculta visualmente -- el propio
-   cambio de fondo del chip (ver :has(input:checked) mas abajo) ya comunica
-   la seleccion, el icono de checkbox encima sobra. */
-.wookb-wrap .wookb-chip input[type="checkbox"] {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-  margin: 0;
-  pointer-events: none;
-}
-.wookb-wrap .wookb-chip:hover {
-  border-color: var(--tblr-primary, #206bc4);
-}
-/* Chip marcado: se rellena de color primario, como un badge activo. Usa
-   :has(), soportado en todos los navegadores modernos (Chrome/Edge/Safari
-   2023+, Firefox 2024+); es admin de WordPress, no frontend publico. */
-.wookb-wrap .wookb-chip:has(input:checked) {
-  background: var(--tblr-primary, #206bc4);
-  border-color: var(--tblr-primary, #206bc4);
-  color: #fff;
-}
-
-/* Fase 1 -- control manual de documentos: badges pequeños reusando los
-   mismos colores solidos + texto blanco que ya usan los .notice de arriba
-   (warning para "desactualizado", igual en claro/oscuro porque las
-   variables de Tabler cambian solas). Sin badge nuevo para "auto"/"manual":
-   se diferencian por texto plano, mismo criterio que la columna Estado. */
-.wookb-wrap .wookb-badge-stale,
-.wookb-wrap .wookb-badge-manual,
-.wookb-wrap .wookb-badge-auto {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  margin-right: 6px;
-}
-.wookb-wrap .wookb-badge-stale {
-  background: var(--tblr-warning, #f76707);
-  color: #fff;
-}
-.wookb-wrap .wookb-badge-manual {
-  background: var(--tblr-primary, #206bc4);
-  color: #fff;
-}
-.wookb-wrap .wookb-badge-auto {
-  background: var(--tblr-secondary-bg, #e5e7eb);
-  color: var(--tblr-body-color);
-}
-
-/* Fase 2 -- pestaña WooCommerce: separa visualmente "Detectado
-   automáticamente" (solo lectura) de "Rellenar a mano" con un borde lateral
-   sutil, reusando las variables de color ya definidas por Tabler (sin
-   introducir ningún color nuevo). */
+/* Pestaña WooCommerce: "Detectado automaticamente" vs "Rellenar a mano",
+   diferenciados por fondo, sin borde lateral. */
 .wookb-wrap .wookb-wc-detected {
-  border-left: 3px solid var(--tblr-border-color, #e5e7eb);
-  padding-left: 12px;
+  background: var(--tblr-secondary-bg, #f3f4f6);
+  border-radius: 6px;
+  padding: 12px 14px;
 }
 .wookb-wrap .wookb-wc-manual {
-  border-left: 3px solid var(--tblr-primary, #206bc4);
-  padding-left: 12px;
+  background: var(--tblr-primary-lt, rgba(32, 107, 196, 0.1));
+  border-radius: 6px;
+  padding: 12px 14px;
 }
 
-/* QA (bug A, ampliación UX1): badges de la columna "Control manual" -- ahora
-   solo badges (el bloque de edición se movió a la fila expandida de abajo),
-   deja que envuelvan en varias lineas si hace falta en vez de forzar una
-   sola linea sin cortes (evita que esta celda vuelva a inflar su ancho). */
+/* Badges de la columna "Control manual": envuelven en varias lineas si
+   hace falta, para no volver a inflar el ancho de la columna (bug A). */
 .wookb-wrap .wookb-manual-badges {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
+  gap: var(--tblr-spacer-1, 0.25rem);
 }
 
-/* Fila expandida de edición manual (single_row() en Registry_Table): ocupa
-   todo el ancho de la tabla vía colspan, con un fondo ligeramente distinto
-   (reusa --tblr-secondary-bg, misma variable que ya usa la cabecera de la
-   tabla) para que se lea como un panel de detalle bajo la fila, no como una
-   fila de datos mas. Sin borde propio nuevo: el border-bottom ya lo pone la
-   regla general ".wp-list-table th, .wp-list-table td" de mas arriba. */
+/* Fila expandida de edicion manual (single_row() en Registry_Table): ocupa
+   todo el ancho de la tabla via colspan. Mismo fondo que las filas de
+   datos (--tblr-card-bg, NO el de la cabecera) para leerse como parte de
+   la fila de arriba, no como un bloque aparte; se quita la linea divisoria
+   entre ambas (:has() + hermano siguiente), el border-bottom que separa
+   de la SIGUIENTE fila de documento se mantiene. */
+.wookb-wrap .wp-list-table tbody tr:has(+ .wookb-manual-expand-row) > td {
+  border-bottom: none;
+}
 .wookb-wrap .wookb-manual-expand-row > td {
-  background: var(--tblr-secondary-bg, #f3f4f6);
+  background: var(--tblr-card-bg, var(--tblr-body-bg));
   padding: 10px 16px 14px;
 }
 .wookb-wrap .wookb-manual-expand-cell details > summary {
@@ -504,6 +529,16 @@
   font-size: 13px;
   margin-top: 8px;
 }
+.wookb-wrap .wookb-manual-expand-cell label {
+  color: var(--tblr-body-color);
+}
+.wookb-wrap .wookb-manual-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--tblr-spacer-2, 0.5rem);
+  margin-top: 10px;
+}
 .wookb-wrap .wookb-manual-expand-cell .button {
-  margin-right: 8px;
+  margin-right: 0;
 }
