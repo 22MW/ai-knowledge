@@ -89,20 +89,16 @@ class Markdown_Discovery {
 	 * la vez arriesga JSON-LD duplicado o contradictorio en la misma página
 	 * (dos bloques <script type="application/ld+json"> con el mismo @type
 	 * para la misma URL), que es peor para SEO que no cubrirlo nosotros --
-	 * evitar el conflicto pesa más que "cubrirlo siempre". Por eso: si
-	 * RankMath está activo Y su módulo 'schema' está activo
-	 * (\RankMath\Helper::is_module_active('schema'), la misma comprobación
-	 * que usa el propio RankMath para decidir si generar su JSON-LD), no se
-	 * imprime nada aquí -- se deja el schema en manos de RankMath. Si
-	 * RankMath no está activo, o está activo pero con el módulo Schema
-	 * desactivado por el usuario, se imprime el nuestro como red de
+	 * evitar el conflicto pesa más que "cubrirlo siempre". Por eso, antes de
+	 * imprimir nada, should_skip_schema() comprueba TODAS las fuentes
+	 * conocidas que ya cubren esto: WooCommerce core (Product, siempre
+	 * activo salvo que alguien desenganche su hook explícitamente), RankMath
+	 * (Article y Product, si su módulo 'schema' está activo), Yoast SEO y
+	 * AIOSEO (ambos activos por defecto sin módulo desactivable simple). Si
+	 * ninguna de esas fuentes aplica, se imprime el nuestro como red de
 	 * seguridad mínima (mejor Schema.org básico que ninguno).
 	 */
 	public static function print_json_ld() {
-		if ( self::rankmath_schema_active() ) {
-			return;
-		}
-
 		$post_id = self::scoped_post_id();
 		if ( ! $post_id ) {
 			return;
@@ -110,6 +106,10 @@ class Markdown_Discovery {
 
 		$post = get_post( $post_id );
 		if ( ! $post ) {
+			return;
+		}
+
+		if ( self::should_skip_schema( $post_id, $post->post_type ) ) {
 			return;
 		}
 
@@ -133,8 +133,54 @@ class Markdown_Discovery {
 		echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON, no HTML; ver wp_json_encode() arriba.
 	}
 
-	protected static function rankmath_schema_active() {
-		return class_exists( '\RankMath\Helper' ) && \RankMath\Helper::is_module_active( 'schema' );
+	/**
+	 * True si alguna fuente conocida ya imprime JSON-LD para este mismo
+	 * contenido -- decidido ANTES de generar/imprimir nada nuestro,
+	 * comprobando si el plugin/hook responsable está activo, nunca
+	 * inspeccionando el HTML ya generado (no es fiable: el orden de hooks
+	 * varía y no hay garantía de examinar el output completo a tiempo).
+	 */
+	protected static function should_skip_schema( $post_id, $post_type ) {
+		$skip = false;
+
+		// WooCommerce core SIEMPRE imprime su propio Product/Offer JSON-LD en
+		// wp_footer para productos (WC_Structured_Data::output_structured_data(),
+		// enganchado sin condición en su constructor) -- no es un módulo
+		// opcional como el de RankMath, así que no hace falta preguntarle a
+		// RankMath para este caso: si WooCommerce está activo y ese hook sigue
+		// enganchado (nadie lo ha desenganchado a mano), el suyo ya cubre
+		// 'product' y el nuestro sería un duplicado exacto (mismo @type, misma
+		// URL).
+		if ( 'product' === $post_type && function_exists( 'WC' ) && WC()->structured_data
+			&& has_action( 'wp_footer', array( WC()->structured_data, 'output_structured_data' ) ) ) {
+			$skip = true;
+		}
+
+		// RankMath: solo si su módulo 'schema' está activo (es desactivable,
+		// a diferencia de WooCommerce/Yoast/AIOSEO) -- misma comprobación que
+		// usa el propio RankMath para decidir si generar su JSON-LD.
+		if ( ! $skip && class_exists( '\RankMath\Helper' ) && \RankMath\Helper::is_module_active( 'schema' ) ) {
+			$skip = true;
+		}
+
+		// Yoast SEO y AIOSEO: ambos imprimen schema por defecto en cuanto están
+		// activos, sin un módulo "Schema" desactivable de forma simple como
+		// RankMath -- su sola presencia ya es suficiente indicio de conflicto.
+		if ( ! $skip && ( defined( 'WPSEO_VERSION' ) || defined( 'AIOSEO_VERSION' ) ) ) {
+			$skip = true;
+		}
+
+		/**
+		 * Fuerza (o desactiva) el salto de nuestro JSON-LD para un post/post_type
+		 * concreto, para cubrir a mano cualquier caso no contemplado aquí (otro
+		 * plugin de SEO no listado, o un hook de WooCommerce desenganchado a
+		 * propósito) sin tener que tocar código.
+		 *
+		 * @param bool   $skip      Si se debe omitir nuestro JSON-LD.
+		 * @param int    $post_id   ID del post actual.
+		 * @param string $post_type post_type del post actual.
+		 */
+		return (bool) apply_filters( 'wookb_skip_schema', $skip, $post_id, $post_type );
 	}
 
 	/**

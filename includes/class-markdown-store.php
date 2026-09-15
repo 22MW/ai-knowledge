@@ -26,8 +26,15 @@ class Markdown_Store {
 		return self::base_dir() . '/' . $relative;
 	}
 
+	/**
+	 * URL pública del .md, servida vía Markdown_Server (ruta virtual de
+	 * WordPress) en vez de apuntar al archivo físico directamente: así el
+	 * Content-Type (text/plain) lo fija PHP y funciona igual en Apache o
+	 * nginx, sin depender de la configuración MIME del servidor.
+	 */
 	public static function public_url( $relative ) {
-		return self::base_url() . '/' . $relative;
+		$without_extension = preg_replace( '/\.md$/', '', $relative );
+		return home_url( '/ai-knowledge-doc/' . $without_extension . '.md' );
 	}
 
 	/**

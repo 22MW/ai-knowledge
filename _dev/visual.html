@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Knowledge & Visibility — Estado</title>
+  <style>
+    :root { color-scheme: light; --ok: #12805c; --warn: #a15c00; --bad: #b42318; --bg: #f6f7f9; --card: #ffffff; --text: #1f2937; --muted: #667085; --line: #d0d5dd; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); }
+    main { max-width: 1120px; margin: 0 auto; padding: 32px 20px; }
+    header { margin-bottom: 24px; }
+    h1 { margin: 0 0 8px; font-size: 32px; }
+    h2 { margin: 0 0 14px; font-size: 18px; }
+    p { margin: 0 0 10px; }
+    .muted { color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; box-shadow: 0 1px 2px rgba(16, 24, 40, .04); }
+    .wide { grid-column: span 3; }
+    .badge { display: inline-block; border-radius: 999px; padding: 4px 10px; font-size: 13px; font-weight: 700; }
+    .ok { color: var(--ok); background: #ecfdf3; }
+    .warn { color: var(--warn); background: #fffaeb; }
+    .bad { color: var(--bad); background: #fef3f2; }
+    ul { margin: 0; padding-left: 20px; }
+    li { margin: 6px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; }
+    code { background: #f2f4f7; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+    @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } .wide { grid-column: span 1; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>AI Knowledge & Visibility — Estado</h1>
+      <p class="muted">Última actualización: 2026-09-15 · antes "woo-kb-generator"</p>
+      <span class="badge warn">En desarrollo — QA en curso</span>
+    </header>
+
+    <section class="grid">
+
+      <article class="card wide">
+        <h2>Mapa de <code>_dev/</code> — qué mirar según lo que necesites</h2>
+        <table>
+          <tr><th>Archivo</th><th>Para qué sirve</th></tr>
+          <tr><td><code>visual.html</code> (este)</td><td>Vista rápida de estado. Si solo vas a mirar uno, es este.</td></tr>
+          <tr><td><code>roadmap.md</code></td><td>El plan completo, fase por fase, con los pasos técnicos de cada una. Es la fuente de verdad del "qué falta".</td></tr>
+          <tr><td><code>decisiones.md</code></td><td>Decisiones ya cerradas (nombre, alcance) y por qué se tomaron. No se reabren sin motivo nuevo.</td></tr>
+          <tr><td><code>contexto-activo.md</code></td><td>Qué se está haciendo ahora mismo, en esta sesión concreta.</td></tr>
+          <tr><td><code>qa-resultados-fase-0-a-5.md</code></td><td>Bugs y dudas encontrados probando de verdad, organizados por severidad.</td></tr>
+          <tr><td><code>tests-qa-fase-0-a-5.md</code></td><td>La lista de pruebas en sí (checklist), con tus anotaciones al probar.</td></tr>
+          <tr><td><code>estado-plugin-informe.md</code></td><td>Foto fija de auditoría del código original, de cuando se empezó. Ya no cambia.</td></tr>
+          <tr><td><code>analisis-jet-geo.md</code></td><td>Ideas de un plugin competidor (JetGEO) que se pueden reutilizar, mapeadas a fases del roadmap.</td></tr>
+        </table>
+      </article>
+
+      <article class="card wide">
+        <h2>Fases del roadmap</h2>
+        <table>
+          <tr><th>Fase</th><th>Qué es</th><th>Estado</th></tr>
+          <tr><td>0</td><td>Identidad (renombrado a AI Knowledge & Visibility)</td><td><span class="badge ok">Hecho</span></td></tr>
+          <tr><td>1</td><td>Control manual de documentos + botón en editor</td><td><span class="badge warn">Hecho, con bugs de QA en curso de arreglo</span></td></tr>
+          <tr><td>2</td><td>Pestaña WooCommerce (tienda/envíos/IVA/pagos)</td><td><span class="badge warn">Hecho, pendiente rediseño UX pedido en QA</span></td></tr>
+          <tr><td>3</td><td>API REST de contenido (JSON sin IA)</td><td><span class="badge ok">Hecho y probado (QA sin fallos)</span></td></tr>
+          <tr><td>4</td><td>Markdown público descubrible (<code>&lt;link rel="alternate"&gt;</code>)</td><td><span class="badge warn">Hecho, pendiente arreglo de descarga vs apertura del .md</span></td></tr>
+          <tr><td>5</td><td>JSON-LD (Schema.org)</td><td><span class="badge bad">Bug confirmado en arreglo: duplicado con el schema nativo de WooCommerce</span></td></tr>
+          <tr><td>6</td><td>Panel de visibilidad y diagnóstico</td><td><span class="badge warn">Pendiente</span></td></tr>
+          <tr><td>7</td><td>API pública documentada (OpenAPI)</td><td><span class="badge warn">Pendiente</span></td></tr>
+          <tr><td>8</td><td>Aviso a buscadores en tiempo real (IndexNow)</td><td><span class="badge warn">Pendiente</span></td></tr>
+          <tr><td>9</td><td>Feeds especializados</td><td><span class="badge warn">Pendiente</span></td></tr>
+          <tr><td>10</td><td>Campos personalizados (ACF/Meta Box/Pods)</td><td><span class="badge warn">Pendiente</span></td></tr>
+          <tr><td>11</td><td>Gestión de crawlers de IA (robots.txt)</td><td><span class="badge warn">Pendiente — ver ideas de JetGEO en <code>analisis-jet-geo.md</code></span></td></tr>
+        </table>
+      </article>
+
+      <article class="card">
+        <h2>Urgente (en curso ahora)</h2>
+        <ul>
+          <li>Arreglar JSON-LD duplicado con WooCommerce nativo (Fase 5).</li>
+          <li>Botón "Generar" de fila no refleja el límite de caracteres guardado.</li>
+          <li>Borde/zona negra visual tras el fix del salto de tema.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Pendiente de tu decisión</h2>
+        <ul>
+          <li>¿Confirmar repetición del botón del editor (Fase 1) con más detalle? (posible bug sin diagnosticar del todo)</li>
+          <li>¿Automatizar que <code>.md</code> se abra en vez de descargarse, o dejarlo manual?</li>
+          <li>¿Cambiar también el slug del menú (<code>page=woo-kb-generator</code>) a <code>ai-knowledge</code>?</li>
+          <li>¿Enlazar el catálogo de tienda desde archivos/categoría (Fase 4 ampliada)?</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Futuro (rediseño de UX, no bugs)</h2>
+        <ul>
+          <li>Registro: editor de texto más grande y cómodo.</li>
+          <li>"Carga inicial" confusa una vez hay contenido parcial.</li>
+          <li>WooCommerce: selección tipo checkbox como los posts + prompt por campo.</li>
+          <li>Sistema de tags dinámicos (<code>{post.title}</code>...) en prompts, inspirado en JetGEO.</li>
+        </ul>
+      </article>
+
+      <article class="card wide">
+        <h2>Últimas decisiones</h2>
+        <ul>
+          <li>Nombre: <strong>AI Knowledge & Visibility</strong>, slug <code>ai-knowledge</code>. Namespace de código (<code>WOOKB</code>) y slug de menú se mantienen sin cambiar.</li>
+          <li>El generador vía IA (OpenAI) + Support Genix sigue siendo el núcleo del producto; la capa de visibilidad (JSON, Markdown público, JSON-LD, etc.) se añade encima, no lo sustituye.</li>
+          <li>Nunca se escribe <code>robots.txt</code> automáticamente sin confirmación explícita del usuario.</li>
+        </ul>
+      </article>
+
+      <article class="card wide">
+        <h2>Próximo paso</h2>
+        <p>1. Cerrar los 3 bugs urgentes en curso. 2. Confirmar contigo las 4 decisiones pendientes. 3. Seguir con Fase 6 o abordar el rediseño de UX — a decidir cuál primero.</p>
+      </article>
+
+    </section>
+  </main>
+</body>
+</html>

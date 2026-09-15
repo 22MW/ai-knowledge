@@ -4,9 +4,32 @@ Todas las modificaciones relevantes de este plugin se documentan en este archivo
 
 ## [1.0.8] - 2026-09-15
 
+Ver `_dev/roadmap.md` para el plan completo por fases y `_dev/decisiones.md`
+para el porqué de la identidad/alcance. Este plugin sigue orientado a IA +
+Support Genix como núcleo; todo lo de abajo es capa añadida encima.
+
 ### Cambiado
 - Renombrado de identidad (Fase 0): nombre visible del plugin de "WOO Knowledge Base Generator" a **"AI Knowledge & Visibility"**, y Text Domain de `woo-kb-generator` a `ai-knowledge`. El slug interno de la página de admin (`page=woo-kb-generator`), las constantes `WOOKB_*` y el namespace `WOOKB\` se mantienen sin cambios (decisión explícita: no tocar identificadores internos sin necesidad).
-- Fase 1: control manual de documentos (modo manual con texto fijado a mano, límite de caracteres por documento, aviso de "origen actualizado") y botón "Añadir a la base de conocimiento" en el editor de cualquier post/CPT.
+- Carpeta del plugin y repositorio Git renombrados a `ai-knowledge` (antes `woo-kb-generator`).
+- Botón "Generar/actualizar documentos de tienda" movido de Ajustes a la nueva pestaña WooCommerce.
+
+### Añadido
+- **Fase 1 — Control manual de documentos:** modo por documento `auto`/`manual` (texto fijado a mano que ya no se regenera solo), límite de caracteres persistido por documento, aviso de "origen actualizado" (`stale`) en el Registro, en `admin_notices` y en la barra de admin, y botón "Añadir a la base de conocimiento" en el editor de cualquier post/CPT marcado en Ajustes.
+- **Fase 2 — Pestaña WooCommerce:** tienda, envíos, impuestos/IVA (nuevo, no existía antes), pagos, condiciones de venta y devoluciones detectados automáticamente desde la configuración real de WooCommerce; plazo de entrega y notas legales rellenables a mano; vista previa del Markdown publicado por idioma.
+- **Fase 3 — API REST de contenido:** `GET /wp-json/ai-knowledge/v1/content/{id}` y `GET /wp-json/ai-knowledge/v1/{post_type}` (listado paginado), solo lectura, sin IA, filtrado por Alcance, sin filtrar si un contenido existe pero está excluido.
+- **Fase 4 — Descubrimiento de Markdown:** `<link rel="alternate" type="text/markdown">` en el `<head>` del contenido ya sincronizado.
+- **Fase 5 — JSON-LD:** `Product`/`Offer` (WooCommerce) o `Article` (resto) en el `<head>`, cediendo el schema a WooCommerce/RankMath/Yoast/AIOSEO cuando ya lo cubren, para no duplicar.
+
+### Corregido
+- El botón "Generar" de una fila del Registro no reflejaba el límite de caracteres ya guardado para esa fila, mostraba siempre el valor por defecto general.
+- Salto visual de claro a oscuro en cada recarga del panel (el tema se aplicaba con jQuery al final de la carga; ahora se fija con un script inline síncrono antes de pintar).
+- **Los `.md` públicos se descargaban en vez de abrirse en el navegador** en servidores nginx (como Local by Flywheel): antes se enlazaba directo al archivo físico, cuyo `Content-Type` depende de la configuración MIME del servidor. Ahora se sirven por una ruta virtual de WordPress (`/ai-knowledge-doc/{lang}/{slug}.md`, clase `Markdown_Server`) que fija `Content-Type: text/plain` desde PHP, funciona igual en Apache o nginx.
+- JSON-LD duplicado con el schema nativo de WooCommerce (`WC_Structured_Data`, siempre activo si WooCommerce lo está, independientemente de RankMath): ahora se detecta y se cede el schema, igual que ya se hacía con RankMath/Yoast/AIOSEO.
+
+### Pendiente de esta versión (ver `_dev/qa-resultados-fase-0-a-5.md`)
+- Confirmar si el botón "Añadir a la base de conocimiento" del editor da feedback suficiente (reportado como "no se ve nada" en la primera ronda de QA).
+- Borde/zona oscura visible tras el fix del tema (reportado, no reproducido aún en código).
+- Rediseño de UX pendiente de acordar: editor de texto del Registro, claridad de "Carga inicial", selección de campos de WooCommerce igual que los posts, notas legales.
 
 ## [1.0.7] - 2026-08-22
 

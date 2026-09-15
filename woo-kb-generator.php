@@ -65,9 +65,14 @@ function wookb_activate() {
 		file_put_contents( $llm_dir . '/index.php', "<?php\n// Silence is golden.\n" );
 	}
 
-	// Flush de reglas de rewrite para llms.txt.
+	// Flush de reglas de rewrite para llms.txt y para la ruta virtual de los .md
+	// (Markdown_Server: servidos vía PHP para fijar Content-Type: text/plain
+	// sin depender de la configuración MIME del servidor -- ver esa clase).
 	if ( class_exists( '\WOOKB\Llms_Txt' ) ) {
 		\WOOKB\Llms_Txt::add_rewrite_rule();
+	}
+	if ( class_exists( '\WOOKB\Markdown_Server' ) ) {
+		\WOOKB\Markdown_Server::add_rewrite_rule();
 	}
 	flush_rewrite_rules();
 }

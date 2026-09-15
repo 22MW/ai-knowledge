@@ -293,7 +293,7 @@ class Registry_Table extends \WP_List_Table {
 				min="100"
 				max="10000"
 				step="50"
-				value="<?php echo esc_attr( Generator::BODY_CHAR_LIMIT ); ?>"
+				value="<?php echo esc_attr( $item->char_limit ? $item->char_limit : Generator::BODY_CHAR_LIMIT ); ?>"
 				placeholder="<?php echo esc_attr( Generator::BODY_CHAR_LIMIT ); ?>"
 				style="width:5.5em"
 				title="<?php esc_attr_e( 'Límite de caracteres para esta generación (uso único, no se guarda)', 'ai-knowledge' ); ?>"
