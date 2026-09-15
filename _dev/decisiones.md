@@ -71,5 +71,9 @@ no inventar por pantalla.
   clases — en un empate de especificidad gana quien cargue después en el
   DOM, y no es fiable asumir que siempre seamos nosotros. Motivo confirmado
   por el usuario inspeccionando el navegador. Por eso el bloque de hover de
-  botones en `wookb-theme.css` usa `!important` a propósito (único sitio
-  del archivo donde se usa) — no quitarlo pensando que "no hace falta".
+  botones en `wookb-theme.css` usa `!important` a propósito — no quitarlo
+  pensando que "no hace falta". Mismo caso confirmado el 2026-09-16 con
+  `.wp-core-ui select:hover` (texto invisible en oscuro): el hover/foco de
+  `select` en `wookb-theme.css` usa `!important` por el mismo motivo. Si
+  aparece un tercer caso igual (otro elemento nativo con hover/foco pisado
+  por WordPress core), se resuelve igual, no como excepción rara.

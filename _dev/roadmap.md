@@ -6,11 +6,11 @@ Cada fase explica QUÉ hace y CÓMO se construye (pasos).
 
 Otros archivos de `_dev/` que siguen existiendo y para qué sirven (no son
 plan, son consulta):
-- `decisiones.md` — decisiones ya cerradas y su motivo (identidad, alcance).
-- `contexto-activo.md` — en qué fase estamos ahora mismo.
-- `estado-plugin-informe.md` — auditoría técnica del código tal como estaba
+- [`decisiones.md`](decisiones.md) — decisiones ya cerradas y su motivo (identidad, alcance).
+- [`contexto-activo.md`](contexto-activo.md) — en qué fase estamos ahora mismo.
+- [`estado-plugin-informe.md`](estado-plugin-informe.md) — auditoría técnica del código tal como estaba
   al empezar (referencia, no cambia).
-- `mejoras-plugin-ai-woocommerce.md` — documento original de ideas del
+- [`mejoras-plugin-ai-woocommerce.md`](mejoras-plugin-ai-woocommerce.md) — documento original de ideas del
   usuario; todo lo aprovechable de ahí ya está repartido en las fases de
   abajo.
 
@@ -145,15 +145,25 @@ para que buscadores entiendan qué es cada página sin adivinarlo.
 
 ---
 
-## Fase 6 — Panel de visibilidad y diagnóstico — PENDIENTE
+## Fase 6 — Panel de visibilidad y diagnóstico — HECHO
 
 **Qué hace:** una pestaña nueva en el admin ya existente que resume si el
 contenido está bien expuesto a IA/buscadores.
 
-**Pasos:**
-1. Nueva pestaña "Visibilidad IA" en `class-admin.php` (mismo patrón que las pestañas actuales).
-2. Mostrar: total de contenido expuesto, estado de `llms.txt` (ok / tapado por archivo físico, ver `Llms_Txt::physical_file_exists()`), estado del Markdown, del JSON (Fase 2) y del Schema (Fase 4).
-3. Botón "Comprobar accesibilidad": lee `robots.txt`, cabecera `X-Robots-Tag` y `noindex` de una URL de muestra; muestra resultado simple (ok / aviso), sin editar nada automáticamente.
+**MVP:**
+1. Nueva pestaña "Visibilidad IA" en `class-admin.php` (mismo patrón que las pestañas actuales), vista `admin/views/tab-visibilidad-ia.php`.
+2. Resumen (sin acción del usuario, calculado en `render()`): estado de `llms.txt` (ok / tapado por archivo físico, `Llms_Txt::physical_file_exists()`), confirmación de que Markdown/JSON (Fase 3)/Schema (Fase 5) están activos para el contenido en scope, y contador simple "Quedan N elementos sin sincronizar" = `Scope::resolve_ids()` menos filas con `status = 'synced'` en `Registry` — decisión tomada en [`analisis-jet-geo.md`](analisis-jet-geo.md) (Content_Inspector). Sin desglose por post_type (mejora futura).
+3. Selector desplegable con contenido ya sincronizado (`Registry::query(['status' => 'synced'])`: título + URL) + botón "Comprobar accesibilidad". **La URL a comprobar sale solo de este selector, nunca de un campo libre** (evita SSRF).
+4. Acción `admin_post` `wookb_check_accessibility` (nonce + `current_user_can()`) en `class-admin.php`: `wp_remote_get()` a la URL elegida, lee cabecera `X-Robots-Tag` y `<meta name="robots">` del HTML devuelto; lee `home_url('/robots.txt')` para saber si esa ruta está permitida. Resultado guardado en transient corto y mostrado tras redirect (mismo patrón que otras acciones `admin_post` del plugin).
+5. Detección de conflicto de señales: avisa si `robots.txt` permite la URL pero `noindex`/`X-Robots-Tag` la bloquea, o viceversa — decisión tomada en [`analisis-jet-geo.md`](analisis-jet-geo.md) (opción A).
+
+**Casos límite:** desplegable vacío si no hay contenido sincronizado (ocultar botón); `wp_remote_get` puede fallar (timeout/local) → mostrar error, no fatal.
+
+**Validación:** `php -l`; prueba manual — contador contra `Registry::summary()`, forzar un `noindex` en un post permitido por `robots.txt` y confirmar que se detecta el conflicto. **Confirmado por el usuario en real**: contador correcto (26 pendientes), conflicto detectado en un caso real (noindex del sitio local vía "Desalentar a los motores de búsqueda").
+
+**Ampliación tras confirmación visual:** descripción introductoria de la pestaña; cada fila (Markdown/JSON/JSON-LD) enlaza a un ejemplo real ya sincronizado y explica para qué sirve; `llms.txt` físico muestra fecha de modificación + vista previa de sus primeras líneas, y botón "Borrar archivo físico" (confirmación JS fuerte, mismo patrón que "Borrar todos" del Registro) explicando antes que el plugin genera el suyo dinámicamente al vuelo, sin archivo fijo.
+
+**Bug aparte encontrado y corregido en el mismo commit:** `<select>` del admin con texto invisible en hover/foco en modo oscuro (`.wp-core-ui select:hover` de WordPress core, mismo caso que los botones — ver `_dev/decisiones.md`).
 
 ---
 
@@ -176,6 +186,14 @@ a los buscadores compatibles con IndexNow en vez de esperar a que rastreen.
 1. Enganchar en los mismos puntos que ya usa `Sync` (`on_product_saved`, `on_generic_post_saved`, `on_trash_or_delete`).
 2. Cola con debounce (reusar patrón de `Queue`) para no notificar de más si hay varios guardados seguidos.
 3. Ajuste on/off en Ajustes, clave IndexNow propia del sitio.
+
+---
+
+**Anotación ([`analisis-jet-geo.md`](analisis-jet-geo.md)):** pendiente valorar en `class-scope.php`
+un modo "todos los CPT públicos, presente y futuro" como alternativa a la
+lista explícita actual, más un filtro de extensión sobre la lista de
+post_types excluidos por defecto. No tiene fase asignada todavía — no se
+implementa hasta decidirlo aparte.
 
 ---
 
@@ -212,6 +230,40 @@ Perplexity, Google, Bing) de crawlers de entrenamiento, y deja ver/ajustar
 1. Lectura de `robots.txt` actual (solo lectura) en el panel de la Fase 5.
 2. Edición asistida: requiere permiso explícito del usuario antes de escribir en `robots.txt` (archivo sensible, fuera del propio plugin) — no se automatiza sin esa confirmación en cada caso.
 3. Logs de accesos de crawlers conocidos, con límite de filas para no llenar la base de datos.
+
+**Anotación ([`analisis-jet-geo.md`](analisis-jet-geo.md)):** concretar con 3 categorías de
+propósito de bot (`ai_search` / `user_requested_assistant` /
+`model_training`, estándar del sector) y un catálogo base de ~24 crawlers
+conocidos con filtro de extensión propio (`apply_filters`). Auto-generar el
+bloque de `robots.txt` a partir de 3 preguntas sí/no al admin — pero solo
+proponerlo para copiar/aplicar con confirmación explícita, nunca escribirlo
+solo (mantiene la decisión ya tomada arriba).
+
+---
+
+## Fase futura (sin número) — Tags dinámicos en prompts y textos manuales — IDEA, NO PLANIFICADA
+
+**Qué haría:** placeholders tipo `{post.title}`, `{post.excerpt}`,
+`{post.meta key="..."}`, `{product.price}`, `{product.stock}`, `{site.name}`
+usables en el "Instrucciones adicionales del prompt" (`extra_prompt`) y en
+el texto manual de un documento (Fase 1), sustituidos por el dato real ya
+disponible en `Extractor_Base`/`Extractor_Woo` antes de mandarlo a OpenAI o
+de publicar el texto manual.
+
+**Origen:** [`analisis-jet-geo.md`](analisis-jet-geo.md), punto 4. No está planificada: requiere
+`evaluar-cambio`/`planificar-cambio` propios cuando se quiera abordar.
+
+---
+
+## Fase futura (sin número) — Onboarding por pasos — IDEA, NO PLANIFICADA
+
+**Qué haría:** asistente de primera configuración con estado persistente,
+un paso por bloque (alcance/content-settings, robots.txt, llms.txt,
+Markdown, logs de crawlers), cada paso validando su propio cambio antes de
+aplicarlo — en vez de configurar pestaña por pestaña sin guía, como hoy.
+
+**Origen:** [`analisis-jet-geo.md`](analisis-jet-geo.md), punto 5. No está planificada: requiere
+`evaluar-cambio`/`planificar-cambio` propios cuando se quiera abordar.
 
 ---
 

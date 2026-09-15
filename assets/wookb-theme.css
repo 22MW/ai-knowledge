@@ -18,6 +18,9 @@
    1. BASE Y LAYOUT GENERAL
    ========================================================================== */
 
+body.toplevel_page_woo-kb-generator #wpcontent {
+  padding-left: 0px !important;
+}
 /* Color de marca: se sobreescribe aqui, en el mismo selector que gana la
    cascada sobre Tabler, para que TODO lo que usa "primary" en toda la
    pagina cambie de un solo sitio. */
@@ -34,8 +37,9 @@
   color: var(--tblr-body-color);
   font-family: var(--tblr-body-font-family, Inter, -apple-system, sans-serif);
   padding: 1.5rem calc(1.5rem + 20px) 1.5rem calc(1.5rem + 2px);
-  border-radius: 8px;
-  margin: 1rem 0 0 0;
+  border-radius: 0;
+  margin: 0;
+  min-height: 100vh;
 }
 
 .wookb-wrap h3 {
@@ -118,12 +122,14 @@
   border-radius: 8px;
   padding: 20px 24px;
   margin-bottom: 20px;
+  max-width: 1100px;
 }
 .wookb-card h2 {
   font-size: 15px;
   font-weight: 600;
   margin-top: 0;
   color: var(--tblr-emphasis-color, inherit);
+  max-width: 1100px;
 }
 .wookb-card hr {
   border: none;
@@ -152,6 +158,15 @@
   color: var(--tblr-body-color);
   border: 1px solid var(--tblr-border-color, #d1d5db);
   border-radius: 6px;
+}
+/* WordPress core (.wp-core-ui select:hover) fuerza color:#1e1e1e con la
+   misma especificidad que la regla de arriba -- en oscuro deja el texto
+   del select invisible sobre fondo oscuro en hover. Mismo caso confirmado
+   ya documentado para botones en decisiones.md: se fuerza con !important. */
+.wookb-wrap select:hover,
+.wookb-wrap select:focus {
+  color: var(--tblr-body-color) !important;
+  border-color: var(--tblr-border-color, #d1d5db) !important;
 }
 
 /* ==========================================================================
@@ -210,9 +225,9 @@
    background/border-color/color con la MISMA especificidad que cualquier
    regla nuestra de 3 clases -- en un empate gana quien cargue despues, y
    no es fiable asumir que siempre seamos nosotros. Se restablece cada
-   variante de forma explicita con !important: unico punto del archivo
-   donde se usa, a proposito, para no depender del orden de carga frente a
-   wp-core-ui. */
+   variante de forma explicita con !important, a proposito, para no
+   depender del orden de carga frente a wp-core-ui (mismo caso repetido
+   con el hover/foco de select, ver seccion 1). */
 .wookb-wrap .button:hover,
 .wookb-wrap .button:focus,
 .wookb-wrap .button:focus-visible {
@@ -298,7 +313,9 @@
   font-size: 13px;
   cursor: pointer;
   user-select: none;
-  transition: background 0.1s ease, color 0.1s ease;
+  transition:
+    background 0.1s ease,
+    color 0.1s ease;
 }
 .wookb-wrap .wookb-chip input[type="checkbox"] {
   position: absolute;

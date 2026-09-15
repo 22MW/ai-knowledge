@@ -40,12 +40,14 @@ Support Genix como núcleo; todo lo de abajo es capa añadida encima.
 - **Fase 3 — API REST de contenido:** `GET /wp-json/ai-knowledge/v1/content/{id}` y `GET /wp-json/ai-knowledge/v1/{post_type}` (listado paginado), solo lectura, sin IA, filtrado por Alcance, sin filtrar si un contenido existe pero está excluido.
 - **Fase 4 — Descubrimiento de Markdown:** `<link rel="alternate" type="text/markdown">` en el `<head>` del contenido ya sincronizado.
 - **Fase 5 — JSON-LD:** `Product`/`Offer` (WooCommerce) o `Article` (resto) en el `<head>`, cediendo el schema a WooCommerce/RankMath/Yoast/AIOSEO cuando ya lo cubren, para no duplicar.
+- **Fase 6 — Panel "Visibilidad IA":** nueva pestaña con estado de exposición (llms.txt, Markdown, JSON, JSON-LD) con enlace a un ejemplo real de cada uno; contador de contenido pendiente de sincronizar; selector cerrado de contenido ya sincronizado + botón "Comprobar accesibilidad" que lee `robots.txt` y noindex/`X-Robots-Tag` en vivo y avisa de contradicciones entre ambas señales; detección y explicación de un `llms.txt` físico que tape al generado por el plugin, con vista previa, fecha de modificación y botón para borrarlo (confirmación explícita, el plugin sigue sirviendo el suyo generado al vuelo).
 
 ### Corregido
 - El botón "Generar" de una fila del Registro no reflejaba el límite de caracteres ya guardado para esa fila, mostraba siempre el valor por defecto general.
 - Salto visual de claro a oscuro en cada recarga del panel (el tema se aplicaba con jQuery al final de la carga; ahora se fija con un script inline síncrono antes de pintar).
 - **Los `.md` públicos se descargaban en vez de abrirse en el navegador** en servidores nginx (como Local by Flywheel): antes se enlazaba directo al archivo físico, cuyo `Content-Type` depende de la configuración MIME del servidor. Ahora se sirven por una ruta virtual de WordPress (`/ai-knowledge-doc/{lang}/{slug}.md`, clase `Markdown_Server`) que fija `Content-Type: text/plain` desde PHP, funciona igual en Apache o nginx.
 - JSON-LD duplicado con el schema nativo de WooCommerce (`WC_Structured_Data`, siempre activo si WooCommerce lo está, independientemente de RankMath): ahora se detecta y se cede el schema, igual que ya se hacía con RankMath/Yoast/AIOSEO.
+- Texto de los `<select>` del admin invisible en hover/foco en modo oscuro: `.wp-core-ui select:hover` de WordPress core forzaba `color:#1e1e1e` con la misma especificidad que la regla del tema — mismo caso ya conocido con los botones, resuelto igual (`!important`, ver `_dev/decisiones.md`).
 
 ### Pendiente de esta versión (ver `_dev/qa-resultados-fase-0-a-5.md`)
 - Confirmar si el botón "Añadir a la base de conocimiento" del editor da feedback suficiente (reportado como "no se ve nada" en la primera ronda de QA).

@@ -33,8 +33,8 @@
   <main>
     <header>
       <h1>AI Knowledge & Visibility — Estado</h1>
-      <p class="muted">Última actualización: 2026-09-16 · antes "woo-kb-generator"</p>
-      <span class="badge ok">Fases 0-5 hechas y probadas. CSS/UX del admin rediseñado y confirmado visualmente.</span>
+      <p class="muted">Última actualización: 2026-09-16 (Fase 6 hecha y probada en real) · antes "woo-kb-generator"</p>
+      <span class="badge ok">Fases 0-6 hechas y probadas. CSS/UX del admin rediseñado y confirmado visualmente.</span>
     </header>
 
     <section class="grid">
@@ -44,14 +44,14 @@
         <table>
           <tr><th>Archivo</th><th>Para qué sirve</th></tr>
           <tr><td><code>visual.html</code> (este)</td><td>Vista rápida de estado. Si solo vas a mirar uno, es este.</td></tr>
-          <tr><td><code>roadmap.md</code></td><td>El plan completo, fase por fase, con los pasos técnicos de cada una. Es la fuente de verdad del "qué falta".</td></tr>
-          <tr><td><code>decisiones.md</code></td><td>Decisiones ya cerradas (nombre, alcance) y por qué se tomaron. No se reabren sin motivo nuevo.</td></tr>
-          <tr><td><code>contexto-activo.md</code></td><td>Qué se está haciendo ahora mismo, en esta sesión concreta.</td></tr>
-          <tr><td><code>qa-resultados-fase-0-a-5.md</code></td><td>Bugs y dudas encontrados probando de verdad, organizados por severidad.</td></tr>
-          <tr><td><code>tests-qa-fase-0-a-5.md</code></td><td>La lista de pruebas en sí (checklist), con tus anotaciones al probar.</td></tr>
-          <tr><td><code>estado-plugin-informe.md</code></td><td>Foto fija de auditoría del código original, de cuando se empezó. Ya no cambia.</td></tr>
-          <tr><td><code>analisis-jet-geo.md</code></td><td>Ideas de un plugin competidor (JetGEO) que se pueden reutilizar, mapeadas a fases del roadmap.</td></tr>
-          <tr><td><code>guia-estilo-visual.html</code></td><td>Fuente de verdad visual: carga el CSS real del plugin, botones/colores/badges en claro y oscuro. Mirar antes de crear cualquier estilo nuevo.</td></tr>
+          <tr><td><a href="roadmap.md"><code>roadmap.md</code></a></td><td>El plan completo, fase por fase, con los pasos técnicos de cada una. Es la fuente de verdad del "qué falta".</td></tr>
+          <tr><td><a href="decisiones.md"><code>decisiones.md</code></a></td><td>Decisiones ya cerradas (nombre, alcance) y por qué se tomaron. No se reabren sin motivo nuevo.</td></tr>
+          <tr><td><a href="contexto-activo.md"><code>contexto-activo.md</code></a></td><td>Qué se está haciendo ahora mismo, en esta sesión concreta.</td></tr>
+          <tr><td><a href="qa-resultados-fase-0-a-5.md"><code>qa-resultados-fase-0-a-5.md</code></a></td><td>Bugs y dudas encontrados probando de verdad, organizados por severidad.</td></tr>
+          <tr><td><a href="tests-qa-fase-0-a-5.md"><code>tests-qa-fase-0-a-5.md</code></a></td><td>La lista de pruebas en sí (checklist), con tus anotaciones al probar.</td></tr>
+          <tr><td><a href="estado-plugin-informe.md"><code>estado-plugin-informe.md</code></a></td><td>Foto fija de auditoría del código original, de cuando se empezó. Ya no cambia.</td></tr>
+          <tr><td><a href="analisis-jet-geo.md"><code>analisis-jet-geo.md</code></a></td><td>Ideas de un plugin competidor (JetGEO) que se pueden reutilizar, mapeadas a fases del roadmap.</td></tr>
+          <tr><td><a href="guia-estilo-visual.html"><code>guia-estilo-visual.html</code></a></td><td>Fuente de verdad visual: carga el CSS real del plugin, botones/colores/badges en claro y oscuro. Mirar antes de crear cualquier estilo nuevo.</td></tr>
         </table>
       </article>
 
@@ -70,12 +70,12 @@
           <tr><td>3</td><td>API REST de contenido (JSON sin IA)</td><td><span class="badge ok">Hecho y probado (QA sin fallos)</span></td></tr>
           <tr><td>4</td><td>Markdown público descubrible (<code>&lt;link rel="alternate"&gt;</code>)</td><td><span class="badge ok">Hecho. Descarga vs apertura arreglado (ruta virtual Markdown_Server)</span></td></tr>
           <tr><td>5</td><td>JSON-LD (Schema.org)</td><td><span class="badge ok">Hecho. Duplicado con WooCommerce/RankMath/Yoast/AIOSEO resuelto</span></td></tr>
-          <tr><td>6</td><td>Panel de visibilidad y diagnóstico</td><td><span class="badge warn">Pendiente</span></td></tr>
+          <tr><td>6</td><td>Panel "Visibilidad IA": estado de exposición + contador de pendientes + comprobación de accesibilidad con conflicto robots/noindex (ver <a href="roadmap.md">roadmap.md</a>)</td><td><span class="badge ok">Hecho y probado en real (contador y conflicto de señales confirmados)</span></td></tr>
           <tr><td>7</td><td>API pública documentada (OpenAPI)</td><td><span class="badge warn">Pendiente</span></td></tr>
           <tr><td>8</td><td>Aviso a buscadores en tiempo real (IndexNow)</td><td><span class="badge warn">Pendiente</span></td></tr>
           <tr><td>9</td><td>Feeds especializados</td><td><span class="badge warn">Pendiente</span></td></tr>
           <tr><td>10</td><td>Campos personalizados (ACF/Meta Box/Pods)</td><td><span class="badge warn">Pendiente</span></td></tr>
-          <tr><td>11</td><td>Gestión de crawlers de IA (robots.txt)</td><td><span class="badge warn">Pendiente — ver ideas de JetGEO en <code>analisis-jet-geo.md</code></span></td></tr>
+          <tr><td>11</td><td>Gestión de crawlers de IA (robots.txt)</td><td><span class="badge warn">Pendiente — ver ideas de JetGEO en <a href="analisis-jet-geo.md">analisis-jet-geo.md</a></span></td></tr>
         </table>
       </article>
 
@@ -100,7 +100,15 @@
           <li>Registro: editor de texto más grande y cómodo.</li>
           <li>"Carga inicial" confusa una vez hay contenido parcial.</li>
           <li>WooCommerce: selección tipo checkbox como los posts + prompt por campo.</li>
-          <li>Sistema de tags dinámicos (<code>{post.title}</code>...) en prompts, inspirado en JetGEO.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Ideas sin fase todavía (<a href="analisis-jet-geo.md">analisis-jet-geo.md</a>)</h2>
+        <ul>
+          <li>Sistema de tags dinámicos (<code>{post.title}</code>...) en prompts y texto manual.</li>
+          <li>Onboarding por pasos (asistente de primera configuración).</li>
+          <li><code>Scope</code>: modo "todos los CPT públicos" + filtro de exclusión.</li>
         </ul>
       </article>
 
@@ -110,12 +118,14 @@
           <li>Nombre: <strong>AI Knowledge & Visibility</strong>, slug <code>ai-knowledge</code>. Namespace de código (<code>WOOKB</code>) y slug de menú se mantienen sin cambiar.</li>
           <li>El generador vía IA (OpenAI) + Support Genix sigue siendo el núcleo del producto; la capa de visibilidad (JSON, Markdown público, JSON-LD, etc.) se añade encima, no lo sustituye.</li>
           <li>Nunca se escribe <code>robots.txt</code> automáticamente sin confirmación explícita del usuario.</li>
+          <li>Borrar <code>llms.txt</code> físico sí es posible desde el admin (Fase 6), pero siempre con confirmación fuerte en JS y explicando antes que el plugin genera el suyo dinámicamente al vuelo — nunca un borrado silencioso.</li>
+          <li>Hover/foco de elementos nativos (botones, <code>&lt;select&gt;</code>) pisados por WordPress core: se resuelve con <code>!important</code>, es la solución estándar del proyecto, no una excepción rara.</li>
         </ul>
       </article>
 
       <article class="card wide">
         <h2>Próximo paso</h2>
-        <p>Verificar en el navegador el arreglo de la tabla del Registro. Después: Fase 6 (panel de diagnóstico) o rediseño de UX de WooCommerce/Carga inicial — a decidir cuál primero.</p>
+        <p>Fase 6 hecha y probada en real. Pendiente decidir con el usuario: Fase 7 (API pública documentada) o el rediseño de UX pendiente (Carga inicial / selección de campos WooCommerce).</p>
       </article>
 
     </section>

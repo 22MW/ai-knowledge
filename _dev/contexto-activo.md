@@ -8,42 +8,43 @@
 
 ## Commiteado y pusheado (confirmado en `git log`)
 
-7 commits en `knowBaseDev`, Fases 0-5 del roadmap completas, más los bugs de
-la primera ronda de QA arreglados. Detalle en `CHANGELOG.md`.
+8 commits en `knowBaseDev`, Fases 0-5 del roadmap completas, los bugs de la
+primera ronda de QA arreglados, y el rediseño completo del CSS del admin
+(commit `20ae873`). Detalle en [`CHANGELOG.md`](../CHANGELOG.md); regla
+visual permanente en [`decisiones.md`](decisiones.md).
 
-## Confirmado visualmente por el usuario (pendiente de commit)
+## Confirmado por el usuario, autorizado para commit (pendiente de commitear)
 
-Rediseño completo del CSS del admin (`assets/wookb-theme.css`), a raíz de
-varias rondas de feedback visual real:
+**Fase 6 — Panel "Visibilidad IA", completa y probada en real:**
+- Estado de exposición (llms.txt, Markdown, JSON, JSON-LD) con enlace a un
+  ejemplo real de cada uno, y contador de contenido pendiente de
+  sincronizar (confirmado: 26 pendientes correctos).
+- Selector cerrado de contenido ya sincronizado + "Comprobar
+  accesibilidad": lee `robots.txt` y noindex/`X-Robots-Tag` en vivo, avisa
+  de conflicto entre ambas señales — confirmado detectando un caso real.
+- `llms.txt` físico: vista previa + fecha de modificación + botón "Borrar
+  archivo físico" (confirmación JS fuerte), explicando antes que el plugin
+  genera el suyo dinámicamente al vuelo.
+- Archivos: `admin/class-admin.php`, `admin/views/tab-visibilidad-ia.php`
+  (nuevo), `includes/class-accessibility-checker.php` (nuevo).
 
-- Sistema de 6 variantes de botón (neutro/primario/peligro/éxito/info),
-  usando solo variables reales de Tabler, mismo tamaño siempre
-  (`padding: .5625rem 1rem; font-size: .875rem`, valores reales de `.btn`
-  de Tabler, no inventados).
-- Sin bordes decorativos en cajas/paneles/botones (solo color de fondo
-  sólido); bordes solo en campos de formulario y separadores de tabla.
-- Hover de botones con `filter: invert(1)` + `!important` (WordPress core
-  gana el empate de especificidad si no se fuerza).
-- Tabla del Registro: layout arreglado (`table-layout: auto`), fila
-  expandida "Ver/editar Markdown" ligada visualmente a su fila, columna
-  Acciones con límite/Generar/Borrar apilados y mismo ancho.
-- Nuevo `_dev/guia-estilo-visual.html`: carga el CSS real del plugin
-  (no una copia), única fuente de verdad visual, claro y oscuro.
-- Todo documentado como regla permanente en `_dev/decisiones.md`.
-
-**Este bloque está confirmado por el usuario y autorizado para commit.**
+**Bug aparte corregido:** `<select>` del admin con texto invisible en
+hover/foco en modo oscuro (`assets/wookb-theme.css`, mismo caso que los
+botones — `!important`, ver `decisiones.md`).
 
 ## Pendiente real (sin empezar)
 
-- Fases 6-11 del roadmap.
+- Fases 7-11 del roadmap.
 - UX grande sin abordar: "Carga inicial" confusa, WooCommerce con
   selección de campos tipo checkbox + prompt por campo (ver
   `_dev/qa-resultados-fase-0-a-5.md`).
 - Estilos inline en PHP (`style="width:100%"`, etc. en varias vistas):
   detectado, no abordado — pendiente de decidir si se mueve a CSS.
-- `llms-faq.md`: contenido del sitio, sin commitear a propósito.
+- [`llms-faq.md`](../llms-faq.md): contenido del sitio, sin commitear a propósito.
 - Bug sin repetir: botón del editor (Fase 1) sin feedback claro la primera
   vez que se probó.
+- Ideas sueltas sin fase (`analisis-jet-geo.md`): tags dinámicos en
+  prompts, onboarding por pasos, modo "todos los CPT" en `Scope`.
 
 ## Decisiones de proceso (aplican siempre en este plugin)
 
@@ -57,5 +58,6 @@ varias rondas de feedback visual real:
 
 ## Relevo mínimo — siguiente paso
 
-Con el commit de este bloque hecho: decidir con el usuario si sigue la
-Fase 6 o el rediseño de UX pendiente (Carga inicial / WooCommerce).
+Con el commit de Fase 6 hecho: decidir con el usuario si sigue la Fase 7
+(API pública documentada) o el rediseño de UX pendiente (Carga inicial /
+selección de campos WooCommerce).

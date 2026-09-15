@@ -39,6 +39,8 @@ class Admin
 		add_action('admin_post_wookb_resolve_stale', array(__CLASS__, 'resolve_stale'));
 		add_action('admin_post_wookb_back_to_auto', array(__CLASS__, 'back_to_auto'));
 		add_action('admin_post_wookb_save_woocommerce_settings', array(__CLASS__, 'save_woocommerce_settings'));
+		add_action('admin_post_wookb_check_accessibility', array(__CLASS__, 'check_accessibility'));
+		add_action('admin_post_wookb_delete_physical_llms_txt', array(__CLASS__, 'delete_physical_llms_txt'));
 		add_action('admin_enqueue_scripts', array(__CLASS__, 'assets'));
 		add_action('admin_notices', array(__CLASS__, 'maybe_stale_notice'));
 		add_action('admin_bar_menu', array(__CLASS__, 'admin_bar_stale_node'), 100);
@@ -100,8 +102,9 @@ class Admin
 		if (class_exists('WooCommerce')) {
 			$tabs['woocommerce'] = __('WooCommerce', 'ai-knowledge');
 		}
-		$tabs['ajustes']       = __('Ajustes', 'ai-knowledge');
-		$tabs['carga-inicial'] = __('Carga inicial', 'ai-knowledge');
+		$tabs['ajustes']        = __('Ajustes', 'ai-knowledge');
+		$tabs['carga-inicial']  = __('Carga inicial', 'ai-knowledge');
+		$tabs['visibilidad-ia'] = __('Visibilidad IA', 'ai-knowledge');
 
 		echo '<div class="wookb-wrap">';
 		// Fase 1, arreglo del salto de tema: script inline SINCRONO, impreso
@@ -920,6 +923,67 @@ class Admin
 		}
 
 		self::redirect('registro');
+	}
+
+	/**
+	 * Fase 6: comprueba accesibilidad de UNA URL del contenido ya sincronizado
+	 * (Registro + dentro del Scope) frente a robots.txt y noindex/X-Robots-Tag,
+	 * avisando si se contradicen. El objetivo NUNCA llega como URL libre desde
+	 * el formulario -- solo un "source_id:lang" que se valida contra filas
+	 * reales del Registro (status=synced) y contra Scope::resolve_ids(), para
+	 * que wp_remote_get() no pueda usarse para pedir una URL arbitraria (SSRF).
+	 */
+	public static function check_accessibility()
+	{
+		self::verify('wookb_check_accessibility');
+
+		$target = isset($_POST['check_target']) ? sanitize_text_field(wp_unslash($_POST['check_target'])) : ''; // phpcs:ignore
+		list($source_id, $lang) = array_pad(explode(':', $target, 2), 2, '');
+		$source_id = (int) $source_id;
+		$lang      = sanitize_key($lang);
+
+		$row = $source_id && $lang ? Registry::find($source_id, $lang) : null;
+
+		if (! $row || 'synced' !== $row->status || ! Scope::is_included($source_id)) {
+			set_transient('wookb_accessibility_error', __('Selección no válida: elige una de las opciones de la lista.', 'ai-knowledge'), MINUTE_IN_SECONDS);
+			self::redirect('visibilidad-ia');
+		}
+
+		$url = get_permalink($source_id);
+		if (! $url) {
+			set_transient('wookb_accessibility_error', __('No se pudo resolver la URL pública de ese contenido.', 'ai-knowledge'), MINUTE_IN_SECONDS);
+			self::redirect('visibilidad-ia');
+		}
+
+		$result = Accessibility_Checker::check($url);
+		if (is_wp_error($result)) {
+			set_transient('wookb_accessibility_error', $result->get_error_message(), MINUTE_IN_SECONDS);
+		} else {
+			set_transient('wookb_accessibility_result', $result, MINUTE_IN_SECONDS);
+		}
+
+		self::redirect('visibilidad-ia');
+	}
+
+	/**
+	 * Fase 6: borra el llms.txt físico de la raíz del sitio, si existe. Solo
+	 * ese archivo, ruta fija (nunca a partir de input del usuario): el
+	 * plugin genera el suyo dinámicamente vía rewrite (Llms_Txt::maybe_serve())
+	 * cada vez que se pide, así que borrar el físico no deja al sitio sin
+	 * llms.txt, solo deja de tapar al del plugin. Confirmación fuerte en JS
+	 * (mismo patrón que "Borrar todos" del Registro) porque es un archivo
+	 * fuera de la carpeta del propio plugin.
+	 */
+	public static function delete_physical_llms_txt()
+	{
+		self::verify('wookb_delete_physical_llms_txt');
+
+		$path = ABSPATH . 'llms.txt';
+		if (file_exists($path)) {
+			wp_delete_file($path);
+		}
+
+		self::redirect('visibilidad-ia');
 	}
 
 	/**
