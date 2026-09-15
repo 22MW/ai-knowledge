@@ -13,31 +13,29 @@ $faq_content     = class_exists( '\WOOKB\Llms_Faq' ) ? Llms_Faq::read() : '';
 	<input type="hidden" name="action" value="wookb_save_settings" />
 	<?php wp_nonce_field( 'wookb_save_settings' ); ?>
 
+	<p class="description">
+		<?php
+		printf(
+			/* translators: %s: enlace a la pestaña Carga inicial */
+			esc_html__( 'El límite diario, el tamaño de lote y el debounce de la cola se editan en %s.', 'ai-knowledge' ),
+			'<a href="' . esc_url( admin_url( 'admin.php?page=woo-kb-generator&tab=carga-inicial' ) ) . '">' . esc_html__( 'Carga inicial', 'ai-knowledge' ) . '</a>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
+		);
+		?>
+	</p>
 	<table class="form-table">
 		<tr>
-			<th><?php esc_html_e( 'Límite diario de generaciones', 'ai-knowledge' ); ?></th>
+			<th><?php esc_html_e( 'Largo del texto generado (caracteres)', 'ai-knowledge' ); ?></th>
 			<td>
-				<input type="number" min="1" name="daily_limit" value="<?php echo esc_attr( $settings['daily_limit'] ); ?>" />
-				<label style="margin-left:12px;">
-					<input type="checkbox" name="no_limit" value="1" <?php checked( ! empty( $settings['no_limit'] ) ); ?> />
-					<?php esc_html_e( 'Sin límite (usar solo en cargas manuales supervisadas — recuerda desactivarlo al terminar)', 'ai-knowledge' ); ?>
-				</label>
-				<?php if ( ! empty( $settings['no_limit'] ) ) : ?>
-					<p style="color:#b32d2e;font-weight:600;"><?php esc_html_e( 'Aviso: el límite diario está DESACTIVADO.', 'ai-knowledge' ); ?></p>
-				<?php endif; ?>
+				<input type="number" min="100" max="10000" name="body_char_limit" value="<?php echo esc_attr( $settings['body_char_limit'] ); ?>" />
+				<p class="description"><?php esc_html_e( 'El tamaño real del cuerpo de cada documento generado (sin contar el título). Se puede sobrescribir por documento individual desde el Registro.', 'ai-knowledge' ); ?></p>
 			</td>
 		</tr>
 		<tr>
-			<th><?php esc_html_e( 'Tamaño de lote (carga inicial)', 'ai-knowledge' ); ?></th>
-			<td><input type="number" min="1" name="batch_size" value="<?php echo esc_attr( $settings['batch_size'] ); ?>" /></td>
-		</tr>
-		<tr>
-			<th><?php esc_html_e( 'Retraso de debounce (segundos)', 'ai-knowledge' ); ?></th>
-			<td><input type="number" min="0" name="debounce_seconds" value="<?php echo esc_attr( $settings['debounce_seconds'] ); ?>" /></td>
-		</tr>
-		<tr>
 			<th><?php esc_html_e( 'Tokens de salida por documento', 'ai-knowledge' ); ?></th>
-			<td><input type="number" min="200" name="output_tokens" value="<?php echo esc_attr( $settings['output_tokens'] ); ?>" /></td>
+			<td>
+				<input type="number" min="200" name="output_tokens" value="<?php echo esc_attr( $settings['output_tokens'] ); ?>" />
+				<p class="description"><?php esc_html_e( 'Techo técnico de la petición a la IA (para que la respuesta no se corte a mitad), no el largo del texto — eso lo controla el campo de arriba.', 'ai-knowledge' ); ?></p>
+			</td>
 		</tr>
 		<tr>
 			<th><?php esc_html_e( 'Origen de la clave IA', 'ai-knowledge' ); ?></th>

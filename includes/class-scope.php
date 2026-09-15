@@ -23,6 +23,7 @@ class Scope {
 			'batch_size'       => 20,
 			'debounce_seconds' => 300,
 			'output_tokens'    => 2500,
+			'body_char_limit'  => 1000, // Generator::BODY_CHAR_LIMIT es solo el respaldo si esta clave faltara.
 			'ai_key_source'    => 'genix', // genix|own
 			'own_api_key'      => '',
 			'own_model'        => 'gpt-4o-mini',

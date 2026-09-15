@@ -21,8 +21,8 @@ class Queue {
 	}
 
 	public static function init() {
-		add_action( self::HOOK_GENERATE, array( __CLASS__, 'run_generate' ), 10, 2 );
-		add_action( self::HOOK_SEED, array( __CLASS__, 'run_seed_batch' ), 10, 1 );
+		add_action( self::HOOK_GENERATE, array( __CLASS__, 'run_generate' ), 10, 3 );
+		add_action( self::HOOK_SEED, array( __CLASS__, 'run_seed_batch' ), 10, 2 );
 		add_action( self::HOOK_INTEGRITY, array( __CLASS__, 'run_integrity_check' ) );
 
 		if ( ! self::has_action_scheduler() ) {
@@ -36,21 +36,27 @@ class Queue {
 
 	/**
 	 * Encola (con debounce) la generación de un documento para source_id+lang.
+	 * $force: si true, Document_Pipeline::process() regenera aunque el hash
+	 * del origen no haya cambiado (usado por "Reiniciar todo" en Carga
+	 * inicial, ver Admin::start_seed_force()).
 	 */
-	public static function enqueue( $source_id, $lang ) {
+	public static function enqueue( $source_id, $lang, $force = false ) {
 		$settings = Scope::settings();
 		$delay    = max( 0, (int) $settings['debounce_seconds'] );
 
-		$args = array( 'source_id' => (int) $source_id, 'lang' => $lang );
+		$args = array( 'source_id' => (int) $source_id, 'lang' => $lang, 'force' => (bool) $force );
 
 		if ( self::has_action_scheduler() ) {
-			// Debounce: desprogramar cualquier acción previa idéntica pendiente.
+			// Debounce: desprogramar cualquier acción previa idéntica pendiente
+			// (mismo source_id+lang+force -- una petición force=true no
+			// desprograma una force=false pendiente ni viceversa, caso raro
+			// aceptado).
 			as_unschedule_action( self::HOOK_GENERATE, $args, self::GROUP );
 			as_schedule_single_action( time() + $delay, self::HOOK_GENERATE, $args, self::GROUP );
 		} else {
 			$lock_key = 'wookb_lock_' . $source_id . '_' . $lang;
 			set_transient( $lock_key, time(), $delay + 60 );
-			wp_schedule_single_event( time() + $delay, self::HOOK_GENERATE, array( $source_id, $lang ) );
+			wp_schedule_single_event( time() + $delay, self::HOOK_GENERATE, array( $source_id, $lang, $force ) );
 		}
 
 		Registry::upsert(
@@ -67,7 +73,7 @@ class Queue {
 	/**
 	 * Ejecuta la generación real de un documento. Comprueba origen, hash y límite diario.
 	 */
-	public static function run_generate( $source_id, $lang ) {
+	public static function run_generate( $source_id, $lang, $force = false ) {
 		$source_id = (int) $source_id;
 
 		$post = get_post( $source_id );
@@ -86,21 +92,21 @@ class Queue {
 			// Reprogramar para las 00:05 del día siguiente.
 			$tomorrow = strtotime( 'tomorrow 00:05', current_time( 'timestamp' ) ); // phpcs:ignore
 			if ( self::has_action_scheduler() ) {
-				as_schedule_single_action( $tomorrow, self::HOOK_GENERATE, array( 'source_id' => $source_id, 'lang' => $lang ), self::GROUP );
+				as_schedule_single_action( $tomorrow, self::HOOK_GENERATE, array( 'source_id' => $source_id, 'lang' => $lang, 'force' => (bool) $force ), self::GROUP );
 			} else {
-				wp_schedule_single_event( $tomorrow, self::HOOK_GENERATE, array( $source_id, $lang ) );
+				wp_schedule_single_event( $tomorrow, self::HOOK_GENERATE, array( $source_id, $lang, $force ) );
 			}
 			return;
 		}
 
-		$result = Document_Pipeline::process( $source_id, $lang );
+		$result = Document_Pipeline::process( $source_id, $lang, null, $force );
 
 		if ( ! is_wp_error( $result ) ) {
 			self::increment_daily_counter();
 		}
 	}
 
-	public static function run_seed_batch( $offset = 0 ) {
+	public static function run_seed_batch( $offset = 0, $force = false ) {
 		$settings = Scope::settings();
 		$ids      = Scope::resolve_ids();
 		$batch    = array_slice( $ids, $offset, (int) $settings['batch_size'] );
@@ -121,12 +127,12 @@ class Queue {
 			$own_lang = Wpml::element_language( $source_id );
 			foreach ( Wpml::active_languages() as $lang ) {
 				if ( $lang === $own_lang ) {
-					self::enqueue( $source_id, $lang );
+					self::enqueue( $source_id, $lang, $force );
 					continue;
 				}
 				$translated_id = Wpml::get_translation_id( $source_id, $lang );
 				if ( $translated_id && (int) $translated_id !== (int) $source_id ) {
-					self::enqueue( $translated_id, $lang );
+					self::enqueue( $translated_id, $lang, $force );
 				}
 				// Sin traduccion real a ese idioma: no se encola nada (antes
 				// se encolaba $source_id igualmente, mal etiquetado).
@@ -135,15 +141,20 @@ class Queue {
 
 		$next_offset = $offset + (int) $settings['batch_size'];
 		if ( self::has_action_scheduler() ) {
-			as_schedule_single_action( time() + 60, self::HOOK_SEED, array( 'offset' => $next_offset ), self::GROUP );
+			as_schedule_single_action( time() + 60, self::HOOK_SEED, array( 'offset' => $next_offset, 'force' => (bool) $force ), self::GROUP );
 		} else {
-			wp_schedule_single_event( time() + 60, self::HOOK_SEED, array( $next_offset ) );
+			wp_schedule_single_event( time() + 60, self::HOOK_SEED, array( $next_offset, $force ) );
 		}
 	}
 
-	public static function start_seed() {
+	/**
+	 * $force: false = "Generar pendientes" (comportamiento de siempre, no
+	 * regenera lo que no cambió). true = "Reiniciar todo" (Admin::
+	 * start_seed_force()), fuerza regenerar también lo ya sincronizado.
+	 */
+	public static function start_seed( $force = false ) {
 		update_option( 'wookb_seed_running', 1, false );
-		self::run_seed_batch( 0 );
+		self::run_seed_batch( 0, $force );
 	}
 
 	public static function cancel_seed() {

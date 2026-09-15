@@ -22,6 +22,8 @@ class Admin
 		add_action('admin_post_wookb_save_exclusions', array(__CLASS__, 'save_exclusions'));
 		add_action('admin_post_wookb_save_settings', array(__CLASS__, 'save_settings'));
 		add_action('admin_post_wookb_start_seed', array(__CLASS__, 'start_seed'));
+		add_action('admin_post_wookb_start_seed_force', array(__CLASS__, 'start_seed_force'));
+		add_action('admin_post_wookb_save_queue_settings', array(__CLASS__, 'save_queue_settings'));
 		add_action('admin_post_wookb_cancel_seed', array(__CLASS__, 'cancel_seed'));
 		add_action('admin_post_wookb_row_action', array(__CLASS__, 'row_action'));
 		add_action('admin_post_wookb_regenerate_single', array(__CLASS__, 'regenerate_single'));
@@ -119,9 +121,7 @@ class Admin
 		echo '<div class="wookb-header-row"><h3>' . esc_html__('Base de conocimiento IA', 'ai-knowledge') . '</h3>';
 		echo '<button type="button" class="wookb-theme-toggle"> ' . esc_html__('Modo oscuro', 'ai-knowledge') . '</button></div>';
 
-		if ('registro' === $tab) {
-			self::render_registry_summary();
-		}
+		self::render_registry_summary();
 
 		if (isset($_GET['wookb_notice'])) { // phpcs:ignore
 			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Guardado.', 'ai-knowledge') . '</p></div>';
@@ -258,11 +258,11 @@ class Admin
 
 		Scope::update_settings(
 			array(
-				'daily_limit'      => max(1, (int) ($_POST['daily_limit'] ?? 100)), // phpcs:ignore
-				'no_limit'         => ! empty($_POST['no_limit']), // phpcs:ignore
-				'batch_size'       => max(1, (int) ($_POST['batch_size'] ?? 20)), // phpcs:ignore
-				'debounce_seconds' => max(0, (int) ($_POST['debounce_seconds'] ?? 300)), // phpcs:ignore
+				// daily_limit/no_limit/batch_size/debounce_seconds: movidos a
+				// Carga inicial (UX2), se guardan con save_queue_settings(), no
+				// aqui -- este formulario ya no los envia.
 				'output_tokens'    => max(200, (int) ($_POST['output_tokens'] ?? 2500)), // phpcs:ignore
+				'body_char_limit'  => max(100, min(10000, (int) ($_POST['body_char_limit'] ?? 1000))), // phpcs:ignore
 				'ai_key_source'    => in_array($_POST['ai_key_source'] ?? '', array('genix', 'own'), true) ? sanitize_key($_POST['ai_key_source']) : 'genix', // phpcs:ignore
 				'own_api_key'      => isset($_POST['own_api_key']) ? sanitize_text_field(wp_unslash($_POST['own_api_key'])) : '', // phpcs:ignore
 				'own_model'        => isset($_POST['own_model']) ? sanitize_text_field(wp_unslash($_POST['own_model'])) : 'gpt-4o-mini', // phpcs:ignore
@@ -285,6 +285,45 @@ class Admin
 	{
 		self::verify('wookb_start_seed');
 		Queue::start_seed();
+		self::redirect('carga-inicial');
+	}
+
+	/**
+	 * UX2: "Reiniciar todo" -- misma cola que "Generar pendientes" pero con
+	 * force=true, para regenerar tambien lo que ya estaba sincronizado. Accion
+	 * propia (no un parametro del formulario de start_seed) para que el
+	 * nonce/confirmacion JS de la vista sean inequivocos sobre cual de las
+	 * dos se esta pidiendo.
+	 */
+	public static function start_seed_force()
+	{
+		self::verify('wookb_start_seed_force');
+		Queue::start_seed(true);
+		self::redirect('carga-inicial');
+	}
+
+	/**
+	 * UX2: guarda SOLO los 3 ajustes de cola (limite diario, lote, debounce),
+	 * movidos de Ajustes a Carga inicial. Accion separada de save_settings()
+	 * a proposito: save_settings() reescribe TODAS sus claves desde $_POST
+	 * con valores por defecto si faltan -- si este formulario mas pequeño
+	 * llamase a esa misma accion, cada guardado desde aqui resetearia
+	 * output_tokens/clave IA/prompt adicional a su valor por defecto. Con
+	 * Scope::update_settings() (merge) esto no puede pasar.
+	 */
+	public static function save_queue_settings()
+	{
+		self::verify('wookb_save_queue_settings');
+
+		Scope::update_settings(
+			array(
+				'daily_limit'      => max(1, (int) ($_POST['daily_limit'] ?? 100)), // phpcs:ignore
+				'no_limit'         => ! empty($_POST['no_limit']), // phpcs:ignore
+				'batch_size'       => max(1, (int) ($_POST['batch_size'] ?? 20)), // phpcs:ignore
+				'debounce_seconds' => max(0, (int) ($_POST['debounce_seconds'] ?? 300)), // phpcs:ignore
+			)
+		);
+
 		self::redirect('carga-inicial');
 	}
 

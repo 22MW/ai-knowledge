@@ -17,6 +17,8 @@ class Generator {
 	// relevante. Igualar la longitud nivela el terreno, pero debe seguir
 	// siendo informativo (horarios, dias, precios por franja) — no un
 	// telegrama de bullets sueltos. Ver investigacion-comportamiento-chatbot.md.
+	// Editable en Ajustes (Scope::settings()['body_char_limit']); esta
+	// constante es solo el valor de respaldo si el ajuste no existe.
 	const BODY_CHAR_LIMIT = 1000;
 
 	/**
@@ -88,10 +90,17 @@ class Generator {
 
 	/**
 	 * Normaliza un limite de caracteres recibido desde fuera (puede venir de
-	 * $_POST): si es null, cero o negativo, cae al valor por defecto.
+	 * $_POST, o de char_limit por fila en el Registro): si es null, cae al
+	 * ajuste general (Scope::settings()['body_char_limit']); si es cero,
+	 * negativo o el ajuste no existe, cae a BODY_CHAR_LIMIT.
 	 */
 	protected static function resolve_char_limit( $char_limit ) {
-		$char_limit = null === $char_limit ? self::BODY_CHAR_LIMIT : (int) $char_limit;
+		if ( null === $char_limit ) {
+			$settings   = Scope::settings();
+			$char_limit = ! empty( $settings['body_char_limit'] ) ? (int) $settings['body_char_limit'] : self::BODY_CHAR_LIMIT;
+		} else {
+			$char_limit = (int) $char_limit;
+		}
 		return $char_limit > 0 ? $char_limit : self::BODY_CHAR_LIMIT;
 	}
 

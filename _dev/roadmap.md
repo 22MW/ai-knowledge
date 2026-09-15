@@ -267,6 +267,27 @@ aplicarlo — en vez de configurar pestaña por pestaña sin guía, como hoy.
 
 ---
 
+## UX pendiente de rediseño (detalle completo en [`qa-resultados-fase-0-a-5.md`](qa-resultados-fase-0-a-5.md))
+
+- **UX2 — "Carga inicial" confusa — HECHO.** Botón único sustituido por
+  "Generar pendientes" (comportamiento de siempre, seguro repetir) +
+  "Reiniciar todo" (fuerza regenerar también lo ya sincronizado, con
+  confirmación fuerte). Límite diario/tamaño de lote/debounce movidos aquí
+  desde Ajustes, con guardado propio (`wookb_save_queue_settings`,
+  `Scope::update_settings()` con merge — no reescribe el resto de Ajustes).
+  De paso: contador "Total de documentos" visible en todas las pestañas, no
+  solo en Registro; y nuevo ajuste general "Largo del texto generado
+  (caracteres)" en Ajustes (antes fijo en código, `Generator::BODY_CHAR_LIMIT`,
+  sin ningún sitio del admin donde verlo o cambiarlo).
+- **UX3 — WooCommerce: checkboxes + prompt por campo — PENDIENTE.** Cambio
+  de arquitectura de datos (nueva estructura para selección por campo y
+  texto manual por campo suelto), requiere `rol-analista` antes de tocar
+  código.
+- **UX4 — Visibilidad del botón "Generar documentos de tienda" — PENDIENTE.**
+  Revisar si quedó poco visible/mal etiquetado en la pestaña WooCommerce.
+
+---
+
 ## Explícitamente descartado (decisión ya tomada, no una fase)
 
 - Prompt específico por documento — se descartó a favor de solo texto manual (Fase 1).

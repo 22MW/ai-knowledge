@@ -97,11 +97,9 @@ estrecha), textarea de ~2/3 del ancho de la pantalla y mínimo 15 líneas de
 alto, botones más grandes.
 
 **UX2 — "Carga inicial" confunde una vez que ya hay contenido sincronizado
-parcialmente.** El texto actual ("Alcance actual: 38 elementos... 13
-sincronizados... carga en curso...") no dice claramente qué hace cada botón
-(cancelar/reiniciar/añadir lo nuevo). Pedido: aclarar la pestaña para que
-sirva tanto para la carga inicial como para sincronizar contenido añadido
-después.
+parcialmente. — HECHO (ver `_dev/roadmap.md`, sección "UX pendiente de
+rediseño").** Botón único sustituido por "Generar pendientes" +
+"Reiniciar todo", y ajustes de cola movidos a esta pestaña.
 
 **UX3 — Pestaña WooCommerce: los datos detectados deberían tratarse como
 los posts** (selección tipo checkbox de qué incluir en el prompt/`.md`),

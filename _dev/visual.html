@@ -33,8 +33,8 @@
   <main>
     <header>
       <h1>AI Knowledge & Visibility — Estado</h1>
-      <p class="muted">Última actualización: 2026-09-16 (Fase 6 hecha y probada en real) · antes "woo-kb-generator"</p>
-      <span class="badge ok">Fases 0-6 hechas y probadas. CSS/UX del admin rediseñado y confirmado visualmente.</span>
+      <p class="muted">Última actualización: 2026-09-16 (UX2 — Carga inicial rediseñada) · antes "woo-kb-generator"</p>
+      <span class="badge ok">Fases 0-6 hechas y probadas. CSS/UX del admin rediseñado, Carga inicial rediseñada.</span>
     </header>
 
     <section class="grid">
@@ -98,8 +98,8 @@
         <h2>Futuro (rediseño de UX, no bugs)</h2>
         <ul>
           <li>Registro: editor de texto más grande y cómodo.</li>
-          <li>"Carga inicial" confusa una vez hay contenido parcial.</li>
-          <li>WooCommerce: selección tipo checkbox como los posts + prompt por campo.</li>
+          <li>WooCommerce (UX3): selección tipo checkbox como los posts + prompt por campo — cambio de arquitectura de datos, requiere <code>rol-analista</code>.</li>
+          <li>WooCommerce (UX4): revisar visibilidad del botón "Generar documentos de tienda".</li>
         </ul>
       </article>
 
@@ -113,6 +113,11 @@
       </article>
 
       <article class="card wide">
+        <h2>UX2 — Carga inicial rediseñada (2026-09-16)</h2>
+        <p>Botón único sustituido por "Generar pendientes" (seguro repetirlo, no regenera lo que no cambió) y "Reiniciar todo" (fuerza regenerar también lo ya sincronizado, confirmación fuerte), en fila, con las variantes de botón ya existentes. Límite diario/tamaño de lote/debounce movidos aquí desde Ajustes, con guardado propio para no arriesgar el resto de Ajustes. El resumen "Total de documentos" ahora es visible en todas las pestañas. Nuevo ajuste general "Largo del texto generado (caracteres)" en Ajustes (antes fijo en código, 1000, sin sitio donde verlo/cambiarlo).</p>
+      </article>
+
+      <article class="card wide">
         <h2>Últimas decisiones</h2>
         <ul>
           <li>Nombre: <strong>AI Knowledge & Visibility</strong>, slug <code>ai-knowledge</code>. Namespace de código (<code>WOOKB</code>) y slug de menú se mantienen sin cambiar.</li>
@@ -120,12 +125,13 @@
           <li>Nunca se escribe <code>robots.txt</code> automáticamente sin confirmación explícita del usuario.</li>
           <li>Borrar <code>llms.txt</code> físico sí es posible desde el admin (Fase 6), pero siempre con confirmación fuerte en JS y explicando antes que el plugin genera el suyo dinámicamente al vuelo — nunca un borrado silencioso.</li>
           <li>Hover/foco de elementos nativos (botones, <code>&lt;select&gt;</code>) pisados por WordPress core: se resuelve con <code>!important</code>, es la solución estándar del proyecto, no una excepción rara.</li>
+          <li>Ningún estilo de botón nuevo se crea sin necesidad real: para "Reiniciar todo" se reutilizó la variante neutro ya existente, no se añadió una 6ª variante "aviso".</li>
         </ul>
       </article>
 
       <article class="card wide">
         <h2>Próximo paso</h2>
-        <p>Fase 6 hecha y probada en real. Pendiente decidir con el usuario: Fase 7 (API pública documentada) o el rediseño de UX pendiente (Carga inicial / selección de campos WooCommerce).</p>
+        <p>Fase 6 y UX2 hechas y probadas en real. Pendiente decidir con el usuario: Fase 7 (API pública documentada) o UX3 (WooCommerce: checkboxes + prompt por campo, con <code>rol-analista</code> primero).</p>
       </article>
 
     </section>
