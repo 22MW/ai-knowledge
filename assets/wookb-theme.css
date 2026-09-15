@@ -29,13 +29,25 @@
   --tblr-primary-fg: #fff;
 }
 
+/* QA (bug B, preexistente desde el commit inicial -- confirmado con
+   `git log -p -- assets/wookb-theme.css`, no es regresion de la Fase 1):
+   el margen lateral (20px derecha, 2px izquierda) queda FUERA del area
+   donde se pinta "background", asi que en modo oscuro se veia una franja
+   sin colorear (fondo por defecto de wp-admin) flanqueando la caja
+   coloreada -- un "borde" de otro color. Se sustituye el margen lateral
+   por padding extra (mismo hueco visual exacto de antes: el contenido
+   interior queda exactamente igual de separado del borde de la ventana),
+   para que el "background" del propio .wookb-wrap cubra tambien esa zona.
+   El margen superior (1rem) se mantiene: separa de las pestañas/avisos de
+   arriba, que ya son zona sin tema por diseño (fuera de .wookb-wrap), no
+   parte de la caja coloreada. */
 .wookb-wrap {
   background: var(--tblr-body-bg);
   color: var(--tblr-body-color);
   font-family: var(--tblr-body-font-family, Inter, -apple-system, sans-serif);
-  padding: 1.5rem;
+  padding: 1.5rem calc(1.5rem + 20px) 1.5rem calc(1.5rem + 2px);
   border-radius: 8px;
-  margin: 1rem 20px 0 2px;
+  margin: 1rem 0 0 0;
 }
 
 .wookb-wrap h3 {
@@ -214,6 +226,25 @@
   background: var(--tblr-card-bg, var(--tblr-body-bg));
   border: 1px solid var(--tblr-border-color, #e5e7eb);
   color: var(--tblr-body-color);
+}
+/* QA (bug A): WP_List_Table::get_table_classes() añade la clase "fixed" por
+   defecto (Registry_Table no la sobreescribe), y wp-admin/css/list-tables.css
+   pone table-layout:fixed para cualquier tabla ".fixed". En fixed layout el
+   ancho de cada columna sin "width" propio se decide SOLO por el contenido de
+   la fila de CABECERA -- nunca por el contenido real de las filas de datos.
+   Todas las columnas de ancho variable (Origen, Control manual, Enlaces,
+   casilla) no tenian "width" fijo aqui (a diferencia de lang/status/bridge/
+   hash/updated/actions, que si lo tienen mas abajo): la cabecera "Control
+   manual" (mas texto que "Origen") se llevaba mas ancho fijo que "Origen",
+   y el titulo real de cada fila (mucho mas largo que cualquier cabecera)
+   quedaba forzado a partirse letra por letra en una columna demasiado
+   estrecha para el. Se vuelve a table-layout:auto (como una tabla HTML
+   normal): cada columna se mide por su contenido real, no por el de la
+   cabecera. Los "width" explicitos de las columnas cortas de mas abajo
+   siguen funcionando en auto layout, ahi actuan como sugerencia/minimo en
+   vez de valor estricto, sin conflicto. */
+.wookb-wrap .wp-list-table.fixed {
+  table-layout: auto;
 }
 .wookb-wrap .wp-list-table th,
 .wookb-wrap .wp-list-table td {
@@ -440,4 +471,39 @@
 .wookb-wrap .wookb-wc-manual {
   border-left: 3px solid var(--tblr-primary, #206bc4);
   padding-left: 12px;
+}
+
+/* QA (bug A, ampliación UX1): badges de la columna "Control manual" -- ahora
+   solo badges (el bloque de edición se movió a la fila expandida de abajo),
+   deja que envuelvan en varias lineas si hace falta en vez de forzar una
+   sola linea sin cortes (evita que esta celda vuelva a inflar su ancho). */
+.wookb-wrap .wookb-manual-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Fila expandida de edición manual (single_row() en Registry_Table): ocupa
+   todo el ancho de la tabla vía colspan, con un fondo ligeramente distinto
+   (reusa --tblr-secondary-bg, misma variable que ya usa la cabecera de la
+   tabla) para que se lea como un panel de detalle bajo la fila, no como una
+   fila de datos mas. Sin borde propio nuevo: el border-bottom ya lo pone la
+   regla general ".wp-list-table th, .wp-list-table td" de mas arriba. */
+.wookb-wrap .wookb-manual-expand-row > td {
+  background: var(--tblr-secondary-bg, #f3f4f6);
+  padding: 10px 16px 14px;
+}
+.wookb-wrap .wookb-manual-expand-cell details > summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.wookb-wrap .wookb-manual-textarea {
+  box-sizing: border-box;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  margin-top: 8px;
+}
+.wookb-wrap .wookb-manual-expand-cell .button {
+  margin-right: 8px;
 }

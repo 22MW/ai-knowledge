@@ -142,7 +142,7 @@ class Registry_Table extends \WP_List_Table {
 				}
 				return implode( ' · ', $out );
 			case 'manual':
-				return $this->manual_control_markup( $item );
+				return $this->manual_badges_markup( $item );
 			case 'actions':
 				return $this->row_actions_markup( $item );
 			default:
@@ -171,13 +171,70 @@ class Registry_Table extends \WP_List_Table {
 	}
 
 	/**
-	 * Fase 1: control manual por fila -- textarea con el Markdown actual
-	 * (override_text si ya esta en modo manual, si no el .md real via
-	 * Markdown_Store), limite de caracteres propio, y los botones Pasar a
-	 * manual / Volver a Auto / Marcar revisado. Colapsado en <details> para no
-	 * romper el ancho de la tabla existente.
+	 * QA (bug real, tabla del Registro): con la columna "Control manual"
+	 * llevando badges + <details> + textarea + botones dentro de una sola
+	 * celda, y sin ancho propio en el CSS (a diferencia de TODAS sus
+	 * columnas hermanas: lang/status/bridge/hash/updated/actions tienen
+	 * "width" explicito en admin.css/wookb-theme.css), la tabla -- que
+	 * WP_List_Table marca con la clase "fixed" por defecto
+	 * (get_table_classes() de core, no sobreescrito aqui) y por tanto usa
+	 * table-layout:fixed via wp-admin/css/list-tables.css (`table.fixed {
+	 * table-layout: fixed; }`) -- reparte el ancho de columnas SIN
+	 * constraint explicito segun el contenido de la fila de CABECERA
+	 * (unico que cuenta en fixed layout), no el de las filas de datos. La
+	 * cabecera "Control manual" es mas larga que "Origen", asi que esa
+	 * columna se llevaba mas ancho que "Origen" -- y el titulo real de cada
+	 * fila en "Origen" quedaba forzado a envolver letra por letra en una
+	 * columna demasiado estrecha. Confirmado por lectura de
+	 * wp-admin/includes/class-wp-list-table.php::get_table_classes()
+	 * (siempre añade "fixed" salvo que se sobreescriba, y Registry_Table no
+	 * lo hace) + wp-admin/css/list-tables.css línea ~291.
+	 *
+	 * Arreglo de layout: assets/wookb-theme.css fuerza table-layout:auto
+	 * para esta tabla (columnas se miden por contenido real, como una tabla
+	 * HTML normal).
+	 *
+	 * Arreglo de UX (ampliación del mismo encargo, ver UX1 de
+	 * qa-resultados-fase-0-a-5.md): el bloque de edición ya NO vive dentro
+	 * de la celda estrecha de "Control manual". Esta columna ahora solo
+	 * muestra los badges (Manual/Auto + aviso de "stale"), cortos y sin
+	 * necesidad de mucho ancho. El <details> con el textarea/botones se
+	 * imprime en una fila aparte que ocupa TODO el ancho de la tabla
+	 * (colspan, ver single_row()) -- no una celda de columna.
 	 */
-	protected function manual_control_markup( $item ) {
+	protected function manual_badges_markup( $item ) {
+		$is_manual       = 'manual' === $item->override_mode;
+		$resolve_form_id = 'wookb-resolve-stale-' . (int) $item->id;
+
+		ob_start();
+		?>
+		<div class="wookb-manual-badges">
+			<?php if ( $is_manual ) : ?>
+				<span class="wookb-badge-manual"><?php esc_html_e( 'Manual', 'ai-knowledge' ); ?></span>
+			<?php else : ?>
+				<span class="wookb-badge-auto"><?php esc_html_e( 'Auto', 'ai-knowledge' ); ?></span>
+			<?php endif; ?>
+			<?php if ( ! empty( $item->stale ) ) : ?>
+				<span class="wookb-badge-stale"><?php esc_html_e( 'Origen actualizado', 'ai-knowledge' ); ?></span>
+				<button type="submit" form="<?php echo esc_attr( $resolve_form_id ); ?>" class="button button-small"><?php esc_html_e( 'Marcar revisado', 'ai-knowledge' ); ?></button>
+			<?php endif; ?>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Bloque completo de edición manual (textarea + límite + botones), a
+	 * ancho completo de fila -- ver single_row(), que lo imprime en un
+	 * <tr><td colspan="..."> aparte justo debajo de la fila normal del
+	 * documento, no dentro de una columna. Mismas 4 acciones/formularios de
+	 * siempre (wookb_set_manual, wookb_set_char_limit, wookb_back_to_auto,
+	 * wookb_resolve_stale), sin cambios de lógica -- solo maquetación:
+	 * textarea de 15 líneas (antes 6) y botones a tamaño normal "button"
+	 * (antes "button-small"), pedido explícito por ser un bloque ahora a
+	 * ancho completo, no una celda estrecha.
+	 */
+	protected function manual_expanded_row_markup( $item ) {
 		$is_manual = 'manual' === $item->override_mode;
 
 		if ( $is_manual && null !== $item->override_text && '' !== $item->override_text ) {
@@ -214,25 +271,9 @@ class Registry_Table extends \WP_List_Table {
 			<input type="hidden" name="row_id" value="<?php echo esc_attr( $item->id ); ?>" />
 			<?php wp_nonce_field( 'wookb_resolve_stale' ); ?>
 		</form>
-		<?php
-		$this->out_of_band_forms[] = ob_get_clean();
-
-		ob_start();
-		?>
-		<div>
-			<?php if ( $is_manual ) : ?>
-				<span class="wookb-badge-manual"><?php esc_html_e( 'Manual', 'ai-knowledge' ); ?></span>
-			<?php else : ?>
-				<span class="wookb-badge-auto"><?php esc_html_e( 'Auto', 'ai-knowledge' ); ?></span>
-			<?php endif; ?>
-			<?php if ( ! empty( $item->stale ) ) : ?>
-				<span class="wookb-badge-stale"><?php esc_html_e( 'Origen actualizado', 'ai-knowledge' ); ?></span>
-				<button type="submit" form="<?php echo esc_attr( $resolve_form_id ); ?>" class="button button-small"><?php esc_html_e( 'Marcar revisado', 'ai-knowledge' ); ?></button>
-			<?php endif; ?>
-		</div>
 		<details>
 			<summary><?php esc_html_e( 'Ver/editar Markdown', 'ai-knowledge' ); ?></summary>
-			<textarea form="<?php echo esc_attr( $set_manual_form_id ); ?>" name="override_text" rows="6" style="width:100%;"><?php echo esc_textarea( $current_text ); ?></textarea>
+			<textarea form="<?php echo esc_attr( $set_manual_form_id ); ?>" name="override_text" rows="15" class="wookb-manual-textarea" style="width:100%;"><?php echo esc_textarea( $current_text ); ?></textarea>
 			<p>
 				<label>
 					<?php esc_html_e( 'Límite de caracteres', 'ai-knowledge' ); ?>
@@ -248,18 +289,39 @@ class Registry_Table extends \WP_List_Table {
 						style="width:6em"
 					/>
 				</label>
-				<button type="submit" form="<?php echo esc_attr( $char_limit_form_id ); ?>" class="button button-small"><?php esc_html_e( 'Guardar límite', 'ai-knowledge' ); ?></button>
+				<button type="submit" form="<?php echo esc_attr( $char_limit_form_id ); ?>" class="button"><?php esc_html_e( 'Guardar límite', 'ai-knowledge' ); ?></button>
 			</p>
 			<p>
 				<?php if ( $is_manual ) : ?>
-					<button type="submit" form="<?php echo esc_attr( $back_auto_form_id ); ?>" class="button button-small"><?php esc_html_e( 'Volver a Auto', 'ai-knowledge' ); ?></button>
+					<button type="submit" form="<?php echo esc_attr( $back_auto_form_id ); ?>" class="button"><?php esc_html_e( 'Volver a Auto', 'ai-knowledge' ); ?></button>
 				<?php else : ?>
-					<button type="submit" form="<?php echo esc_attr( $set_manual_form_id ); ?>" class="button button-small"><?php esc_html_e( 'Pasar a manual', 'ai-knowledge' ); ?></button>
+					<button type="submit" form="<?php echo esc_attr( $set_manual_form_id ); ?>" class="button"><?php esc_html_e( 'Pasar a manual', 'ai-knowledge' ); ?></button>
 				<?php endif; ?>
 			</p>
 		</details>
 		<?php
 		return ob_get_clean();
+	}
+
+	/**
+	 * Override de WP_List_Table::single_row(): imprime la fila normal del
+	 * documento tal cual (parent::single_row(), sin tocar columnas,
+	 * data-colname, columna primaria ni el toggle-row nativo de la vista
+	 * movil -- todo eso lo sigue gestionando el core igual que antes), y
+	 * justo debajo una fila EXTRA que ocupa toda la anchura de la tabla
+	 * (colspan = numero total de columnas) con el bloque de edición manual
+	 * completo. No es una columna mas: es una fila aparte, para que el
+	 * textarea/botones no queden encerrados en una celda estrecha.
+	 */
+	public function single_row( $item ) {
+		parent::single_row( $item );
+
+		$colspan = count( $this->get_columns() );
+		echo '<tr class="wookb-manual-expand-row">';
+		echo '<td colspan="' . esc_attr( $colspan ) . '" class="wookb-manual-expand-cell">';
+		echo $this->manual_expanded_row_markup( $item ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado campo a campo dentro del propio metodo.
+		echo '</td>';
+		echo '</tr>';
 	}
 
 	protected function row_actions_markup( $item ) {
