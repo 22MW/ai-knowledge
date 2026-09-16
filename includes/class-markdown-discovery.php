@@ -75,6 +75,16 @@ class Markdown_Discovery {
 			'<link rel="alternate" type="text/markdown" href="%s" />' . "\n",
 			esc_url( Markdown_Store::public_url( $row->md_path ) )
 		);
+
+		// Recomendacion de la spec oficial (llmstxt.org), complementaria a la de
+		// arriba: "alternate" dice "aqui esta la version Markdown de ESTA
+		// pagina"; "describedby" dice "ESTA pagina esta descrita en este indice
+		// general". Mismo gating (contenido sincronizado y dentro de Scope):
+		// solo se afirma cobertura por llms.txt para lo que realmente aparece ahi.
+		printf(
+			'<link rel="describedby" href="%s" />' . "\n",
+			esc_url( home_url( '/llms.txt' ) )
+		);
 	}
 
 	/**

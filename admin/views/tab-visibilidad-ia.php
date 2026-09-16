@@ -96,6 +96,15 @@ $htaccess_block_preview = "RewriteEngine On\n" . implode( "\n", Htaccess_Guard::
 	<tr>
 		<th><?php esc_html_e( 'llms.txt', 'ai-knowledge' ); ?></th>
 		<td>
+			<p class="description">
+				<?php
+				printf(
+					/* translators: %s: enlace a la propuesta oficial de llms.txt */
+					esc_html__( 'Un archivo Markdown propuesto en la raíz del sitio que da a los LLM (modelos de lenguaje) un índice curado de tu contenido más importante. Convención emergente, no un estándar ratificado todavía. %s', 'ai-knowledge' ),
+					'<a href="https://llmstxt.org/" target="_blank" rel="noopener">' . esc_html__( 'Ver la propuesta oficial de llms.txt', 'ai-knowledge' ) . '</a>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
+				);
+				?>
+			</p>
 			<?php if ( Llms_Txt::physical_file_exists() ) : ?>
 				<span class="description"><?php esc_html_e( '⚠ Tapado por un archivo físico llms.txt en la raíz del sitio: se sirve ese en vez del generado por el plugin.', 'ai-knowledge' ); ?></span>
 				<?php if ( $llms_physical_mtime ) : ?>

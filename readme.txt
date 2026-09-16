@@ -64,7 +64,7 @@ No. Sin Support Genix, el plugin sigue generando los documentos `.md` y publican
 
 = ¿Qué es `/llms.txt` y para qué sirve? =
 
-Es un archivo público, en un formato estándar que cada vez más motores de búsqueda de inteligencia artificial (ChatGPT, Perplexity, etc.) consultan para entender el contenido de una web sin tener que rastrear página por página. Este plugin lo genera y lo mantiene actualizado automáticamente a partir de tu catálogo real, sin que tengas que escribirlo ni actualizarlo a mano.
+Es un archivo Markdown propuesto en la raíz del sitio que da a los LLM (modelos de lenguaje) un índice curado de tu contenido más importante. Es una convención emergente, no un estándar ratificado todavía — cada vez más motores de búsqueda de inteligencia artificial (ChatGPT, Perplexity, etc.) lo consultan para entender el contenido de una web sin tener que rastrear página por página. Puedes ver la propuesta oficial en https://llmstxt.org/. Este plugin lo genera y lo mantiene actualizado automáticamente a partir de tu catálogo real, sin que tengas que escribirlo ni actualizarlo a mano.
 
 = ¿Qué pasa si mi web tiene varios idiomas (WPML)? =
 
