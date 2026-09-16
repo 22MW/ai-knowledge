@@ -10,6 +10,9 @@ require_once WOOKB_DIR . 'admin/class-registry-table.php';
 $table = new Registry_Table();
 $table->prepare_items();
 ?>
+<p class="description">
+	<?php esc_html_e( 'Todos los documentos generados: su estado, cuándo se actualizaron, y acceso a su contenido. Desde aquí puedes regenerar, borrar, fijar texto manual o filtrar por estado/idioma.', 'ai-knowledge' ); ?>
+</p>
 <?php if ( isset( $_GET['wookb_regen_error'] ) ) : // phpcs:ignore ?>
 	<div class="notice notice-error is-dismissible"><p><?php echo esc_html( urldecode( wp_unslash( $_GET['wookb_regen_error'] ) ) ); // phpcs:ignore ?></p></div>
 <?php endif; ?>

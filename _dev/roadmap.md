@@ -269,22 +269,38 @@ propósito general (eso ya lo cubre la Fase 3).
 
 ---
 
-## Fase 10 — Replanteada: Alcance/Exclusiones + campos custom + modo "todos los CPT" — EN PAUSA, pendiente de `evaluar-cambio`/`rol-analista` conjunto
+## Fase 10 — Replanteada: plan conjunto de UX del admin — EN PAUSA, pendiente de `planificar-cambio`
 
-Fase ampliada el 2026-09-16: fusiona tres puntos que antes estaban sueltos
-porque los tres tocan la misma superficie (`class-scope.php`,
-`tab-alcance.php`, `tab-exclusiones.php`) y no tiene sentido planificarlos
-ni maquetarlos por separado.
+Fase ampliada el 2026-09-16 (segunda vez): además de Alcance/Exclusiones +
+campos custom + modo "todos los CPT" (ya fusionados antes), se añade
+descripción por pestaña y el rediseño Simple/Avanzada del Registro — las
+tres piezas tocan la experiencia general del admin, se planifican juntas.
 
-**1. Rediseño Alcance/Exclusiones (antes "UX5").** El selector "Taxonomías
+**1. Descripción por pestaña.** Cada pestaña del admin (Alcance,
+Exclusiones, Registro, Prompt, WooCommerce, Ajustes, Carga inicial,
+Visibilidad IA) debe empezar con una descripción clara de para qué sirve
+— hoy varias no la tienen o la dan por hecha. Cambio de contenido, bajo
+riesgo, se puede hacer pestaña a pestaña sin bloquear el resto.
+
+**2. Rediseño Alcance/Exclusiones (antes "UX5").** El selector "Taxonomías
 / términos" es casi idéntico en `tab-alcance.php` y `tab-exclusiones.php`
 (misma lista de términos, mismo diseño de chips, mismo bucle por
 post_type — solo cambia si significa incluir o excluir), fácil de
-confundir entre las dos pestañas. Sin decidir todavía: ¿pestaña única con
-un interruptor incluir/excluir por término, o mantener dos pestañas pero
-con distinción visual más clara (color, icono, texto)?
+confundir entre las dos pestañas.
+**Confirmado por el usuario:** pestaña única, con el bloque de
+taxonomías/términos renderizado UNA sola vez, y un interruptor de 3
+estados por término (Incluir / Excluir / Sin decidir) en vez de dos listas
+de checkboxes en pestañas separadas. **"Sin decidir" es el estado por
+defecto de cada término** — igual que hoy los checkboxes de post_types
+están desactivados hasta que se marcan a mano, aquí ningún término queda
+incluido ni excluido hasta que el admin lo active explícitamente. Se
+sustituyen `tax_terms` (incluir) y `exclude_terms` (excluir) en
+`Scope::settings()` por una única estructura, ej.
+`term_actions[taxonomia][term_id] = 'include'|'exclude'` (retrocompatible:
+migrar los datos existentes al activar, no perder configuración ya
+guardada).
 
-**2. Campos personalizados de ACF / Meta Box / Pods.** El dato **ya es
+**3. Campos personalizados de ACF / Meta Box / Pods.** El dato **ya es
 seleccionable hoy** en Alcance (esos plugins guardan sus valores como
 `post_meta` normal, y `Scope::sampled_custom_field_keys()` ya lo muestrea)
 — esto es solo cosmético: mostrar la etiqueta legible del campo en vez de
@@ -292,21 +308,60 @@ la key técnica cruda, y filtrar el ruido propio de ACF (su meta "espejo"
 `_nombre_del_campo`, referencia interna sin valor real). No es un hueco de
 datos, es un pulido de usabilidad del selector.
 
-**3. Modo "todos los CPT públicos" en Scope (antes idea suelta de
+**4. Modo "todos los CPT públicos" en Scope (antes idea suelta de
 [`analisis-jet-geo.md`](analisis-jet-geo.md)).** Alternativa a la lista
 explícita actual de post_types en Alcance: un modo "todos los CPT
 públicos, presente y futuro", más un filtro de extensión sobre la lista de
 post_types excluidos por defecto. Afecta directamente a cómo se dibuja la
 pestaña Alcance, por eso se junta aquí.
 
-**Por qué van juntas:** los tres puntos determinan cómo se ve y se
-comporta la misma pestaña (o pestañas) de selección de contenido. Decidir
-por separado arriesga maquetar el mismo tipo de selector dos o tres veces.
+**5. Registro: "Ajustes avanzados" por fila (2026-09-16, sustituye el plan
+anterior de vista Simple/Avanzada — probado y descartado en el mismo día).**
 
-**Pendiente antes de tocar código:** `evaluar-cambio`/`rol-analista`
-conjunto para los tres puntos a la vez — el 2 y el 3 cambian cómo se
-resuelve el alcance (`Scope::resolve_ids()`, `custom_fields_for()`), no
-son solo maquetación.
+**Historial de esta pieza:** se implementó primero una versión con dos
+vistas completas (Simple/Avanzada, interruptor + selector de filas por
+página) — código llegó a escribirse y luego se **revirtió entero** tras ver
+el resultado: quitaba los filtros, el checkbox de selección y las acciones
+por fila de la vista por defecto, cambiando demasiado la tabla que ya
+funcionaba. Descartado, no se retoma.
+
+**Enfoque definitivo, mucho más simple — una sola tabla, sin vistas
+alternativas:**
+- La tabla principal sigue exactamente como está hoy en su mecánica:
+  filtros (Estado/Idioma/Buscar) encima, checkbox de selección por fila,
+  desplegable "Aplicar" con Borrar/Regenerar seleccionados, acciones
+  masivas del toolbar (Borrar todos, Reiniciar cola) — nada de esto se
+  toca ni se quita.
+- **Columnas siempre visibles:** Origen, Idioma (solo si hay más de un
+  idioma activo, como ya se acordó), Estado, Actualizado, Enlaces, y
+  Control manual **reducido a un badge** (Auto/Manual, y aviso si está
+  desactualizado) — ya no la gestión completa en la celda.
+- **Columna Acciones se queda** (Generar/Borrar por fila), pero **sin el
+  campo numérico de límite de caracteres** — ese control ya vive dentro de
+  "Ajustes avanzados", no hace falta repetirlo en la fila principal.
+- El desplegable que hoy existe por fila ("Ver/editar Markdown") se
+  renombra a **"Ajustes avanzados"** y pasa a contener TODO lo que hoy está
+  disperso o son columnas propias: Puente, Hash, el textarea de
+  ver/editar Markdown, el campo de límite de caracteres, y los botones
+  "Pasar a manual"/"Volver a Auto". Nada de información se pierde, se
+  reorganiza dentro de esa fila expandible en vez de ocupar columnas
+  siempre visibles.
+- Sin selector de filas por página nuevo, sin `view=`/`per_page=` en la
+  URL, sin cambios en `Registry_Table::get_columns()`/`get_bulk_actions()`
+  — la paginación sigue como está hoy (20 fijas), no forma parte de este
+  cambio.
+
+**Por qué van juntas (2, 3, 4, 5):** todas tocan la experiencia general de
+selección/revisión de contenido del admin. Decidir por separado arriesga
+maquetar el mismo tipo de selector o de tabla varias veces. La pieza 1
+(descripciones) es independiente y de bajo riesgo, se puede adelantar sin
+esperar al resto.
+
+**Pendiente antes de tocar código:** `planificar-cambio` con las
+decisiones de arriba ya propuestas — confirmar o ajustar antes de
+implementar. Los puntos 2, 4 y 5 cambian cómo se resuelve/persiste el
+alcance y la preferencia de vista (`Scope::resolve_ids()`,
+`custom_fields_for()`, nueva `user_meta`), no son solo maquetación.
 
 ---
 

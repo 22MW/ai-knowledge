@@ -403,10 +403,13 @@ body.toplevel_page_woo-kb-generator #wpcontent {
   border-bottom: 1px solid var(--tblr-border-color, #e5e7eb);
   vertical-align: middle;
 }
-.wookb-wrap .wp-list-table thead th {
+.wookb-wrap .wp-list-table thead th,
+.wookb-wrap .widefat tfoot td.check-column,
+.wookb-wrap .widefat thead td.check-column {
   background: var(--tblr-secondary-bg, #f3f4f6);
   font-weight: 600;
 }
+
 .wookb-wrap .wp-list-table tbody tr:hover {
   background: var(--tblr-secondary-bg, #f9fafb);
 }

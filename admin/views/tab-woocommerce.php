@@ -31,6 +31,10 @@ $contact_answers = class_exists( '\WOOKB\Chatbot_Prompt_Builder' ) ? Chatbot_Pro
 $contact_text     = isset( $contact_answers['contacto'] ) ? trim( (string) $contact_answers['contacto'] ) : '';
 ?>
 
+<p class="description">
+	<?php esc_html_e( 'Información de tu tienda que se genera como documentos propios (envíos, impuestos, pagos, condiciones) para que el chatbot y los buscadores de IA la conozcan. Lo que WooCommerce ya sabe se detecta solo; lo que no, se rellena a mano.', 'ai-knowledge' ); ?>
+</p>
+
 <h2><?php esc_html_e( 'Detectado automáticamente', 'ai-knowledge' ); ?></h2>
 <p class="description"><?php esc_html_e( 'Datos leídos en tiempo real de la configuración de WooCommerce. Solo lectura: para cambiarlos, edítalos en WooCommerce.', 'ai-knowledge' ); ?></p>
 

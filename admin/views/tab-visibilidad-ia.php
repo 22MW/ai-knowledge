@@ -88,7 +88,7 @@ $htaccess_block_preview = "RewriteEngine On\n" . implode( "\n", Htaccess_Guard::
 ?>
 
 <p class="description">
-	<?php esc_html_e( 'Resumen de si el contenido del plugin está bien expuesto a buscadores y agentes de IA, y una comprobación puntual de accesibilidad. Todo lo que ves aquí es solo lectura: no cambia nada por sí solo.', 'ai-knowledge' ); ?>
+	<?php esc_html_e( 'Resumen de si el contenido del plugin está bien expuesto a buscadores y agentes de IA, comprobación puntual de accesibilidad, y gestión de qué crawlers de IA pueden acceder a tu web (robots.txt/.htaccess). El resumen de arriba es solo lectura; la gestión de crawlers de más abajo sí escribe cambios reales, siempre con confirmación explícita.', 'ai-knowledge' ); ?>
 </p>
 
 <h2><?php esc_html_e( 'Estado de exposición', 'ai-knowledge' ); ?></h2>

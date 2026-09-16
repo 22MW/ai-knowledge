@@ -9,6 +9,9 @@ $settings        = Scope::settings();
 $ai_cfg          = Generator::ai_config();
 $faq_content     = class_exists( '\WOOKB\Llms_Faq' ) ? Llms_Faq::read() : '';
 ?>
+<p class="description">
+	<?php esc_html_e( 'Configuración general del generador de documentos: largo del texto, clave de IA a usar, instrucciones adicionales del prompt, y qué post_types muestran el botón de añadir a la base de conocimiento desde su editor.', 'ai-knowledge' ); ?>
+</p>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 	<input type="hidden" name="action" value="wookb_save_settings" />
 	<?php wp_nonce_field( 'wookb_save_settings' ); ?>

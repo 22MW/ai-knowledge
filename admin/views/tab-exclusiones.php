@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $settings = Scope::settings();
 ?>
 <p class="description">
-	<?php esc_html_e( 'La exclusión actúa en el origen: un elemento excluido no genera .md, ni documento privado, ni entrada en llms.txt.', 'ai-knowledge' ); ?>
+	<?php esc_html_e( 'Excepciones dentro del alcance ya marcado en Alcance: IDs concretos o categorías/etiquetas que NO quieres que generen documento, aunque su tipo de contenido esté incluido. La exclusión actúa en el origen: un elemento excluido no genera .md, ni documento privado, ni entrada en llms.txt.', 'ai-knowledge' ); ?>
 </p>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 	<input type="hidden" name="action" value="wookb_save_exclusions" />

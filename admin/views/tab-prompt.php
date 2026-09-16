@@ -14,7 +14,7 @@ if ( false === $draft ) {
 }
 ?>
 <p class="description">
-	<?php esc_html_e( 'Responde lo que sepas, opcionalmente añade páginas del sitio como referencia, y genera un primer borrador con IA. Puedes editarlo a mano antes de guardar, y pulirlo con IA después de tus cambios.', 'ai-knowledge' ); ?>
+	<?php esc_html_e( 'El prompt de sistema que usa el chatbot para responder sobre tu negocio: quién eres, cómo compráis/enviáis, etc. Responde lo que sepas, opcionalmente añade páginas del sitio como referencia, y genera un primer borrador con IA. Puedes editarlo a mano antes de guardar, y pulirlo con IA después de tus cambios.', 'ai-knowledge' ); ?>
 </p>
 
 <?php if ( $draft_error ) : ?>
