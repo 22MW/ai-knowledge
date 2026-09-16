@@ -74,7 +74,7 @@
           <tr><td>7</td><td>API pública documentada: <code>GET /wp-json/ai-knowledge/v1/openapi.json</code>, OpenAPI 3.0 real de las 2 rutas de la Fase 3, enlazado desde <code>llms.txt</code> (ver <a href="roadmap.md">roadmap.md</a>)</td><td><span class="badge ok">Hecho y confirmado en navegador por el usuario</span></td></tr>
           <tr><td>8</td><td>Aviso a buscadores en tiempo real (IndexNow): clave del sitio autogenerada, interruptor en Ajustes, aviso no bloqueante con debounce (ver <a href="roadmap.md">roadmap.md</a>). Google no soporta IndexNow.</td><td><span class="badge ok">Hecho y confirmado en real (HTTP 202)</span></td></tr>
           <tr><td>9</td><td>Feeds especializados: <code>feeds/products.xml</code> (Google Merchant) y <code>feeds/content.json</code>, enlazados desde <code>llms.txt</code> y desde el <code>&lt;head&gt;</code> de todas las páginas (ver <a href="roadmap.md">roadmap.md</a>).</td><td><span class="badge ok">Hecho y confirmado en real</span></td></tr>
-          <tr><td>10</td><td>Campos personalizados (ACF/Meta Box/Pods)</td><td><span class="badge warn">Pendiente</span></td></tr>
+          <tr><td>10</td><td>Replanteada (2026-09-16): rediseño Alcance/Exclusiones (selectores casi idénticos, fácil confundir incluir/excluir) + campos personalizados ACF/Meta Box/Pods (el dato ya es seleccionable, falta etiqueta legible) + modo "todos los CPT públicos" en Scope — las tres juntas porque tocan la misma pestaña (ver <a href="roadmap.md">roadmap.md</a>)</td><td><span class="badge warn">En pausa, pendiente de evaluar-cambio/rol-analista conjunto</span></td></tr>
           <tr><td>11</td><td>Gestión de crawlers de IA (robots.txt)</td><td><span class="badge warn">Pendiente — ver ideas de JetGEO en <a href="analisis-jet-geo.md">analisis-jet-geo.md</a></span></td></tr>
         </table>
       </article>
@@ -108,7 +108,6 @@
         <ul>
           <li>Sistema de tags dinámicos (<code>{post.title}</code>...) en prompts y texto manual.</li>
           <li>Onboarding por pasos (asistente de primera configuración).</li>
-          <li><code>Scope</code>: modo "todos los CPT públicos" + filtro de exclusión.</li>
         </ul>
       </article>
 

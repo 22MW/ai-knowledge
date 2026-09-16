@@ -269,15 +269,44 @@ propósito general (eso ya lo cubre la Fase 3).
 
 ---
 
-## Fase 10 — Campos personalizados de ACF / Meta Box / Pods — PENDIENTE
+## Fase 10 — Replanteada: Alcance/Exclusiones + campos custom + modo "todos los CPT" — EN PAUSA, pendiente de `evaluar-cambio`/`rol-analista` conjunto
 
-**Qué hace:** además de `post_meta` plano (ya soportado hoy en
-`Scope::custom_fields_for()`), detecta campos definidos con esos plugins
-para poder seleccionarlos igual que los nativos.
+Fase ampliada el 2026-09-16: fusiona tres puntos que antes estaban sueltos
+porque los tres tocan la misma superficie (`class-scope.php`,
+`tab-alcance.php`, `tab-exclusiones.php`) y no tiene sentido planificarlos
+ni maquetarlos por separado.
 
-**Pasos:**
-1. Detectar si `class_exists('ACF')` / Meta Box / Pods está activo.
-2. Ampliar `Scope::sampled_custom_field_keys()` para incluir esos campos con su etiqueta legible, no solo la key técnica.
+**1. Rediseño Alcance/Exclusiones (antes "UX5").** El selector "Taxonomías
+/ términos" es casi idéntico en `tab-alcance.php` y `tab-exclusiones.php`
+(misma lista de términos, mismo diseño de chips, mismo bucle por
+post_type — solo cambia si significa incluir o excluir), fácil de
+confundir entre las dos pestañas. Sin decidir todavía: ¿pestaña única con
+un interruptor incluir/excluir por término, o mantener dos pestañas pero
+con distinción visual más clara (color, icono, texto)?
+
+**2. Campos personalizados de ACF / Meta Box / Pods.** El dato **ya es
+seleccionable hoy** en Alcance (esos plugins guardan sus valores como
+`post_meta` normal, y `Scope::sampled_custom_field_keys()` ya lo muestrea)
+— esto es solo cosmético: mostrar la etiqueta legible del campo en vez de
+la key técnica cruda, y filtrar el ruido propio de ACF (su meta "espejo"
+`_nombre_del_campo`, referencia interna sin valor real). No es un hueco de
+datos, es un pulido de usabilidad del selector.
+
+**3. Modo "todos los CPT públicos" en Scope (antes idea suelta de
+[`analisis-jet-geo.md`](analisis-jet-geo.md)).** Alternativa a la lista
+explícita actual de post_types en Alcance: un modo "todos los CPT
+públicos, presente y futuro", más un filtro de extensión sobre la lista de
+post_types excluidos por defecto. Afecta directamente a cómo se dibuja la
+pestaña Alcance, por eso se junta aquí.
+
+**Por qué van juntas:** los tres puntos determinan cómo se ve y se
+comporta la misma pestaña (o pestañas) de selección de contenido. Decidir
+por separado arriesga maquetar el mismo tipo de selector dos o tres veces.
+
+**Pendiente antes de tocar código:** `evaluar-cambio`/`rol-analista`
+conjunto para los tres puntos a la vez — el 2 y el 3 cambian cómo se
+resuelve el alcance (`Scope::resolve_ids()`, `custom_fields_for()`), no
+son solo maquetación.
 
 ---
 
@@ -299,18 +328,6 @@ conocidos con filtro de extensión propio (`apply_filters`). Auto-generar el
 bloque de `robots.txt` a partir de 3 preguntas sí/no al admin — pero solo
 proponerlo para copiar/aplicar con confirmación explícita, nunca escribirlo
 solo (mantiene la decisión ya tomada arriba).
-
----
-
-## Fase futura (sin número) — Modo "todos los CPT públicos" en Scope — IDEA, NO PLANIFICADA
-
-**Qué haría:** en `class-scope.php`, alternativa a la lista explícita actual
-de post_types: un modo "todos los CPT públicos, presente y futuro", más un
-filtro de extensión sobre la lista de post_types excluidos por defecto.
-
-**Origen:** [`analisis-jet-geo.md`](analisis-jet-geo.md). No está planificada: requiere
-`evaluar-cambio`/`planificar-cambio` propios cuando se quiera abordar; no se
-implementa hasta decidirlo aparte.
 
 ---
 
@@ -358,6 +375,9 @@ aplicarlo — en vez de configurar pestaña por pestaña sin guía, como hoy.
   código.
 - **UX4 — Visibilidad del botón "Generar documentos de tienda" — PENDIENTE.**
   Revisar si quedó poco visible/mal etiquetado en la pestaña WooCommerce.
+- **Rediseño Alcance/Exclusiones + campos custom + modo "todos los CPT":
+  ver Fase 10 replanteada** (fusionado ahí el 2026-09-16, no se repite
+  aquí).
 
 ---
 
