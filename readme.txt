@@ -38,11 +38,10 @@ Genera automáticamente una base de conocimiento en Markdown a partir de tu cat�
 1. Sube la carpeta `ai-knowledge` a `/wp-content/plugins/`.
 2. Activa el plugin desde el menú **Plugins** de WordPress.
 3. Ve al nuevo menú **Base de conocimiento IA** en el panel de administración.
-4. En la pestaña **Alcance**, elige qué tipos de contenido (productos, páginas, etc.) quieres incluir.
-5. Si quieres excluir contenido concreto, configúralo en la pestaña **Exclusiones**.
-6. Revisa los **Ajustes** (origen y modelo de IA, y longitud de los documentos).
-7. Ve a **Generación masiva** y pulsa "Generar pendientes" para crear los documentos pendientes del catálogo.
-8. Sigue el progreso desde la pestaña **Registro**.
+4. En la pestaña **Contenido**, elige qué tipos de contenido (productos, páginas, etc.) quieres incluir y qué excluir.
+5. Revisa los **Ajustes** (origen y modelo de IA, y longitud de los documentos).
+6. Ve a **Generación masiva** y pulsa "Generar pendientes" para crear los documentos pendientes del catálogo.
+7. Sigue el progreso desde la pestaña **Registro**.
 
 No hace falta configurar nada más para que `/llms.txt` empiece a publicarse: se activa automáticamente en cuanto hay documentos generados.
 

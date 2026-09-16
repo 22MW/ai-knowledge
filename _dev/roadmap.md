@@ -31,6 +31,35 @@ mantiene sin reescribir. Todas las fases se añaden encima o al lado.
 
 ---
 
+## Fase 0.2 — Documentación pública + técnica — HECHO (2026-09-16)
+
+**Qué hace:** documentación completa lista para publicar en la web
+(soporte + comercial) y un documento técnico para desarrolladores que se
+queda dentro del plugin. Plan completo en
+[`roadmap-documentacion.md`](roadmap-documentacion.md).
+
+**Pasos:**
+1. `_dev/docs/index.md` — qué es el plugin, comercial, lenguaje humano.
+2. `_dev/docs/instalacion.md` — instalar y poner en marcha.
+3. Un `.md` por cada una de las 9 tabs del admin (`tab-registro.md`,
+   `tab-contenido.md`, `tab-negocio.md`, `tab-faqs.md`,
+   `tab-woocommerce.md`, `tab-chatbot.md`, `tab-visibilidad-ia.md`,
+   `tab-generacion-masiva.md`, `tab-ajustes.md`), con FAQ propia y
+   enlazados entre sí.
+4. 13 etiquetas `[SCREENSHOT]`/`[VIDEO]` insertadas donde falta un medio
+   visual, para que se sustituyan antes de publicar.
+5. `_dev/documentacion-tecnica.md` — arquitectura, namespace `AIKB`,
+   esquema de la tabla `wookb_documents`, filtros propios (`wookb_*`),
+   API REST, dependencias en runtime. Se queda en el plugin, no se
+   publica en la web.
+6. De paso: corregido `readme.txt`, que mencionaba las tabs viejas
+   "Alcance"/"Exclusiones" (ya fusionadas en "Contenido").
+
+**Pendiente**: sustituir las 13 etiquetas de medios por capturas/vídeos
+reales antes de publicar en la web.
+
+---
+
 ## Fase 0.1 — Identidad, cierre del rename interno — HECHO (2026-09-16)
 
 **Qué hace:** completa lo que la Fase 0 dejó pendiente a propósito: elimina el rastro de "woo-kb-generator" que quedaba en código.

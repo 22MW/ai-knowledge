@@ -8,6 +8,17 @@ Ver `_dev/roadmap.md` para el plan completo por fases y `_dev/decisiones.md`
 para el porqué de la identidad/alcance. Este plugin sigue orientado a IA +
 Support Genix como núcleo; todo lo de abajo es capa añadida encima.
 
+### Documentación pública y técnica
+
+- Documentación completa en `_dev/docs/`: índice comercial, guía de
+  instalación y un documento por cada pestaña del admin, enlazados entre
+  sí y con preguntas frecuentes. Pendiente de sustituir capturas/vídeos
+  marcados antes de publicar en la web.
+- `_dev/documentacion-tecnica.md`: documento técnico para desarrolladores
+  (arquitectura, namespace, base de datos, API REST), interno al plugin.
+- Corregido `readme.txt`: las instrucciones de instalación mencionaban las
+  pestañas "Alcance" y "Exclusiones", ya fusionadas en "Contenido".
+
 ### Cierre del rename de identidad interno (2026-09-16)
 
 - Eliminado todo rastro de "woo-kb-generator" del código: archivo principal
