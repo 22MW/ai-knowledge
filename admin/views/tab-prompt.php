@@ -16,6 +16,7 @@ if ( ! Chatbot_Prompt::is_genix_ready() ) {
 	return;
 }
 
+$settings    = Scope::settings();
 $answers     = Chatbot_Prompt_Builder::get_saved_answers();
 $draft_error = get_transient( 'wookb_prompt_draft_error' );
 delete_transient( 'wookb_prompt_draft_error' );
@@ -32,7 +33,25 @@ if ( false === $draft ) {
 	<div class="notice notice-error"><p><?php echo esc_html( $draft_error ); ?></p></div>
 <?php endif; ?>
 
-<h2><?php esc_html_e( '1. Cuestionario', 'ai-knowledge' ); ?></h2>
+<h2><?php esc_html_e( '1. Ajustes del chat', 'ai-knowledge' ); ?></h2>
+<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+	<input type="hidden" name="action" value="wookb_save_chatbot_settings" />
+	<?php wp_nonce_field( 'wookb_save_chatbot_settings' ); ?>
+	<table class="form-table">
+		<tr>
+			<th><?php esc_html_e( 'Límite de "Documentos relacionados"', 'ai-knowledge' ); ?></th>
+			<td>
+				<input type="number" min="0" name="chatbot_docs_list_limit" value="<?php echo esc_attr( $settings['chatbot_docs_list_limit'] ); ?>" />
+				<p class="description"><?php esc_html_e( 'Máximo de enlaces mostrados bajo la respuesta del chatbot. 0 = sin límite.', 'ai-knowledge' ); ?></p>
+			</td>
+		</tr>
+	</table>
+	<?php submit_button( __( 'Guardar ajustes del chat', 'ai-knowledge' ) ); ?>
+</form>
+
+<hr />
+
+<h2><?php esc_html_e( '2. Cuestionario', 'ai-knowledge' ); ?></h2>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 	<input type="hidden" name="action" value="wookb_generate_prompt_draft" />
 	<?php wp_nonce_field( 'wookb_generate_prompt_draft' ); ?>
@@ -70,7 +89,7 @@ if ( false === $draft ) {
 
 <hr />
 
-<h2><?php esc_html_e( '2. Borrador editable', 'ai-knowledge' ); ?></h2>
+<h2><?php esc_html_e( '3. Borrador editable', 'ai-knowledge' ); ?></h2>
 <p class="description"><?php esc_html_e( 'Edita libremente. Cuando termines, puedes pulir la redacción con IA (sin cambiar el fondo) o guardar directamente.', 'ai-knowledge' ); ?></p>
 
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" id="wookb-prompt-draft-form">

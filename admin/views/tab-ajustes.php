@@ -9,7 +9,7 @@ $settings        = Scope::settings();
 $ai_cfg          = Generator::ai_config();
 ?>
 <p class="description">
-	<?php esc_html_e( 'Configuración general del generador de documentos: largo del texto, clave de IA a usar, instrucciones adicionales del prompt, y qué post_types muestran el botón de añadir a la base de conocimiento desde su editor.', 'ai-knowledge' ); ?>
+	<?php esc_html_e( 'Configuración general del generador de documentos: largo del texto, clave de IA a usar y qué post_types muestran el botón de añadir a la base de conocimiento desde su editor.', 'ai-knowledge' ); ?>
 </p>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 	<input type="hidden" name="action" value="wookb_save_settings" />
@@ -71,17 +71,6 @@ $ai_cfg          = Generator::ai_config();
 		<tr>
 			<th><?php esc_html_e( 'Modelo (clave propia)', 'ai-knowledge' ); ?></th>
 			<td><input type="text" name="own_model" class="regular-text" value="<?php echo esc_attr( $settings['own_model'] ); ?>" /></td>
-		</tr>
-		<tr>
-			<th><?php esc_html_e( 'Instrucciones adicionales del prompt', 'ai-knowledge' ); ?></th>
-			<td><textarea name="extra_prompt" rows="4" class="large-text"><?php echo esc_textarea( $settings['extra_prompt'] ); ?></textarea></td>
-		</tr>
-		<tr>
-			<th><?php esc_html_e( 'Límite de "Documentos relacionados" en el chat', 'ai-knowledge' ); ?></th>
-			<td>
-				<input type="number" min="0" name="chatbot_docs_list_limit" value="<?php echo esc_attr( $settings['chatbot_docs_list_limit'] ); ?>" />
-				<p class="description"><?php esc_html_e( 'Máximo de enlaces mostrados bajo la respuesta del chatbot (Fase 2, pieza 3). 0 = sin límite.', 'ai-knowledge' ); ?></p>
-			</td>
 		</tr>
 		<tr>
 			<th><?php esc_html_e( 'Botón "Añadir a la base de conocimiento" en el editor', 'ai-knowledge' ); ?></th>

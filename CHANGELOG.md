@@ -2,7 +2,7 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
-## [1.0.8.5] - 2026-09-16
+## [1.0.8.6] - 2026-09-16
 
 Ver `_dev/roadmap.md` para el plan completo por fases y `_dev/decisiones.md`
 para el porqué de la identidad/alcance. Este plugin sigue orientado a IA +
@@ -44,6 +44,10 @@ Support Genix como núcleo; todo lo de abajo es capa añadida encima.
 
 ### Reestructuración Negocio/Chatbot/FAQs (2026-09-16)
 
+- Ajustes generales deja de mostrar y usar el antiguo campo "Instrucciones
+  adicionales del prompt". El límite de "Documentos relacionados" se mueve
+  a Chatbot y se guarda desde un formulario propio, sin arriesgar el resto de
+  ajustes generales.
 - Negocio y FAQs adoptan el mismo contrato de instrucciones que los
   documentos WooCommerce: prompt breve o completo, prioridad sobre formato,
   orden y estructura, pero nunca sobre los datos reales. Documento/datos e

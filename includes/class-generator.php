@@ -185,10 +185,6 @@ class Generator {
 		$prompt .= '- Enlaza siempre a la URL del producto: ' . $data['url'] . ". No generes ni menciones ningún otro enlace. No añadas tú mismo ninguna sección de \"disponible en otros idiomas\": se añade automáticamente después de tu respuesta, no la dupliques. Nunca enlaces al propio documento.\n";
 		$prompt .= "- NO incluyas avisos genéricos tipo \"precio orientativo\" o \"confirma la disponibilidad\": esos avisos los añade el propio chatbot en su respuesta cuando corresponde, no deben estar guardados en este documento.\n\n";
 
-		if ( ! empty( $settings['extra_prompt'] ) ) {
-			$prompt .= "Instrucciones adicionales del sitio:\n" . $settings['extra_prompt'] . "\n\n";
-		}
-
 		$prompt .= "Datos del producto:\n" . implode( "\n", $datos ) . "\n\n";
 		$prompt .= 'Idioma de salida: ' . strtoupper( $data['lang'] ) . ". Responde solo con el documento Markdown, sin explicaciones adicionales.";
 

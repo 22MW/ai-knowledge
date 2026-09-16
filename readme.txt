@@ -27,7 +27,7 @@ Genera automáticamente una base de conocimiento en Markdown a partir de tu cat�
 * Los generadores de Negocio, FAQs y documentos WooCommerce aceptan instrucciones breves o prompts completos que prevalecen sobre el formato predeterminado sin poder inventar datos; el resultado se revisa antes de guardar en Negocio y FAQs.
 * Conexión directa con Support Genix (Pro y Lite): crea/actualiza los posts `sgkb-docs` que el chatbot usa como fuente, y sincroniza el prompt de sistema del chatbot con un asistente de redacción propio.
 * Documentos compuestos automáticos de "información de tienda" (cómo comprar, condiciones, envío y pago, catálogo) generados desde la configuración real de WooCommerce, no inventados. Sus instrucciones opcionales de pulido pueden cambiar el formato y la estructura, pero nunca añadir datos ausentes; un documento completo creado externamente puede pegarse manualmente desde Registro.
-* Panel de administración con pestañas: Alcance, Exclusiones, Registro, Prompt, Ajustes y Carga inicial.
+* Panel de administración con pestañas especializadas; los ajustes exclusivos del chatbot, como el límite de documentos relacionados, viven en Chatbot y no en los ajustes generales.
 * Funciona igual sin Support Genix instalado: en ese caso, el plugin sigue generando y publicando `/llms.txt` de forma independiente.
 * Sin dependencias obligatorias: WooCommerce, WPML y Support Genix se detectan en tiempo real; si no están, esas funciones concretas simplemente no se activan.
 
@@ -86,6 +86,9 @@ El plugin detecta el borrado/despublicación y elimina automáticamente el docum
 == Changelog ==
 
 Ver `CHANGELOG.md` para el historial completo y detallado de cambios.
+
+= 1.0.8.6 =
+Limpieza de Ajustes: retirado el prompt global obsoleto y movido el límite de documentos relacionados a la pestaña Chatbot con guardado independiente.
 
 = 1.0.8.5 =
 Pestaña WooCommerce editable con selección de datos, pulido mediante instrucciones privadas protegidas, mejoras equivalentes en Negocio y FAQs, y guardado manual más claro desde Registro.

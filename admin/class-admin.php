@@ -20,6 +20,7 @@ class Admin
 		add_action('admin_menu', array(__CLASS__, 'menu'));
 		add_action('admin_post_wookb_save_content', array(__CLASS__, 'save_content'));
 		add_action('admin_post_wookb_save_settings', array(__CLASS__, 'save_settings'));
+		add_action('admin_post_wookb_save_chatbot_settings', array(__CLASS__, 'save_chatbot_settings'));
 		add_action('admin_post_wookb_start_seed', array(__CLASS__, 'start_seed'));
 		add_action('admin_post_wookb_start_seed_force', array(__CLASS__, 'start_seed_force'));
 		add_action('admin_post_wookb_save_queue_settings', array(__CLASS__, 'save_queue_settings'));
@@ -330,8 +331,6 @@ class Admin
 				'ai_key_source'    => in_array($_POST['ai_key_source'] ?? '', array('genix', 'own'), true) ? sanitize_key($_POST['ai_key_source']) : 'genix', // phpcs:ignore
 				'own_api_key'      => isset($_POST['own_api_key']) ? sanitize_text_field(wp_unslash($_POST['own_api_key'])) : '', // phpcs:ignore
 				'own_model'        => isset($_POST['own_model']) ? sanitize_text_field(wp_unslash($_POST['own_model'])) : 'gpt-4o-mini', // phpcs:ignore
-				'extra_prompt'     => isset($_POST['extra_prompt']) ? sanitize_textarea_field(wp_unslash($_POST['extra_prompt'])) : '', // phpcs:ignore
-				'chatbot_docs_list_limit' => max(0, (int) ($_POST['chatbot_docs_list_limit'] ?? Chatbot_Relevance_Guard::DOCS_LIST_LIMIT_DEFAULT)), // phpcs:ignore
 				// Fase 1: post_types donde se muestra el meta box del editor.
 				// Se guarda siempre que llegue el campo oculto 'editor_button_post_types_submitted'
 				// (ver tab-ajustes.php) para poder distinguir "ningun CPT marcado"
@@ -344,6 +343,20 @@ class Admin
 		);
 
 		self::redirect('ajustes');
+	}
+
+	/** Guarda los ajustes que afectan solo al chatbot de Support Genix. */
+	public static function save_chatbot_settings()
+	{
+		self::verify('wookb_save_chatbot_settings');
+
+		Scope::update_settings(
+			array(
+				'chatbot_docs_list_limit' => max(0, (int) ($_POST['chatbot_docs_list_limit'] ?? Chatbot_Relevance_Guard::DOCS_LIST_LIMIT_DEFAULT)), // phpcs:ignore
+			)
+		);
+
+		self::redirect('prompt');
 	}
 
 	public static function start_seed()

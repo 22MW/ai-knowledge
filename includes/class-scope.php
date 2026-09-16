@@ -34,7 +34,6 @@ class Scope {
 			'ai_key_source'    => 'genix', // genix|own
 			'own_api_key'      => '',
 			'own_model'        => 'gpt-4o-mini',
-			'extra_prompt'     => '',
 			'chatbot_docs_list_limit' => Chatbot_Relevance_Guard::DOCS_LIST_LIMIT_DEFAULT,
 			// Fase 1: post_types donde aparece el meta box "Base de conocimiento
 			// IA" en el editor. Null = no guardado todavia -> default real

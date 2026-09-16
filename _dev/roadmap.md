@@ -524,13 +524,23 @@ su estilo oscuro), `Robots_Txt_Guard` nueva clase con el mismo patrón que
 
 **Qué haría:** placeholders tipo `{post.title}`, `{post.excerpt}`,
 `{post.meta key="..."}`, `{product.price}`, `{product.stock}`, `{site.name}`
-usables en el "Instrucciones adicionales del prompt" (`extra_prompt`) y en
-el texto manual de un documento (Fase 1), sustituidos por el dato real ya
+usables en las instrucciones puntuales de generación y en el texto manual
+de un documento (Fase 1), sustituidos por el dato real ya
 disponible en `Extractor_Base`/`Extractor_Woo` antes de mandarlo a OpenAI o
 de publicar el texto manual.
 
 **Origen:** [`analisis-jet-geo.md`](analisis-jet-geo.md), punto 4. No está planificada: requiere
 `evaluar-cambio`/`planificar-cambio` propios cuando se quiera abordar.
+
+---
+
+## Conectores nativos de WordPress 7.0 — PENDIENTE, separado
+
+Integrar el AI Client y los Conectores nativos para Anthropic/Claude,
+OpenAI y Google/Gemini, con descubrimiento y selección de modelos realmente
+disponibles. Se mantiene separado de la limpieza de Ajustes porque requiere
+adaptar todas las llamadas directas actuales a OpenAI y preservar Genix/
+clave propia en instalaciones anteriores a WordPress 7.0.
 
 ---
 

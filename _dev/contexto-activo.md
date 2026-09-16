@@ -23,6 +23,10 @@ con IA"), probadas en real y confirmadas por el usuario (2026-09-16):
 - Pestaña **Negocio** nueva: datos del negocio + generación IA del resumen
   de `llms.txt`.
 - Pestaña **Chatbot** (antes "Prompt"): solo visible si Genix está activo.
+- Limpieza de Ajustes: eliminado el antiguo `extra_prompt` de interfaz,
+  guardado y generación; el valor histórico no se borra de la base de datos,
+  simplemente deja de usarse. `chatbot_docs_list_limit` se mueve a Chatbot
+  con guardado propio.
 - Pestaña **FAQs** nueva (movida desde Ajustes): generación IA,
   **multiidioma real** (antes un único archivo global).
 - Fix: sufijo "(ES)"/"(EN)" en `llms.txt`/Registro solo en sitios
@@ -61,7 +65,8 @@ con IA"), probadas en real y confirmadas por el usuario (2026-09-16):
 - Estilo unificado con Contenido/Negocio (sin cajas de fondo).
 - Fix: IDs de pasarela de pago (texto) se destruían con `absint()`.
 
-Sin commitear todavía: pendiente de tu permiso.
+El bloque anterior quedó publicado en `knowBaseDev` como `ff3daa8`. La
+limpieza actual de Ajustes/Chatbot está pendiente de validación y commit.
 
 ## Pendiente de confirmar
 
@@ -73,6 +78,9 @@ Sin commitear todavía: pendiente de tu permiso.
 
 ## Pendiente real (sin empezar)
 
+- Integración futura con los Conectores nativos de WordPress 7.0 para
+  Anthropic/Claude, OpenAI y Google/Gemini, con selector de modelos reales.
+  Se abordará aparte por afectar a todas las llamadas IA del plugin.
 - UX3 (WooCommerce: checkboxes + prompt por campo a nivel de PRODUCTO,
   cambio de arquitectura de datos, requiere `rol-analista` — distinto de
   la selección de envíos/impuestos/pagos/catálogo ya hecha en la ronda 2)
