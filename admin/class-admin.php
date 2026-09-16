@@ -34,6 +34,7 @@ class Admin
 		add_action('admin_post_wookb_normalize_prompt', array(__CLASS__, 'normalize_prompt'));
 		add_action('admin_post_wookb_save_prompt_draft', array(__CLASS__, 'save_prompt_draft'));
 		add_action('admin_post_wookb_sync_store_docs', array(__CLASS__, 'sync_store_docs'));
+		add_action('admin_post_wookb_polish_store_doc', array(__CLASS__, 'polish_store_doc'));
 		add_action('admin_post_wookb_generate_faqs_draft', array(__CLASS__, 'generate_faqs_draft'));
 		add_action('admin_post_wookb_save_llms_faq', array(__CLASS__, 'save_llms_faq'));
 		add_action('admin_post_wookb_force_generate', array(__CLASS__, 'force_generate'));
@@ -897,19 +898,81 @@ class Admin
 	}
 
 	/**
-	 * Fase 2: guarda la sección "Rellenar a mano" de la pestaña WooCommerce
-	 * (plazo de entrega en texto libre, notas legales adicionales). El
-	 * contacto/horario NO se guarda aquí -- se reutiliza tal cual desde
-	 * Chatbot_Prompt_Builder (ver tab-woocommerce.php), no se duplica.
+	 * Pule con IA (sin inventar datos, ver Chatbot_Prompt_Builder::
+	 * polish_factual_text()) el texto ya generado de un documento de tienda
+	 * (informacion-tienda o catalogo-tienda) y lo fija en modo manual
+	 * (publish_manual_text(), reutilizado tal cual de la Fase 1) para que
+	 * "Generar/actualizar ahora" no lo pise despues (ver guard de
+	 * override_mode en Store_Info_Doc::persist()).
 	 */
+	public static function polish_store_doc()
+	{
+		self::verify('wookb_polish_store_doc');
+
+		$row_id     = isset($_POST['row_id']) ? (int) $_POST['row_id'] : 0; // phpcs:ignore
+		$extra_info = isset($_POST['extra_info']) ? sanitize_textarea_field(wp_unslash($_POST['extra_info'])) : ''; // phpcs:ignore
+
+		$row = Registry::find_by_id($row_id);
+		if (! $row) {
+			self::redirect('woocommerce');
+		}
+
+		$current_text = ('manual' === $row->override_mode && null !== $row->override_text && '' !== $row->override_text)
+			? $row->override_text
+			: Markdown_Store::body_only(Markdown_Store::read($row->md_path));
+
+		$polished = Chatbot_Prompt_Builder::polish_factual_text($current_text, $extra_info, Store_Info_Doc::CHAR_LIMIT);
+
+		if (is_wp_error($polished)) {
+			set_transient('wookb_store_docs_error', $polished->get_error_message(), MINUTE_IN_SECONDS);
+			self::redirect('woocommerce');
+		}
+
+		self::publish_manual_text($row, $polished);
+
+		self::redirect('woocommerce');
+	}
+
+	/**
+	 * Convierte un array de IDs marcados (checkbox) en [ id => 'include' ].
+	 * $numeric=true para IDs enteros (instance_id, tax_rate_id, term_id);
+	 * false para IDs de texto (gateway->id de WooCommerce, ej. 'bacs',
+	 * 'paypal' -- absint() los destruiria a 0).
+	 */
+	protected static function checked_ids_to_selection($post_key, $numeric = true)
+	{
+		if (! isset($_POST[$post_key]) || ! is_array($_POST[$post_key])) { // phpcs:ignore
+			return array();
+		}
+		$raw       = wp_unslash($_POST[$post_key]); // phpcs:ignore
+		$ids       = $numeric ? array_map('absint', $raw) : array_map('sanitize_key', $raw);
+		$selection = array();
+		foreach ($ids as $id) {
+			$selection[$id] = 'include';
+		}
+		return $selection;
+	}
+
 	public static function save_woocommerce_settings()
 	{
 		self::verify('wookb_save_woocommerce_settings');
 
 		Scope::update_settings(
 			array(
-				'delivery_time_note' => isset($_POST['delivery_time_note']) ? sanitize_textarea_field(wp_unslash($_POST['delivery_time_note'])) : '', // phpcs:ignore
-				'legal_notes_extra'  => isset($_POST['legal_notes_extra']) ? sanitize_textarea_field(wp_unslash($_POST['legal_notes_extra'])) : '', // phpcs:ignore
+				'delivery_time_note'    => isset($_POST['delivery_time_note']) ? sanitize_textarea_field(wp_unslash($_POST['delivery_time_note'])) : '', // phpcs:ignore
+				'legal_notes_extra'     => isset($_POST['legal_notes_extra']) ? sanitize_textarea_field(wp_unslash($_POST['legal_notes_extra'])) : '', // phpcs:ignore
+				'wc_shipping_methods'   => self::checked_ids_to_selection('wc_shipping_methods'),
+				'wc_tax_rates'          => self::checked_ids_to_selection('wc_tax_rates'),
+				'wc_catalog_categories' => self::checked_ids_to_selection('wc_catalog_categories'),
+				'wc_payment_methods'    => self::checked_ids_to_selection('wc_payment_methods', false),
+				'wc_min_order_note'     => isset($_POST['wc_min_order_note']) ? sanitize_textarea_field(wp_unslash($_POST['wc_min_order_note'])) : '', // phpcs:ignore
+				'wc_pickup_available'   => ! empty($_POST['wc_pickup_available']), // phpcs:ignore
+				'wc_store_name'         => isset($_POST['wc_store_name']) ? sanitize_text_field(wp_unslash($_POST['wc_store_name'])) : '', // phpcs:ignore
+				'wc_currency'           => isset($_POST['wc_currency']) ? sanitize_text_field(wp_unslash($_POST['wc_currency'])) : '', // phpcs:ignore
+				'wc_base_country'       => isset($_POST['wc_base_country']) ? sanitize_text_field(wp_unslash($_POST['wc_base_country'])) : '', // phpcs:ignore
+				'wc_terms_text'         => isset($_POST['wc_terms_text']) ? sanitize_textarea_field(wp_unslash($_POST['wc_terms_text'])) : '', // phpcs:ignore
+				'wc_returns_text'       => isset($_POST['wc_returns_text']) ? sanitize_textarea_field(wp_unslash($_POST['wc_returns_text'])) : '', // phpcs:ignore
+				'wc_contact_hours'      => isset($_POST['wc_contact_hours']) ? sanitize_textarea_field(wp_unslash($_POST['wc_contact_hours'])) : '', // phpcs:ignore
 			)
 		);
 

@@ -528,18 +528,6 @@ body.toplevel_page_woo-kb-generator #wpcontent {
    7. BLOQUES ESPECIFICOS
    ========================================================================== */
 
-/* Pestaña WooCommerce: "Detectado automaticamente" vs "Rellenar a mano",
-   diferenciados por fondo, sin borde lateral. */
-.wookb-wrap .wookb-wc-detected {
-  background: var(--tblr-secondary-bg, #f3f4f6);
-  border-radius: 6px;
-  padding: 12px 14px;
-}
-.wookb-wrap .wookb-wc-manual {
-  background: var(--tblr-primary-lt, rgba(32, 107, 196, 0.1));
-  border-radius: 6px;
-  padding: 12px 14px;
-}
 
 /* Badges de la columna "Control manual": envuelven en varias lineas si
    hace falta, para no volver a inflar el ancho de la columna (bug A). */

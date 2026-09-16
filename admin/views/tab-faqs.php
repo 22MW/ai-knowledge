@@ -45,8 +45,9 @@ if ( false === $faq_content ) {
 	<input type="hidden" name="lang" value="<?php echo esc_attr( $lang ); ?>" />
 	<?php wp_nonce_field( 'wookb_generate_faqs_draft' ); ?>
 	<p>
-		<label><?php esc_html_e( 'Información extra (opcional)', 'ai-knowledge' ); ?></label><br />
-		<textarea name="extra_info" rows="3" class="large-text" placeholder="<?php esc_attr_e( 'Pega aquí cualquier instrucción o dato adicional para esta generación.', 'ai-knowledge' ); ?>"></textarea>
+		<label><?php esc_html_e( 'Instrucciones para generar o ampliar las FAQs (opcional)', 'ai-knowledge' ); ?></label><br />
+		<textarea name="extra_info" rows="3" class="large-text" placeholder="<?php esc_attr_e( 'Indica el tono, número de preguntas, formato, orden o estructura que quieres.', 'ai-knowledge' ); ?>"></textarea>
+		<span class="description"><?php esc_html_e( 'Puedes escribir una indicación breve o pegar un prompt completo. Estas instrucciones prevalecen sobre el formato predeterminado, pero solo pueden usar los datos de Negocio y la FAQ actual. Revisa el borrador antes de guardarlo.', 'ai-knowledge' ); ?></span>
 	</p>
 	<?php submit_button( __( 'Generar/ampliar con IA', 'ai-knowledge' ), '' ); ?>
 	<p class="description"><?php esc_html_e( 'Usa los datos guardados en la pestaña Negocio. Si ya hay FAQ guardada (en este idioma), la amplía o mejora en vez de partir de cero — puedes repetir esto todas las veces que haga falta: amplía los datos de Negocio (guárdalos primero) o edita la FAQ a mano abajo, guarda, y vuelve a generar para mejorar el resultado.', 'ai-knowledge' ); ?></p>

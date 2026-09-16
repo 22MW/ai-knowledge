@@ -371,7 +371,9 @@ alternativas:**
   renombra a **"Ajustes avanzados"** y pasa a contener TODO lo que hoy está
   disperso o son columnas propias: Puente, Hash, el textarea de
   ver/editar Markdown, el campo de límite de caracteres, y los botones
-  "Pasar a manual"/"Volver a Auto". Nada de información se pierde, se
+  "Guardar cambios" siempre y "Volver a Auto" solo en modo Manual. Guardar
+  desde Auto fija el texto y cambia a Manual; guardar desde Manual conserva
+  el modo. Nada de información se pierde, se
   reorganiza dentro de esa fila expandible en vez de ocupar columnas
   siempre visibles.
 - Sin cambios en `Registry_Table::get_columns()`/`get_bulk_actions()`.
@@ -564,8 +566,8 @@ del plugin. Corregido a "negocio/tienda online".
   atención humana, contacto. Válidos con o sin WooCommerce/Genix. Incluye
   su propia mini-herramienta de generación IA para el resumen usado como
   cita de apertura de `llms.txt` (campo `negocio` en
-  `Chatbot_Prompt_Builder::questions()`), con campo libre "Información
-  extra" para pegar instrucciones sueltas antes de generar.
+  `Chatbot_Prompt_Builder::questions()`), con campo libre de instrucciones
+  para una indicación breve o un prompt completo antes de generar.
 - **Chatbot** (pestaña "Prompt" internamente, mismo slug de siempre —
   visible en el menú **solo si Support Genix está activo**, igual patrón
   que la pestaña WooCommerce): tono, qué hacer sin info, límites, cómo
@@ -575,7 +577,14 @@ del plugin. Corregido a "negocio/tienda online".
   `save_prompt_draft`, más la vista misma) se bloquean con un aviso, no
   solo se ocultan del menú — por si alguien fuerza la URL a mano.
 - **FAQs** (nueva pestaña, siempre visible, antes vivía dentro de
-  Ajustes): igual patrón de generación con IA + campo "Información extra".
+  Ajustes): igual patrón de generación con IA + campo libre de instrucciones.
+
+**Contrato común de instrucciones para Negocio y FAQs:** las instrucciones
+privadas prevalecen sobre formato, orden y estructura predeterminados, pero
+nunca sobre los datos reales ni sobre la prohibición de inventar. Datos,
+contenido actual e instrucciones viajan en bloques delimitados; si la IA
+copia instrucciones o delimitadores, la respuesta se rechaza. Ambos flujos
+mantienen el borrador editable y requieren guardarlo manualmente.
 
 **Migración de datos:** `Scope::settings()`-equivalente para el
 cuestionario (`Chatbot_Prompt_Builder::save_answers()`) ahora parte de lo
@@ -640,6 +649,105 @@ pasa con los documentos públicos generados (`Markdown_Store`, base
 la sección FAQ), `admin/views/tab-woocommerce.php` (enlace a "Contacto y
 horario" actualizado a la pestaña Negocio), `admin/views/tab-registro.php`,
 `.gitignore` (`llms-faq.md`, `llms-faq-*.md`, `chatbot-system-prompt.md`).
+
+---
+
+## Pestaña WooCommerce: selección editable + pulido con IA — HECHO (2026-09-16, mismo día)
+
+Ampliación pedida tras revisar la pestaña WooCommerce: hasta ahora
+"Detectado automáticamente" era solo lectura (vivía de leer WooCommerce en
+cada carga), y el documento generado no incluía envíos ni permitía elegir
+impuestos/pagos/categorías del catálogo — entraban todos sin poder filtrar,
+o en el caso de envíos, ninguno en absoluto (hueco real, no solo de UX).
+
+**Selección editable (checkbox = incluido en el documento), mismo patrón
+que Contenido — `Scope::is_selected()`/`Store_Info_Doc::is_selected()`:
+`null` = nunca guardado todavía → todo lo detectado sale premarcado (sin
+perder contenido ya publicado); array guardado, aunque vacío, = selección
+real del admin:**
+- **Envíos**: por método/zona (`wc_shipping_methods`). Antes no entraban
+  en el documento en absoluto — ahora sí, con nueva sección `## Envíos`.
+  Envío gratis con importe mínimo se detecta solo desde el propio método
+  de WooCommerce (`WC_Shipping_Free_Shipping`, opción `min_amount`).
+- **Impuestos/IVA** (`wc_tax_rates`): antes entraban todos sin poder
+  elegir, ahora por tipo de impuesto.
+- **Métodos de pago** (`wc_payment_methods`): antes solo se listaban,
+  ahora seleccionables igual que envíos/impuestos.
+- **Catálogo: categorías** (`wc_catalog_categories`): antes se incluían
+  todas las categorías con productos automáticamente, ahora seleccionable.
+- Solo los métodos/pasarelas **activos** se premarcan por defecto la
+  primera vez (los desactivados no, aunque sigan apareciendo como opción
+  marcable) — corregido tras detectarlo en pruebas.
+
+**"Detectado automáticamente" deja de ser solo lectura — pasa a ser
+snapshot editable (`wc_store_name`, `wc_currency`, `wc_base_country`,
+`wc_terms_text`, `wc_returns_text`):** precargado con el valor real de
+WooCommerce la primera vez, pero desde que se guarda una vez, vive en
+`Scope::settings()` — si se borra la página de condiciones/devoluciones o
+cambia el ajuste en WooCommerce después, el documento no lo pierde hasta
+que el admin lo edite a mano otra vez.
+
+**Contacto y horario propio de la tienda online** (`wc_contact_hours`,
+nuevo campo), distinto del contacto general del negocio (pestaña Negocio)
+porque pueden diferir (ej. soporte de pedidos vs. atención general) — con
+fallback al de Negocio si se deja vacío.
+
+**Campos nuevos con detección + fallback manual:**
+- **Pedido mínimo / envío gratis** (`wc_min_order_note`): solo se usa si
+  ningún método de envío marcado es "Envío gratis" con mínimo configurado
+  en WooCommerce (si lo es, se detecta solo).
+- **Recogida en tienda** (`wc_pickup_available`): solo se usa si ningún
+  método marcado es "Recogida local" de WooCommerce (si lo es, se detecta
+  solo, apareciendo como cualquier otro método de envío seleccionable).
+
+**"Pulir redacción con IA" para los documentos de tienda/catálogo —
+punto intermedio deliberado, no generación libre:** los documentos siguen
+construyéndose de forma **determinista** (datos reales, sin IA, decisión
+ya tomada antes por riesgo de alucinación en contenido legal/de pago). Se
+añade un botón que **pule la redacción sin cambiar ningún dato**
+(`Chatbot_Prompt_Builder::polish_factual_text()`, mismo espíritu que
+`normalize()` del prompt del chatbot pero con límite de caracteres propio
+de estos documentos, 20000), con campo "Instrucciones para pulir el texto"
+que acepta una indicación breve o un prompt completo. Esas instrucciones
+prevalecen sobre el formato/orden predeterminado, pero no sobre las reglas
+factuales: no pueden añadir datos ausentes. Documento e instrucciones viajan
+delimitados y la respuesta se rechaza si copia instrucciones internas. Si el
+usuario ya dispone de un texto completo generado externamente, lo pega en
+modo manual desde Registro. El resultado se guarda en modo manual (reutiliza
+`override_mode`/`override_text` de Fase 1 vía `Admin::publish_manual_text()`),
+y `Store_Info_Doc::persist()` ahora respeta ese modo manual — antes
+"Generar/actualizar ahora" habría sobreescrito cualquier pulido.
+
+La presentación de ambos documentos sigue el patrón visual de Negocio:
+título `h2`, explicación, campo de instrucciones, botón y resultado. En
+sitios de un solo idioma no se muestra el código `ES`; en sitios
+multiidioma se integra en el propio título del documento.
+
+**Estilo unificado con Contenido/Negocio:** quitada la caja con fondo
+(`.wookb-wc-detected`/`.wookb-wc-manual`, clases y CSS eliminados) — ahora
+todo vive en un único `<table class="form-table">` con filas `th`/`td`,
+igual patrón que el resto de pestañas.
+
+**Bug corregido durante la implementación:** el selector de métodos de
+pago usaba `absint()` para convertir los IDs marcados — los gateway IDs de
+WooCommerce son texto (`'bacs'`, `'paypal'`...), no números;
+`checked_ids_to_selection()` ahora acepta un flag `$numeric` para no
+destruir IDs de texto.
+
+**Archivos tocados:** `includes/class-scope.php` (nuevos
+`wc_shipping_methods`/`wc_tax_rates`/`wc_catalog_categories`/
+`wc_payment_methods`/`wc_min_order_note`/`wc_pickup_available`/
+`wc_store_name`/`wc_currency`/`wc_base_country`/`wc_terms_text`/
+`wc_returns_text`/`wc_contact_hours`), `includes/class-store-info-doc.php`
+(`is_selected()`, `shipping_summary_lines()`, `has_shipping_method_type()`,
+filtros en `tax_summary_lines()`/`payment_summary()`/catálogo, guard de
+`override_mode` en `persist()`, nueva sección "## Envíos" +
+labels es/en/de), `includes/class-chatbot-prompt-builder.php`
+(`polish_factual_text()`), `admin/class-admin.php`
+(`checked_ids_to_selection()`, `polish_store_doc()`, `save_woocommerce_settings()`
+ampliado), `admin/views/tab-woocommerce.php` (reescrita: todo editable,
+una sola tabla, checkboxes, botón de pulido por documento),
+`assets/wookb-theme.css` (quitadas `.wookb-wc-detected`/`.wookb-wc-manual`).
 
 ---
 

@@ -55,8 +55,9 @@ if ( false === $summary_draft ) {
 	<input type="hidden" name="action" value="wookb_generate_business_summary_draft" />
 	<?php wp_nonce_field( 'wookb_generate_business_summary_draft' ); ?>
 	<p>
-		<label><?php esc_html_e( 'Información extra (opcional)', 'ai-knowledge' ); ?></label><br />
-		<textarea name="extra_info" rows="3" class="large-text" placeholder="<?php esc_attr_e( 'Pega aquí cualquier instrucción o dato adicional para esta generación.', 'ai-knowledge' ); ?>"></textarea>
+		<label><?php esc_html_e( 'Instrucciones para generar o pulir el texto (opcional)', 'ai-knowledge' ); ?></label><br />
+		<textarea name="extra_info" rows="3" class="large-text" placeholder="<?php esc_attr_e( 'Indica el tono, formato, orden o estructura que quieres para el resumen.', 'ai-knowledge' ); ?>"></textarea>
+		<span class="description"><?php esc_html_e( 'Puedes escribir una indicación breve o pegar un prompt completo. Estas instrucciones prevalecen sobre el formato predeterminado, pero solo pueden usar los datos guardados arriba. Revisa el borrador antes de guardarlo.', 'ai-knowledge' ); ?></span>
 	</p>
 	<?php submit_button( __( 'Generar/pulir con IA', 'ai-knowledge' ), '' ); ?>
 </form>

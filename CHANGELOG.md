@@ -2,14 +2,53 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
-## [1.0.8.4] - 2026-09-15/16
+## [1.0.8.5] - 2026-09-16
 
 Ver `_dev/roadmap.md` para el plan completo por fases y `_dev/decisiones.md`
 para el porqué de la identidad/alcance. Este plugin sigue orientado a IA +
 Support Genix como núcleo; todo lo de abajo es capa añadida encima.
 
+### Pestaña WooCommerce: selección editable + pulido con IA (2026-09-16)
+
+- Envíos, impuestos/IVA, métodos de pago y categorías del catálogo pasan
+  de listarse automáticamente a ser **seleccionables** (checkbox = entra
+  en el documento). Envíos no entraba antes en el documento en absoluto —
+  ahora sí, con nueva sección "## Envíos" (envío gratis con mínimo
+  configurado se detecta solo).
+- "Detectado automáticamente" (nombre, moneda, país, condiciones de venta,
+  devoluciones) deja de ser solo lectura: ahora es un snapshot editable,
+  precargado de WooCommerce la primera vez pero que ya no se pierde si
+  WooCommerce cambia o se borra la página.
+- Nuevo campo "Contacto y horario de la tienda online", independiente del
+  contacto general de Negocio (con fallback si se deja vacío).
+- Nuevos campos "Pedido mínimo/envío gratis" y "Recogida en tienda", solo
+  usados como respaldo si WooCommerce no tiene ya el dato como método de
+  envío real (si lo tiene, se detecta solo).
+- Nuevo botón "Pulir redacción con IA" en los documentos generados de
+  tienda/catálogo: mejora solo la redacción, sin cambiar ningún dato
+  (documentos legales/de pago siguen construyéndose de forma determinista,
+  decisión ya tomada antes por riesgo de alucinación).
+- Las instrucciones opcionales de pulido pueden ser una indicación breve o
+  un prompt completo y prevalecen sobre el formato predeterminado. Los datos
+  siguen protegidos: si el prompt solicita información ausente, se omite.
+  Las respuestas que copian instrucciones internas se rechazan sin publicar.
+  Un texto completo generado externamente se puede pegar en modo manual desde
+  Registro.
+- Los dos bloques de pulido de WooCommerce adoptan el orden visual de Negocio:
+  título `h2`, explicación, instrucciones, acción y resultado. El código de
+  idioma solo aparece en el título cuando el sitio tiene varios idiomas.
+- Estilo unificado con Contenido/Negocio (sin cajas de fondo, una sola
+  tabla).
+- Fix: selector de métodos de pago usaba `absint()` sobre IDs de texto
+  (`'bacs'`, `'paypal'`...), los destruía a `0`.
+
 ### Reestructuración Negocio/Chatbot/FAQs (2026-09-16)
 
+- Negocio y FAQs adoptan el mismo contrato de instrucciones que los
+  documentos WooCommerce: prompt breve o completo, prioridad sobre formato,
+  orden y estructura, pero nunca sobre los datos reales. Documento/datos e
+  instrucciones viajan delimitados y las respuestas que copian instrucciones
+  internas se rechazan antes de mostrar el borrador.
 - Prompt genérico de generación de documentos corregido: ya no dice
   "bodega/tienda online" (sesgado al sitio de pruebas), ahora
   "negocio/tienda online" — afecta a todos los clientes del plugin.
@@ -63,6 +102,9 @@ Support Genix como núcleo; todo lo de abajo es capa añadida encima.
 
 ### Fase 10, pieza 5: "Ajustes avanzados" en el Registro (2026-09-16)
 
+- El editor muestra siempre "Guardar cambios": desde Auto guarda el texto y
+  pasa a Manual; desde Manual guarda y permanece en Manual. En modo Manual
+  se mantiene además "Volver a Auto".
 - Columnas Puente y Hash ya no son siempre visibles: se movieron dentro
   del desplegable por fila, renombrado de "Ver/editar Markdown" a
   "Ajustes avanzados".

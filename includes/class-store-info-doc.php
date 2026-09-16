@@ -152,6 +152,13 @@ class Store_Info_Doc {
 			return true;
 		}
 
+		// Modo manual (ej. tras "Pulir redacción con IA", ver Admin::polish_store_doc()):
+		// el texto lo fijó el admin a mano, no se regenera aquí. Mismo criterio
+		// que Document_Pipeline::process() para filas de producto.
+		if ( $existing && 'manual' === $existing->override_mode ) {
+			return true;
+		}
+
 		$markdown = "# {$title}\n\n" . $body;
 
 		$slug     = 'store-info' === self::type_slug( $source_type ) ? 'informacion-tienda' : 'catalogo-tienda';
@@ -298,6 +305,30 @@ class Store_Info_Doc {
 		}
 		$lines[] = '';
 
+		// Envíos: métodos realmente habilitados y seleccionados por el admin
+		// (pestaña WooCommerce, checkbox por método -- ver shipping_summary_lines()).
+		// Envío gratis y recogida en tienda se detectan solos si están
+		// configurados como método de envío real; si no, se usan los campos
+		// manuales de fallback (pedido mínimo / recogida) en vez de inventar.
+		$shipping_lines = self::shipping_summary_lines( $lang );
+		$lines[]        = '## ' . self::label( $lang, 'heading_shipping' );
+		if ( empty( $shipping_lines ) ) {
+			$lines[] = self::label( $lang, 'shipping_not_configured' );
+		} else {
+			$lines = array_merge( $lines, $shipping_lines );
+		}
+		$wc_settings = Scope::settings();
+		if ( ! self::has_shipping_method_type( 'free_shipping' ) ) {
+			$min_order_note = trim( (string) $wc_settings['wc_min_order_note'] );
+			if ( '' !== $min_order_note ) {
+				$lines[] = '- ' . $min_order_note;
+			}
+		}
+		if ( ! self::has_shipping_method_type( 'local_pickup' ) && ! empty( $wc_settings['wc_pickup_available'] ) ) {
+			$lines[] = '- ' . self::label( $lang, 'pickup_available_manual' );
+		}
+		$lines[] = '';
+
 		// Plazos de entrega: WooCommerce no expone un campo de plazo en los
 		// métodos de envío activos (verificado por MCP execute-php inspeccionando
 		// WC_Shipping_Zones::get_zones()), así que es un dato de texto libre que
@@ -309,18 +340,20 @@ class Store_Info_Doc {
 		$lines[]       = '' !== $delivery_note ? $delivery_note : self::label( $lang, 'delivery_times_pending' );
 		$lines[]       = '';
 
-		// Contacto y horario: dato ya recogido por el negocio en el cuestionario
-		// del chatbot (Chatbot_Prompt_Builder), texto libre y ya validado por el
-		// cliente -- se reutiliza tal cual en vez de duplicarlo a mano, así una
-		// sola fuente sirve para el prompt del chatbot y para este documento.
-		if ( class_exists( '\WOOKB\Chatbot_Prompt_Builder' ) ) {
+		// Contacto y horario: propio de la tienda online (pestaña WooCommerce,
+		// wc_contact_hours) si se ha rellenado -- puede diferir del contacto
+		// general del negocio. Si no, cae al del cuestionario del chatbot
+		// (Chatbot_Prompt_Builder, pestaña Negocio), ya validado por el
+		// cliente, para no duplicar el dato si es el mismo.
+		$contact = trim( (string) Scope::settings()['wc_contact_hours'] );
+		if ( '' === $contact && class_exists( '\WOOKB\Chatbot_Prompt_Builder' ) ) {
 			$answers = \WOOKB\Chatbot_Prompt_Builder::get_saved_answers();
 			$contact = isset( $answers['contacto'] ) ? trim( (string) $answers['contacto'] ) : '';
-			if ( '' !== $contact ) {
-				$lines[] = '## ' . self::label( $lang, 'heading_contact' );
-				$lines[] = $contact;
-				$lines[] = '';
-			}
+		}
+		if ( '' !== $contact ) {
+			$lines[] = '## ' . self::label( $lang, 'heading_contact' );
+			$lines[] = $contact;
+			$lines[] = '';
 		}
 
 		// Pago: pasarelas realmente habilitadas (enabled === 'yes'), no todas las
@@ -409,7 +442,12 @@ class Store_Info_Doc {
 
 		$lines[] = '## ' . self::label( $lang, 'heading_catalog' );
 
+		$selection = Scope::settings()['wc_catalog_categories'];
+
 		foreach ( $terms as $term ) {
+			if ( ! self::is_selected( $selection, $term->term_id ) ) {
+				continue;
+			}
 			$term_id = $term->term_id;
 			if ( class_exists( 'SitePress' ) ) {
 				$translated_term_id = apply_filters( 'wpml_object_id', $term_id, 'product_cat', false, $lang );
@@ -459,6 +497,76 @@ class Store_Info_Doc {
 	}
 
 	/**
+	 * true si un elemento (por su id -- instance_id de envío, tax_rate_id,
+	 * term_id de categoría) esta seleccionado para entrar en el documento.
+	 * null en la settings = nunca se guardo una seleccion todavia -> se
+	 * trata TODO como seleccionado (no perder contenido ya publicado sin
+	 * decision explicita del admin); array = seleccion real, aunque vacia.
+	 */
+	protected static function is_selected( $selection, $id ) {
+		if ( null === $selection ) {
+			return true;
+		}
+		return isset( $selection[ $id ] ) && 'include' === $selection[ $id ];
+	}
+
+	/**
+	 * Metodos de envio realmente habilitados, filtrados por la seleccion
+	 * del admin (pestaña WooCommerce, checkbox por metodo). Enriquece los
+	 * metodos "Envio gratis" con su importe minimo real (WC_Shipping_Free_Shipping,
+	 * opcion 'min_amount') en vez de dejarlo como dato manual -- WooCommerce
+	 * ya lo tiene configurado si el metodo esta activo.
+	 */
+	public static function shipping_summary_lines( $lang ) {
+		if ( ! class_exists( 'WC_Shipping_Zones' ) ) {
+			return array();
+		}
+
+		$selection = Scope::settings()['wc_shipping_methods'];
+		$lines     = array();
+
+		foreach ( \WC_Shipping_Zones::get_zones() as $zone ) {
+			foreach ( (array) $zone['shipping_methods'] as $method ) {
+				if ( 'no' === $method->enabled ) {
+					continue;
+				}
+				if ( ! self::is_selected( $selection, $method->instance_id ) ) {
+					continue;
+				}
+				$line = '- ' . $zone['zone_name'] . ': ' . $method->get_title();
+				if ( 'free_shipping' === $method->id ) {
+					$min_amount = $method->get_option( 'min_amount' );
+					if ( '' !== $min_amount ) {
+						$line .= ' (' . sprintf( self::label( $lang, 'shipping_free_from' ), $min_amount ) . ')';
+					}
+				}
+				$lines[] = $line;
+			}
+		}
+
+		return $lines;
+	}
+
+	/** true si hay algun metodo seleccionado de tipo $type (free_shipping|local_pickup). */
+	public static function has_shipping_method_type( $type ) {
+		if ( ! class_exists( 'WC_Shipping_Zones' ) ) {
+			return false;
+		}
+		$selection = Scope::settings()['wc_shipping_methods'];
+		foreach ( \WC_Shipping_Zones::get_zones() as $zone ) {
+			foreach ( (array) $zone['shipping_methods'] as $method ) {
+				if ( 'no' === $method->enabled || ! self::is_selected( $selection, $method->instance_id ) ) {
+					continue;
+				}
+				if ( $type === $method->id ) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Pasarelas de pago realmente habilitadas (WC()->payment_gateways()
 	 * expone TODAS las instaladas; se filtra por enabled === 'yes').
 	 */
@@ -472,9 +580,13 @@ class Store_Info_Doc {
 			return array();
 		}
 
-		$lines = array();
+		$selection = Scope::settings()['wc_payment_methods'];
+		$lines     = array();
 		foreach ( WC()->payment_gateways()->payment_gateways() as $gateway ) {
 			if ( 'yes' !== $gateway->enabled ) {
+				continue;
+			}
+			if ( ! self::is_selected( $selection, $gateway->id ) ) {
 				continue;
 			}
 			$lines[] = '- ' . $gateway->get_title();
@@ -503,13 +615,17 @@ class Store_Info_Doc {
 			$classes[] = $class_obj;
 		}
 
-		$lines = array();
+		$selection = Scope::settings()['wc_tax_rates'];
+		$lines     = array();
 		foreach ( $classes as $class_obj ) {
 			$rates = \WC_Tax::get_rates_for_tax_class( $class_obj->slug );
 			if ( empty( $rates ) || is_wp_error( $rates ) ) {
 				continue;
 			}
 			foreach ( $rates as $rate ) {
+				if ( ! self::is_selected( $selection, (int) $rate->tax_rate_id ) ) {
+					continue;
+				}
 				$country = ! empty( $rate->tax_rate_country ) ? $rate->tax_rate_country : self::label( $lang, 'tax_all_countries' );
 				$percent = rtrim( rtrim( number_format( (float) $rate->tax_rate, 4, '.', '' ), '0' ), '.' );
 				$line    = '- ' . $class_obj->name . ' (' . $country . '): ' . $percent . '%';
@@ -619,6 +735,10 @@ class Store_Info_Doc {
 				'returns_link'            => 'Política completa',
 				'returns_pending'         => '[pendiente] La página de devoluciones y reembolsos está configurada pero no se pudo leer su contenido.',
 				'returns_not_configured'  => '[pendiente] Esta tienda todavía no tiene configurada una página de devoluciones y reembolsos en WooCommerce (Ajustes > Cuentas y privacidad).',
+				'heading_shipping'        => 'Envíos',
+				'shipping_not_configured' => '[pendiente] No hay métodos de envío seleccionados todavía (pestaña WooCommerce).',
+				'shipping_free_from'      => 'gratis a partir de %s',
+				'pickup_available_manual' => 'Recogida en tienda disponible.',
 				'heading_delivery_times'  => 'Plazos de entrega',
 				'delivery_times_pending'  => '[pendiente] No hay un plazo de entrega en texto confirmado por el negocio todavía (los métodos de envío configurados no incluyen una estimación de tiempo).',
 				'heading_contact'         => 'Contacto y horario',
@@ -659,6 +779,10 @@ class Store_Info_Doc {
 				'returns_link'            => 'Full policy',
 				'returns_pending'         => '[pending] The returns and refunds page is configured but its content could not be read.',
 				'returns_not_configured'  => '[pending] This store does not have a returns and refunds page configured in WooCommerce yet (Settings > Accounts & Privacy).',
+				'heading_shipping'        => 'Shipping',
+				'shipping_not_configured' => '[pending] No shipping methods selected yet (WooCommerce tab).',
+				'shipping_free_from'      => 'free from %s',
+				'pickup_available_manual' => 'In-store pickup available.',
 				'heading_delivery_times'  => 'Delivery times',
 				'delivery_times_pending'  => '[pending] There is no delivery time confirmed by the business in free text yet (the configured shipping methods do not include a time estimate).',
 				'heading_contact'         => 'Contact and opening hours',
@@ -699,6 +823,10 @@ class Store_Info_Doc {
 				'returns_link'            => 'Vollständige Richtlinie',
 				'returns_pending'         => '[ausstehend] Die Seite zu Rückgabe und Erstattung ist konfiguriert, ihr Inhalt konnte aber nicht gelesen werden.',
 				'returns_not_configured'  => '[ausstehend] Für diesen Shop ist noch keine Seite zu Rückgabe und Erstattung in WooCommerce konfiguriert (Einstellungen > Konten & Datenschutz).',
+				'heading_shipping'        => 'Versand',
+				'shipping_not_configured' => '[ausstehend] Noch keine Versandmethoden ausgewählt (Reiter WooCommerce).',
+				'shipping_free_from'      => 'kostenlos ab %s',
+				'pickup_available_manual' => 'Abholung im Laden möglich.',
 				'heading_delivery_times'  => 'Lieferzeiten',
 				'delivery_times_pending'  => '[ausstehend] Es gibt noch keine vom Unternehmen bestätigte Lieferzeit als Freitext (die konfigurierten Versandmethoden enthalten keine Zeitschätzung).',
 				'heading_contact'         => 'Kontakt und Öffnungszeiten',

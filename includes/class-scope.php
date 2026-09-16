@@ -48,6 +48,35 @@ class Scope {
 			// get_saved_answers()['contacto'] (ver Store_Info_Doc::build_store_info_body()).
 			'delivery_time_note' => '',
 			'legal_notes_extra'  => '',
+			// Selecciones de la pestaña WooCommerce (checkbox = incluido en el
+			// documento generado, mismo patron que Contenido): null = nunca
+			// guardado todavia -> se tratan TODOS los detectados como
+			// pre-marcados (no perder contenido ya publicado sin decision
+			// explicita); array = seleccion real ya guardada por el admin,
+			// aunque este vacio (nada marcado a proposito).
+			'wc_shipping_methods'  => null, // [ instance_id => 'include' ]
+			'wc_tax_rates'         => null, // [ tax_rate_id => 'include' ]
+			'wc_catalog_categories' => null, // [ term_id => 'include' ]
+			'wc_payment_methods'   => null, // [ gateway_id => 'include' ]
+			// Fallback manual (Rellenar a mano): solo se usan si WooCommerce
+			// no tiene el dato como metodo de envio real detectable.
+			'wc_min_order_note'   => '',
+			'wc_pickup_available' => false,
+			// Snapshot editable: precargado con el valor real de WooCommerce
+			// la primera vez que se guarda esta pestaña, pero desde entonces
+			// vive aqui -- si se borra la pagina o cambia el ajuste en
+			// WooCommerce despues, el documento generado no lo pierde hasta
+			// que el admin lo edite a mano otra vez.
+			'wc_store_name'    => '',
+			'wc_currency'      => '',
+			'wc_base_country'  => '',
+			'wc_terms_text'    => '',
+			'wc_returns_text'  => '',
+			// Contacto/horario PROPIO de la tienda online, distinto del
+			// contacto general del negocio (pestaña Negocio, cuestionario
+			// del chatbot): pueden ser diferentes (ej. soporte de pedidos
+			// vs. atencion general). Vacio = usa el de Negocio como fallback.
+			'wc_contact_hours' => '',
 			// Fase 8: aviso a IndexNow. La clave se genera sola (Indexnow::get_key()),
 			// nunca se rellena a mano desde aquí.
 			'indexnow_enabled' => false,

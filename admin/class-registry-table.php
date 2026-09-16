@@ -328,10 +328,9 @@ class Registry_Table extends \WP_List_Table {
 					/>
 				</label>
 				<button type="submit" form="<?php echo esc_attr( $char_limit_form_id ); ?>" class="button"><?php esc_html_e( 'Guardar límite', 'ai-knowledge' ); ?></button>
+				<button type="submit" form="<?php echo esc_attr( $set_manual_form_id ); ?>" class="button"><?php esc_html_e( 'Guardar cambios', 'ai-knowledge' ); ?></button>
 				<?php if ( $is_manual ) : ?>
 					<button type="submit" form="<?php echo esc_attr( $back_auto_form_id ); ?>" class="button"><?php esc_html_e( 'Volver a Auto', 'ai-knowledge' ); ?></button>
-				<?php else : ?>
-					<button type="submit" form="<?php echo esc_attr( $set_manual_form_id ); ?>" class="button"><?php esc_html_e( 'Pasar a manual', 'ai-knowledge' ); ?></button>
 				<?php endif; ?>
 			</p>
 		</details>

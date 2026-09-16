@@ -33,7 +33,7 @@
   <main>
     <header>
       <h1>AI Knowledge & Visibility — Estado</h1>
-      <p class="muted">Última actualización: 2026-09-16 (reestructuración Negocio/Chatbot/FAQs: pestañas Negocio y FAQs nuevas, Chatbot solo con Genix, FAQs multiidioma reales) · antes "woo-kb-generator"</p>
+      <p class="muted">Última actualización: 2026-09-16 (pestaña WooCommerce: selección editable y pulido con instrucciones que prevalecen sobre el formato sin inventar datos) · antes "woo-kb-generator"</p>
       <span class="badge ok">Fases 0-11 hechas y confirmadas.</span>
     </header>
 
@@ -66,7 +66,7 @@
           <tr><th>Fase</th><th>Qué es</th><th>Estado</th></tr>
           <tr><td>0</td><td>Identidad (renombrado a AI Knowledge & Visibility)</td><td><span class="badge ok">Hecho</span></td></tr>
           <tr><td>1</td><td>Control manual de documentos + botón en editor</td><td><span class="badge ok">Hecho. Bugs de QA arreglados (char_limit, tabla rota, margen)</span></td></tr>
-          <tr><td>2</td><td>Pestaña WooCommerce (tienda/envíos/IVA/pagos)</td><td><span class="badge warn">Hecho. Rediseño UX pedido (selección tipo checkbox) sin abordar</span></td></tr>
+          <tr><td>2</td><td>Pestaña WooCommerce (tienda/envíos/IVA/pagos)</td><td><span class="badge ok">Hecho. Selección checkbox (envíos/IVA/pagos/catálogo) + snapshot editable + pulido con IA, 2026-09-16. Pendiente: UX3 selección a nivel de producto</span></td></tr>
           <tr><td>3</td><td>API REST de contenido (JSON sin IA)</td><td><span class="badge ok">Hecho y probado (QA sin fallos)</span></td></tr>
           <tr><td>4</td><td>Markdown público descubrible (<code>&lt;link rel="alternate"&gt;</code>)</td><td><span class="badge ok">Hecho. Descarga vs apertura arreglado (ruta virtual Markdown_Server)</span></td></tr>
           <tr><td>5</td><td>JSON-LD (Schema.org)</td><td><span class="badge ok">Hecho. Duplicado con WooCommerce/RankMath/Yoast/AIOSEO resuelto</span></td></tr>
@@ -74,7 +74,7 @@
           <tr><td>7</td><td>API pública documentada: <code>GET /wp-json/ai-knowledge/v1/openapi.json</code>, OpenAPI 3.0 real de las 2 rutas de la Fase 3, enlazado desde <code>llms.txt</code> (ver <a href="roadmap.md">roadmap.md</a>)</td><td><span class="badge ok">Hecho y confirmado en navegador por el usuario</span></td></tr>
           <tr><td>8</td><td>Aviso a buscadores en tiempo real (IndexNow): clave del sitio autogenerada, interruptor en Ajustes, aviso no bloqueante con debounce (ver <a href="roadmap.md">roadmap.md</a>). Google no soporta IndexNow.</td><td><span class="badge ok">Hecho y confirmado en real (HTTP 202)</span></td></tr>
           <tr><td>9</td><td>Feeds especializados: <code>feeds/products.xml</code> (Google Merchant) y <code>feeds/content.json</code>, enlazados desde <code>llms.txt</code> y desde el <code>&lt;head&gt;</code> de todas las páginas (ver <a href="roadmap.md">roadmap.md</a>).</td><td><span class="badge ok">Hecho y confirmado en real</span></td></tr>
-          <tr><td>10</td><td>Plan conjunto de UX del admin (5 piezas, ver <a href="roadmap.md">roadmap.md</a>): 1) descripción por pestaña, 2) pestaña "Contenido" (fusión Alcance/Exclusiones, checkbox simple por término), 3) etiquetas legibles de campos ACF/Meta Box/Pods, 4) modo "todos los CPT", 5) Registro con "Ajustes avanzados" por fila.</td><td><span class="badge ok">Completa (5/5 piezas)</span></td></tr>
+          <tr><td>10</td><td>Plan conjunto de UX del admin (5 piezas, ver <a href="roadmap.md">roadmap.md</a>): 1) descripción por pestaña, 2) pestaña "Contenido" (fusión Alcance/Exclusiones, checkbox simple por término), 3) etiquetas legibles de campos ACF/Meta Box/Pods, 4) modo "todos los CPT", 5) Registro con "Ajustes avanzados" por fila y "Guardar cambios" disponible tanto en Auto como en Manual.</td><td><span class="badge ok">Completa (5/5 piezas)</span></td></tr>
           <tr><td>11</td><td>Gestión de crawlers de IA: catálogo de ~28 bots conocidos (Permitir/Bloquear por bot), bloqueo real por <code>robots.txt</code> y <code>.htaccess</code> con descarga obligatoria de seguridad y vista previa, logs de accesos (ver <a href="roadmap.md">roadmap.md</a>)</td><td><span class="badge ok">Hecho y confirmado en real</span></td></tr>
         </table>
       </article>
@@ -98,7 +98,7 @@
         <h2>Futuro (rediseño de UX, no bugs)</h2>
         <ul>
           <li>Registro: editor de texto más grande y cómodo.</li>
-          <li>WooCommerce (UX3): selección tipo checkbox como los posts + prompt por campo — cambio de arquitectura de datos, requiere <code>rol-analista</code>.</li>
+          <li>WooCommerce (UX3): selección tipo checkbox a nivel de PRODUCTO + prompt por campo (distinto de la selección de envíos/IVA/pagos/catálogo ya hecha) — cambio de arquitectura de datos, requiere <code>rol-analista</code>.</li>
           <li>WooCommerce (UX4): revisar visibilidad del botón "Generar documentos de tienda".</li>
         </ul>
       </article>
@@ -118,7 +118,12 @@
 
       <article class="card wide">
         <h2>Reestructuración Negocio/Chatbot/FAQs (2026-09-16)</h2>
-        <p>Prompt genérico de generación corregido (ya no "bodega", ahora "negocio"). Pestaña Prompt original dividida: <strong>Negocio</strong> (siempre visible, datos puros + generación IA del resumen de llms.txt), <strong>Chatbot</strong> (solo visible si Support Genix está activo, con guardas también en los handlers), y <strong>FAQs</strong> nueva (movida desde Ajustes, generación IA, ahora <strong>multiidioma real</strong>: un documento/.md por idioma con fila propia en Registro, en vez del archivo global único de antes). Fix: el sufijo "(ES)"/"(EN)" en llms.txt y en el Registro ya solo aparece en sitios realmente multiidioma. Bug real corregido de paso: formularios anidados en la fila expandida del Registro rompían "Borrar seleccionados" en silencio (heredado de la pieza 5 de la Fase 10). De paso: orígenes editables (<code>chatbot-system-prompt.md</code>, FAQ fuente) movidos de la raíz del plugin a <code>wp-content/llm/</code>, junto al resto de contenido — el <code>chatbot-system-prompt.md</code> viejo, que llevaba trackeado en git con datos reales del cliente, se destrackeó.</p>
+        <p>Prompt genérico de generación corregido (ya no "bodega", ahora "negocio"). Pestaña Prompt original dividida: <strong>Negocio</strong> (siempre visible, datos puros + generación IA del resumen de llms.txt), <strong>Chatbot</strong> (solo visible si Support Genix está activo, con guardas también en los handlers), y <strong>FAQs</strong> nueva (movida desde Ajustes, generación IA, ahora <strong>multiidioma real</strong>: un documento/.md por idioma con fila propia en Registro, en vez del archivo global único de antes). Negocio y FAQs usan el mismo contrato de instrucciones que WooCommerce: indicación breve o prompt completo, prioridad sobre formato/orden/estructura sin poder inventar datos, bloques privados delimitados y rechazo de respuestas que copien instrucciones. Sus borradores siguen siendo editables y se guardan manualmente. Fix: el sufijo "(ES)"/"(EN)" en llms.txt y en el Registro ya solo aparece en sitios realmente multiidioma. Bug real corregido de paso: formularios anidados en la fila expandida del Registro rompían "Borrar seleccionados" en silencio (heredado de la pieza 5 de la Fase 10). De paso: orígenes editables (<code>chatbot-system-prompt.md</code>, FAQ fuente) movidos de la raíz del plugin a <code>wp-content/llm/</code>, junto al resto de contenido — el <code>chatbot-system-prompt.md</code> viejo, que llevaba trackeado en git con datos reales del cliente, se destrackeó.</p>
+      </article>
+
+      <article class="card wide">
+        <h2>Pestaña WooCommerce: selección editable + pulido con IA (2026-09-16)</h2>
+        <p>Envíos (nueva sección "## Envíos", antes no entraba en el documento), impuestos/IVA, métodos de pago y categorías del catálogo pasan de listarse/incluirse automáticamente a ser <strong>seleccionables</strong> (checkbox), mismo patrón que Contenido — solo los activos se premarcan por defecto. "Detectado automáticamente" deja de ser solo lectura: nombre, moneda, país, condiciones de venta y devoluciones son ahora un <strong>snapshot editable</strong> que sobrevive a cambios/borrados en WooCommerce. Nuevo "Contacto y horario de la tienda online" (independiente del de Negocio) y campos de respaldo "Pedido mínimo/envío gratis" y "Recogida en tienda" (solo si WooCommerce no lo detecta ya). Nuevo botón <strong>"Pulir redacción con IA"</strong> en los documentos de tienda/catálogo: admite instrucciones breves o un prompt completo, que prevalecen sobre el formato y el orden predeterminados sin poder inventar datos. Documento e instrucciones viajan delimitados; si la IA copia instrucciones internas, la respuesta se rechaza sin publicar. Un texto completo creado con otra IA se puede pegar manualmente desde Registro. Ambos bloques siguen el orden visual de Negocio (<code>h2</code>, explicación, instrucciones, acción y resultado) y ocultan el idioma cuando solo hay uno. Estilo unificado con Contenido/Negocio (sin cajas de fondo). Fix: IDs de pasarela de pago (texto, ej. "bacs") se destruían con <code>absint()</code>.</p>
       </article>
 
       <article class="card wide">
@@ -135,7 +140,7 @@
 
       <article class="card wide">
         <h2>Próximo paso</h2>
-        <p>Fase 10 completa. Pendiente: UX3 (WooCommerce, requiere <code>rol-analista</code>), UX4 (visibilidad del botón de generar documentos de tienda), o una tarea nueva.</p>
+        <p>Fase 10 completa, más reestructuración Negocio/Chatbot/FAQs y pestaña WooCommerce (selección + pulido con IA). Probar WooCommerce en real. Pendiente: UX3 (selección a nivel de producto, requiere <code>rol-analista</code>), UX4 (visibilidad del botón de generar documentos de tienda), o una tarea nueva.</p>
       </article>
 
     </section>

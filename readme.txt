@@ -24,8 +24,9 @@ Genera automáticamente una base de conocimiento en Markdown a partir de tu cat�
 * Compatible con WPML: genera un documento por cada idioma activo, resolviendo traducciones reales y evitando falsos "documentos puente" cuando no hace falta.
 * Publicación pública de `/llms.txt`, generado dinámicamente desde el propio registro de documentos (no un archivo estático que se queda desactualizado).
 * Sección de FAQ pública editable, incluida en `/llms.txt`.
+* Los generadores de Negocio, FAQs y documentos WooCommerce aceptan instrucciones breves o prompts completos que prevalecen sobre el formato predeterminado sin poder inventar datos; el resultado se revisa antes de guardar en Negocio y FAQs.
 * Conexión directa con Support Genix (Pro y Lite): crea/actualiza los posts `sgkb-docs` que el chatbot usa como fuente, y sincroniza el prompt de sistema del chatbot con un asistente de redacción propio.
-* Documentos compuestos automáticos de "información de tienda" (cómo comprar, condiciones, envío y pago, catálogo) generados desde la configuración real de WooCommerce, no inventados.
+* Documentos compuestos automáticos de "información de tienda" (cómo comprar, condiciones, envío y pago, catálogo) generados desde la configuración real de WooCommerce, no inventados. Sus instrucciones opcionales de pulido pueden cambiar el formato y la estructura, pero nunca añadir datos ausentes; un documento completo creado externamente puede pegarse manualmente desde Registro.
 * Panel de administración con pestañas: Alcance, Exclusiones, Registro, Prompt, Ajustes y Carga inicial.
 * Funciona igual sin Support Genix instalado: en ese caso, el plugin sigue generando y publicando `/llms.txt` de forma independiente.
 * Sin dependencias obligatorias: WooCommerce, WPML y Support Genix se detectan en tiempo real; si no están, esas funciones concretas simplemente no se activan.
@@ -86,8 +87,11 @@ El plugin detecta el borrado/despublicación y elimina automáticamente el docum
 
 Ver `CHANGELOG.md` para el historial completo y detallado de cambios.
 
+= 1.0.8.5 =
+Pestaña WooCommerce editable con selección de datos, pulido mediante instrucciones privadas protegidas, mejoras equivalentes en Negocio y FAQs, y guardado manual más claro desde Registro.
+
 = 1.0.8.4 =
-Pestaña WooCommerce con impuestos/IVA autodetectados, control manual por documento, API REST de contenido, descubrimiento de Markdown público, JSON-LD, panel "Visibilidad IA" con comprobación de accesibilidad, documentación OpenAPI de la API, aviso en tiempo real a buscadores compatibles con IndexNow, feeds especializados (Google Merchant y JSON) enlazados desde llms.txt y desde el `<head>` del sitio, gestión de crawlers de IA (catálogo de bots conocidos, bloqueo real por robots.txt/.htaccess con descarga obligatoria de seguridad, y logs de accesos), rediseño del alcance de contenido (pestañas Alcance y Exclusiones fusionadas en "Contenido", modo "todos los tipos públicos", "Ajustes avanzados" en el Registro), y reorganización de datos del negocio/chatbot/FAQs: nuevas pestañas Negocio y FAQs (generación con IA, FAQs multiidioma reales), pestaña Chatbot visible solo con Support Genix instalado.
+Pestaña WooCommerce con impuestos/IVA autodetectados, control manual por documento, API REST de contenido, descubrimiento de Markdown público, JSON-LD, panel "Visibilidad IA" con comprobación de accesibilidad, documentación OpenAPI de la API, aviso en tiempo real a buscadores compatibles con IndexNow, feeds especializados (Google Merchant y JSON) enlazados desde llms.txt y desde el `<head>` del sitio, gestión de crawlers de IA (catálogo de bots conocidos, bloqueo real por robots.txt/.htaccess con descarga obligatoria de seguridad, y logs de accesos), rediseño del alcance de contenido (pestañas Alcance y Exclusiones fusionadas en "Contenido", modo "todos los tipos públicos", "Ajustes avanzados" en el Registro), reorganización de datos del negocio/chatbot/FAQs (nuevas pestañas Negocio y FAQs con generación con IA, FAQs multiidioma reales, pestaña Chatbot visible solo con Support Genix instalado), y pestaña WooCommerce con envíos/impuestos/pagos/catálogo seleccionables, datos autodetectados ahora editables y persistentes, y pulido con instrucciones que prevalecen sobre el formato sin poder inventar datos.
 
 = 1.0.7 =
 Ajustes de aspecto del panel de administración (tema visual), corrección de un bug de enrutado que hacía que algunos enlaces del chatbot llevaran a la página de inicio en vez de al contenido real, y corrección del bug de "Carga inicial" que generaba filas de cola huérfanas cuando el contenido se regeneraba desde cero.
