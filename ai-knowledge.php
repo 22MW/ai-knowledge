@@ -8,6 +8,8 @@
  * Author URI: https://22mw.online/
  * Text Domain: ai-knowledge
  * Requires PHP: 7.4
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *
  * Dependencias: ninguna dura. WooCommerce, Support Genix y WPML se detectan en runtime.
  */
