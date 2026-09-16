@@ -8,6 +8,31 @@ Ver `_dev/roadmap.md` para el plan completo por fases y `_dev/decisiones.md`
 para el porqué de la identidad/alcance. Este plugin sigue orientado a IA +
 Support Genix como núcleo; todo lo de abajo es capa añadida encima.
 
+### Fase 10, piezas 2/3/4: pestaña "Contenido" (2026-09-16)
+
+- `tab-alcance.php` + `tab-exclusiones.php` fusionadas en una sola pestaña
+  "Contenido" (`tab-contenido.php`). Registro pasa a ser la primera
+  pestaña y la que carga por defecto.
+- Taxonomías/términos: bloque único (antes duplicado en las dos
+  pestañas), checkbox simple por término (marcado = incluido). Taxonomías
+  técnicas (`product_type`, `post_format`) ocultas por ser ruido.
+- IDs sueltos: dos campos, "IDs a incluir" / "IDs a excluir".
+- Nuevo modo "Todos los tipos públicos" para CPTs, con excepciones,
+  alternativa a la lista explícita de siempre.
+- Campos custom: etiqueta legible (ACF/Meta Box/Pods) junto a la key
+  técnica cuando se puede resolver.
+- Migración automática y retrocompatible de la configuración guardada
+  (`tax_terms`/`exclude_terms`/`extra_ids`/`exclude_ids` → `term_actions`/
+  `id_actions`), sin que el usuario tenga que volver a configurar nada.
+- Borrar un documento (fila individual, selección o "Borrar todos") añade
+  automáticamente su origen a "IDs a excluir", para que el cron no lo
+  regenere solo. Mensajes de confirmación explican esto.
+- **Fix (bug real, no de esta sesión sino heredado de la pieza 5):** el
+  borrado en lote del Registro no funcionaba — la fila expandida "Ajustes
+  avanzados" imprimía formularios anidados dentro del formulario grande
+  de selección múltiple (HTML inválido), rompiendo el envío de las filas
+  seleccionadas. Corregido.
+
 ### Fase 10, pieza 5: "Ajustes avanzados" en el Registro (2026-09-16)
 
 - Columnas Puente y Hash ya no son siempre visibles: se movieron dentro

@@ -95,7 +95,7 @@ $table->prepare_items();
 		<?php submit_button( __( 'Filtrar', 'ai-knowledge' ), '', '', false ); ?>
 	</form>
 
-	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wookb-toolbar-form" onsubmit="return confirm('<?php echo esc_js( __( 'Vas a BORRAR todos los documentos que cumplen el filtro actual (o TODOS si no hay filtro puesto): sus archivos .md y sus posts en Support Genix. Esto NO se puede deshacer. ¿Seguro que quieres continuar?', 'ai-knowledge' ) ); ?>');">
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wookb-toolbar-form" onsubmit="return confirm('<?php echo esc_js( __( '¿Borrar todos los documentos que cumplen el filtro actual (o TODOS si no hay filtro puesto) y sus posts asociados? Sus orígenes se añadirán a "IDs a excluir" en Contenido, para que no se vuelvan a generar solos (quítalos de esa lista si quieres que se vuelvan a generar).', 'ai-knowledge' ) ); ?>');">
 		<input type="hidden" name="action" value="wookb_delete_all" />
 		<input type="hidden" name="status" value="<?php echo isset( $_GET['status'] ) ? esc_attr( wp_unslash( $_GET['status'] ) ) : ''; // phpcs:ignore ?>" />
 		<input type="hidden" name="lang" value="<?php echo isset( $_GET['lang'] ) ? esc_attr( wp_unslash( $_GET['lang'] ) ) : ''; // phpcs:ignore ?>" />
@@ -122,9 +122,32 @@ $table->prepare_items();
 	pagina de menu) para el procesamiento real y la explicacion completa.
 	row_ids[] lo rellena Registry_Table::column_cb().
 -->
-<form method="post">
+<form method="post" action="<?php echo esc_url( admin_url( 'admin.php?page=woo-kb-generator&tab=registro' ) ); ?>" id="wookb-registro-bulk-form">
 	<?php $table->display(); ?>
 </form>
+<script>
+	// WP_List_Table no confirma el bulk action "Borrar seleccionados" por
+	// defecto -- se añade aqui, mismo aviso que "Borrar todos"/borrado de
+	// fila individual: tambien excluye los origenes en Contenido.
+	( function () {
+		var form = document.getElementById( 'wookb-registro-bulk-form' );
+		if ( ! form ) {
+			return;
+		}
+		form.addEventListener( 'submit', function ( e ) {
+			var top    = form.querySelector( '#bulk-action-selector-top' );
+			var bottom = form.querySelector( '#bulk-action-selector-bottom' );
+			var action = ( top && '-1' !== top.value ) ? top.value : ( bottom ? bottom.value : '-1' );
+			if ( 'delete' !== action ) {
+				return;
+			}
+			var msg = <?php echo wp_json_encode( __( '¿Borrar los documentos seleccionados y sus posts asociados? Sus orígenes se añadirán a "IDs a excluir" en Contenido, para que no se vuelvan a generar solos (quítalos de esa lista si quieres que se vuelvan a generar).', 'ai-knowledge' ) ); ?>;
+			if ( ! window.confirm( msg ) ) {
+				e.preventDefault();
+			}
+		} );
+	} )();
+</script>
 <?php
 // Formularios de fila (Generar/Borrar) impresos AQUI, fuera del <form> de
 // arriba a proposito: no se pueden anidar <form> dentro de otro <form> (HTML

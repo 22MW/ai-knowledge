@@ -12,11 +12,18 @@ class Scope {
 
 	public static function settings() {
 		$defaults = array(
-			'post_types'       => array( 'product' ),
-			'tax_terms'        => array(), // [ 'product_cat' => [12, 34] ]
-			'extra_ids'        => array(),
-			'exclude_ids'      => array(),
-			'exclude_terms'    => array(), // [ 'product_cat' => [56] ]
+			'post_types'                    => array( 'product' ),
+			// Fase 10, pieza 4: 'explicit' (usa post_types de arriba) o
+			// 'all_public' (todos los CPT publicos, excepto attachment y los
+			// marcados en post_types_excluded_when_all).
+			'post_types_mode'               => 'explicit',
+			'post_types_excluded_when_all'  => array(),
+			// Fase 10, pieza 2: sustituye a tax_terms/exclude_terms.
+			// [ taxonomia => [ term_id => 'include'|'exclude' ] ]
+			'term_actions'                  => array(),
+			// Fase 10, pieza 2: sustituye a extra_ids/exclude_ids.
+			// [ post_id => 'include'|'exclude' ]
+			'id_actions'                    => array(),
 			'custom_fields'    => array(), // [ post_type => [field keys] ]
 			'daily_limit'      => 100,
 			'no_limit'         => false,
@@ -51,7 +58,63 @@ class Scope {
 			'crawler_actions' => array(),
 		);
 		$saved = get_option( 'wookb_settings', array() );
+
+		// Fase 10, pieza 2: migracion lazy de las 4 claves viejas
+		// (tax_terms/exclude_terms/extra_ids/exclude_ids) a term_actions/
+		// id_actions. No puede ir en el activation hook: no se ejecuta en
+		// updates de un plugin ya activo, y el activador no toca
+		// wookb_settings. Idempotente: solo se dispara si term_actions no
+		// existe todavia en el option crudo; al terminar, term_actions
+		// siempre existe (aunque vacio) y no se repite.
+		if ( ! isset( $saved['term_actions'] ) ) {
+			$saved = self::migrate_legacy_scope_settings( $saved );
+		}
+
 		return wp_parse_args( $saved, $defaults );
+	}
+
+	/**
+	 * Migra tax_terms/exclude_terms/extra_ids/exclude_ids (formato viejo) a
+	 * term_actions/id_actions (formato nuevo), reproduciendo exactamente la
+	 * prioridad que tenia is_included(): exclude siempre pisa include, por
+	 * eso las listas exclude_* se procesan DESPUES de las include_*.
+	 */
+	protected static function migrate_legacy_scope_settings( array $raw ) {
+		$term_actions = array();
+		if ( ! empty( $raw['tax_terms'] ) && is_array( $raw['tax_terms'] ) ) {
+			foreach ( $raw['tax_terms'] as $taxonomy => $terms ) {
+				foreach ( (array) $terms as $term_id ) {
+					$term_actions[ $taxonomy ][ (int) $term_id ] = 'include';
+				}
+			}
+		}
+		if ( ! empty( $raw['exclude_terms'] ) && is_array( $raw['exclude_terms'] ) ) {
+			foreach ( $raw['exclude_terms'] as $taxonomy => $terms ) {
+				foreach ( (array) $terms as $term_id ) {
+					$term_actions[ $taxonomy ][ (int) $term_id ] = 'exclude';
+				}
+			}
+		}
+
+		$id_actions = array();
+		if ( ! empty( $raw['extra_ids'] ) ) {
+			foreach ( (array) $raw['extra_ids'] as $post_id ) {
+				$id_actions[ (int) $post_id ] = 'include';
+			}
+		}
+		if ( ! empty( $raw['exclude_ids'] ) ) {
+			foreach ( (array) $raw['exclude_ids'] as $post_id ) {
+				$id_actions[ (int) $post_id ] = 'exclude';
+			}
+		}
+
+		$raw['term_actions'] = $term_actions;
+		$raw['id_actions']   = $id_actions;
+		unset( $raw['tax_terms'], $raw['exclude_terms'], $raw['extra_ids'], $raw['exclude_ids'] );
+
+		update_option( 'wookb_settings', $raw, false );
+
+		return $raw;
 	}
 
 	public static function update_settings( array $data ) {
@@ -62,11 +125,29 @@ class Scope {
 	/**
 	 * Devuelve el listado de IDs de post (idioma por defecto / todos si WPML) dentro del alcance.
 	 */
-	public static function resolve_ids() {
+	/**
+	 * Post types efectivos segun post_types_mode: la lista explicita guardada,
+	 * o todos los CPT publicos (menos attachment y los marcados a excluir
+	 * cuando el modo es 'all_public').
+	 */
+	public static function effective_post_types() {
 		$settings = self::settings();
-		$ids      = array();
 
-		foreach ( (array) $settings['post_types'] as $post_type ) {
+		if ( 'all_public' === $settings['post_types_mode'] ) {
+			$all = array_keys( get_post_types( array( 'public' => true ), 'names' ) );
+			$all = array_diff( $all, array( 'attachment' ), (array) $settings['post_types_excluded_when_all'] );
+			return array_values( $all );
+		}
+
+		return (array) $settings['post_types'];
+	}
+
+	public static function resolve_ids() {
+		$settings    = self::settings();
+		$post_types  = self::effective_post_types();
+		$ids         = array();
+
+		foreach ( $post_types as $post_type ) {
 			$args = array(
 				'post_type'      => $post_type,
 				'post_status'    => 'publish',
@@ -74,29 +155,34 @@ class Scope {
 				'fields'         => 'ids',
 			);
 
-			if ( ! empty( $settings['tax_terms'] ) ) {
-				$tax_query = array();
-				foreach ( $settings['tax_terms'] as $taxonomy => $terms ) {
-					if ( empty( $terms ) ) {
-						continue;
+			$tax_query = array();
+			foreach ( (array) $settings['term_actions'] as $taxonomy => $terms ) {
+				$include_terms = array();
+				foreach ( (array) $terms as $term_id => $action ) {
+					if ( 'include' === $action ) {
+						$include_terms[] = (int) $term_id;
 					}
+				}
+				if ( $include_terms ) {
 					$tax_query[] = array(
 						'taxonomy' => $taxonomy,
 						'field'    => 'term_id',
-						'terms'    => array_map( 'intval', $terms ),
+						'terms'    => $include_terms,
 					);
 				}
-				if ( $tax_query ) {
-					$args['tax_query'] = $tax_query; // phpcs:ignore
-				}
+			}
+			if ( $tax_query ) {
+				$args['tax_query'] = $tax_query; // phpcs:ignore
 			}
 
 			$found = get_posts( $args );
 			$ids   = array_merge( $ids, $found );
 		}
 
-		if ( ! empty( $settings['extra_ids'] ) ) {
-			$ids = array_merge( $ids, array_map( 'intval', $settings['extra_ids'] ) );
+		foreach ( (array) $settings['id_actions'] as $post_id => $action ) {
+			if ( 'include' === $action ) {
+				$ids[] = (int) $post_id;
+			}
 		}
 
 		$ids = array_unique( $ids );
@@ -110,18 +196,19 @@ class Scope {
 	public static function is_included( $post_id ) {
 		$settings = self::settings();
 
-		if ( in_array( (int) $post_id, array_map( 'intval', $settings['exclude_ids'] ), true ) ) {
+		if ( isset( $settings['id_actions'][ (int) $post_id ] ) && 'exclude' === $settings['id_actions'][ (int) $post_id ] ) {
 			return false;
 		}
 
-		if ( ! empty( $settings['exclude_terms'] ) ) {
-			foreach ( $settings['exclude_terms'] as $taxonomy => $terms ) {
-				if ( empty( $terms ) ) {
-					continue;
+		foreach ( (array) $settings['term_actions'] as $taxonomy => $terms ) {
+			$exclude_terms = array();
+			foreach ( (array) $terms as $term_id => $action ) {
+				if ( 'exclude' === $action ) {
+					$exclude_terms[] = (int) $term_id;
 				}
-				if ( has_term( array_map( 'intval', $terms ), $taxonomy, $post_id ) ) {
-					return false;
-				}
+			}
+			if ( $exclude_terms && has_term( $exclude_terms, $taxonomy, $post_id ) ) {
+				return false;
 			}
 		}
 
@@ -169,6 +256,17 @@ class Scope {
 			'_alp_',
 			'_ame_',
 		);
+	}
+
+	/**
+	 * Taxonomias tecnicas internas (no contenido real) que no aportan nada
+	 * como filtro de alcance y solo ensucian el selector: product_type es
+	 * el tipo interno de WooCommerce (simple/grouped/external/variable, no
+	 * una categoria), post_format es el formato de entrada de WordPress
+	 * core (raramente usado y no es un filtro de contenido real).
+	 */
+	public static function noise_taxonomies() {
+		return array( 'product_type', 'post_format' );
 	}
 
 	public static function noise_meta_exact() {
@@ -225,6 +323,70 @@ class Scope {
 		);
 		sort( $keys );
 
+		// Fase 10, pieza 3: oculta el meta "espejo" de ACF (p.ej. "_nombre_del_campo"
+		// junto a "nombre_del_campo") del listado que se muestra en el admin. Es
+		// solo cosmetico: NO cambia el contrato de datos, sampled_custom_field_keys()
+		// sigue devolviendo/guardando keys tecnicas crudas en custom_fields.
+		$keys = array_values(
+			array_filter(
+				$keys,
+				function ( $k ) use ( $keys ) {
+					if ( 0 === strpos( $k, '_' ) && in_array( substr( $k, 1 ), $keys, true ) ) {
+						return false;
+					}
+					return true;
+				}
+			)
+		);
+
 		return $keys;
+	}
+
+	/**
+	 * Fase 10, pieza 3: etiqueta legible para una meta key tecnica, cuando se
+	 * puede resolver via ACF, Meta Box o Pods. Si ninguno resuelve (o no estan
+	 * activos), devuelve la key tal cual -- fallback seguro, sin romper nada
+	 * en entornos donde estos plugins no existen.
+	 */
+	public static function custom_field_label( $post_type, $key ) {
+		if ( function_exists( 'acf_get_field' ) ) {
+			$field = acf_get_field( $key );
+			if ( ! $field && function_exists( 'get_field_object' ) ) {
+				// ACF suele indexar por nombre de campo, no por meta key directa:
+				// intenta resolverlo contra un post de referencia del mismo CPT.
+				$sample = get_posts(
+					array(
+						'post_type'      => $post_type,
+						'posts_per_page' => 1,
+						'fields'         => 'ids',
+					)
+				);
+				if ( $sample ) {
+					$field = get_field_object( $key, $sample[0] );
+				}
+			}
+			if ( $field && ! empty( $field['label'] ) ) {
+				return $field['label'];
+			}
+		}
+
+		if ( function_exists( 'rwmb_get_field_settings' ) ) {
+			$field = rwmb_get_field_settings( $key, array(), null );
+			if ( $field && ! empty( $field['name'] ) ) {
+				return $field['name'];
+			}
+		}
+
+		if ( function_exists( 'pods_api' ) ) {
+			$pods_api = pods_api();
+			if ( $pods_api && method_exists( $pods_api, 'load_field' ) ) {
+				$field = $pods_api->load_field( array( 'name' => $key ) );
+				if ( $field && ! empty( $field['label'] ) ) {
+					return $field['label'];
+				}
+			}
+		}
+
+		return $key;
 	}
 }

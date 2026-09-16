@@ -91,7 +91,7 @@ class Editor_Metabox {
 
 	/**
 	 * Añade el post_type (si falta) y el ID de este post concreto al alcance
-	 * (mismo patron que Admin::save_scope()), y encola su generación en modo
+	 * (mismo patron que Admin::save_content()), y encola su generación en modo
 	 * auto. No quita nada del alcance existente: solo suma.
 	 */
 	public static function handle_add() {
@@ -113,15 +113,14 @@ class Editor_Metabox {
 			$post_types[] = $post->post_type;
 		}
 
-		$extra_ids = array_map( 'intval', (array) $settings['extra_ids'] );
-		if ( ! in_array( (int) $post_id, $extra_ids, true ) ) {
-			$extra_ids[] = (int) $post_id;
-		}
+		// Fase 10, pieza 2: extra_ids fue sustituido por id_actions.
+		$id_actions = (array) $settings['id_actions'];
+		$id_actions[ (int) $post_id ] = 'include';
 
 		Scope::update_settings(
 			array(
-				'post_types' => $post_types,
-				'extra_ids'  => $extra_ids,
+				'post_types'  => $post_types,
+				'id_actions'  => $id_actions,
 			)
 		);
 

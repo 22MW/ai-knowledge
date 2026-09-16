@@ -269,7 +269,7 @@ propósito general (eso ya lo cubre la Fase 3).
 
 ---
 
-## Fase 10 — Replanteada: plan conjunto de UX del admin — EN PAUSA, pendiente de `planificar-cambio`
+## Fase 10 — Replanteada: plan conjunto de UX del admin — HECHO (completa, 2026-09-16)
 
 Fase ampliada el 2026-09-16 (segunda vez): además de Alcance/Exclusiones +
 campos custom + modo "todos los CPT" (ya fusionados antes), se añade
@@ -282,38 +282,65 @@ Visibilidad IA) debe empezar con una descripción clara de para qué sirve
 — hoy varias no la tienen o la dan por hecha. Cambio de contenido, bajo
 riesgo, se puede hacer pestaña a pestaña sin bloquear el resto.
 
-**2. Rediseño Alcance/Exclusiones (antes "UX5").** El selector "Taxonomías
-/ términos" es casi idéntico en `tab-alcance.php` y `tab-exclusiones.php`
-(misma lista de términos, mismo diseño de chips, mismo bucle por
-post_type — solo cambia si significa incluir o excluir), fácil de
-confundir entre las dos pestañas.
-**Confirmado por el usuario:** pestaña única, con el bloque de
-taxonomías/términos renderizado UNA sola vez, y un interruptor de 3
-estados por término (Incluir / Excluir / Sin decidir) en vez de dos listas
-de checkboxes en pestañas separadas. **"Sin decidir" es el estado por
-defecto de cada término** — igual que hoy los checkboxes de post_types
-están desactivados hasta que se marcan a mano, aquí ningún término queda
-incluido ni excluido hasta que el admin lo active explícitamente. Se
-sustituyen `tax_terms` (incluir) y `exclude_terms` (excluir) en
-`Scope::settings()` por una única estructura, ej.
-`term_actions[taxonomia][term_id] = 'include'|'exclude'` (retrocompatible:
-migrar los datos existentes al activar, no perder configuración ya
-guardada).
+**2. Rediseño Alcance/Exclusiones (antes "UX5") — HECHO.** `tab-alcance.php`
+y `tab-exclusiones.php` se fusionaron en una sola pestaña **"Contenido"**
+(`admin/views/tab-contenido.php`), con el bloque de taxonomías/términos
+renderizado UNA sola vez.
 
-**3. Campos personalizados de ACF / Meta Box / Pods.** El dato **ya es
-seleccionable hoy** en Alcance (esos plugins guardan sus valores como
-`post_meta` normal, y `Scope::sampled_custom_field_keys()` ya lo muestrea)
-— esto es solo cosmético: mostrar la etiqueta legible del campo en vez de
-la key técnica cruda, y filtrar el ruido propio de ACF (su meta "espejo"
-`_nombre_del_campo`, referencia interna sin valor real). No es un hueco de
-datos, es un pulido de usabilidad del selector.
+**Decisión final tras probar en real (2026-09-16, ajustada respecto al plan
+original):** el diseño inicial usaba un select de 3 estados (Incluir/
+Excluir/Sin decidir) por término. Probado en real, se simplificó a
+**checkbox simple por término** (marcado = incluido, sin marcar = no
+filtra — mismo patrón visual que los checkboxes de CPTs), por petición
+explícita del usuario tras ver el select en pantalla: "nada marcado = todos
+los términos" (permisivo, igual que el `tax_terms` original), sin concepto
+de "excluir término" aparte — el excluir explícito sigue existiendo para
+CPTs (modo pieza 4) e IDs sueltos, no para términos.
 
-**4. Modo "todos los CPT públicos" en Scope (antes idea suelta de
-[`analisis-jet-geo.md`](analisis-jet-geo.md)).** Alternativa a la lista
-explícita actual de post_types en Alcance: un modo "todos los CPT
-públicos, presente y futuro", más un filtro de extensión sobre la lista de
-post_types excluidos por defecto. Afecta directamente a cómo se dibuja la
-pestaña Alcance, por eso se junta aquí.
+`Scope::settings()`: `tax_terms`/`exclude_terms`/`extra_ids`/`exclude_ids`
+sustituidos por `term_actions[taxonomia][term_id] = 'include'|'exclude'`
+(aunque la vista solo envía `'include'`) e `id_actions[post_id] =
+'include'|'exclude'` (dos campos de texto separados, "IDs a incluir"/"IDs a
+excluir"). Migración retrocompatible lazy dentro de `Scope::settings()`
+(idempotente, se dispara sola la primera vez que se lee `wookb_settings`
+tras el update — no en el activation hook, que no se ejecuta en updates de
+plugin ya activo).
+
+Taxonomías técnicas (`product_type` de WooCommerce, `post_format` de WP
+core) ocultas del selector — ruido, no contenido real
+(`Scope::noise_taxonomies()`).
+
+**3. Campos personalizados de ACF / Meta Box / Pods — HECHO.** Cosmético,
+sin cambio de contrato de datos: `Scope::custom_field_label()` resuelve la
+etiqueta legible (ACF → Meta Box → Pods → fallback a la key cruda), y
+`sampled_custom_field_keys()` filtra el meta "espejo" de ACF
+(`_nombre_del_campo` si existe `nombre_del_campo`).
+
+**4. Modo "todos los CPT públicos" en Scope — HECHO.** `post_types_mode`
+(`explicit`/`all_public`) + `post_types_excluded_when_all` en
+`Scope::settings()`, resuelto por `Scope::effective_post_types()`. En modo
+`all_public` se mantiene el detalle por CPT (términos/campos custom siguen
+afinables), confirmado por el usuario.
+
+**Bug real encontrado y corregido durante las pruebas (2026-09-16):** la
+fila expandida "Ajustes avanzados" del Registro (pieza 5) imprimía 4
+`<form>` reales dentro de la fila de la tabla, anidados dentro del `<form>`
+grande de selección múltiple del Registro. `<form>` anidado es HTML
+inválido: el navegador cierra el formulario exterior en el primer
+`</form>` interior que encuentra, dejando los checkboxes de las filas
+siguientes fuera del formulario real — "Borrar seleccionados"/"Regenerar
+seleccionados" no enviaban `row_ids[]` correctamente y fallaban en
+silencio, sin error visible. Corregido moviendo esos 4 forms al patrón
+"fuera de banda" que ya usaban los botones Generar/Borrar de cada fila
+(`Registry_Table::out_of_band_forms`).
+
+Otros ajustes hechos durante la prueba real: Registro pasa a ser la
+primera pestaña y la que carga por defecto (antes Contenido); borrar un
+documento (individual, en lote o "Borrar todos") añade su origen a "IDs a
+excluir" automáticamente, para que el cron no lo regenere solo
+(`Admin::exclude_from_scope()`); confirmación JS añadida al borrado en
+lote (no tenía ninguna); títulos de sección en `<h2>` en toda la pestaña
+Contenido.
 
 **5. Registro: "Ajustes avanzados" por fila — HECHO (2026-09-16, sustituye
 el plan anterior de vista Simple/Avanzada — probado y descartado en el

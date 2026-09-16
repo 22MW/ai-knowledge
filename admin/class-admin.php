@@ -18,8 +18,7 @@ class Admin
 	public static function init()
 	{
 		add_action('admin_menu', array(__CLASS__, 'menu'));
-		add_action('admin_post_wookb_save_scope', array(__CLASS__, 'save_scope'));
-		add_action('admin_post_wookb_save_exclusions', array(__CLASS__, 'save_exclusions'));
+		add_action('admin_post_wookb_save_content', array(__CLASS__, 'save_content'));
 		add_action('admin_post_wookb_save_settings', array(__CLASS__, 'save_settings'));
 		add_action('admin_post_wookb_start_seed', array(__CLASS__, 'start_seed'));
 		add_action('admin_post_wookb_start_seed_force', array(__CLASS__, 'start_seed_force'));
@@ -96,11 +95,10 @@ class Admin
 			wp_die(esc_html__('No tienes permisos suficientes.', 'ai-knowledge'));
 		}
 
-		$tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'alcance'; // phpcs:ignore
+		$tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'registro'; // phpcs:ignore
 		$tabs = array(
-			'alcance'      => __('Alcance', 'ai-knowledge'),
-			'exclusiones'  => __('Exclusiones', 'ai-knowledge'),
 			'registro'     => __('Registro', 'ai-knowledge'),
+			'contenido'    => __('Contenido', 'ai-knowledge'),
 			'prompt'       => __('Prompt', 'ai-knowledge'),
 		);
 		// Fase 2: pestaña "WooCommerce" solo si WooCommerce esta activo -- sin
@@ -194,18 +192,50 @@ class Admin
 		exit;
 	}
 
-	public static function save_scope()
+	/**
+	 * Fase 10, pieza 2/4: sustituye a save_scope()/save_exclusions(). Un unico
+	 * formulario ("Contenido") guarda modo de CPT, taxonomias/terminos e IDs
+	 * sueltos como acciones include/exclude, mas los campos custom.
+	 */
+	public static function save_content()
 	{
-		self::verify('wookb_save_scope');
+		self::verify('wookb_save_content');
+
+		$post_types_mode = isset($_POST['post_types_mode']) ? sanitize_key(wp_unslash($_POST['post_types_mode'])) : 'explicit'; // phpcs:ignore
+		if (! in_array($post_types_mode, array('explicit', 'all_public'), true)) {
+			$post_types_mode = 'explicit';
+		}
 
 		$post_types = isset($_POST['post_types']) ? array_map('sanitize_key', (array) wp_unslash($_POST['post_types'])) : array(); // phpcs:ignore
-		$extra_ids  = isset($_POST['extra_ids']) ? array_filter(array_map('intval', explode(',', sanitize_text_field(wp_unslash($_POST['extra_ids']))))) : array(); // phpcs:ignore
+		$post_types_excluded_when_all = isset($_POST['post_types_excluded_when_all']) ? array_map('sanitize_key', (array) wp_unslash($_POST['post_types_excluded_when_all'])) : array(); // phpcs:ignore
 
-		$tax_terms = array();
-		if (! empty($_POST['tax_terms']) && is_array($_POST['tax_terms'])) { // phpcs:ignore
-			foreach (wp_unslash($_POST['tax_terms']) as $taxonomy => $terms) { // phpcs:ignore
-				$tax_terms[sanitize_key($taxonomy)] = array_map('intval', (array) $terms);
+		$term_actions = array();
+		if (! empty($_POST['term_actions']) && is_array($_POST['term_actions'])) { // phpcs:ignore
+			foreach (wp_unslash($_POST['term_actions']) as $taxonomy => $terms) { // phpcs:ignore
+				if (! is_array($terms)) {
+					continue;
+				}
+				foreach ($terms as $term_id => $value) {
+					$value = sanitize_key($value);
+					if (! in_array($value, array('include', 'exclude'), true)) {
+						// Ausencia = "sin decidir": no se guarda esa clave.
+						continue;
+					}
+					$term_actions[sanitize_key($taxonomy)][absint($term_id)] = $value;
+				}
 			}
+		}
+
+		$include_ids = isset($_POST['include_ids']) ? array_filter(array_map('intval', explode(',', sanitize_text_field(wp_unslash($_POST['include_ids']))))) : array(); // phpcs:ignore
+		$exclude_ids = isset($_POST['exclude_ids']) ? array_filter(array_map('intval', explode(',', sanitize_text_field(wp_unslash($_POST['exclude_ids']))))) : array(); // phpcs:ignore
+
+		$id_actions = array();
+		foreach ($include_ids as $id) {
+			$id_actions[$id] = 'include';
+		}
+		foreach ($exclude_ids as $id) {
+			// exclude pisa si el mismo ID aparece en ambos campos.
+			$id_actions[$id] = 'exclude';
 		}
 
 		$custom_fields = array();
@@ -215,46 +245,61 @@ class Admin
 			}
 		}
 
-		Scope::update_settings(
-			array(
-				'post_types'    => $post_types,
-				'extra_ids'     => $extra_ids,
-				'tax_terms'     => $tax_terms,
-				'custom_fields' => $custom_fields,
-			)
-		);
+		// Sincronía de borrado: para cada ID recién excluido, y para cada
+		// termino recien excluido, ejecutar borrado de sus documentos.
+		$previous = Scope::settings();
 
-		self::redirect('alcance');
-	}
-
-	public static function save_exclusions()
-	{
-		self::verify('wookb_save_exclusions');
-
-		$exclude_ids = isset($_POST['exclude_ids']) ? array_filter(array_map('intval', explode(',', sanitize_text_field(wp_unslash($_POST['exclude_ids']))))) : array(); // phpcs:ignore
-
-		$exclude_terms = array();
-		if (! empty($_POST['exclude_terms']) && is_array($_POST['exclude_terms'])) { // phpcs:ignore
-			foreach (wp_unslash($_POST['exclude_terms']) as $taxonomy => $terms) { // phpcs:ignore
-				$exclude_terms[sanitize_key($taxonomy)] = array_map('intval', (array) $terms);
+		$previous_id_actions = (array) $previous['id_actions'];
+		foreach ($id_actions as $id => $action) {
+			$was_excluded = isset($previous_id_actions[$id]) && 'exclude' === $previous_id_actions[$id];
+			if ('exclude' === $action && ! $was_excluded) {
+				Sync::delete_documents_for($id);
 			}
 		}
 
-		// Sincronía: para cada ID recién excluido, ejecutar borrado de sus documentos.
-		$previous = Scope::settings();
-		$new_exclusions = array_diff($exclude_ids, (array) $previous['exclude_ids']);
-		foreach ($new_exclusions as $id) {
-			Sync::delete_documents_for($id);
+		$previous_term_actions = (array) $previous['term_actions'];
+		foreach ($term_actions as $taxonomy => $terms) {
+			foreach ($terms as $term_id => $action) {
+				if ('exclude' !== $action) {
+					continue;
+				}
+				$was_excluded = isset($previous_term_actions[$taxonomy][$term_id]) && 'exclude' === $previous_term_actions[$taxonomy][$term_id];
+				if ($was_excluded) {
+					continue;
+				}
+				$affected = get_posts(
+					array(
+						'post_type'      => 'any',
+						'post_status'    => 'publish',
+						'posts_per_page' => -1,
+						'fields'         => 'ids',
+						'tax_query'      => array( // phpcs:ignore
+							array(
+								'taxonomy' => $taxonomy,
+								'field'    => 'term_id',
+								'terms'    => array($term_id),
+							),
+						),
+					)
+				);
+				foreach ($affected as $affected_id) {
+					Sync::delete_documents_for($affected_id);
+				}
+			}
 		}
 
 		Scope::update_settings(
 			array(
-				'exclude_ids'   => $exclude_ids,
-				'exclude_terms' => $exclude_terms,
+				'post_types'                   => $post_types,
+				'post_types_mode'              => $post_types_mode,
+				'post_types_excluded_when_all' => $post_types_excluded_when_all,
+				'term_actions'                 => $term_actions,
+				'id_actions'                   => $id_actions,
+				'custom_fields'                => $custom_fields,
 			)
 		);
 
-		self::redirect('exclusiones');
+		self::redirect('contenido');
 	}
 
 	public static function save_settings()
@@ -353,10 +398,37 @@ class Admin
 				Queue::enqueue($row->source_id, $row->lang);
 			} elseif ('delete' === $action) {
 				Sync::delete_documents_for($row->source_id);
+				self::exclude_from_scope(array($row));
 			}
 		}
 
 		self::redirect('registro');
+	}
+
+	/**
+	 * Borrar una fila del Registro (individual, en lote o "Borrar todos")
+	 * tambien excluye su origen del alcance (id_actions en Contenido): si
+	 * no, la cola/cron la volveria a generar sola en el siguiente ciclo.
+	 * Solo aplica a posts reales, no a documentos compuestos (Store_Info_Doc)
+	 * que usan un source_id centinela sin post_type real detras. Recibe
+	 * varias filas para hacer un unico update_option, no uno por fila.
+	 */
+	protected static function exclude_from_scope(array $rows)
+	{
+		$id_actions = (array) Scope::settings()['id_actions'];
+		$changed    = false;
+
+		foreach ($rows as $row) {
+			if (! post_type_exists($row->source_type)) {
+				continue;
+			}
+			$id_actions[(int) $row->source_id] = 'exclude';
+			$changed = true;
+		}
+
+		if ($changed) {
+			Scope::update_settings(array('id_actions' => $id_actions));
+		}
 	}
 
 	/**
@@ -472,13 +544,16 @@ class Admin
 		$lang   = isset($_POST['lang']) ? sanitize_key(wp_unslash($_POST['lang'])) : ''; // phpcs:ignore
 		$search = isset($_POST['s']) ? sanitize_text_field(wp_unslash($_POST['s'])) : ''; // phpcs:ignore
 
-		$ids = Registry::query_all_ids(array('status' => $status, 'lang' => $lang, 'search' => $search));
+		$ids  = Registry::query_all_ids(array('status' => $status, 'lang' => $lang, 'search' => $search));
+		$rows = array();
 		foreach ($ids as $row_id) {
 			$row = Registry::find_by_id($row_id);
 			if ($row) {
 				Sync::delete_documents_for($row->source_id);
+				$rows[] = $row;
 			}
 		}
+		self::exclude_from_scope($rows);
 
 		self::redirect('registro');
 	}
@@ -586,6 +661,7 @@ class Admin
 
 		$row_ids = array_map('intval', wp_unslash($_POST['row_ids'])); // phpcs:ignore
 		$skipped_manual = 0;
+		$deleted_rows   = array();
 
 		foreach ($row_ids as $row_id) {
 			$row = Registry::find_by_id($row_id);
@@ -597,6 +673,7 @@ class Admin
 				// Reutiliza el mismo borrado sincronizado que la accion individual:
 				// fila del Registro + .md + post sgkb-docs de Genix.
 				Sync::delete_documents_for($row->source_id);
+				$deleted_rows[] = $row;
 			} elseif ('regenerate' === $action) {
 				// Fase 1: las filas en modo manual no se tocan en la regeneracion
 				// en bloque -- su texto lo fijo el admin a mano, "Regenerar
@@ -619,6 +696,8 @@ class Admin
 				Document_Pipeline::process($row->source_id, $row->lang, null, true);
 			}
 		}
+
+		self::exclude_from_scope($deleted_rows);
 
 		$redirect = admin_url('admin.php?page=woo-kb-generator&tab=registro&wookb_notice=1');
 		if ($skipped_manual > 0) {

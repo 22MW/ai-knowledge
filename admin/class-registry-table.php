@@ -252,6 +252,19 @@ class Registry_Table extends \WP_List_Table {
 		$back_auto_form_id  = 'wookb-back-auto-' . (int) $item->id;
 		$resolve_form_id    = 'wookb-resolve-stale-' . (int) $item->id;
 
+		// Bug real (Fase 10, pieza 5, detectado 2026-09-16): estos 4 <form>
+		// se imprimian aqui mismo, DENTRO de la fila expandida -- que a su vez
+		// esta DENTRO del <form> grande de bulk actions del Registro (ver
+		// tab-registro.php). <form> anidado es HTML invalido: el navegador
+		// cierra el <form> EXTERIOR en el primer </form> interior que
+		// encuentra, dejando fuera de el los checkboxes de las filas
+		// siguientes -- "Borrar seleccionados"/"Regenerar seleccionados" se
+		// quedaba sin enviar row_ids[] de la mayoria de filas, fallando en
+		// silencio. Mismo patron que ya usa row_actions_markup(): estos 4
+		// forms se imprimen FUERA de banda (out_of_band_forms, ver
+		// render_out_of_band_forms() en tab-registro.php), y los controles de
+		// abajo (textarea/input/button) se asocian con el atributo
+		// form="..." aunque esten en otro punto del DOM.
 		ob_start();
 		?>
 		<form id="<?php echo esc_attr( $set_manual_form_id ); ?>" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:none">
@@ -274,6 +287,11 @@ class Registry_Table extends \WP_List_Table {
 			<input type="hidden" name="row_id" value="<?php echo esc_attr( $item->id ); ?>" />
 			<?php wp_nonce_field( 'wookb_resolve_stale' ); ?>
 		</form>
+		<?php
+		$this->out_of_band_forms[] = ob_get_clean();
+
+		ob_start();
+		?>
 		<details>
 			<summary><?php esc_html_e( 'Ajustes avanzados', 'ai-knowledge' ); ?></summary>
 			<p class="wookb-manual-meta">
@@ -343,7 +361,7 @@ class Registry_Table extends \WP_List_Table {
 			<input type="hidden" name="row_id" value="<?php echo esc_attr( $item->id ); ?>" />
 			<?php wp_nonce_field( 'wookb_regenerate_single' ); ?>
 		</form>
-		<form id="<?php echo esc_attr( $delete_form_id ); ?>" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:none" onsubmit="return confirm('<?php echo esc_js( __( '¿Borrar documento y post asociado?', 'ai-knowledge' ) ); ?>');">
+		<form id="<?php echo esc_attr( $delete_form_id ); ?>" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:none" onsubmit="return confirm('<?php echo esc_js( __( '¿Borrar documento y post asociado? El origen se añadirá a "IDs a excluir" en Contenido, para que no se vuelva a generar solo (quítalo de esa lista si quieres que se vuelva a generar).', 'ai-knowledge' ) ); ?>');">
 			<input type="hidden" name="action" value="wookb_row_action" />
 			<input type="hidden" name="row_id" value="<?php echo esc_attr( $item->id ); ?>" />
 			<input type="hidden" name="row_op" value="delete" />

@@ -6,40 +6,32 @@
 `github.com/22MW/ai-knowledge`. Ruta:
 `app/public/wp-content/plugins/ai-knowledge/`.
 
-## Confirmado (Fases 0-9 y 11 completas; Fase 10 en curso)
+## Confirmado (Fases 0-11 completas)
 
-Fases 0-9 y 11 commiteadas y pusheadas. Fase 10 replanteada varias veces
-(ver `_dev/roadmap.md`): plan conjunto de UX del admin con 5 piezas.
+Fase 10 (plan conjunto de UX del admin, 5 piezas) completa y probada en
+real por el usuario (2026-09-16): descripción por pestaña, pestaña
+"Contenido" (fusión Alcance+Exclusiones con checkbox simple por término,
+modo "todos los CPT", etiquetas de campos custom), y "Ajustes avanzados"
+en el Registro. Ver `_dev/roadmap.md` para el detalle completo de cada
+pieza.
 
-**Estado de la Fase 10 ahora mismo (2026-09-16):**
-- Pieza 1 (descripción por pestaña en las 8 pestañas): **hecha y
-  commiteada** (`568bf17`).
-- Pieza 5 (Registro, "Ajustes avanzados"): **hecha**, pendiente de commit.
-  Puente/Hash movidos dentro del desplegable renombrado "Ajustes
-  avanzados"; quitado el campo de límite puntual de la columna Acciones;
-  añadido selector "por página" (20/50/100) en la toolbar (fuera del plan
-  original, pedido aparte); reordenado "Generar por ID o URL" antes de la
-  toolbar. Sin probar todavía en real por el usuario.
-- Piezas 2, 3, 4 (Alcance/Exclusiones unificado, campos custom
-  ACF/Meta Box/Pods, modo "todos los CPT"): sin empezar.
+Durante las pruebas se encontró y corrigió un bug real heredado de la
+pieza 5: la fila expandida del Registro anidaba `<form>` dentro del
+formulario grande de selección múltiple (HTML inválido), rompiendo
+"Borrar seleccionados"/"Regenerar seleccionados" en silencio.
+
+Sin commitear todavía: pendiente de tu permiso.
 
 ## Pendiente de confirmar
 
-- **Sin commitear todavía**: pieza 5 completa + fix de encoding en
-  `assets/admin.js` (emojis del botón de tema) + edición manual del
-  usuario en `_dev/guia-estilo-visual.html` + roadmap/changelog
-  actualizados. Pendiente de tu permiso explícito para commit + push a
-  `knowBaseDev`.
-- No se ha podido ejecutar `php -l` en esta sesión (no hay binario `php`
-  accesible en este entorno) — validar en real en LocalWP.
+- No se ha podido ejecutar `php -l` en ninguna sesión reciente (no hay
+  binario `php` accesible en este entorno) — validar sintaxis en real en
+  LocalWP antes de dar la Fase 10 por cerrada del todo.
 - Hay ~100 filas de datos de PRUEBA en la tabla `wookb_crawler_log` (Fase
   11, botón temporal ya retirado). Inofensivas, dentro del tope de 500.
 
 ## Pendiente real (sin empezar)
 
-- Fase 10, piezas 2-4 (ver roadmap): Alcance/Exclusiones unificado con
-  interruptor de 3 estados por término (Incluir/Excluir/Sin decidir, neutro
-  por defecto), campos custom ACF/Meta Box/Pods, modo "todos los CPT".
 - UX3 (WooCommerce: checkboxes + prompt por campo, cambio de arquitectura
   de datos, requiere `rol-analista`) y UX4 (visibilidad del botón de
   generar documentos de tienda).
@@ -65,13 +57,16 @@ Fases 0-9 y 11 commiteadas y pusheadas. Fase 10 replanteada varias veces
 - Nunca "hecho" en algo visual sin confirmación del usuario.
 - Ningún color/estilo nuevo sin usar una variable real de Tabler o una
   clase ya definida — ver `_dev/guia-estilo-visual.html` primero.
-- **Nuevo (2026-09-16):** antes de rediseñar una tabla/vista existente que
-  ya funciona, confirmar el diseño exacto columna por columna con el
-  usuario antes de escribir código — un rediseño completo sin esa
-  confirmación previa se hizo y hubo que revertirlo entero.
+- Antes de rediseñar una tabla/vista existente que ya funciona, confirmar
+  el diseño exacto columna por columna con el usuario antes de escribir
+  código — un rediseño completo sin esa confirmación previa se hizo en la
+  pieza 5 (vista Simple/Avanzada) y hubo que revertirlo entero.
+- Al cambiar un comportamiento consolidado (p.ej. de "select de 3 estados"
+  a "checkbox simple" en términos), probar en real cuanto antes: el diseño
+  cerrado por escrito no sustituye ver el resultado en pantalla.
 
 ## Relevo mínimo — siguiente paso
 
-Confirmar commit + push del estado actual (pieza 5 completa). Después:
-probar en real en LocalWP (no se pudo validar con `php -l` en esta
-sesión) y seguir con la pieza 2 (Alcance/Exclusiones unificado).
+Confirmar commit + push del estado actual (Fase 10 completa). Después:
+validar `php -l` en real en LocalWP, y decidir el siguiente foco (UX3/UX4,
+o una tarea nueva).
