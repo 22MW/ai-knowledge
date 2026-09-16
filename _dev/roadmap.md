@@ -167,7 +167,7 @@ contenido está bien expuesto a IA/buscadores.
 
 ---
 
-## Fase 7 — API pública documentada — EN CURSO (plan aprobado)
+## Fase 7 — API pública documentada — HECHO (confirmado en navegador por el usuario)
 
 **Qué hace:** describe la API REST de la Fase 3 (`class-rest-content.php`)
 para que un agente pueda descubrirla solo.
@@ -180,7 +180,7 @@ documento **OpenAPI 3.0 real, escrito a mano** (son solo 2 rutas, poco
 trabajo), en vez de renombrar el índice nativo de WordPress como si fuera
 OpenAPI sin serlo.
 
-**MVP aprobado:**
+**Implementado:**
 1. Nueva ruta `GET /ai-knowledge/v1/openapi.json` en
    `Rest_Content::register_routes()`, pública (mismo criterio que las
    otras 2 rutas).

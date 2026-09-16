@@ -10,7 +10,7 @@ Support Genix como núcleo; todo lo de abajo es capa añadida encima.
 
 ### Rediseño de CSS/admin (2026-09-16)
 
-- Sistema único de 6 variantes de botón (neutro, primario, peligro, éxito,
+- Sistema único de 5 variantes de botón (neutro, primario, peligro, éxito,
   info), todas con variables reales de Tabler y mismo tamaño
   (`padding: .5625rem 1rem; font-size: .875rem`, valor real de `.btn` de
   Tabler). Cubre también la clase `delete` que genera `submit_button()` de
@@ -43,6 +43,7 @@ Support Genix como núcleo; todo lo de abajo es capa añadida encima.
 - **Fase 6 — Panel "Visibilidad IA":** nueva pestaña con estado de exposición (llms.txt, Markdown, JSON, JSON-LD) con enlace a un ejemplo real de cada uno; contador de contenido pendiente de sincronizar; selector cerrado de contenido ya sincronizado + botón "Comprobar accesibilidad" que lee `robots.txt` y noindex/`X-Robots-Tag` en vivo y avisa de contradicciones entre ambas señales; detección y explicación de un `llms.txt` físico que tape al generado por el plugin, con vista previa, fecha de modificación y botón para borrarlo (confirmación explícita, el plugin sigue sirviendo el suyo generado al vuelo).
 - **UX2 — Carga inicial rediseñada:** botón único sustituido por "Generar pendientes" (comportamiento de siempre) y "Reiniciar todo" (fuerza regenerar también lo ya sincronizado, confirmación fuerte); límite diario/tamaño de lote/debounce movidos aquí desde Ajustes con guardado propio; el resumen "Total de documentos" ahora es visible en todas las pestañas, no solo en Registro.
 - **Ajuste general "Largo del texto generado (caracteres)"** en Ajustes: antes fijo en código (`Generator::BODY_CHAR_LIMIT = 1000`), sin ningún sitio del admin donde verlo o cambiarlo; ahora editable, con el límite por documento del Registro (Fase 1) teniendo prioridad si está puesto.
+- **Fase 7 — API pública documentada:** `GET /wp-json/ai-knowledge/v1/openapi.json`, documento OpenAPI 3.0 real (escrito a mano, no el índice nativo de WordPress) describiendo `/content/{id}` y `/{post_type}` con sus parámetros y el schema `ContentItem`. `llms.txt` enlaza ahora a este documento en una sección `## API` propia, para que los crawlers que ya lo leen lo descubran sin depender de visitarlo por su cuenta.
 
 ### Corregido
 - El botón "Generar" de una fila del Registro no reflejaba el límite de caracteres ya guardado para esa fila, mostraba siempre el valor por defecto general.

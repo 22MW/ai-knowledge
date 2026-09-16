@@ -8,24 +8,17 @@
 
 ## Commiteado y pusheado (confirmado en `git log`)
 
-10 commits en `knowBaseDev`, Fases 0-6 del roadmap completas, UX2 (Carga
-inicial rediseñada) y el ajuste general de largo de texto (commit
-`768d239`, sobre `334492e` — Fase 6 — y `20ae873` — rediseño CSS). Detalle
-completo en [`CHANGELOG.md`](../CHANGELOG.md); regla visual permanente en
+13 commits en `knowBaseDev`, Fases 0-7 del roadmap completas: UX2 (Carga
+inicial rediseñada) + ajuste general de largo de texto (`768d239`) y
+Fase 7 — OpenAPI + enlace desde `llms.txt` (`f58fc94`), sobre `334492e`
+(Fase 6) y `20ae873` (rediseño CSS). Detalle completo en
+[`CHANGELOG.md`](../CHANGELOG.md); regla visual permanente en
 [`decisiones.md`](decisiones.md).
 
-## En curso ahora mismo
+## Pendiente de confirmar
 
-**Fase 7 — API pública documentada.** Evaluada y planificada, plan
-aprobado por el usuario, pendiente de implementar:
-- Documento OpenAPI 3.0 **real, escrito a mano** (no el índice nativo de
-  WordPress, que no es formato OpenAPI — hallazgo de `evaluar-cambio`) en
-  `GET /wp-json/ai-knowledge/v1/openapi.json`.
-- Describe las 2 rutas ya existentes de Fase 3 (`/content/{id}`,
-  `/{post_type}`) y su respuesta tipada según `Extractor_Base`/`Extractor_Woo`.
-- Detalle completo del plan en `_dev/roadmap.md`, sección Fase 7.
-- Archivo a tocar: `includes/class-rest-content.php` (nueva ruta + método
-  `get_openapi_spec()`).
+- `CHANGELOG.md`: tiene la entrada de Fase 7 escrita pero sin commitear
+  todavía — revisar si sigue así antes de continuar.
 
 ## Pendiente real (sin empezar)
 
@@ -36,7 +29,7 @@ aprobado por el usuario, pendiente de implementar:
   pendiente de rediseño".
 - Estilos inline en PHP (`style="width:100%"`, etc. en varias vistas):
   detectado, no abordado — pendiente de decidir si se mueve a CSS.
-- [`llms-faq.md`](../llms-faq.md): contenido del sitio, sin commitear a propósito.
+- [`llms-faq.md`](../llms-faq.md): contenido del sitio, en `.gitignore`, nunca se commitea.
 - Bug sin repetir: botón del editor (Fase 1) sin feedback claro la primera
   vez que se probó.
 - Ideas sueltas sin fase (`analisis-jet-geo.md`): tags dinámicos en
@@ -54,6 +47,7 @@ aprobado por el usuario, pendiente de implementar:
 
 ## Relevo mínimo — siguiente paso
 
-Implementar Fase 7 (plan ya aprobado, ver arriba) con `implementar-cambio`.
-Después: decidir con el usuario si sigue la Fase 8 o UX3 (WooCommerce, con
-`rol-analista` primero por ser cambio de arquitectura de datos).
+Cerrar el commit pendiente de `CHANGELOG.md` (Fase 7 ya confirmada en
+navegador). Después: decidir con el usuario si sigue la Fase 8 o UX3
+(WooCommerce, con `rol-analista` primero por ser cambio de arquitectura de
+datos).
