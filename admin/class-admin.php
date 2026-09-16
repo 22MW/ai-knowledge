@@ -275,6 +275,7 @@ class Admin
 				'editor_button_post_types' => isset($_POST['editor_button_post_types_submitted'])
 					? (isset($_POST['editor_button_post_types']) ? array_map('sanitize_key', (array) wp_unslash($_POST['editor_button_post_types'])) : array()) // phpcs:ignore
 					: Scope::settings()['editor_button_post_types'],
+				'indexnow_enabled' => ! empty($_POST['indexnow_enabled']), // phpcs:ignore
 			)
 		);
 

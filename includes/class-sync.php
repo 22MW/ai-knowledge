@@ -48,6 +48,7 @@ class Sync {
 			return;
 		}
 		self::enqueue_all_languages( $product_id );
+		Indexnow::enqueue_notify( get_permalink( $product_id ) );
 	}
 
 	public static function on_generic_post_saved( $post_id, $post, $update ) {
@@ -58,6 +59,7 @@ class Sync {
 			return;
 		}
 		self::enqueue_all_languages( $post_id );
+		Indexnow::enqueue_notify( get_permalink( $post_id ) );
 	}
 
 	protected static function enqueue_all_languages( $post_id ) {
@@ -83,6 +85,9 @@ class Sync {
 		if ( ! in_array( $post_type, (array) $settings['post_types'], true ) ) {
 			return;
 		}
+		// URL capturada antes de borrar: se avisa igual, para que el crawler
+		// detecte cuanto antes que ya no existe (recrawl -> 404/410).
+		Indexnow::enqueue_notify( get_permalink( $post_id ) );
 		self::delete_documents_for( $post_id );
 	}
 

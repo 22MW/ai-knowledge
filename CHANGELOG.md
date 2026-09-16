@@ -2,7 +2,7 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
-## [1.0.8] - 2026-09-15/16
+## [1.0.8.1] - 2026-09-15/16
 
 Ver `_dev/roadmap.md` para el plan completo por fases y `_dev/decisiones.md`
 para el porqué de la identidad/alcance. Este plugin sigue orientado a IA +
@@ -44,6 +44,7 @@ Support Genix como núcleo; todo lo de abajo es capa añadida encima.
 - **UX2 — Carga inicial rediseñada:** botón único sustituido por "Generar pendientes" (comportamiento de siempre) y "Reiniciar todo" (fuerza regenerar también lo ya sincronizado, confirmación fuerte); límite diario/tamaño de lote/debounce movidos aquí desde Ajustes con guardado propio; el resumen "Total de documentos" ahora es visible en todas las pestañas, no solo en Registro.
 - **Ajuste general "Largo del texto generado (caracteres)"** en Ajustes: antes fijo en código (`Generator::BODY_CHAR_LIMIT = 1000`), sin ningún sitio del admin donde verlo o cambiarlo; ahora editable, con el límite por documento del Registro (Fase 1) teniendo prioridad si está puesto.
 - **Fase 7 — API pública documentada:** `GET /wp-json/ai-knowledge/v1/openapi.json`, documento OpenAPI 3.0 real (escrito a mano, no el índice nativo de WordPress) describiendo `/content/{id}` y `/{post_type}` con sus parámetros y el schema `ContentItem`. `llms.txt` enlaza ahora a este documento en una sección `## API` propia, para que los crawlers que ya lo leen lo descubran sin depender de visitarlo por su cuenta.
+- **Fase 8 — Aviso a buscadores en tiempo real (IndexNow):** al crear, actualizar o borrar contenido del alcance, se avisa a buscadores compatibles con IndexNow (Bing y otros; Google no lo soporta) en vez de esperar a que rastreen. Interruptor on/off en Ajustes, clave del sitio autogenerada y servida por rewrite (`/{key}.txt`), aviso no bloqueante con el mismo debounce que ya usa la cola de generación de documentos. Verificado en real: respuesta `HTTP 202` de `api.indexnow.org` al guardar un producto.
 
 ### Corregido
 - El botón "Generar" de una fila del Registro no reflejaba el límite de caracteres ya guardado para esa fila, mostraba siempre el valor por defecto general.

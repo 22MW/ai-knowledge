@@ -211,23 +211,42 @@ que expire el caché o se sincronice contenido (`Llms_Txt::invalidate()`).
 
 ---
 
-## Fase 8 — Aviso a buscadores en tiempo real (IndexNow) — PENDIENTE
+## Fase 8 — Aviso a buscadores en tiempo real (IndexNow) — HECHO (confirmado en real: HTTP 202)
 
 **Qué hace:** cuando se crea, actualiza o borra contenido del alcance, avisa
-a los buscadores compatibles con IndexNow en vez de esperar a que rastreen.
+a los buscadores compatibles con IndexNow (Bing y otros; Google no lo
+soporta) en vez de esperar a que rastreen.
 
 **Pasos:**
 1. Enganchar en los mismos puntos que ya usa `Sync` (`on_product_saved`, `on_generic_post_saved`, `on_trash_or_delete`).
 2. Cola con debounce (reusar patrón de `Queue`) para no notificar de más si hay varios guardados seguidos.
 3. Ajuste on/off en Ajustes, clave IndexNow propia del sitio.
 
----
-
-**Anotación ([`analisis-jet-geo.md`](analisis-jet-geo.md)):** pendiente valorar en `class-scope.php`
-un modo "todos los CPT públicos, presente y futuro" como alternativa a la
-lista explícita actual, más un filtro de extensión sobre la lista de
-post_types excluidos por defecto. No tiene fase asignada todavía — no se
-implementa hasta decidirlo aparte.
+**Scope lock (precheck 2026-09-16):**
+- Nuevo: `includes/class-indexnow.php` — genera/guarda la clave del sitio,
+  sirve `https://{sitio}/{key}.txt` (mismo patrón de rewrite que ya usan
+  `Llms_Txt`/`Markdown_Server`), y hace el `wp_remote_post` a IndexNow
+  (no bloqueante, best-effort: si falla, no rompe el guardado del post).
+- Editar `includes/class-sync.php`: llamar al aviso en los 3 puntos ya
+  existentes (`on_product_saved`, `on_generic_post_saved`,
+  `on_trash_or_delete`), reusando debounce vía `Queue` si aplica.
+- Editar `includes/class-plugin.php`: `require` + `Indexnow::init()`.
+- Editar `admin/class-admin.php` (`save_settings()` o handler propio) +
+  `admin/views/tab-ajustes.php`: interruptor on/off y clave (generada o
+  editable) del sitio.
+- Documentación a actualizar al cerrar: `CHANGELOG.md`, `readme.txt`,
+  `_dev/contexto-activo.md`, este roadmap (pasar a HECHO).
+- Validación: `php -l`; prueba manual — guardar un producto del alcance y
+  confirmar el ping saliente; comprobar que `{key}.txt` responde en la URL
+  esperada.
+- **Confirmado por el usuario en real (2026-09-16):** guardado de producto
+  → acción `wookb_indexnow_notify` encolada en Action Scheduler con la URL
+  correcta → ejecutada → `api.indexnow.org` responde `HTTP 202`. Verificado
+  con un log temporal en `Indexnow::run_notify()` (`blocking => true` +
+  `error_log()`), revertido a no bloqueante tras confirmar.
+- Pendiente de decidir aparte, no bloquea el cierre de esta fase: cobertura
+  de Google (IndexNow no lo soporta) requeriría la Search Console Indexing
+  API, integración distinta con OAuth propio — no forma parte de esta fase.
 
 ---
 
@@ -272,6 +291,18 @@ conocidos con filtro de extensión propio (`apply_filters`). Auto-generar el
 bloque de `robots.txt` a partir de 3 preguntas sí/no al admin — pero solo
 proponerlo para copiar/aplicar con confirmación explícita, nunca escribirlo
 solo (mantiene la decisión ya tomada arriba).
+
+---
+
+## Fase futura (sin número) — Modo "todos los CPT públicos" en Scope — IDEA, NO PLANIFICADA
+
+**Qué haría:** en `class-scope.php`, alternativa a la lista explícita actual
+de post_types: un modo "todos los CPT públicos, presente y futuro", más un
+filtro de extensión sobre la lista de post_types excluidos por defecto.
+
+**Origen:** [`analisis-jet-geo.md`](analisis-jet-geo.md). No está planificada: requiere
+`evaluar-cambio`/`planificar-cambio` propios cuando se quiera abordar; no se
+implementa hasta decidirlo aparte.
 
 ---
 

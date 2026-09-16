@@ -41,6 +41,10 @@ class Scope {
 			// get_saved_answers()['contacto'] (ver Store_Info_Doc::build_store_info_body()).
 			'delivery_time_note' => '',
 			'legal_notes_extra'  => '',
+			// Fase 8: aviso a IndexNow. La clave se genera sola (Indexnow::get_key()),
+			// nunca se rellena a mano desde aquí.
+			'indexnow_enabled' => false,
+			'indexnow_key'     => '',
 		);
 		$saved = get_option( 'wookb_settings', array() );
 		return wp_parse_args( $saved, $defaults );

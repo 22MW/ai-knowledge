@@ -6,23 +6,30 @@
 `github.com/22MW/ai-knowledge`. Ruta:
 `app/public/wp-content/plugins/ai-knowledge/`.
 
-## Commiteado y pusheado (confirmado en `git log`)
+## Confirmado (Fases 0-8 completas)
 
-13 commits en `knowBaseDev`, Fases 0-7 del roadmap completas: UX2 (Carga
-inicial rediseñada) + ajuste general de largo de texto (`768d239`) y
-Fase 7 — OpenAPI + enlace desde `llms.txt` (`f58fc94`), sobre `334492e`
-(Fase 6) y `20ae873` (rediseño CSS). Detalle completo en
-[`CHANGELOG.md`](../CHANGELOG.md); regla visual permanente en
-[`decisiones.md`](decisiones.md).
+Fase 8 — Aviso a buscadores en tiempo real (IndexNow) — implementada y
+confirmada en real (2026-09-16): `HTTP 202` de `api.indexnow.org` al
+guardar un producto. Detalle completo en [`CHANGELOG.md`](../CHANGELOG.md)
+y en `_dev/roadmap.md` (Fase 8).
+
+Archivos nuevos/tocados en esta fase: `includes/class-indexnow.php`
+(nuevo), `includes/class-plugin.php`, `includes/class-scope.php`,
+`includes/class-sync.php`, `admin/class-admin.php`,
+`admin/views/tab-ajustes.php`.
 
 ## Pendiente de confirmar
 
-- `CHANGELOG.md`: tiene la entrada de Fase 7 escrita pero sin commitear
-  todavía — revisar si sigue así antes de continuar.
+- **Sin commitear todavía**: los cambios de Fase 8 (código + CHANGELOG.md +
+  readme.txt + roadmap.md + visual.html) están en el working tree de
+  `knowBaseDev`, sin commit ni push — pendiente de permiso explícito.
+- Flush de permalinks: la URL de la clave IndexNow (`/{key}.txt`) necesita
+  que se guarden los Enlaces Permanentes (o un flush) para responder en
+  producción tras el deploy — mismo requisito ya conocido de `llms.txt`.
 
 ## Pendiente real (sin empezar)
 
-- Fases 8-11 del roadmap.
+- Fases 9-11 del roadmap.
 - UX3 (WooCommerce: checkboxes + prompt por campo, cambio de arquitectura
   de datos, requiere `rol-analista`) y UX4 (visibilidad del botón de
   generar documentos de tienda) — ver `_dev/roadmap.md`, sección "UX
@@ -34,6 +41,9 @@ Fase 7 — OpenAPI + enlace desde `llms.txt` (`f58fc94`), sobre `334492e`
   vez que se probó.
 - Ideas sueltas sin fase (`analisis-jet-geo.md`): tags dinámicos en
   prompts, onboarding por pasos, modo "todos los CPT" en `Scope`.
+- Cobertura de Google para avisos en tiempo real: IndexNow no lo soporta;
+  requeriría la Search Console Indexing API (OAuth propio) como
+  integración aparte — no planificada.
 
 ## Decisiones de proceso (aplican siempre en este plugin)
 
@@ -47,7 +57,6 @@ Fase 7 — OpenAPI + enlace desde `llms.txt` (`f58fc94`), sobre `334492e`
 
 ## Relevo mínimo — siguiente paso
 
-Cerrar el commit pendiente de `CHANGELOG.md` (Fase 7 ya confirmada en
-navegador). Después: decidir con el usuario si sigue la Fase 8 o UX3
-(WooCommerce, con `rol-analista` primero por ser cambio de arquitectura de
-datos).
+Confirmar con el usuario si se commitea/pushea la Fase 8. Después: decidir
+si sigue la Fase 9 o UX3 (WooCommerce, con `rol-analista` primero por ser
+cambio de arquitectura de datos).

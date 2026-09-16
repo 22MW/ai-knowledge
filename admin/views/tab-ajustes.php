@@ -101,6 +101,24 @@ $faq_content     = class_exists( '\WOOKB\Llms_Faq' ) ? Llms_Faq::read() : '';
 				<p class="description"><?php esc_html_e( 'Tipos de contenido públicos donde aparece el meta box "Base de conocimiento IA" en su editor. Por defecto, todos.', 'ai-knowledge' ); ?></p>
 			</td>
 		</tr>
+		<tr>
+			<th><?php esc_html_e( 'Aviso a buscadores (IndexNow)', 'ai-knowledge' ); ?></th>
+			<td>
+				<label>
+					<input type="checkbox" name="indexnow_enabled" value="1" <?php checked( ! empty( $settings['indexnow_enabled'] ) ); ?> />
+					<?php esc_html_e( 'Avisar a buscadores compatibles con IndexNow (Bing y otros; Google no lo soporta) al crear, actualizar o borrar contenido del alcance.', 'ai-knowledge' ); ?>
+				</label>
+				<p class="description">
+					<?php
+					printf(
+						/* translators: %s: URL del archivo de clave IndexNow */
+						esc_html__( 'Clave del sitio (generada automáticamente): %s', 'ai-knowledge' ),
+						'<code>' . esc_html( home_url( '/' . Indexnow::get_key() . '.txt' ) ) . '</code>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
+					);
+					?>
+				</p>
+			</td>
+		</tr>
 	</table>
 	<?php submit_button( __( 'Guardar ajustes', 'ai-knowledge' ) ); ?>
 </form>

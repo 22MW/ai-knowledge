@@ -36,6 +36,7 @@ class Plugin {
 		require_once WOOKB_DIR . 'includes/class-rest-guard.php';
 		require_once WOOKB_DIR . 'includes/class-rest-content.php';
 		require_once WOOKB_DIR . 'includes/class-sync.php';
+		require_once WOOKB_DIR . 'includes/class-indexnow.php';
 		require_once WOOKB_DIR . 'includes/class-doc-redirect.php';
 		require_once WOOKB_DIR . 'includes/class-markdown-discovery.php';
 		require_once WOOKB_DIR . 'includes/class-markdown-server.php';
@@ -47,6 +48,7 @@ class Plugin {
 
 		Queue::init();
 		Sync::init();
+		Indexnow::init();
 		Doc_Redirect::init();
 		Markdown_Discovery::init();
 		Markdown_Server::init();
@@ -77,5 +79,6 @@ class Plugin {
 	public static function register_rewrite() {
 		Llms_Txt::add_rewrite_rule();
 		Markdown_Server::add_rewrite_rule();
+		Indexnow::add_rewrite_rule();
 	}
 }
