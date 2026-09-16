@@ -33,8 +33,8 @@
   <main>
     <header>
       <h1>AI Knowledge & Visibility — Estado</h1>
-      <p class="muted">Última actualización: 2026-09-16 (Fase 11 hecha y confirmada: robots.txt/.htaccess aplicados en real) · antes "woo-kb-generator"</p>
-      <span class="badge ok">Fases 0-9 y 11 hechas y confirmadas. Fase 10 replanteada y en pausa (ver roadmap).</span>
+      <p class="muted">Última actualización: 2026-09-16 (descripción añadida a las 8 pestañas del admin; Registro Simple/Avanzada probado y revertido, plan más simple en roadmap) · antes "woo-kb-generator"</p>
+      <span class="badge ok">Fases 0-9 y 11 hechas y confirmadas. Fase 10 en marcha (pieza 1 hecha, resto sin empezar, ver roadmap).</span>
     </header>
 
     <section class="grid">
@@ -74,7 +74,7 @@
           <tr><td>7</td><td>API pública documentada: <code>GET /wp-json/ai-knowledge/v1/openapi.json</code>, OpenAPI 3.0 real de las 2 rutas de la Fase 3, enlazado desde <code>llms.txt</code> (ver <a href="roadmap.md">roadmap.md</a>)</td><td><span class="badge ok">Hecho y confirmado en navegador por el usuario</span></td></tr>
           <tr><td>8</td><td>Aviso a buscadores en tiempo real (IndexNow): clave del sitio autogenerada, interruptor en Ajustes, aviso no bloqueante con debounce (ver <a href="roadmap.md">roadmap.md</a>). Google no soporta IndexNow.</td><td><span class="badge ok">Hecho y confirmado en real (HTTP 202)</span></td></tr>
           <tr><td>9</td><td>Feeds especializados: <code>feeds/products.xml</code> (Google Merchant) y <code>feeds/content.json</code>, enlazados desde <code>llms.txt</code> y desde el <code>&lt;head&gt;</code> de todas las páginas (ver <a href="roadmap.md">roadmap.md</a>).</td><td><span class="badge ok">Hecho y confirmado en real</span></td></tr>
-          <tr><td>10</td><td>Replanteada (2026-09-16): rediseño Alcance/Exclusiones (selectores casi idénticos, fácil confundir incluir/excluir) + campos personalizados ACF/Meta Box/Pods (el dato ya es seleccionable, falta etiqueta legible) + modo "todos los CPT públicos" en Scope — las tres juntas porque tocan la misma pestaña (ver <a href="roadmap.md">roadmap.md</a>)</td><td><span class="badge warn">En pausa, pendiente de evaluar-cambio/rol-analista conjunto</span></td></tr>
+          <tr><td>10</td><td>Plan conjunto de UX del admin (5 piezas, ver <a href="roadmap.md">roadmap.md</a>): 1) descripción por pestaña, 2) Alcance/Exclusiones unificado, 3) campos ACF/Meta Box/Pods, 4) modo "todos los CPT", 5) Registro con "Ajustes avanzados" por fila (tras probar y revertir una versión con dos vistas Simple/Avanzada completas).</td><td><span class="badge warn">Pieza 1 hecha. Piezas 2-5 sin empezar</span></td></tr>
           <tr><td>11</td><td>Gestión de crawlers de IA: catálogo de ~28 bots conocidos (Permitir/Bloquear por bot), bloqueo real por <code>robots.txt</code> y <code>.htaccess</code> con descarga obligatoria de seguridad y vista previa, logs de accesos (ver <a href="roadmap.md">roadmap.md</a>)</td><td><span class="badge ok">Hecho y confirmado en real</span></td></tr>
         </table>
       </article>
@@ -130,7 +130,7 @@
 
       <article class="card wide">
         <h2>Próximo paso</h2>
-        <p>Fase 11 confirmada. Decidir con el usuario: retomar Fase 10 (requiere <code>evaluar-cambio</code>/<code>rol-analista</code>) o UX3 (WooCommerce, con <code>rol-analista</code> primero).</p>
+        <p>Fase 10, pieza 1 hecha. Retomar con la pieza 5 (Registro: "Ajustes avanzados" por fila, ya bien definida en el roadmap) o con la pieza 2 (Alcance/Exclusiones unificado).</p>
       </article>
 
     </section>

@@ -25,7 +25,7 @@
 	function applyTheme( $wrap, theme ) {
 		$wrap.attr( 'data-bs-theme', theme );
 		var $btn = $wrap.find( '.wookb-theme-toggle' );
-		$btn.text( 'dark' === theme ? '☀️ Modo claro' : '🌙 Modo oscuro' );
+		$btn.text( 'dark' === theme ? ' Modo claro' : ' Modo oscuro' );
 	}
 
 	// El tema inicial YA se fija con un <script> inline sincrono impreso por

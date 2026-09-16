@@ -38,8 +38,6 @@ class Registry_Table extends \WP_List_Table {
 			'source' => __( 'Origen', 'ai-knowledge' ),
 			'lang'   => __( 'Idioma', 'ai-knowledge' ),
 			'status' => __( 'Estado', 'ai-knowledge' ),
-			'bridge' => __( 'Puente', 'ai-knowledge' ),
-			'hash'   => __( 'Hash', 'ai-knowledge' ),
 			'updated' => __( 'Actualizado', 'ai-knowledge' ),
 			'links'  => __( 'Enlaces', 'ai-knowledge' ),
 			'manual' => __( 'Control manual', 'ai-knowledge' ),
@@ -47,8 +45,17 @@ class Registry_Table extends \WP_List_Table {
 		);
 	}
 
+	/** Valores permitidos para el selector "por página" de la toolbar. */
+	const PER_PAGE_OPTIONS = array( 20, 50, 100 );
+
+	/** Lee 'per_page' de la URL con whitelist, igual que status/lang/s. */
+	public static function current_per_page() {
+		$requested = isset( $_GET['per_page'] ) ? (int) $_GET['per_page'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return in_array( $requested, self::PER_PAGE_OPTIONS, true ) ? $requested : self::PER_PAGE_OPTIONS[0];
+	}
+
 	public function prepare_items() {
-		$per_page     = 20;
+		$per_page     = self::current_per_page();
 		$current_page = $this->get_pagenum();
 
 		$status = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : ''; // phpcs:ignore
@@ -123,10 +130,6 @@ class Registry_Table extends \WP_List_Table {
 				// Texto plano, sin badge/pastilla -- pedido explicito del
 				// usuario (mismo aspecto que la columna Idioma).
 				return esc_html( self::status_label( $item->status ) );
-			case 'bridge':
-				return $item->is_bridge ? esc_html__( 'Sí', 'ai-knowledge' ) : '—';
-			case 'hash':
-				return esc_html( substr( $item->source_hash, 0, 8 ) );
 			case 'updated':
 				return esc_html( $item->updated_at );
 			case 'links':
@@ -272,7 +275,14 @@ class Registry_Table extends \WP_List_Table {
 			<?php wp_nonce_field( 'wookb_resolve_stale' ); ?>
 		</form>
 		<details>
-			<summary><?php esc_html_e( 'Ver/editar Markdown', 'ai-knowledge' ); ?></summary>
+			<summary><?php esc_html_e( 'Ajustes avanzados', 'ai-knowledge' ); ?></summary>
+			<p class="wookb-manual-meta">
+				<strong><?php esc_html_e( 'Puente:', 'ai-knowledge' ); ?></strong>
+				<?php echo $item->is_bridge ? esc_html__( 'Sí', 'ai-knowledge' ) : '—'; ?>
+				&nbsp;·&nbsp;
+				<strong><?php esc_html_e( 'Hash:', 'ai-knowledge' ); ?></strong>
+				<?php echo esc_html( substr( $item->source_hash, 0, 8 ) ); ?>
+			</p>
 			<textarea form="<?php echo esc_attr( $set_manual_form_id ); ?>" name="override_text" rows="15" class="wookb-manual-textarea" style="width:100%;"><?php echo esc_textarea( $current_text ); ?></textarea>
 			<p class="wookb-manual-actions">
 				<label>
@@ -345,20 +355,6 @@ class Registry_Table extends \WP_List_Table {
 		ob_start();
 		?>
 		<div class="wookb-row-actions-stack">
-			<label>
-				<span class="screen-reader-text"><?php esc_html_e( 'Límite de caracteres', 'ai-knowledge' ); ?></span>
-				<input
-					type="number"
-					name="char_limit"
-					form="<?php echo esc_attr( $regen_form_id ); ?>"
-					min="100"
-					max="10000"
-					step="50"
-					value="<?php echo esc_attr( $item->char_limit ? $item->char_limit : Generator::BODY_CHAR_LIMIT ); ?>"
-					placeholder="<?php echo esc_attr( Generator::BODY_CHAR_LIMIT ); ?>"
-					title="<?php esc_attr_e( 'Límite de caracteres para esta generación (uso único, no se guarda)', 'ai-knowledge' ); ?>"
-				/>
-			</label>
 			<button type="submit" form="<?php echo esc_attr( $regen_form_id ); ?>" class="button button-small"><?php esc_html_e( 'Generar', 'ai-knowledge' ); ?></button>
 			<button type="submit" form="<?php echo esc_attr( $delete_form_id ); ?>" class="button button-small button-link-delete"><?php esc_html_e( 'Borrar', 'ai-knowledge' ); ?></button>
 		</div>

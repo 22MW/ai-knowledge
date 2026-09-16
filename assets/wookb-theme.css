@@ -461,7 +461,7 @@ body.toplevel_page_woo-kb-generator #wpcontent {
    (pedido explicito), en vez de en fila. */
 .wookb-wrap .wookb-row-actions-stack {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: var(--tblr-spacer-1, 0.25rem);
   width: 140px;
 }
@@ -572,6 +572,11 @@ body.toplevel_page_woo-kb-generator #wpcontent {
 }
 .wookb-wrap .wookb-manual-expand-cell label {
   color: var(--tblr-body-color);
+}
+.wookb-wrap .wookb-manual-meta {
+  color: var(--tblr-secondary-color, #6b7280);
+  font-size: 13px;
+  margin: 8px 0;
 }
 .wookb-wrap .wookb-manual-actions {
   display: flex;

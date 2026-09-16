@@ -6,40 +6,40 @@
 `github.com/22MW/ai-knowledge`. Ruta:
 `app/public/wp-content/plugins/ai-knowledge/`.
 
-## Confirmado (Fases 0-9 y 11 completas; Fase 10 en pausa/replanteada)
+## Confirmado (Fases 0-9 y 11 completas; Fase 10 en curso)
 
 Fases 0-9 y 11 commiteadas y pusheadas. Fase 10 replanteada varias veces
 (ver `_dev/roadmap.md`): plan conjunto de UX del admin con 5 piezas.
 
 **Estado de la Fase 10 ahora mismo (2026-09-16):**
-- Pieza 1 (descripción por pestaña en las 8 pestañas): **hecha**, pendiente
-  de commit.
-- Pieza 5 (Registro): se implementó primero una versión con dos vistas
-  completas (Simple/Avanzada) — **se probó, no gustó, y se revirtió por
-  completo** (código descartado, `admin/class-registry-table.php` vuelto a
-  su versión commiteada). El enfoque definitivo, mucho más simple, queda
-  documentado en el roadmap (pieza 5): una sola tabla como la de siempre,
-  con el desplegable "Ver/editar Markdown" renombrado a "Ajustes
-  avanzados" y ampliado para contener Puente/Hash/límite de
-  caracteres/botones manual — **sin implementar todavía**, a la espera de
-  retomarlo.
+- Pieza 1 (descripción por pestaña en las 8 pestañas): **hecha y
+  commiteada** (`568bf17`).
+- Pieza 5 (Registro, "Ajustes avanzados"): **hecha**, pendiente de commit.
+  Puente/Hash movidos dentro del desplegable renombrado "Ajustes
+  avanzados"; quitado el campo de límite puntual de la columna Acciones;
+  añadido selector "por página" (20/50/100) en la toolbar (fuera del plan
+  original, pedido aparte); reordenado "Generar por ID o URL" antes de la
+  toolbar. Sin probar todavía en real por el usuario.
 - Piezas 2, 3, 4 (Alcance/Exclusiones unificado, campos custom
   ACF/Meta Box/Pods, modo "todos los CPT"): sin empezar.
 
 ## Pendiente de confirmar
 
-- **Sin commitear todavía**: pieza 1 (descripciones) + revert de la pieza
-  5 + roadmap actualizado. Pendiente de tu permiso explícito para commit +
-  push a `knowBaseDev`.
+- **Sin commitear todavía**: pieza 5 completa + fix de encoding en
+  `assets/admin.js` (emojis del botón de tema) + edición manual del
+  usuario en `_dev/guia-estilo-visual.html` + roadmap/changelog
+  actualizados. Pendiente de tu permiso explícito para commit + push a
+  `knowBaseDev`.
+- No se ha podido ejecutar `php -l` en esta sesión (no hay binario `php`
+  accesible en este entorno) — validar en real en LocalWP.
 - Hay ~100 filas de datos de PRUEBA en la tabla `wookb_crawler_log` (Fase
   11, botón temporal ya retirado). Inofensivas, dentro del tope de 500.
 
 ## Pendiente real (sin empezar)
 
-- Fase 10, piezas 2-5 (ver roadmap): Alcance/Exclusiones unificado con
+- Fase 10, piezas 2-4 (ver roadmap): Alcance/Exclusiones unificado con
   interruptor de 3 estados por término (Incluir/Excluir/Sin decidir, neutro
-  por defecto), campos custom ACF/Meta Box/Pods, modo "todos los CPT", y
-  "Ajustes avanzados" del Registro.
+  por defecto), campos custom ACF/Meta Box/Pods, modo "todos los CPT".
 - UX3 (WooCommerce: checkboxes + prompt por campo, cambio de arquitectura
   de datos, requiere `rol-analista`) y UX4 (visibilidad del botón de
   generar documentos de tienda).
@@ -72,6 +72,6 @@ Fases 0-9 y 11 commiteadas y pusheadas. Fase 10 replanteada varias veces
 
 ## Relevo mínimo — siguiente paso
 
-Confirmar commit + push del estado actual (descripciones + revert + roadmap).
-Después: implementar la Fase 10 pieza 5 ("Ajustes avanzados" del Registro,
-ya bien definida) o empezar por la pieza 2 (Alcance/Exclusiones unificado).
+Confirmar commit + push del estado actual (pieza 5 completa). Después:
+probar en real en LocalWP (no se pudo validar con `php -l` en esta
+sesión) y seguir con la pieza 2 (Alcance/Exclusiones unificado).

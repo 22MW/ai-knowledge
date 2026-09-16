@@ -58,6 +58,18 @@ $table->prepare_items();
 	</script>
 <?php endif; ?>
 
+<h2><?php esc_html_e( 'Generar por ID o URL', 'ai-knowledge' ); ?></h2>
+<p class="description">
+	<?php esc_html_e( 'Para un producto/página que ya no tiene fila en el Registro (por ejemplo, tras borrarlo aquí): genera de nuevo, en todos los idiomas activos, de forma inmediata y sin esperar al cron.', 'ai-knowledge' ); ?>
+</p>
+<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+	<input type="hidden" name="action" value="wookb_force_generate" />
+	<?php wp_nonce_field( 'wookb_force_generate' ); ?>
+	<input type="text" name="force_id_or_url" placeholder="<?php esc_attr_e( 'ID del producto/página, o su URL', 'ai-knowledge' ); ?>" style="width:320px" />
+	<?php submit_button( __( 'Generar ahora', 'ai-knowledge' ), 'secondary', '', false ); ?>
+</form>
+<hr />
+
 <div class="wookb-toolbar-row">
 	<form method="get" class="wookb-toolbar-form">
 		<input type="hidden" name="page" value="woo-kb-generator" />
@@ -75,6 +87,11 @@ $table->prepare_items();
 			<?php endforeach; ?>
 		</select>
 		<input type="search" name="s" value="<?php echo isset( $_GET['s'] ) ? esc_attr( wp_unslash( $_GET['s'] ) ) : ''; // phpcs:ignore ?>" placeholder="<?php esc_attr_e( 'Buscar por título…', 'ai-knowledge' ); ?>" />
+		<select name="per_page">
+			<?php foreach ( array( 20, 50, 100 ) as $pp ) : ?>
+				<option value="<?php echo esc_attr( $pp ); ?>" <?php selected( Registry_Table::current_per_page() === $pp ); ?>><?php echo esc_html( sprintf( /* translators: %d: numero de filas por pagina */ __( '%d por página', 'ai-knowledge' ), $pp ) ); ?></option>
+			<?php endforeach; ?>
+		</select>
 		<?php submit_button( __( 'Filtrar', 'ai-knowledge' ), '', '', false ); ?>
 	</form>
 
@@ -94,18 +111,6 @@ $table->prepare_items();
 	</form>
 </div>
 
-<hr />
-<h2><?php esc_html_e( 'Generar por ID o URL', 'ai-knowledge' ); ?></h2>
-<p class="description">
-	<?php esc_html_e( 'Para un producto/página que ya no tiene fila en el Registro (por ejemplo, tras borrarlo aquí): genera de nuevo, en todos los idiomas activos, de forma inmediata y sin esperar al cron.', 'ai-knowledge' ); ?>
-</p>
-<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-	<input type="hidden" name="action" value="wookb_force_generate" />
-	<?php wp_nonce_field( 'wookb_force_generate' ); ?>
-	<input type="text" name="force_id_or_url" placeholder="<?php esc_attr_e( 'ID del producto/página, o su URL', 'ai-knowledge' ); ?>" style="width:320px" />
-	<?php submit_button( __( 'Generar ahora', 'ai-knowledge' ), 'secondary', '', false ); ?>
-</form>
-<hr />
 <!--
 	Bulk actions: el formulario se autoenvia a esta misma pagina (sin action=
 	explicito), NO a admin-post.php. WP_List_Table::display() ya renderiza su

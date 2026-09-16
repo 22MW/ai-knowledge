@@ -315,8 +315,9 @@ públicos, presente y futuro", más un filtro de extensión sobre la lista de
 post_types excluidos por defecto. Afecta directamente a cómo se dibuja la
 pestaña Alcance, por eso se junta aquí.
 
-**5. Registro: "Ajustes avanzados" por fila (2026-09-16, sustituye el plan
-anterior de vista Simple/Avanzada — probado y descartado en el mismo día).**
+**5. Registro: "Ajustes avanzados" por fila — HECHO (2026-09-16, sustituye
+el plan anterior de vista Simple/Avanzada — probado y descartado en el
+mismo día).**
 
 **Historial de esta pieza:** se implementó primero una versión con dos
 vistas completas (Simple/Avanzada, interruptor + selector de filas por
@@ -346,10 +347,13 @@ alternativas:**
   "Pasar a manual"/"Volver a Auto". Nada de información se pierde, se
   reorganiza dentro de esa fila expandible en vez de ocupar columnas
   siempre visibles.
-- Sin selector de filas por página nuevo, sin `view=`/`per_page=` en la
-  URL, sin cambios en `Registry_Table::get_columns()`/`get_bulk_actions()`
-  — la paginación sigue como está hoy (20 fijas), no forma parte de este
-  cambio.
+- Sin cambios en `Registry_Table::get_columns()`/`get_bulk_actions()`.
+- **Añadido tras confirmación (2026-09-16), fuera del plan original:**
+  selector "por página" (20/50/100) en la toolbar, mismo patrón GET que
+  status/lang/s — `Registry_Table::current_per_page()` con whitelist,
+  sin `user_meta` ni Screen Options nativas. Y reordenado el bloque
+  "Generar por ID o URL" antes de la toolbar de filtros (más cerca de la
+  tabla que usa).
 
 **Por qué van juntas (2, 3, 4, 5):** todas tocan la experiencia general de
 selección/revisión de contenido del admin. Decidir por separado arriesga

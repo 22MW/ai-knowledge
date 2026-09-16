@@ -8,6 +8,19 @@ Ver `_dev/roadmap.md` para el plan completo por fases y `_dev/decisiones.md`
 para el porqué de la identidad/alcance. Este plugin sigue orientado a IA +
 Support Genix como núcleo; todo lo de abajo es capa añadida encima.
 
+### Fase 10, pieza 5: "Ajustes avanzados" en el Registro (2026-09-16)
+
+- Columnas Puente y Hash ya no son siempre visibles: se movieron dentro
+  del desplegable por fila, renombrado de "Ver/editar Markdown" a
+  "Ajustes avanzados".
+- Columna Acciones: quitado el campo de límite de caracteres puntual (uso
+  único, no guardado); "Generar" usa ahora siempre el límite guardado en
+  "Ajustes avanzados" o el general de Ajustes.
+- Nuevo selector "por página" (20/50/100) en la toolbar del Registro.
+- Reordenado el bloque "Generar por ID o URL" antes de la toolbar de
+  filtros.
+- Fix: botón de modo oscuro/claro sin emoji (corrupción de encoding).
+
 ### Rediseño de CSS/admin (2026-09-16)
 
 - Sistema único de 5 variantes de botón (neutro, primario, peligro, éxito,
