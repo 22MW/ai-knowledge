@@ -2,11 +2,20 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
-## [1.0.8.6] - 2026-09-16
+## [1.1.0] - 2026-09-17
 
 Ver `_dev/roadmap.md` para el plan completo por fases y `_dev/decisiones.md`
 para el porqué de la identidad/alcance. Este plugin sigue orientado a IA +
 Support Genix como núcleo; todo lo de abajo es capa añadida encima.
+
+### Auto-actualización desde GitHub Releases
+
+- El plugin ahora aparece en Dashboard → Actualizaciones y se instala con
+  un clic, igual que un plugin del repositorio oficial. Mismo patrón que
+  AuthGate: consulta la última release pública de `22MW/ai-knowledge` cada
+  hora, sin licencias ni servidor propio.
+- Incluye `_dev/deploy-release.sh` para publicar releases (uso interno,
+  no forma parte del ZIP distribuido).
 
 ### Documentación pública y técnica
 
