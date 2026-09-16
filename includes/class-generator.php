@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Cliente IA: obtiene clave/modelo (Genix o propia) y genera el Markdown del documento.
+ * Genera el Markdown del documento mediante el transporte IA central.
  */
 class Generator {
 
@@ -25,28 +25,7 @@ class Generator {
 	 * Configuración de la IA: clave, modelo y flag de origen.
 	 */
 	public static function ai_config() {
-		$settings = Scope::settings();
-
-		if ( 'genix' === $settings['ai_key_source'] && class_exists( '\Apbd_wps_settings' ) ) {
-			$cfg = \Apbd_wps_settings::GetOpenAIConfig();
-			if ( $cfg && ! empty( $cfg['api_key'] ) ) {
-				return array(
-					'api_key' => $cfg['api_key'],
-					'model'   => ! empty( $cfg['model'] ) ? $cfg['model'] : 'gpt-4o-mini',
-					'source'  => 'genix',
-				);
-			}
-		}
-
-		if ( ! empty( $settings['own_api_key'] ) ) {
-			return array(
-				'api_key' => $settings['own_api_key'],
-				'model'   => $settings['own_model'],
-				'source'  => 'own',
-			);
-		}
-
-		return null;
+		return AI_Client::config();
 	}
 
 	/**
@@ -61,7 +40,7 @@ class Generator {
 	public static function generate( array $data, array $links = array(), $char_limit = null ) {
 		$config = self::ai_config();
 		if ( ! $config ) {
-			return new \WP_Error( 'wookb_no_ai_key', __( 'No hay clave de IA configurada (ni Genix ni propia).', 'ai-knowledge' ) );
+			return new \WP_Error( 'wookb_no_ai_connection', __( 'El origen de IA seleccionado no está conectado.', 'ai-knowledge' ) );
 		}
 
 		$char_limit = self::resolve_char_limit( $char_limit );
@@ -73,7 +52,13 @@ class Generator {
 		// mismo, para no duplicarla.
 		$prompt = self::build_prompt( $data, $links, $char_limit );
 
-		$response = self::call_openai( $config, $prompt );
+		$response = AI_Client::generate(
+			'Eres un redactor técnico que genera documentos de base de conocimiento en Markdown para un chatbot de atención al cliente de un negocio o tienda online.',
+			$prompt,
+			(int) Scope::settings()['output_tokens'],
+			0.5,
+			60
+		);
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
@@ -189,57 +174,6 @@ class Generator {
 		$prompt .= 'Idioma de salida: ' . strtoupper( $data['lang'] ) . ". Responde solo con el documento Markdown, sin explicaciones adicionales.";
 
 		return $prompt;
-	}
-
-	protected static function call_openai( array $config, $prompt ) {
-		$settings   = Scope::settings();
-		$model      = $config['model'];
-		$is_new_gen = ( 0 === strpos( $model, 'gpt-5' ) || 0 === strpos( $model, 'o' ) );
-
-		$body = array(
-			'model'    => $model,
-			'messages' => array(
-				array( 'role' => 'system', 'content' => 'Eres un redactor técnico que genera documentos de base de conocimiento en Markdown para un chatbot de atención al cliente de un negocio o tienda online.' ),
-				array( 'role' => 'user', 'content' => $prompt ),
-			),
-		);
-
-		$tokens_key = $is_new_gen ? 'max_completion_tokens' : 'max_tokens';
-		$body[ $tokens_key ] = (int) $settings['output_tokens'];
-		if ( ! $is_new_gen ) {
-			$body['temperature'] = 0.5;
-		}
-
-		$response = wp_remote_post(
-			'https://api.openai.com/v1/chat/completions',
-			array(
-				'timeout' => 60,
-				'headers' => array(
-					'Authorization' => 'Bearer ' . $config['api_key'],
-					'Content-Type'  => 'application/json',
-				),
-				'body'    => wp_json_encode( $body ),
-			)
-		);
-
-		if ( is_wp_error( $response ) ) {
-			return $response;
-		}
-
-		$code = wp_remote_retrieve_response_code( $response );
-		$json = json_decode( wp_remote_retrieve_body( $response ), true );
-
-		if ( $code < 200 || $code >= 300 ) {
-			$msg = isset( $json['error']['message'] ) ? $json['error']['message'] : 'Error HTTP ' . $code;
-			return new \WP_Error( 'wookb_openai_error', $msg );
-		}
-
-		$content = isset( $json['choices'][0]['message']['content'] ) ? $json['choices'][0]['message']['content'] : '';
-		if ( '' === trim( $content ) ) {
-			return new \WP_Error( 'wookb_openai_empty', __( 'Respuesta vacía de la IA.', 'ai-knowledge' ) );
-		}
-
-		return $content;
 	}
 
 	/**

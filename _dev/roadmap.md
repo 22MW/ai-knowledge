@@ -763,6 +763,14 @@ una sola tabla, checkboxes, botón de pulido por documento),
 
 ## UX pendiente de rediseño (detalle completo en [`qa-resultados-fase-0-a-5.md`](qa-resultados-fase-0-a-5.md))
 
+- **Negocio: fuente y resumen separados — IMPLEMENTADO, QA REAL PENDIENTE.**
+  Guardar o vaciar el resumen de llms.txt ya no modifica «Enfoque del negocio».
+
+- **Conectores WordPress 7.0 — IMPLEMENTADO, QA REAL PENDIENTE.** Orígenes
+  `wp_connectors` y `genix`, adaptador central, catálogo real restringido a
+  Anthropic/OpenAI/Google y selección Automático/modelo explícito. Falta
+  validar llamadas reales con cada proveedor conectado.
+
 - **UX2 — "Carga inicial" confusa — HECHO.** Botón único sustituido por
   "Generar pendientes" (comportamiento de siempre, seguro repetir) +
   "Reiniciar todo" (fuerza regenerar también lo ya sincronizado, con

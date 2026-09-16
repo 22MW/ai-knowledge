@@ -237,9 +237,9 @@ class Llms_Txt {
 	 */
 	protected static function summary() {
 		if ( class_exists( '\WOOKB\Chatbot_Prompt_Builder' ) ) {
-			$answers = Chatbot_Prompt_Builder::get_saved_answers();
-			if ( ! empty( $answers['negocio'] ) ) {
-				return $answers['negocio'];
+			$summary = Chatbot_Prompt_Builder::get_business_summary();
+			if ( '' !== trim( $summary ) ) {
+				return $summary;
 			}
 		}
 		$tagline = get_bloginfo( 'description' );

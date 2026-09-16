@@ -6,10 +6,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $settings        = Scope::settings();
-$ai_cfg          = Generator::ai_config();
+$ai_cfg          = AI_Client::config();
+$wp_ai_available = AI_Client::wordpress_available();
+$wp_ai_models    = $wp_ai_available ? AI_Client::available_models() : array();
 ?>
 <p class="description">
-	<?php esc_html_e( 'Configuración general del generador de documentos: largo del texto, clave de IA a usar y qué post_types muestran el botón de añadir a la base de conocimiento desde su editor.', 'ai-knowledge' ); ?>
+	<?php esc_html_e( 'Configuración general del generador de documentos: largo del texto, origen de IA y qué post_types muestran el botón de añadir a la base de conocimiento desde su editor.', 'ai-knowledge' ); ?>
 </p>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 	<input type="hidden" name="action" value="wookb_save_settings" />
@@ -40,38 +42,60 @@ $ai_cfg          = Generator::ai_config();
 			</td>
 		</tr>
 		<tr>
-			<th><?php esc_html_e( 'Origen de la clave IA', 'ai-knowledge' ); ?></th>
+			<th><?php esc_html_e( 'Origen de IA', 'ai-knowledge' ); ?></th>
 			<td>
-				<label><input type="radio" name="ai_key_source" value="genix" <?php checked( 'genix' === $settings['ai_key_source'] ); ?> /> <?php esc_html_e( 'Reutilizar la de Support Genix', 'ai-knowledge' ); ?></label><br />
-				<label><input type="radio" name="ai_key_source" value="own" <?php checked( 'own' === $settings['ai_key_source'] ); ?> /> <?php esc_html_e( 'Clave propia', 'ai-knowledge' ); ?></label>
+				<?php if ( $wp_ai_available ) : ?>
+					<label><input type="radio" name="ai_key_source" value="wp_connectors" <?php checked( 'wp_connectors' === $settings['ai_key_source'] ); ?> /> <?php esc_html_e( 'Conectores de WordPress', 'ai-knowledge' ); ?></label><br />
+				<?php endif; ?>
+				<label><input type="radio" name="ai_key_source" value="genix" <?php checked( 'wp_connectors' !== $settings['ai_key_source'] || ! $wp_ai_available ); ?> /> <?php esc_html_e( 'Support Genix', 'ai-knowledge' ); ?></label>
 				<p class="description">
 					<?php
 					if ( $ai_cfg ) {
 						printf(
-							/* translators: %1$s clave enmascarada, %2$s modelo, %3$s origen */
-							esc_html__( 'Config. activa: %1$s (modelo %2$s, origen %3$s)', 'ai-knowledge' ),
-							esc_html( substr( $ai_cfg['api_key'], 0, 4 ) . '…' . substr( $ai_cfg['api_key'], -4 ) ),
-							esc_html( $ai_cfg['model'] ),
-							esc_html( $ai_cfg['source'] )
+							/* translators: %1$s modelo, %2$s origen */
+							esc_html__( 'Configuración activa: modelo %1$s, origen %2$s.', 'ai-knowledge' ),
+							esc_html( AI_Client::MODEL_AUTO === $ai_cfg['model'] ? __( 'Automático', 'ai-knowledge' ) : $ai_cfg['model'] ),
+							esc_html( 'wp_connectors' === $ai_cfg['source'] ? __( 'Conectores de WordPress', 'ai-knowledge' ) : __( 'Support Genix', 'ai-knowledge' ) )
 						);
 					} else {
-						esc_html_e( 'No hay clave IA configurada todavía.', 'ai-knowledge' );
+						esc_html_e( 'El origen seleccionado no está conectado.', 'ai-knowledge' );
 					}
 					?>
 				</p>
 			</td>
 		</tr>
+		<?php if ( $wp_ai_available ) : ?>
 		<tr>
-			<th><?php esc_html_e( 'Clave propia (fallback)', 'ai-knowledge' ); ?></th>
+			<th><?php esc_html_e( 'Modelo de WordPress', 'ai-knowledge' ); ?></th>
 			<td>
-				<input type="password" name="own_api_key" class="regular-text" value="<?php echo esc_attr( $settings['own_api_key'] ); ?>" autocomplete="off" />
-				<p class="description"><?php esc_html_e( 'Se guarda en claro, igual que la clave de Support Genix. Límite conocido y documentado.', 'ai-knowledge' ); ?></p>
+				<select name="wp_ai_model">
+					<option value="<?php echo esc_attr( AI_Client::MODEL_AUTO ); ?>" <?php selected( AI_Client::MODEL_AUTO === $settings['wp_ai_model'] ); ?>><?php esc_html_e( 'Automático (recomendado)', 'ai-knowledge' ); ?></option>
+					<?php
+					$current_provider = '';
+					foreach ( $wp_ai_models as $key => $model ) :
+						if ( $current_provider !== $model['provider'] ) :
+							if ( '' !== $current_provider ) {
+								echo '</optgroup>';
+							}
+							$current_provider = $model['provider'];
+							echo '<optgroup label="' . esc_attr( $model['provider_name'] ) . '">';
+						endif;
+						?>
+						<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $key === $settings['wp_ai_model'] ); ?>><?php echo esc_html( $model['name'] . ' (' . $model['model'] . ')' ); ?></option>
+					<?php endforeach; ?>
+					<?php if ( '' !== $current_provider ) { echo '</optgroup>'; } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- etiqueta HTML fija. ?>
+				</select>
+				<p class="description">
+					<?php if ( empty( $wp_ai_models ) ) : ?>
+						<?php esc_html_e( 'No hay modelos compatibles conectados todavía.', 'ai-knowledge' ); ?>
+					<?php else : ?>
+						<?php esc_html_e( 'Automático elige entre los modelos de texto conectados de Anthropic, OpenAI o Google.', 'ai-knowledge' ); ?>
+					<?php endif; ?>
+					<a href="<?php echo esc_url( admin_url( 'options-connectors.php' ) ); ?>"><?php esc_html_e( 'Gestionar Conectores de WordPress', 'ai-knowledge' ); ?></a>
+				</p>
 			</td>
 		</tr>
-		<tr>
-			<th><?php esc_html_e( 'Modelo (clave propia)', 'ai-knowledge' ); ?></th>
-			<td><input type="text" name="own_model" class="regular-text" value="<?php echo esc_attr( $settings['own_model'] ); ?>" /></td>
-		</tr>
+		<?php endif; ?>
 		<tr>
 			<th><?php esc_html_e( 'Botón "Añadir a la base de conocimiento" en el editor', 'ai-knowledge' ); ?></th>
 			<td>

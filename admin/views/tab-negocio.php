@@ -10,7 +10,7 @@ $summary_error    = get_transient( 'wookb_business_summary_error' );
 delete_transient( 'wookb_business_summary_error' );
 $summary_draft    = get_transient( 'wookb_business_summary_draft' );
 if ( false === $summary_draft ) {
-	$summary_draft = $answers['negocio'];
+	$summary_draft = Chatbot_Prompt_Builder::get_business_summary();
 }
 ?>
 <p class="description">
@@ -44,7 +44,7 @@ if ( false === $summary_draft ) {
 
 <h2><?php esc_html_e( '2. Resumen para llms.txt (con IA)', 'ai-knowledge' ); ?></h2>
 <p class="description">
-	<?php esc_html_e( 'Genera o pule con IA el texto de "Enfoque del negocio" de arriba, a partir del resto de datos ya guardados (parte del texto actual si ya hay uno, no empieza de cero). Se usa como cita de apertura pública en /llms.txt, el archivo que leen los buscadores de IA. También produce llm/info.md. Si el resultado se queda corto, amplía los datos de arriba (guárdalos primero) y vuelve a generar — se puede repetir todas las veces que haga falta.', 'ai-knowledge' ); ?>
+	<?php esc_html_e( 'Genera o pule un resumen independiente usando todos los datos guardados arriba, incluido "Enfoque del negocio". Se usa como cita de apertura pública en /llms.txt, el archivo que leen los buscadores de IA. Guardar o borrar este resumen no modifica los datos fuente. Si el resultado se queda corto, amplía los datos de arriba, guárdalos primero y vuelve a generar.', 'ai-knowledge' ); ?>
 </p>
 
 <?php if ( $summary_error ) : ?>

@@ -18,6 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Chatbot_Prompt_Builder {
 
 	const ANSWERS_OPTION = 'wookb_chatbot_prompt_answers';
+	const BUSINESS_SUMMARY_OPTION = 'wookb_business_summary';
 
 	const MAX_LENGTH = 2000;
 
@@ -161,6 +162,24 @@ class Chatbot_Prompt_Builder {
 	}
 
 	/**
+	 * Resumen publico independiente del campo fuente "Enfoque del negocio".
+	 * Si aun no existe la opcion nueva, conserva el comportamiento historico.
+	 */
+	public static function get_business_summary() {
+		$summary = get_option( self::BUSINESS_SUMMARY_OPTION, null );
+		if ( null !== $summary ) {
+			return (string) $summary;
+		}
+
+		$answers = self::get_saved_answers();
+		return (string) $answers['negocio'];
+	}
+
+	public static function save_business_summary( $summary ) {
+		return update_option( self::BUSINESS_SUMMARY_OPTION, sanitize_textarea_field( $summary ), false );
+	}
+
+	/**
 	 * Escribe wp-content/llm/info.md con la info general del negocio (mismo
 	 * cuestionario que arma el prompt: nombre, resumen, contacto, horario,
 	 * idiomas) -- una sola fuente para el prompt del chatbot Y para el
@@ -219,7 +238,7 @@ class Chatbot_Prompt_Builder {
 	public static function generate_business_summary( array $answers, $extra_info = '' ) {
 		$config = Generator::ai_config();
 		if ( ! $config ) {
-			return new \WP_Error( 'wookb_no_ai_key', __( 'No hay clave de IA configurada (ni Genix ni propia).', 'ai-knowledge' ) );
+			return new \WP_Error( 'wookb_no_ai_connection', __( 'El origen de IA seleccionado no está conectado.', 'ai-knowledge' ) );
 		}
 
 		$extra_info = trim( (string) $extra_info );
@@ -232,7 +251,11 @@ class Chatbot_Prompt_Builder {
 			$prompt .= '- ' . $q['label'] . ': ' . $answers[ $key ] . "\n";
 		}
 		if ( ! empty( $answers['negocio'] ) ) {
-			$prompt .= "\nBorrador actual a mejorar (parte de aquí si tiene sentido, no lo ignores):\n" . $answers['negocio'] . "\n";
+			$prompt .= "\n- Enfoque del negocio (dato fuente obligatorio; conserva todos sus hechos): " . $answers['negocio'] . "\n";
+		}
+		$current_summary = self::get_business_summary();
+		if ( '' !== trim( $current_summary ) && $current_summary !== $answers['negocio'] ) {
+			$prompt .= "\nResumen público actual a mejorar sin perder los datos fuente:\n" . $current_summary . "\n";
 		}
 		$prompt .= "<<<FIN_DATOS_REALES_NEGOCIO>>>\n\n";
 		if ( '' !== $extra_info ) {
@@ -242,11 +265,20 @@ class Chatbot_Prompt_Builder {
 		$prompt .= "\nEste texto se usa como cita de apertura pública en llms.txt, el archivo que leen los buscadores de IA para entender de qué trata la web: debe ser una descripción útil y concreta, no vacía ni genérica.\n";
 		$prompt .= 'Responde solo con el texto final (contando saltos de línea, no debe superar los ' . self::MAX_LENGTH . ' caracteres), sin explicaciones ni comillas envolventes.';
 		if ( '' === $extra_info ) {
-			$prompt .= ' Usa prosa breve y no incluyas encabezados Markdown.';
+			$prompt .= ' Redacta una descripción natural y bien conectada que explique qué hace el negocio, qué ofrece, a quién se dirige, dónde está y cómo puede contactar el cliente, únicamente cuando esos datos estén disponibles. Organiza la información en párrafos breves, con una extensión proporcional a los datos reales: no alargues el texto repitiendo información. Conserva nombres, direcciones, horarios, correos y demás datos tal como se facilitaron; no escapes los correos con barras invertidas. No incluyas encabezados Markdown.';
 		}
 
-		$result = self::call_ai( $config, $prompt );
+		$result = AI_Client::generate(
+			'Eres un redactor de perfiles de negocio. Convierte todos los datos reales facilitados en una descripción pública clara, natural y fiel.',
+			$prompt,
+			1200,
+			0.4,
+			40
+		);
 		$result = self::validate_private_instructions_result( $result, $extra_info );
+		if ( ! is_wp_error( $result ) ) {
+			$result = str_replace( '\\@', '@', $result );
+		}
 		return self::enforce_length( $result );
 	}
 
@@ -260,7 +292,7 @@ class Chatbot_Prompt_Builder {
 	public static function generate_faqs( array $answers, $current_faq = '', $extra_info = '' ) {
 		$config = Generator::ai_config();
 		if ( ! $config ) {
-			return new \WP_Error( 'wookb_no_ai_key', __( 'No hay clave de IA configurada (ni Genix ni propia).', 'ai-knowledge' ) );
+			return new \WP_Error( 'wookb_no_ai_connection', __( 'El origen de IA seleccionado no está conectado.', 'ai-knowledge' ) );
 		}
 
 		$extra_info = trim( (string) $extra_info );
@@ -304,7 +336,7 @@ class Chatbot_Prompt_Builder {
 
 		$config = Generator::ai_config();
 		if ( ! $config ) {
-			return new \WP_Error( 'wookb_no_ai_key', __( 'No hay clave de IA configurada (ni Genix ni propia).', 'ai-knowledge' ) );
+			return new \WP_Error( 'wookb_no_ai_connection', __( 'El origen de IA seleccionado no está conectado.', 'ai-knowledge' ) );
 		}
 
 		$limit = $max_length > 0 ? $max_length : self::MAX_LENGTH;
@@ -428,7 +460,7 @@ class Chatbot_Prompt_Builder {
 	public static function generate_draft( array $answers, array $reference_pages = array(), $extra_info = '' ) {
 		$config = Generator::ai_config();
 		if ( ! $config ) {
-			return new \WP_Error( 'wookb_no_ai_key', __( 'No hay clave de IA configurada (ni Genix ni propia).', 'ai-knowledge' ) );
+			return new \WP_Error( 'wookb_no_ai_connection', __( 'El origen de IA seleccionado no está conectado.', 'ai-knowledge' ) );
 		}
 
 		$prompt  = "Genera el PROMPT DE SISTEMA de un chatbot de atención al cliente para un negocio real, a partir de estas respuestas del propio negocio:\n\n";
@@ -494,7 +526,7 @@ class Chatbot_Prompt_Builder {
 
 		$config = Generator::ai_config();
 		if ( ! $config ) {
-			return new \WP_Error( 'wookb_no_ai_key', __( 'No hay clave de IA configurada (ni Genix ni propia).', 'ai-knowledge' ) );
+			return new \WP_Error( 'wookb_no_ai_connection', __( 'El origen de IA seleccionado no está conectado.', 'ai-knowledge' ) );
 		}
 
 		$prompt  = "Pule la redacción del siguiente prompt de sistema de un chatbot (gramática, claridad, consistencia de formato y tono), SIN cambiar ninguna decisión de fondo: no añadas reglas nuevas, no quites ninguna instrucción existente, no cambies datos de contacto, precios ni condiciones. Solo mejora cómo está escrito.\n\n";
@@ -506,49 +538,13 @@ class Chatbot_Prompt_Builder {
 	}
 
 	protected static function call_ai( array $config, $prompt ) {
-		$body = array(
-			'model'    => $config['model'],
-			'messages' => array(
-				array( 'role' => 'system', 'content' => 'Eres un redactor experto en prompts de sistema para chatbots de atención al cliente.' ),
-				array( 'role' => 'user', 'content' => $prompt ),
-			),
+		return AI_Client::generate(
+			'Eres un redactor experto en prompts de sistema para chatbots de atención al cliente.',
+			$prompt,
+			1200,
+			0.4,
+			40
 		);
-		$is_new_gen = ( 0 === strpos( $config['model'], 'gpt-5' ) || 0 === strpos( $config['model'], 'o' ) );
-		$body[ $is_new_gen ? 'max_completion_tokens' : 'max_tokens' ] = 1200;
-		if ( ! $is_new_gen ) {
-			$body['temperature'] = 0.4;
-		}
-
-		$response = wp_remote_post(
-			'https://api.openai.com/v1/chat/completions',
-			array(
-				'timeout' => 40,
-				'headers' => array(
-					'Authorization' => 'Bearer ' . $config['api_key'],
-					'Content-Type'  => 'application/json',
-				),
-				'body'    => wp_json_encode( $body ),
-			)
-		);
-
-		if ( is_wp_error( $response ) ) {
-			return $response;
-		}
-
-		$code = wp_remote_retrieve_response_code( $response );
-		$json = json_decode( wp_remote_retrieve_body( $response ), true );
-
-		if ( $code < 200 || $code >= 300 ) {
-			$msg = isset( $json['error']['message'] ) ? $json['error']['message'] : 'Error HTTP ' . $code;
-			return new \WP_Error( 'wookb_openai_error', $msg );
-		}
-
-		$content = isset( $json['choices'][0]['message']['content'] ) ? trim( $json['choices'][0]['message']['content'] ) : '';
-		if ( '' === $content ) {
-			return new \WP_Error( 'wookb_openai_empty', __( 'Respuesta vacía de la IA.', 'ai-knowledge' ) );
-		}
-
-		return $content;
 	}
 
 	/**
@@ -573,8 +569,7 @@ class Chatbot_Prompt_Builder {
 			return;
 		}
 
-		$answers = self::get_saved_answers();
-		$length  = mb_strlen( trim( (string) $answers['negocio'] ) );
+		$length = mb_strlen( trim( self::get_business_summary() ) );
 		if ( $length >= self::SUMMARY_MIN_LENGTH_RECOMMENDED ) {
 			return;
 		}
@@ -586,7 +581,7 @@ class Chatbot_Prompt_Builder {
 			esc_html__( 'WOO Knowledge Base Generator:', 'ai-knowledge' ),
 			sprintf(
 				/* translators: 1: longitud actual en caracteres, 2: mínimo recomendado, 3: enlace a la pestaña Negocio */
-				esc_html__( 'El resumen del negocio (pestaña Negocio, "Enfoque del negocio") tiene %1$d caracteres. Se usa como cita de apertura en /llms.txt: ampliarlo a al menos %2$d caracteres da más contexto útil a los crawlers de IA. %3$s', 'ai-knowledge' ),
+				esc_html__( 'El resumen público del negocio tiene %1$d caracteres. Se usa como cita de apertura en /llms.txt: ampliarlo a al menos %2$d caracteres da más contexto útil a los crawlers de IA. %3$s', 'ai-knowledge' ),
 				(int) $length,
 				(int) self::SUMMARY_MIN_LENGTH_RECOMMENDED,
 				'<a href="' . esc_url( $negocio_tab_url ) . '">' . esc_html__( 'Ir a la pestaña Negocio', 'ai-knowledge' ) . '</a>'

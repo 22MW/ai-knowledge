@@ -21,6 +21,7 @@ class Plugin {
 
 	public function init() {
 		require_once WOOKB_DIR . 'includes/class-scope.php';
+		require_once WOOKB_DIR . 'includes/class-ai-client.php';
 		require_once WOOKB_DIR . 'includes/class-registry.php';
 		require_once WOOKB_DIR . 'includes/class-wpml.php';
 		require_once WOOKB_DIR . 'includes/extractors/class-extractor-base.php';

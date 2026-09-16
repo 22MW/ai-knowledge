@@ -65,8 +65,31 @@ con IA"), probadas en real y confirmadas por el usuario (2026-09-16):
 - Estilo unificado con Contenido/Negocio (sin cajas de fondo).
 - Fix: IDs de pasarela de pago (texto) se destruían con `absint()`.
 
-El bloque anterior quedó publicado en `knowBaseDev` como `ff3daa8`. La
-limpieza actual de Ajustes/Chatbot está pendiente de validación y commit.
+Las rondas 1 y 2 quedaron publicadas en `knowBaseDev` como `ff3daa8`; la
+limpieza posterior de Ajustes/Chatbot, como `a332da1`.
+
+## Cambio actual — Conectores WordPress 7.0
+
+- Integrado el AI Client nativo como origen seleccionable junto a Support
+  Genix, con adaptador central para generación y traducción auxiliar.
+- El selector descubre modelos de texto reales de los proveedores
+  `anthropic`, `openai` y `google`; admite Automático o elección explícita.
+- La clave propia deja de mostrarse y usarse. Sus valores históricos no se
+  borran de la opción existente.
+- Pendiente QA real: conectar proveedor, guardar modelo automático/manual y
+  probar documentos, Negocio, FAQs, WooCommerce y traducción del chatbot.
+
+## Ajuste del resumen de Negocio
+
+- Corregida la colisión de datos: `answers['negocio']` conserva el enfoque
+  fuente y `wookb_business_summary` guarda el resumen público por separado.
+- Compatibilidad: mientras la nueva opción no exista, el resumen lee el valor
+  histórico de `answers['negocio']`; el primer guardado los separa.
+- El prompt predeterminado ya no pide solo «prosa breve»: genera una
+  descripción conectada y proporcional a los datos reales disponibles.
+- Evita repetir información para rellenar y pide conservar los correos sin
+  barras invertidas. Las instrucciones escritas por el usuario siguen
+  prevaleciendo sobre este formato predeterminado.
 
 ## Pendiente de confirmar
 
@@ -78,9 +101,6 @@ limpieza actual de Ajustes/Chatbot está pendiente de validación y commit.
 
 ## Pendiente real (sin empezar)
 
-- Integración futura con los Conectores nativos de WordPress 7.0 para
-  Anthropic/Claude, OpenAI y Google/Gemini, con selector de modelos reales.
-  Se abordará aparte por afectar a todas las llamadas IA del plugin.
 - UX3 (WooCommerce: checkboxes + prompt por campo a nivel de PRODUCTO,
   cambio de arquitectura de datos, requiere `rol-analista` — distinto de
   la selección de envíos/impuestos/pagos/catálogo ya hecha en la ronda 2)

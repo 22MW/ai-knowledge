@@ -33,7 +33,7 @@
   <main>
     <header>
       <h1>AI Knowledge & Visibility — Estado</h1>
-      <p class="muted">Última actualización: 2026-09-16 (limpieza de Ajustes: sin prompt global obsoleto; límite de documentos relacionados movido a Chatbot) · antes "woo-kb-generator"</p>
+      <p class="muted">Última actualización: 2026-09-16 (Conectores WordPress 7.0 + resumen de Negocio sin repeticiones) · antes "woo-kb-generator"</p>
       <span class="badge ok">Fases 0-11 hechas y confirmadas.</span>
     </header>
 
@@ -58,6 +58,17 @@
       <article class="card wide">
         <h2>Rediseño de CSS/UX del admin (2026-09-16)</h2>
         <p>Tras varias rondas de feedback visual real, se fijó un sistema único: 6 variantes de botón con variables reales de Tabler (no colores inventados), sin bordes decorativos (solo color de fondo sólido), hover forzado con <code>!important</code> (WordPress core gana el empate si no se fuerza), y la tabla del Registro con el layout arreglado. Todo documentado como regla permanente en <code>decisiones.md</code>.</p>
+      </article>
+
+      <article class="card wide">
+        <h2>Origen y modelo de IA (2026-09-16)</h2>
+        <p>Ajustes permite elegir entre <strong>Conectores de WordPress 7.0</strong> y <strong>Support Genix</strong>. Con WordPress se puede usar selección Automática o un modelo real conectado de Anthropic, OpenAI o Google. AI Knowledge no copia ni muestra las credenciales de los conectores. La clave propia se retiró del flujo activo sin borrar valores históricos.</p>
+        <p><span class="badge warn">Implementado; QA real pendiente con proveedores conectados.</span></p>
+      </article>
+
+      <article class="card wide">
+        <h2>Negocio: fuente y resumen independientes</h2>
+        <p>«Enfoque del negocio» conserva los datos detallados que alimentan a la IA. El resumen generado para <code>/llms.txt</code> se guarda aparte: editarlo o vaciarlo ya no borra la información fuente.</p>
       </article>
 
       <article class="card wide">

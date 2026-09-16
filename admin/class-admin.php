@@ -321,6 +321,16 @@ class Admin
 	{
 		self::verify('wookb_save_settings');
 
+		$ai_source = isset($_POST['ai_key_source']) ? sanitize_key(wp_unslash($_POST['ai_key_source'])) : 'genix'; // phpcs:ignore
+		if (! in_array($ai_source, array('genix', 'wp_connectors'), true) || ('wp_connectors' === $ai_source && ! AI_Client::wordpress_available())) {
+			$ai_source = 'genix';
+		}
+
+		$wp_ai_model = isset($_POST['wp_ai_model']) ? sanitize_text_field(wp_unslash($_POST['wp_ai_model'])) : AI_Client::MODEL_AUTO; // phpcs:ignore
+		if (AI_Client::MODEL_AUTO !== $wp_ai_model && ! isset(AI_Client::available_models()[$wp_ai_model])) {
+			$wp_ai_model = AI_Client::MODEL_AUTO;
+		}
+
 		Scope::update_settings(
 			array(
 				// daily_limit/no_limit/batch_size/debounce_seconds: movidos a
@@ -328,9 +338,8 @@ class Admin
 				// aqui -- este formulario ya no los envia.
 				'output_tokens'    => max(200, (int) ($_POST['output_tokens'] ?? 2500)), // phpcs:ignore
 				'body_char_limit'  => max(100, min(10000, (int) ($_POST['body_char_limit'] ?? 1000))), // phpcs:ignore
-				'ai_key_source'    => in_array($_POST['ai_key_source'] ?? '', array('genix', 'own'), true) ? sanitize_key($_POST['ai_key_source']) : 'genix', // phpcs:ignore
-				'own_api_key'      => isset($_POST['own_api_key']) ? sanitize_text_field(wp_unslash($_POST['own_api_key'])) : '', // phpcs:ignore
-				'own_model'        => isset($_POST['own_model']) ? sanitize_text_field(wp_unslash($_POST['own_model'])) : 'gpt-4o-mini', // phpcs:ignore
+				'ai_key_source'    => $ai_source,
+				'wp_ai_model'      => $wp_ai_model,
 				// Fase 1: post_types donde se muestra el meta box del editor.
 				// Se guarda siempre que llegue el campo oculto 'editor_button_post_types_submitted'
 				// (ver tab-ajustes.php) para poder distinguir "ningun CPT marcado"
@@ -783,15 +792,14 @@ class Admin
 	}
 
 	/**
-	 * Guarda el resumen (ya editado/revisado) como el campo 'negocio', y
-	 * regenera llm/info.md (misma fuente que la cita de apertura de llms.txt).
+	 * Guarda el resumen editado/revisado sin sustituir el enfoque del negocio.
 	 */
 	public static function save_business_summary()
 	{
 		self::verify('wookb_save_business_summary');
 
 		$summary = isset($_POST['summary_draft']) ? sanitize_textarea_field(wp_unslash($_POST['summary_draft'])) : ''; // phpcs:ignore
-		Chatbot_Prompt_Builder::save_answers(array('negocio' => $summary));
+		Chatbot_Prompt_Builder::save_business_summary($summary);
 		Chatbot_Prompt_Builder::write_info_doc();
 		delete_transient('wookb_business_summary_draft');
 

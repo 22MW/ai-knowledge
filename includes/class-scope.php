@@ -31,9 +31,8 @@ class Scope {
 			'debounce_seconds' => 300,
 			'output_tokens'    => 2500,
 			'body_char_limit'  => 1000, // Generator::BODY_CHAR_LIMIT es solo el respaldo si esta clave faltara.
-			'ai_key_source'    => 'genix', // genix|own
-			'own_api_key'      => '',
-			'own_model'        => 'gpt-4o-mini',
+			'ai_key_source'    => 'genix', // genix|wp_connectors
+			'wp_ai_model'      => AI_Client::MODEL_AUTO,
 			'chatbot_docs_list_limit' => Chatbot_Relevance_Guard::DOCS_LIST_LIMIT_DEFAULT,
 			// Fase 1: post_types donde aparece el meta box "Base de conocimiento
 			// IA" en el editor. Null = no guardado todavia -> default real

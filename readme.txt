@@ -29,6 +29,8 @@ Genera automáticamente una base de conocimiento en Markdown a partir de tu cat�
 * Documentos compuestos automáticos de "información de tienda" (cómo comprar, condiciones, envío y pago, catálogo) generados desde la configuración real de WooCommerce, no inventados. Sus instrucciones opcionales de pulido pueden cambiar el formato y la estructura, pero nunca añadir datos ausentes; un documento completo creado externamente puede pegarse manualmente desde Registro.
 * Panel de administración con pestañas especializadas; los ajustes exclusivos del chatbot, como el límite de documentos relacionados, viven en Chatbot y no en los ajustes generales.
 * Funciona igual sin Support Genix instalado: en ese caso, el plugin sigue generando y publicando `/llms.txt` de forma independiente.
+* En WordPress 7.0 o superior puede usar los Conectores nativos de Anthropic, OpenAI o Google, con selección automática o manual del modelo disponible. Support Genix se mantiene como origen alternativo.
+* El enfoque detallado del negocio se conserva como dato fuente independiente del resumen público generado para `/llms.txt`.
 * Sin dependencias obligatorias: WooCommerce, WPML y Support Genix se detectan en tiempo real; si no están, esas funciones concretas simplemente no se activan.
 
 == Installation ==
@@ -38,7 +40,7 @@ Genera automáticamente una base de conocimiento en Markdown a partir de tu cat�
 3. Ve al nuevo menú **Base de conocimiento IA** en el panel de administración.
 4. En la pestaña **Alcance**, elige qué tipos de contenido (productos, páginas, etc.) quieres incluir.
 5. Si quieres excluir contenido concreto, configúralo en la pestaña **Exclusiones**.
-6. Revisa los **Ajustes** (límite diario de generaciones, tamaño de lote, modelo de IA a usar).
+6. Revisa los **Ajustes** (origen y modelo de IA, y longitud de los documentos).
 7. Ve a **Carga inicial** y pulsa "Iniciar carga inicial" para generar los primeros documentos de todo tu catálogo.
 8. Sigue el progreso desde la pestaña **Registro**.
 
@@ -77,7 +79,7 @@ Depende del límite diario configurado (por defecto, 100 documentos al día, par
 
 = ¿Se sube contenido a algún sitio externo? =
 
-Solo se envía el contenido necesario al proveedor de IA configurado (Support Genix o una clave propia) para generar el resumen de cada documento. El resto del funcionamiento (registro, publicación de `/llms.txt`, conexión con Genix) ocurre enteramente dentro de tu propio WordPress.
+Solo se envía el contenido necesario al origen de IA seleccionado (Conectores de WordPress o Support Genix) para generar el resumen de cada documento. Las credenciales de los Conectores se gestionan en WordPress y AI Knowledge no las copia ni las muestra. El resto del funcionamiento (registro, publicación de `/llms.txt`, conexión con Genix) ocurre enteramente dentro de tu propio WordPress.
 
 = ¿Qué pasa si borro o despublico un producto? =
 

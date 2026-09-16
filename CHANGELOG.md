@@ -8,6 +8,31 @@ Ver `_dev/roadmap.md` para el plan completo por fases y `_dev/decisiones.md`
 para el porqué de la identidad/alcance. Este plugin sigue orientado a IA +
 Support Genix como núcleo; todo lo de abajo es capa añadida encima.
 
+### Resumen de Negocio más útil por defecto (2026-09-16)
+
+- Separados el campo fuente «Enfoque del negocio» y el resumen público usado
+  por llms.txt: guardar o vaciar uno ya no sobrescribe el otro.
+- Los valores existentes siguen disponibles como compatibilidad inicial hasta
+  que se guarda por primera vez el resumen independiente.
+- Cuando no se indican instrucciones propias, el resumen usa prosa natural,
+  evita repetir datos para alargar el texto y mantiene los correos sin escapes.
+- La extensión se adapta a la información real guardada, sin inventar contenido.
+
+### Conectores nativos de WordPress 7.0 (2026-09-16)
+
+- Nuevo origen de IA mediante **Ajustes → Conectores** de WordPress 7.0,
+  limitado a proveedores configurados de Anthropic, OpenAI y Google.
+- Selector de modelo real: modo Automático recomendado o modelo explícito
+  descubierto desde los conectores disponibles.
+- Todas las generaciones del plugin y la traducción auxiliar del chatbot
+  usan un transporte central común. Support Genix se mantiene como origen
+  alternativo, sin fallback silencioso entre ambos.
+- Retirada la opción de clave propia de la interfaz y del código activo. Los
+  valores históricos guardados no se borran automáticamente de la base de
+  datos.
+- En WordPress anterior a 7.0 no se muestra la opción de Conectores y se
+  conserva Support Genix.
+
 ### Pestaña WooCommerce: selección editable + pulido con IA (2026-09-16)
 
 - Envíos, impuestos/IVA, métodos de pago y categorías del catálogo pasan

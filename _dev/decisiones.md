@@ -81,6 +81,30 @@ no inventar por pantalla.
   aparece un tercer caso igual (otro elemento nativo con hover/foco pisado
   por WordPress core), se resuelve igual, no como excepción rara.
 
+## 2026-09-16 — Orígenes de IA
+
+- Orígenes soportados: Conectores nativos de WordPress 7.0 o Support Genix.
+- Conectores limita descubrimiento y selección a Anthropic, OpenAI y Google.
+- Automático usa únicamente modelos de texto disponibles dentro de esos tres
+  proveedores; también se puede fijar un modelo real del catálogo.
+- No existe fallback silencioso entre orígenes: si falla el elegido, la
+  operación devuelve error.
+- La clave propia deja de ser configuración activa. Los valores históricos
+  se conservan en base de datos para evitar una eliminación destructiva no
+  solicitada.
+
+## 2026-09-16 — Resumen predeterminado de Negocio
+
+- «Enfoque del negocio» es el dato fuente y el resumen público es una opción
+  independiente. Ninguno puede sobrescribir o borrar el otro.
+- La lectura mantiene fallback al valor histórico hasta el primer guardado del
+  resumen separado; no se migra ni elimina información automáticamente.
+- Si no hay instrucciones propias, la longitud se adapta a los datos reales:
+  no se fuerza un mínimo que provoque repeticiones.
+- El formato predeterminado pide párrafos conectados, sin encabezados ni
+  escapes en correos. Las instrucciones del usuario mantienen prioridad sobre
+  este formato, pero nunca autorizan datos inventados.
+
 ## 2026-09-16 — Descubribilidad de la API OpenAPI (Fase 7)
 
 Publicar `/wp-json/ai-knowledge/v1/openapi.json` no basta por sí solo: sin

@@ -464,15 +464,13 @@ class Chatbot_Relevance_Guard {
 
 	/**
 	 * Traduce el texto de la pregunta al idioma indicado usando la misma
-	 * IA/clave que ya usa el plugin para generar documentos
-	 * (Generator::ai_config()). Llamada corta y barata (1 frase). Null si no
-	 * hay clave configurada o la llamada falla -- en ese caso simplemente no
+	 * IA que ya usa el plugin para generar documentos. Llamada corta y barata
+	 * (1 frase). Null si no hay conexión configurada o la llamada falla -- en ese caso simplemente no
 	 * se añaden documentos extra, pero el documento sintetico de instruccion
 	 * de idioma se mantiene igualmente.
 	 */
 	protected static function translate_to_language( $text, $target_lang ) {
-		$config = Generator::ai_config();
-		if ( ! $config ) {
+		if ( ! AI_Client::config() ) {
 			return null;
 		}
 
@@ -483,36 +481,17 @@ class Chatbot_Relevance_Guard {
 		);
 		$target_name = isset( $lang_names[ $target_lang ] ) ? $lang_names[ $target_lang ] : 'español';
 
-		$body = array(
-			'model'    => $config['model'],
-			'messages' => array(
-				array( 'role' => 'system', 'content' => 'Traduce el siguiente texto al ' . $target_name . '. Responde solo con la traducción, sin comillas ni explicaciones.' ),
-				array( 'role' => 'user', 'content' => (string) $text ),
-			),
+		$translated = AI_Client::generate(
+			'Traduce el siguiente texto al ' . $target_name . '. Responde solo con la traducción, sin comillas ni explicaciones.',
+			(string) $text,
+			80,
+			0.2,
+			20
 		);
-		$is_new_gen = ( 0 === strpos( $config['model'], 'gpt-5' ) || 0 === strpos( $config['model'], 'o' ) );
-		$body[ $is_new_gen ? 'max_completion_tokens' : 'max_tokens' ] = 80;
-		if ( ! $is_new_gen ) {
-			$body['temperature'] = 0.2;
-		}
-
-		$response = wp_remote_post(
-			'https://api.openai.com/v1/chat/completions',
-			array(
-				'timeout' => 20,
-				'headers' => array(
-					'Authorization' => 'Bearer ' . $config['api_key'],
-					'Content-Type'  => 'application/json',
-				),
-				'body'    => wp_json_encode( $body ),
-			)
-		);
-
-		if ( is_wp_error( $response ) ) {
+		if ( is_wp_error( $translated ) ) {
 			return null;
 		}
-		$json = json_decode( wp_remote_retrieve_body( $response ), true );
-		$translated = isset( $json['choices'][0]['message']['content'] ) ? trim( $json['choices'][0]['message']['content'] ) : '';
+		$translated = trim( $translated );
 
 		return '' !== $translated ? $translated : null;
 	}
