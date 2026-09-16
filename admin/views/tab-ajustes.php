@@ -20,9 +20,9 @@ $wp_ai_models    = $wp_ai_available ? AI_Client::available_models() : array();
 	<p class="description">
 		<?php
 		printf(
-			/* translators: %s: enlace a la pestaña Carga inicial */
+			/* translators: %s: enlace a la pestaña Generación masiva */
 			esc_html__( 'El límite diario, el tamaño de lote y el debounce de la cola se editan en %s.', 'ai-knowledge' ),
-			'<a href="' . esc_url( admin_url( 'admin.php?page=woo-kb-generator&tab=carga-inicial' ) ) . '">' . esc_html__( 'Carga inicial', 'ai-knowledge' ) . '</a>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
+			'<a href="' . esc_url( admin_url( 'admin.php?page=woo-kb-generator&tab=carga-inicial' ) ) . '">' . esc_html__( 'Generación masiva', 'ai-knowledge' ) . '</a>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
 		);
 		?>
 	</p>

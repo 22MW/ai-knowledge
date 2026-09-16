@@ -105,6 +105,18 @@ no inventar por pantalla.
   escapes en correos. Las instrucciones del usuario mantienen prioridad sobre
   este formato, pero nunca autorizan datos inventados.
 
+## 2026-09-16 — Orden y nombre de pestañas
+
+- «Generación masiva» sustituye al nombre visible «Carga inicial» porque la
+  pantalla sirve también para regeneraciones posteriores.
+- Se conserva `carga-inicial` como identificador técnico compatible.
+- Ajustes queda como última pestaña; Generación masiva, como penúltima.
+- WooCommerce solo aparece activo y Chatbot solo con Genix; Chatbot se coloca
+  después de WooCommerce y antes de Visibilidad IA.
+- Los textos públicos del administrador no muestran números de fase ni usan
+  afirmaciones absolutas como «bloqueo real»: explican el efecto verificable
+  de robots.txt y de las reglas del servidor.
+
 ## 2026-09-16 — Descubribilidad de la API OpenAPI (Fase 7)
 
 Publicar `/wp-json/ai-knowledge/v1/openapi.json` no basta por sí solo: sin

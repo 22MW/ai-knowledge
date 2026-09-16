@@ -91,6 +91,16 @@ limpieza posterior de Ajustes/Chatbot, como `a332da1`.
   barras invertidas. Las instrucciones escritas por el usuario siguen
   prevaleciendo sobre este formato predeterminado.
 
+## Navegación admin
+
+- «Carga inicial» se muestra como «Generación masiva»; el slug interno
+  `carga-inicial` se conserva para no romper enlaces ni redirecciones.
+- Orden acordado: WooCommerce (condicional), Chatbot (condicional),
+  Visibilidad IA, Generación masiva y Ajustes al final.
+- Visibilidad IA ya no muestra referencias internas a fases. Sus textos
+  distinguen con claridad las comprobaciones de solo lectura y las acciones
+  que modifican robots.txt o .htaccess.
+
 ## Pendiente de confirmar
 
 - El fix de instrucciones de pulido pasa `php -l` con PHP 8.3.23 en sus dos

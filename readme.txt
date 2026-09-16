@@ -35,13 +35,13 @@ Genera automáticamente una base de conocimiento en Markdown a partir de tu cat�
 
 == Installation ==
 
-1. Sube la carpeta `woo-kb-generator` a `/wp-content/plugins/`.
+1. Sube la carpeta `ai-knowledge` a `/wp-content/plugins/`.
 2. Activa el plugin desde el menú **Plugins** de WordPress.
 3. Ve al nuevo menú **Base de conocimiento IA** en el panel de administración.
 4. En la pestaña **Alcance**, elige qué tipos de contenido (productos, páginas, etc.) quieres incluir.
 5. Si quieres excluir contenido concreto, configúralo en la pestaña **Exclusiones**.
 6. Revisa los **Ajustes** (origen y modelo de IA, y longitud de los documentos).
-7. Ve a **Carga inicial** y pulsa "Iniciar carga inicial" para generar los primeros documentos de todo tu catálogo.
+7. Ve a **Generación masiva** y pulsa "Generar pendientes" para crear los documentos pendientes del catálogo.
 8. Sigue el progreso desde la pestaña **Registro**.
 
 No hace falta configurar nada más para que `/llms.txt` empiece a publicarse: se activa automáticamente en cuanto hay documentos generados.

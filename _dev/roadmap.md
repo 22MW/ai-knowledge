@@ -763,6 +763,9 @@ una sola tabla, checkboxes, botón de pulido por documento),
 
 ## UX pendiente de rediseño (detalle completo en [`qa-resultados-fase-0-a-5.md`](qa-resultados-fase-0-a-5.md))
 
+- **Navegación admin — HECHO.** «Generación masiva» sustituye a «Carga
+  inicial», queda como penúltima pestaña y Ajustes cierra la navegación.
+
 - **Negocio: fuente y resumen separados — IMPLEMENTADO, QA REAL PENDIENTE.**
   Guardar o vaciar el resumen de llms.txt ya no modifica «Enfoque del negocio».
 

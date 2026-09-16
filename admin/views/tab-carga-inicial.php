@@ -28,17 +28,17 @@ $counted   = Registry::count( array( 'status' => 'synced' ) );
 </p>
 <p><?php printf( esc_html__( 'Documentos ya sincronizados: %d.', 'ai-knowledge' ), (int) $counted ); ?></p>
 <?php if ( ! empty( $settings['no_limit'] ) ) : ?>
-	<p style="color:#b32d2e;font-weight:600;"><?php esc_html_e( 'El límite diario está desactivado — la carga avanzará sin tope.', 'ai-knowledge' ); ?></p>
+	<p style="color:#b32d2e;font-weight:600;"><?php esc_html_e( 'El límite diario está desactivado — la generación avanzará sin tope.', 'ai-knowledge' ); ?></p>
 <?php else : ?>
 	<p><?php printf( esc_html__( 'Límite diario actual: %d generaciones/día.', 'ai-knowledge' ), (int) $settings['daily_limit'] ); ?></p>
 <?php endif; ?>
 
 <?php if ( $running ) : ?>
-	<p><strong><?php esc_html_e( 'Carga en curso (procesando por lotes vía Action Scheduler).', 'ai-knowledge' ); ?></strong></p>
+	<p><strong><?php esc_html_e( 'Generación en curso (procesando por lotes vía Action Scheduler).', 'ai-knowledge' ); ?></strong></p>
 	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 		<input type="hidden" name="action" value="wookb_cancel_seed" />
 		<?php wp_nonce_field( 'wookb_cancel_seed' ); ?>
-		<?php submit_button( __( 'Cancelar carga', 'ai-knowledge' ), 'delete' ); ?>
+		<?php submit_button( __( 'Cancelar generación', 'ai-knowledge' ), 'delete' ); ?>
 	</form>
 <?php else : ?>
 	<p class="description"><?php esc_html_e( '"Generar pendientes" es seguro repetirlo: no regenera lo que ya está sincronizado y sin cambios, solo lo nuevo o lo que falló.', 'ai-knowledge' ); ?></p>

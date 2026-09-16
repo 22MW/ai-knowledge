@@ -7,7 +7,7 @@ if (! defined('ABSPATH')) {
 }
 
 /**
- * Página de menú "Base de conocimiento IA" con pestañas: Alcance, Exclusiones, Registro, Ajustes, Carga inicial.
+ * Página de menú "Base de conocimiento IA" con sus pestañas de contenido, generación y ajustes.
  */
 class Admin
 {
@@ -108,23 +108,20 @@ class Admin
 			'negocio'      => __('Negocio', 'ai-knowledge'),
 			'faqs'         => __('FAQs', 'ai-knowledge'),
 		);
-		// Pestaña "Chatbot" solo si Support Genix esta activo -- sin el, el
-		// prompt de sistema no tiene a donde sincronizarse (chatbot-system-
-		// prompt.md solo lo consume Genix, ver Chatbot_Prompt::sync()), asi
-		// que la pestaña quedaria vacia de proposito real. Mismo patron que
-		// la pestaña WooCommerce de abajo.
-		if (Chatbot_Prompt::is_genix_ready()) {
-			$tabs['prompt'] = __('Chatbot', 'ai-knowledge');
-		}
 		// Fase 2: pestaña "WooCommerce" solo si WooCommerce esta activo -- sin
 		// el, no hay nada real que detectar (moneda, envios, impuestos, pagos)
 		// y la pestaña quedaria vacia/confusa.
 		if (class_exists('WooCommerce')) {
 			$tabs['woocommerce'] = __('WooCommerce', 'ai-knowledge');
 		}
-		$tabs['ajustes']        = __('Ajustes', 'ai-knowledge');
-		$tabs['carga-inicial']  = __('Carga inicial', 'ai-knowledge');
+		// Chatbot va despues de WooCommerce y solo aparece si Support Genix
+		// esta activo: sin el, el prompt no tiene un consumidor real.
+		if (Chatbot_Prompt::is_genix_ready()) {
+			$tabs['prompt'] = __('Chatbot', 'ai-knowledge');
+		}
 		$tabs['visibilidad-ia'] = __('Visibilidad IA', 'ai-knowledge');
+		$tabs['carga-inicial']  = __('Generación masiva', 'ai-knowledge');
+		$tabs['ajustes']        = __('Ajustes', 'ai-knowledge');
 
 		echo '<div class="wookb-wrap">';
 		// Fase 1, arreglo del salto de tema: script inline SINCRONO, impreso
@@ -334,7 +331,7 @@ class Admin
 		Scope::update_settings(
 			array(
 				// daily_limit/no_limit/batch_size/debounce_seconds: movidos a
-				// Carga inicial (UX2), se guardan con save_queue_settings(), no
+				// Generación masiva (UX2), se guardan con save_queue_settings(), no
 				// aqui -- este formulario ya no los envia.
 				'output_tokens'    => max(200, (int) ($_POST['output_tokens'] ?? 2500)), // phpcs:ignore
 				'body_char_limit'  => max(100, min(10000, (int) ($_POST['body_char_limit'] ?? 1000))), // phpcs:ignore
@@ -391,7 +388,7 @@ class Admin
 
 	/**
 	 * UX2: guarda SOLO los 3 ajustes de cola (limite diario, lote, debounce),
-	 * movidos de Ajustes a Carga inicial. Accion separada de save_settings()
+	 * movidos de Ajustes a Generación masiva. Accion separada de save_settings()
 	 * a proposito: save_settings() reescribe TODAS sus claves desde $_POST
 	 * con valores por defecto si faltan -- si este formulario mas pequeño
 	 * llamase a esa misma accion, cada guardado desde aqui resetearia

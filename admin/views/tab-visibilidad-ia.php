@@ -88,7 +88,7 @@ $htaccess_block_preview = "RewriteEngine On\n" . implode( "\n", Htaccess_Guard::
 ?>
 
 <p class="description">
-	<?php esc_html_e( 'Resumen de si el contenido del plugin está bien expuesto a buscadores y agentes de IA, comprobación puntual de accesibilidad, y gestión de qué crawlers de IA pueden acceder a tu web (robots.txt/.htaccess). El resumen de arriba es solo lectura; la gestión de crawlers de más abajo sí escribe cambios reales, siempre con confirmación explícita.', 'ai-knowledge' ); ?>
+	<?php esc_html_e( 'Comprueba cómo se publica el contenido para buscadores y agentes de IA, revisa si las páginas sincronizadas pueden rastrearse y decide qué crawlers de IA pueden acceder a la web. El estado de exposición y la comprobación de accesibilidad son de solo lectura. Las acciones sobre robots.txt y .htaccess modifican archivos reales y siempre requieren confirmación.', 'ai-knowledge' ); ?>
 </p>
 
 <h2><?php esc_html_e( 'Estado de exposición', 'ai-knowledge' ); ?></h2>
@@ -106,7 +106,7 @@ $htaccess_block_preview = "RewriteEngine On\n" . implode( "\n", Htaccess_Guard::
 				?>
 			</p>
 			<?php if ( Llms_Txt::physical_file_exists() ) : ?>
-				<span class="description"><?php esc_html_e( '⚠ Tapado por un archivo físico llms.txt en la raíz del sitio: se sirve ese en vez del generado por el plugin.', 'ai-knowledge' ); ?></span>
+				<span class="description"><?php esc_html_e( '⚠ Hay un archivo físico llms.txt en la raíz del sitio. Ese archivo sustituye al que genera el plugin.', 'ai-knowledge' ); ?></span>
 				<?php if ( $llms_physical_mtime ) : ?>
 					<p class="description">
 						<?php
@@ -125,7 +125,7 @@ $htaccess_block_preview = "RewriteEngine On\n" . implode( "\n", Htaccess_Guard::
 					<?php
 					printf(
 						/* translators: %s: enlace para abrir el archivo físico */
-						esc_html__( 'Este plugin NO necesita un archivo físico: genera su llms.txt al vuelo cada vez que un bot lo pide (ruta virtual, sin nada guardado en disco). Si este archivo físico no lo creaste tú a propósito ni lo necesita otro plugin, puedes borrarlo desde aquí para que se sirva el que genera este plugin. %s', 'ai-knowledge' ),
+						esc_html__( 'El plugin no necesita un archivo físico: publica llms.txt automáticamente mediante una ruta virtual. Si no creaste este archivo a propósito ni lo necesita otro plugin, puedes borrarlo para utilizar la versión generada por AI Knowledge. %s', 'ai-knowledge' ),
 						'<a href="' . esc_url( home_url( '/llms.txt' ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Ver el archivo actual', 'ai-knowledge' ) . '</a>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
 					);
 					?>
@@ -144,7 +144,7 @@ $htaccess_block_preview = "RewriteEngine On\n" . implode( "\n", Htaccess_Guard::
 	<tr>
 		<th><?php esc_html_e( 'Markdown público', 'ai-knowledge' ); ?></th>
 		<td>
-			<span class="description"><?php esc_html_e( 'El mismo contenido que usa el chatbot, publicado como archivo .md para que cualquier crawler o agente IA lo lea sin procesar HTML (Fase 4).', 'ai-knowledge' ); ?></span>
+			<span class="description"><?php esc_html_e( 'El mismo contenido que usa el chatbot, publicado como archivo Markdown para que crawlers y agentes de IA puedan leerlo sin procesar el HTML de la página.', 'ai-knowledge' ); ?></span>
 			<?php if ( $example_row && $example_row->md_path ) : ?>
 				<br /><a href="<?php echo esc_url( Markdown_Store::public_url( $example_row->md_path ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Ver un ejemplo real', 'ai-knowledge' ); ?></a>
 			<?php endif; ?>
@@ -153,7 +153,7 @@ $htaccess_block_preview = "RewriteEngine On\n" . implode( "\n", Htaccess_Guard::
 	<tr>
 		<th><?php esc_html_e( 'JSON estructurado', 'ai-knowledge' ); ?></th>
 		<td>
-			<span class="description"><?php esc_html_e( 'El mismo dato de WordPress/WooCommerce en JSON, sin pasar por IA, vía API REST propia — para que un agente lea el dato exacto sin interpretarlo (Fase 3).', 'ai-knowledge' ); ?></span>
+			<span class="description"><?php esc_html_e( 'Los datos originales de WordPress y WooCommerce en formato JSON, sin pasar por una IA. Permite consultar la información exacta mediante la API del sitio.', 'ai-knowledge' ); ?></span>
 			<?php if ( $example_row ) : ?>
 				<br /><a href="<?php echo esc_url( rest_url( 'ai-knowledge/v1/content/' . $example_row->source_id ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Ver un ejemplo real', 'ai-knowledge' ); ?></a>
 			<?php endif; ?>
@@ -162,7 +162,7 @@ $htaccess_block_preview = "RewriteEngine On\n" . implode( "\n", Htaccess_Guard::
 	<tr>
 		<th><?php esc_html_e( 'JSON-LD (Schema.org)', 'ai-knowledge' ); ?></th>
 		<td>
-			<span class="description"><?php esc_html_e( 'Datos estructurados (Product/Article) incrustados en el código de cada página del alcance, para que buscadores entiendan qué es cada contenido sin adivinarlo (Fase 5).', 'ai-knowledge' ); ?></span>
+			<span class="description"><?php esc_html_e( 'Datos estructurados de Schema.org, como Product o Article, incluidos en el código de cada página para ayudar a los buscadores a identificar el tipo de contenido.', 'ai-knowledge' ); ?></span>
 			<?php if ( $example_row ) :
 				$example_url = get_permalink( $example_row->source_id );
 				?>
@@ -171,7 +171,7 @@ $htaccess_block_preview = "RewriteEngine On\n" . implode( "\n", Htaccess_Guard::
 					<?php
 					printf(
 						/* translators: %s: enlace a una página de ejemplo */
-						esc_html__( 'No tiene URL propia: %s y mira el código fuente, bloque <script type="application/ld+json">.', 'ai-knowledge' ),
+						esc_html__( 'Se incluye dentro de cada página: %s y revisa en el código fuente el bloque <script type="application/ld+json">.', 'ai-knowledge' ),
 						'<a href="' . esc_url( $example_url ) . '" target="_blank" rel="noopener">' . esc_html__( 'abre un ejemplo real', 'ai-knowledge' ) . '</a>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
 					);
 					?>
@@ -257,7 +257,7 @@ $htaccess_block_preview = "RewriteEngine On\n" . implode( "\n", Htaccess_Guard::
 
 <h3><?php esc_html_e( 'Configuración por bot', 'ai-knowledge' ); ?></h3>
 <p class="description">
-	<?php esc_html_e( 'Catálogo de crawlers de IA conocidos, con su categoría de propósito y una acción por bot (Permitir/Bloquear). Esta tabla es la única fuente de verdad: alimenta tanto el bloqueo por robots.txt como el bloqueo por .htaccess de más abajo.', 'ai-knowledge' ); ?>
+	<?php esc_html_e( 'Lista de crawlers de IA conocidos, su finalidad y la acción asignada a cada uno. Esta configuración se aplica tanto a robots.txt como a las reglas de .htaccess que aparecen más abajo.', 'ai-knowledge' ); ?>
 </p>
 <?php
 $category_labels = array(
@@ -323,7 +323,7 @@ $category_labels = array(
 	</div>
 </div>
 
-<p><strong><?php esc_html_e( '⚠ Escribe de verdad el archivo robots.txt del sitio. Descarga la copia actual antes de continuar.', 'ai-knowledge' ); ?></strong></p>
+<p><strong><?php esc_html_e( '⚠ Esta acción modifica el archivo robots.txt del sitio. Descarga una copia antes de continuar.', 'ai-knowledge' ); ?></strong></p>
 
 <?php if ( ! $robots_available ) : ?>
 	<div class="notice notice-warning inline">
@@ -346,9 +346,9 @@ $category_labels = array(
 
 <hr />
 
-<h3><?php esc_html_e( 'Bloqueo real vía .htaccess', 'ai-knowledge' ); ?></h3>
+<h3><?php esc_html_e( 'Bloqueo en el servidor mediante .htaccess', 'ai-knowledge' ); ?></h3>
 <p class="description">
-	<?php esc_html_e( 'robots.txt es una petición educada que un bot puede ignorar. Esto bloquea de verdad a nivel de servidor a los bots marcados como Bloquear en la tabla de arriba.', 'ai-knowledge' ); ?>
+	<?php esc_html_e( 'robots.txt comunica preferencias de rastreo, pero un bot puede ignorarlas. Estas reglas rechazan en el servidor las solicitudes que se identifican como alguno de los bots marcados como Bloquear.', 'ai-knowledge' ); ?>
 </p>
 <p><strong><?php esc_html_e( '⚠ Modifica un archivo fuera de este plugin que puede afectar a todo el sitio si algo sale mal. Descarga la copia actual antes de continuar.', 'ai-knowledge' ); ?></strong></p>
 
@@ -376,7 +376,7 @@ $category_labels = array(
 
 <hr />
 
-<h3><?php esc_html_e( 'Logs de accesos de crawlers de IA', 'ai-knowledge' ); ?></h3>
+<h3><?php esc_html_e( 'Registro de accesos de crawlers de IA', 'ai-knowledge' ); ?></h3>
 <p class="description">
 	<?php
 	printf(
@@ -404,7 +404,7 @@ $category_labels = array(
 			<?php foreach ( $crawler_log_rows as $log_row ) : ?>
 				<tr>
 					<td><?php echo esc_html( $log_row->bot_name ); ?></td>
-					<td><?php echo esc_html( $log_row->category ); ?></td>
+					<td><?php echo esc_html( isset( $category_labels[ $log_row->category ] ) ? $category_labels[ $log_row->category ] : $log_row->category ); ?></td>
 					<td><?php echo esc_html( $log_row->url ); ?></td>
 					<td><?php echo esc_html( $log_row->created_at ); ?></td>
 				</tr>

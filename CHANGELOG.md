@@ -8,6 +8,16 @@ Ver `_dev/roadmap.md` para el plan completo por fases y `_dev/decisiones.md`
 para el porqué de la identidad/alcance. Este plugin sigue orientado a IA +
 Support Genix como núcleo; todo lo de abajo es capa añadida encima.
 
+### Navegación del administrador más clara (2026-09-16)
+
+- «Carga inicial» pasa a llamarse «Generación masiva», porque también se usa
+  después de la primera carga.
+- Orden final: WooCommerce, Chatbot, Visibilidad IA, Generación masiva y
+  Ajustes; las pestañas dependientes siguen ocultas si falta su plugin.
+- Revisados los textos de Visibilidad IA: eliminadas referencias internas a
+  fases, simplificado el lenguaje técnico y aclarado el alcance real de los
+  bloqueos mediante robots.txt y .htaccess.
+
 ### Resumen de Negocio más útil por defecto (2026-09-16)
 
 - Separados el campo fuente «Enfoque del negocio» y el resumen público usado
