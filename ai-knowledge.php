@@ -120,3 +120,14 @@ add_action(
 	},
 	20
 );
+
+/**
+ * Auto-updater desde GitHub Releases (22MW/ai-knowledge), mismo patrón que
+ * AuthGate: hooks nativos de WP, sin licencias, ZIP publicado en cada release.
+ */
+add_action(
+	'init',
+	function () {
+		( new \AIKB\Github_Updater() )->register_hooks();
+	}
+);
