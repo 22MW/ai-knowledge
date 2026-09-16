@@ -250,14 +250,22 @@ soporta) en vez de esperar a que rastreen.
 
 ---
 
-## Fase 9 — Feeds especializados — PENDIENTE
+## Fase 9 — Feeds especializados — HECHO (confirmado en real: enlaces en llms.txt funcionan)
 
 **Qué hace:** exporta el catálogo en formatos que ya esperan otras
-plataformas (comparadores, Google Merchant).
+plataformas (comparadores, Google Merchant), en vez de un JSON de
+propósito general (eso ya lo cubre la Fase 3).
 
-**Pasos:**
-1. `GET /wp-json/ai-knowledge/v1/feeds/products.xml` (Google Merchant) para WooCommerce, usando `Extractor_Woo`.
-2. Un feed genérico `feeds/content.json` para el resto de post_types del alcance.
+**Implementado:**
+1. `GET /wp-json/ai-knowledge/v1/feeds/products.xml` (solo si WooCommerce activo): RSS 2.0 + namespace `g:` (formato Google Merchant), reutilizando `Extractor_Woo` — mismo dato que ya se extrae para el resto del plugin, sin duplicar lógica. Sin marca/GTIN propios: `g:identifier_exists = no` explícito para que Google no rechace el feed.
+2. `GET /wp-json/ai-knowledge/v1/feeds/content.json`: JSON sin paginar con el resto de post_types del alcance (no producto), reutilizando `Extractor_Base`.
+3. Ambos filtrados por `Scope::resolve_ids()`, mismo criterio que la Fase 3. Salida escrita directamente (`header()` + `echo` + `exit`), mismo patrón que `Llms_Txt`/`Markdown_Server`, porque el servidor REST envuelve en JSON por defecto y estos formatos no lo son.
+4. **Descubribilidad para IA/crawlers (mismo criterio que Fase 7):** sección `## Feeds` en `llms.txt` (`Llms_Txt::build()`), con enlace a `feeds/products.xml` (solo si WooCommerce) y `feeds/content.json`, junto a `## API`.
+5. **Ampliación pedida por el usuario:** `<link rel="alternate">` en el `<head>` de TODAS las páginas (sitewide, no por post — un feed representa el catálogo entero, no un contenido concreto), en `Rest_Content::print_feed_links()`. Para herramientas que no leen `llms.txt` (Google Merchant en sí no lo necesita: su feed se registra a mano en Merchant Center, no hay auto-descubrimiento por crawler).
+
+**Excluido (decisión, no pedido):** actualizar el documento OpenAPI de la Fase 7 con estas 2 rutas — son formatos fijos sin parámetros reales que documentar, y no se pidió; queda como ampliación aparte si se quiere más adelante.
+
+**Validación:** `php -l`; prueba manual — pedir ambos feeds y comprobar estructura (XML válido para Google Merchant, JSON coherente para el resto); confirmado que `llms.txt` enlaza a los dos y los enlaces funcionan.
 
 ---
 

@@ -72,6 +72,16 @@ class Llms_Txt {
 		$lines[] = '- [' . __( 'Documentación técnica de la API (OpenAPI)', 'ai-knowledge' ) . '](' . rest_url( 'ai-knowledge/v1/openapi.json' ) . '): ' . __( 'para desarrolladores e integraciones.', 'ai-knowledge' );
 		$lines[] = '';
 
+		// Fase 9: mismo criterio que la sección API de arriba -- publicar el
+		// endpoint no basta si nada enlaza a él.
+		$lines[] = '## Feeds';
+		$lines[] = '';
+		if ( class_exists( 'WooCommerce' ) ) {
+			$lines[] = '- [' . __( 'Feed de productos (Google Merchant)', 'ai-knowledge' ) . '](' . rest_url( 'ai-knowledge/v1/feeds/products.xml' ) . '): ' . __( 'para comparadores y plataformas de shopping.', 'ai-knowledge' );
+		}
+		$lines[] = '- [' . __( 'Feed de contenido (JSON)', 'ai-knowledge' ) . '](' . rest_url( 'ai-knowledge/v1/feeds/content.json' ) . '): ' . __( 'el resto del contenido del alcance, sin paginar.', 'ai-knowledge' );
+		$lines[] = '';
+
 		// Categoria+idioma combinados (pedido explicito): "## Vinos (ES)",
 		// "## Enoturismo (EN)", etc. -- mas cercano al formato de la spec de
 		// llms.txt (secciones tematicas con descripcion corta por enlace) que

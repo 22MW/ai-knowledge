@@ -6,30 +6,29 @@
 `github.com/22MW/ai-knowledge`. Ruta:
 `app/public/wp-content/plugins/ai-knowledge/`.
 
-## Confirmado (Fases 0-8 completas)
+## Confirmado (Fases 0-9 completas)
 
-Fase 8 — Aviso a buscadores en tiempo real (IndexNow) — implementada y
-confirmada en real (2026-09-16): `HTTP 202` de `api.indexnow.org` al
-guardar un producto. Detalle completo en [`CHANGELOG.md`](../CHANGELOG.md)
-y en `_dev/roadmap.md` (Fase 8).
+Fase 9 — Feeds especializados — implementada y confirmada en real
+(2026-09-16): `feeds/products.xml` (Google Merchant) y `feeds/content.json`,
+enlazados desde `llms.txt` (sección `## Feeds`) y desde el `<head>` de
+todas las páginas (`<link rel="alternate">` sitewide). Detalle completo en
+[`CHANGELOG.md`](../CHANGELOG.md) y en `_dev/roadmap.md` (Fase 9).
 
-Archivos nuevos/tocados en esta fase: `includes/class-indexnow.php`
-(nuevo), `includes/class-plugin.php`, `includes/class-scope.php`,
-`includes/class-sync.php`, `admin/class-admin.php`,
-`admin/views/tab-ajustes.php`.
+Archivos tocados en esta fase: `includes/class-rest-content.php` (rutas +
+`print_feed_links()`), `includes/class-llms-txt.php` (sección `## Feeds`).
 
 ## Pendiente de confirmar
 
-- **Sin commitear todavía**: los cambios de Fase 8 (código + CHANGELOG.md +
+- **Sin commitear todavía**: los cambios de Fase 9 (código + CHANGELOG.md +
   readme.txt + roadmap.md + visual.html) están en el working tree de
   `knowBaseDev`, sin commit ni push — pendiente de permiso explícito.
-- Flush de permalinks: la URL de la clave IndexNow (`/{key}.txt`) necesita
-  que se guarden los Enlaces Permanentes (o un flush) para responder en
-  producción tras el deploy — mismo requisito ya conocido de `llms.txt`.
+- Excluido a propósito (decisión, no pedido): actualizar el documento
+  OpenAPI de la Fase 7 con las 2 rutas de feeds — son formatos fijos sin
+  parámetros reales que documentar.
 
 ## Pendiente real (sin empezar)
 
-- Fases 9-11 del roadmap.
+- Fases 10-11 del roadmap.
 - UX3 (WooCommerce: checkboxes + prompt por campo, cambio de arquitectura
   de datos, requiere `rol-analista`) y UX4 (visibilidad del botón de
   generar documentos de tienda) — ver `_dev/roadmap.md`, sección "UX
@@ -41,8 +40,8 @@ Archivos nuevos/tocados en esta fase: `includes/class-indexnow.php`
   vez que se probó.
 - Ideas sueltas sin fase (`analisis-jet-geo.md`): tags dinámicos en
   prompts, onboarding por pasos, modo "todos los CPT" en `Scope`.
-- Cobertura de Google para avisos en tiempo real: IndexNow no lo soporta;
-  requeriría la Search Console Indexing API (OAuth propio) como
+- Cobertura de Google para avisos en tiempo real (Fase 8): IndexNow no lo
+  soporta; requeriría la Search Console Indexing API (OAuth propio) como
   integración aparte — no planificada.
 
 ## Decisiones de proceso (aplican siempre en este plugin)
@@ -57,6 +56,6 @@ Archivos nuevos/tocados en esta fase: `includes/class-indexnow.php`
 
 ## Relevo mínimo — siguiente paso
 
-Confirmar con el usuario si se commitea/pushea la Fase 8. Después: decidir
-si sigue la Fase 9 o UX3 (WooCommerce, con `rol-analista` primero por ser
-cambio de arquitectura de datos).
+Confirmar con el usuario si se commitea/pushea la Fase 9. Después: decidir
+si sigue la Fase 10, la Fase 11 o UX3 (WooCommerce, con `rol-analista`
+primero por ser cambio de arquitectura de datos).

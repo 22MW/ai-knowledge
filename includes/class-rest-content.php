@@ -32,6 +32,29 @@ class Rest_Content {
 
 	public static function init() {
 		add_action( 'rest_api_init', array( __CLASS__, 'register_routes' ) );
+		add_action( 'wp_head', array( __CLASS__, 'print_feed_links' ), 20 );
+	}
+
+	/**
+	 * Fase 9, ampliación: enlaces de descubrimiento en el <head>, sitewide (no
+	 * por post, a diferencia del <link> de Markdown de la Fase 4) porque un
+	 * feed representa el catálogo entero, no un contenido concreto. Para
+	 * herramientas que no leen llms.txt (mismo dato ya enlazado ahí, ver
+	 * Llms_Txt::build()).
+	 */
+	public static function print_feed_links() {
+		if ( class_exists( 'WooCommerce' ) ) {
+			printf(
+				'<link rel="alternate" type="application/rss+xml" title="%s" href="%s" />' . "\n",
+				esc_attr__( 'Feed de productos (Google Merchant)', 'ai-knowledge' ),
+				esc_url( rest_url( self::NAMESPACE_ . '/feeds/products.xml' ) )
+			);
+		}
+		printf(
+			'<link rel="alternate" type="application/json" title="%s" href="%s" />' . "\n",
+			esc_attr__( 'Feed de contenido', 'ai-knowledge' ),
+			esc_url( rest_url( self::NAMESPACE_ . '/feeds/content.json' ) )
+		);
 	}
 
 	public static function register_routes() {
@@ -71,6 +94,31 @@ class Rest_Content {
 			array(
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => array( __CLASS__, 'get_openapi_spec' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+
+		// Fase 9: feeds especializados, formato que ya esperan otras
+		// plataformas (comparadores, Google Merchant), en vez del JSON de
+		// propósito general de arriba. Solo lectura, mismo filtro por Scope.
+		if ( class_exists( 'WooCommerce' ) ) {
+			register_rest_route(
+				self::NAMESPACE_,
+				'/feeds/products\.xml',
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( __CLASS__, 'get_feed_products_xml' ),
+					'permission_callback' => '__return_true',
+				)
+			);
+		}
+
+		register_rest_route(
+			self::NAMESPACE_,
+			'/feeds/content\.json',
+			array(
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'get_feed_content_json' ),
 				'permission_callback' => '__return_true',
 			)
 		);
@@ -333,6 +381,92 @@ class Rest_Content {
 				),
 			),
 		);
+	}
+
+	/**
+	 * Fase 9: GET /ai-knowledge/v1/feeds/products.xml -- feed en formato
+	 * Google Merchant/comparadores (RSS 2.0 + espacio de nombres "g:"),
+	 * reutilizando Extractor_Woo (mismo dato que ya extrae Fase 3, sin
+	 * duplicar lógica). Solo productos dentro del alcance. Se escribe la
+	 * salida directamente (mismo patrón que Llms_Txt/Markdown_Server) porque
+	 * el servidor REST envuelve en JSON por defecto y este formato no lo es.
+	 */
+	public static function get_feed_products_xml() {
+		$currency = get_woocommerce_currency();
+		$ids      = array_values(
+			array_filter(
+				Scope::resolve_ids(),
+				function ( $id ) {
+					return 'product' === get_post_type( $id );
+				}
+			)
+		);
+
+		$rss = new \SimpleXMLElement( '<?xml version="1.0" encoding="UTF-8"?><rss xmlns:g="http://base.google.com/ns/1.0" version="2.0"></rss>' );
+		$channel = $rss->addChild( 'channel' );
+		$channel->addChild( 'title', esc_html( get_bloginfo( 'name' ) ) );
+		$channel->addChild( 'link', esc_url( home_url( '/' ) ) );
+		$channel->addChild( 'description', esc_html__( 'Catálogo de productos', 'ai-knowledge' ) );
+
+		$extractor = Extractors\Extractor_Base::for_post_type( 'product' );
+		foreach ( $ids as $id ) {
+			$data = $extractor->extract( $id );
+			if ( ! $data ) {
+				continue;
+			}
+			$item = $channel->addChild( 'item' );
+			$item->addChild( 'g:id', esc_html( $data['sku'] ? $data['sku'] : (string) $id ), 'http://base.google.com/ns/1.0' );
+			$item->addChild( 'title', esc_html( $data['title'] ) );
+			$item->addChild( 'description', esc_html( $data['short_description'] ? $data['short_description'] : $data['excerpt'] ) );
+			$item->addChild( 'link', esc_url( $data['url'] ) );
+			$image = get_the_post_thumbnail_url( $id, 'full' );
+			if ( $image ) {
+				$item->addChild( 'g:image_link', esc_url( $image ), 'http://base.google.com/ns/1.0' );
+			}
+			$item->addChild( 'g:availability', 'in_stock' === $data['stock'] ? 'in stock' : 'out of stock', 'http://base.google.com/ns/1.0' );
+			if ( '' !== $data['price'] ) {
+				$item->addChild( 'g:price', esc_html( $data['regular_price'] . ' ' . $currency ), 'http://base.google.com/ns/1.0' );
+			}
+			$item->addChild( 'g:condition', 'new', 'http://base.google.com/ns/1.0' );
+			// Sin marca/GTIN/MPN propios: se declara explícitamente para que
+			// Google no rechace el feed por identificador único ausente.
+			$item->addChild( 'g:identifier_exists', 'no', 'http://base.google.com/ns/1.0' );
+		}
+
+		header( 'Content-Type: application/xml; charset=utf-8' );
+		echo $rss->asXML(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- XML ya escapado campo a campo arriba.
+		exit;
+	}
+
+	/**
+	 * Fase 9: GET /ai-knowledge/v1/feeds/content.json -- feed genérico para
+	 * el resto de post_types del alcance (no producto), mismo dato que ya
+	 * extrae Extractor_Base. Sin paginar: pensado para un consumidor externo
+	 * que se sincroniza entero, no para un crawler incremental (eso ya lo
+	 * cubre /{post_type} de la Fase 3).
+	 */
+	public static function get_feed_content_json() {
+		$ids = array_values(
+			array_filter(
+				Scope::resolve_ids(),
+				function ( $id ) {
+					return 'product' !== get_post_type( $id );
+				}
+			)
+		);
+
+		$items = array();
+		foreach ( $ids as $id ) {
+			$extractor = Extractors\Extractor_Base::for_post_type( get_post_type( $id ) );
+			$data      = $extractor->extract( $id );
+			if ( $data ) {
+				$items[] = $data;
+			}
+		}
+
+		header( 'Content-Type: application/json; charset=utf-8' );
+		echo wp_json_encode( array( 'items' => $items ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_json_encode ya produce JSON seguro.
+		exit;
 	}
 
 	/**
