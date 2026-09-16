@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB;
+namespace AIKB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -201,7 +201,7 @@ class Queue {
 		// semanal ya existente), no en el hook de 'init' de cada peticion --
 		// prioriza rendimiento en el hook ligero, tal como pide el requisito
 		// explicito del usuario.
-		if ( class_exists( '\WOOKB\Crawler_Log' ) ) {
+		if ( class_exists( '\AIKB\Crawler_Log' ) ) {
 			Crawler_Log::trim_to_limit();
 		}
 	}

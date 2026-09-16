@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB;
+namespace AIKB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

@@ -18,7 +18,7 @@
    1. BASE Y LAYOUT GENERAL
    ========================================================================== */
 
-body.toplevel_page_woo-kb-generator #wpcontent {
+body.toplevel_page_ai-knowledge #wpcontent {
   padding-left: 0px !important;
 }
 /* Color de marca: se sobreescribe aqui, en el mismo selector que gana la

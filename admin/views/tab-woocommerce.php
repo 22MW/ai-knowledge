@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB;
+namespace AIKB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -26,7 +26,7 @@ $base_country_label = isset( $countries_list[ $base_country_code ] ) ? $countrie
 $terms_page_id  = (int) get_option( 'woocommerce_terms_page_id' );
 $refund_page_id = function_exists( 'wc_get_page_id' ) ? wc_get_page_id( 'refund_returns' ) : 0;
 
-$contact_answers = class_exists( '\WOOKB\Chatbot_Prompt_Builder' ) ? Chatbot_Prompt_Builder::get_saved_answers() : array();
+$contact_answers = class_exists( '\AIKB\Chatbot_Prompt_Builder' ) ? Chatbot_Prompt_Builder::get_saved_answers() : array();
 $contact_text     = isset( $contact_answers['contacto'] ) ? trim( (string) $contact_answers['contacto'] ) : '';
 
 // Valores en vivo de WooCommerce, usados solo como precarga de los campos
@@ -266,7 +266,7 @@ $returns_value     = '' !== $settings['wc_returns_text'] ? $settings['wc_returns
 					printf(
 						/* translators: %s: enlace a la pestaña Negocio */
 						esc_html__( 'Solo si el contacto/horario de la tienda online es distinto del general del negocio (pestaña %s). Vacío = se usa el de Negocio.', 'ai-knowledge' ),
-						'<a href="' . esc_url( admin_url( 'admin.php?page=woo-kb-generator&tab=negocio' ) ) . '">' . esc_html__( 'Negocio', 'ai-knowledge' ) . '</a>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
+						'<a href="' . esc_url( admin_url( 'admin.php?page=ai-knowledge&tab=negocio' ) ) . '">' . esc_html__( 'Negocio', 'ai-knowledge' ) . '</a>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
 					);
 					?>
 				</p>

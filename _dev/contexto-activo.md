@@ -101,6 +101,25 @@ limpieza posterior de Ajustes/Chatbot, como `a332da1`.
   distinguen con claridad las comprobaciones de solo lectura y las acciones
   que modifican robots.txt o .htaccess.
 
+## Rename interno completado (Fase 0.1, 2026-09-16)
+
+- Ya no queda rastro de "woo-kb-generator" en código: archivo principal
+  `ai-knowledge.php`, namespace `AIKB\`, constantes `AIKB_*`, slug de menú
+  `page=ai-knowledge`. Detalle completo en `_dev/roadmap.md` (Fase 0.1) y
+  `_dev/decisiones.md`.
+- Sin tocar por compatibilidad: tabla `wookb_documents` (valor string),
+  funciones `wookb_activate()`/`wookb_deactivate()`, opción `wookb_db_version`,
+  query args `wookb_notice`/`wookb_regen_error`/`wookb_sync_status`,
+  `assets/wookb-theme.css` y su handle de enqueue.
+- Reactivado en Local por el usuario tras el rename del archivo principal
+  (WordPress lo desactiva automáticamente al cambiar esa ruta). Confirmado
+  OK.
+- Sin commit ni push todavía: cambio hecho por el subagente `desarrollador`,
+  pendiente de revisión de diff y aprobación antes de subir.
+- QA real pendiente: solo se validó `php -l` y greps estáticos, más la
+  activación manual. Falta probar en real cada tab/redirect del admin y una
+  generación de documento completa.
+
 ## Pendiente de confirmar
 
 - El fix de instrucciones de pulido pasa `php -l` con PHP 8.3.23 en sus dos

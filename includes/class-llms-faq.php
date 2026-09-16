@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB;
+namespace AIKB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -55,12 +55,12 @@ class Llms_Faq {
 
 	/** Ruta intermedia (con idioma, pero aun en la raiz del plugin), solo para migrar. */
 	protected static function legacy_file_path( $lang ) {
-		return WOOKB_DIR . 'llms-faq-' . sanitize_key( $lang ) . '.md';
+		return AIKB_DIR . 'llms-faq-' . sanitize_key( $lang ) . '.md';
 	}
 
 	/** Ruta original (mono-idioma, sin lang, en la raiz del plugin), solo para migrar. */
 	protected static function legacy_global_file_path() {
-		return WOOKB_DIR . 'llms-faq.md';
+		return AIKB_DIR . 'llms-faq.md';
 	}
 
 	public static function read( $lang ) {
@@ -94,7 +94,7 @@ class Llms_Faq {
 		wp_mkdir_p( dirname( self::file_path( $lang ) ) );
 		file_put_contents( self::file_path( $lang ), $content . "\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_put_contents
 
-		if ( class_exists( '\WOOKB\Llms_Txt' ) ) {
+		if ( class_exists( '\AIKB\Llms_Txt' ) ) {
 			Llms_Txt::invalidate();
 		}
 
@@ -134,11 +134,11 @@ class Llms_Faq {
 			// TODOS los idiomas del mismo source_id -- no vale aqui).
 			if ( $existing ) {
 				Markdown_Store::delete( $existing->md_path );
-				if ( $existing->doc_post_id && class_exists( '\WOOKB\Genix_Bridge' ) ) {
+				if ( $existing->doc_post_id && class_exists( '\AIKB\Genix_Bridge' ) ) {
 					Genix_Bridge::delete_document( $existing->doc_post_id );
 				}
 				Registry::delete_row( $existing->id );
-				if ( class_exists( '\WOOKB\Llms_Txt' ) ) {
+				if ( class_exists( '\AIKB\Llms_Txt' ) ) {
 					Llms_Txt::invalidate();
 				}
 			}
@@ -167,7 +167,7 @@ class Llms_Faq {
 		);
 
 		$doc_post_id = $existing ? $existing->doc_post_id : null;
-		if ( class_exists( '\WOOKB\Genix_Bridge' ) && Genix_Bridge::is_available() ) {
+		if ( class_exists( '\AIKB\Genix_Bridge' ) && Genix_Bridge::is_available() ) {
 			$result = Genix_Bridge::upsert_document(
 				$doc_post_id,
 				array( 'id' => self::SOURCE_ID, 'title' => $title, 'url' => '' ),

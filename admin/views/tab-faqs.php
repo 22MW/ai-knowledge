@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB;
+namespace AIKB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -15,7 +15,7 @@ $faq_error = get_transient( 'wookb_faqs_error_' . $lang );
 delete_transient( 'wookb_faqs_error_' . $lang );
 $faq_content = get_transient( 'wookb_faqs_draft_' . $lang );
 if ( false === $faq_content ) {
-	$faq_content = class_exists( '\WOOKB\Llms_Faq' ) ? Llms_Faq::read( $lang ) : '';
+	$faq_content = class_exists( '\AIKB\Llms_Faq' ) ? Llms_Faq::read( $lang ) : '';
 }
 ?>
 <p class="description">
@@ -24,7 +24,7 @@ if ( false === $faq_content ) {
 
 <?php if ( count( $active_langs ) > 1 ) : ?>
 	<form method="get" class="wookb-toolbar-form">
-		<input type="hidden" name="page" value="woo-kb-generator" />
+		<input type="hidden" name="page" value="ai-knowledge" />
 		<input type="hidden" name="tab" value="faqs" />
 		<select name="lang" onchange="this.form.submit()">
 			<?php foreach ( $active_langs as $l ) : ?>

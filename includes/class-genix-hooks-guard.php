@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB;
+namespace AIKB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -271,7 +271,7 @@ class Genix_Hooks_Guard {
 			// archivo), insertado justo antes del apagado de "reasoning" para
 			// no alterar el resto del orden del prompt.
 			$block  = "        // Custom instructions from the site administrator (patched by\n";
-			$block .= "        // woo-kb-generator: Lite no trae este bloque de fabrica, solo Pro).\n";
+			$block .= "        // ai-knowledge: Lite no trae este bloque de fabrica, solo Pro).\n";
 			$block .= "        \$wookb_custom_instructions = trim(\$this->GetOption('chatbot_custom_instructions', ''));\n";
 			$block .= "        if (!empty(\$wookb_custom_instructions)) {\n";
 			$block .= "            \$prompt .= \"## Additional instructions\\n\";\n";
@@ -362,7 +362,7 @@ class Genix_Hooks_Guard {
 			}
 		}
 
-		wp_safe_redirect( admin_url( 'admin.php?page=woo-kb-generator' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=ai-knowledge' ) );
 		exit;
 	}
 }

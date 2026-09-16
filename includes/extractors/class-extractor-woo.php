@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB\Extractors;
+namespace AIKB\Extractors;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

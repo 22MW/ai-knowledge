@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB;
+namespace AIKB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -122,13 +122,13 @@ class Registry_Table extends \WP_List_Table {
 				// devuelve vacio y se veia solo el numero -- se resuelve el
 				// titulo fijo de la clase en su lugar (mismo patron que
 				// Llms_Txt::link_line() usa para estos mismos source_type).
-				if ( class_exists( '\WOOKB\Store_Info_Doc' ) ) {
+				if ( class_exists( '\AIKB\Store_Info_Doc' ) ) {
 					$composite_title = Store_Info_Doc::title_for( $item->source_type, $item->lang );
 					if ( $composite_title ) {
 						return esc_html( $composite_title );
 					}
 				}
-				if ( class_exists( '\WOOKB\Llms_Faq' ) && Llms_Faq::SOURCE_TYPE === $item->source_type ) {
+				if ( class_exists( '\AIKB\Llms_Faq' ) && Llms_Faq::SOURCE_TYPE === $item->source_type ) {
 					return esc_html( Llms_Faq::title() );
 				}
 				$title = get_the_title( $item->source_id );

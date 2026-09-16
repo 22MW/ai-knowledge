@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB;
+namespace AIKB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -66,12 +66,12 @@ class Editor_Metabox {
 		$row  = Registry::find( $post->ID, $lang );
 
 		if ( $row ) {
-			require_once WOOKB_DIR . 'admin/class-registry-table.php';
+			require_once AIKB_DIR . 'admin/class-registry-table.php';
 			echo '<p>' . esc_html__( 'Estado:', 'ai-knowledge' ) . ' ' . esc_html( Registry_Table::status_label( $row->status ) ) . '</p>';
 			if ( 'manual' === $row->override_mode ) {
 				echo '<p>' . esc_html__( 'Modo: manual', 'ai-knowledge' ) . '</p>';
 			}
-			$url = admin_url( 'admin.php?page=woo-kb-generator&tab=registro&s=' . rawurlencode( $post->post_title ) );
+			$url = admin_url( 'admin.php?page=ai-knowledge&tab=registro&s=' . rawurlencode( $post->post_title ) );
 			echo '<p><a href="' . esc_url( $url ) . '" target="_blank">' . esc_html__( 'Ver en el Registro', 'ai-knowledge' ) . '</a></p>';
 			return;
 		}

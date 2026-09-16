@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB;
+namespace AIKB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -22,7 +22,7 @@ $wp_ai_models    = $wp_ai_available ? AI_Client::available_models() : array();
 		printf(
 			/* translators: %s: enlace a la pestaña Generación masiva */
 			esc_html__( 'El límite diario, el tamaño de lote y el debounce de la cola se editan en %s.', 'ai-knowledge' ),
-			'<a href="' . esc_url( admin_url( 'admin.php?page=woo-kb-generator&tab=carga-inicial' ) ) . '">' . esc_html__( 'Generación masiva', 'ai-knowledge' ) . '</a>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
+			'<a href="' . esc_url( admin_url( 'admin.php?page=ai-knowledge&tab=carga-inicial' ) ) . '">' . esc_html__( 'Generación masiva', 'ai-knowledge' ) . '</a>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
 		);
 		?>
 	</p>
@@ -100,7 +100,7 @@ $wp_ai_models    = $wp_ai_available ? AI_Client::available_models() : array();
 			<th><?php esc_html_e( 'Botón "Añadir a la base de conocimiento" en el editor', 'ai-knowledge' ); ?></th>
 			<td>
 				<?php
-				$editor_post_types = class_exists( '\WOOKB\Editor_Metabox' ) ? Editor_Metabox::allowed_post_types() : (array) $settings['editor_button_post_types'];
+				$editor_post_types = class_exists( '\AIKB\Editor_Metabox' ) ? Editor_Metabox::allowed_post_types() : (array) $settings['editor_button_post_types'];
 				?>
 				<input type="hidden" name="editor_button_post_types_submitted" value="1" />
 				<div class="wookb-chip-group">
@@ -145,7 +145,7 @@ $wp_ai_models    = $wp_ai_available ? AI_Client::available_models() : array();
 	printf(
 		/* translators: %s: enlace a la pestaña Prompt */
 		esc_html__( 'El prompt de sistema del chatbot se gestiona en la pestaña %s.', 'ai-knowledge' ),
-		'<a href="' . esc_url( admin_url( 'admin.php?page=woo-kb-generator&tab=prompt' ) ) . '">' . esc_html__( 'Prompt', 'ai-knowledge' ) . '</a>'
+		'<a href="' . esc_url( admin_url( 'admin.php?page=ai-knowledge&tab=prompt' ) ) . '">' . esc_html__( 'Prompt', 'ai-knowledge' ) . '</a>'
 	);
 	?>
 </p>
@@ -158,7 +158,7 @@ $wp_ai_models    = $wp_ai_available ? AI_Client::available_models() : array();
 	printf(
 		/* translators: %s: enlace a la pestaña WooCommerce */
 		esc_html__( 'Los documentos de información de tienda (cómo comprar, condiciones, envío, pago, impuestos) se generan desde la pestaña %s.', 'ai-knowledge' ),
-		'<a href="' . esc_url( admin_url( 'admin.php?page=woo-kb-generator&tab=woocommerce' ) ) . '">' . esc_html__( 'WooCommerce', 'ai-knowledge' ) . '</a>'
+		'<a href="' . esc_url( admin_url( 'admin.php?page=ai-knowledge&tab=woocommerce' ) ) . '">' . esc_html__( 'WooCommerce', 'ai-knowledge' ) . '</a>'
 	);
 	?>
 </p>

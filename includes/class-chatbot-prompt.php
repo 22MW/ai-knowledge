@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB;
+namespace AIKB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -36,7 +36,7 @@ class Chatbot_Prompt {
 	 * textarea de la pestaña Chatbot. Vive en wp-content/llm/ junto al
 	 * resto de contenido del plugin (documentos publicos, info.md, FAQ),
 	 * en vez de suelto en la carpeta del plugin -- consolidado a partir
-	 * del 2026-09-16 (antes: WOOKB_DIR . 'chatbot-system-prompt.md').
+	 * del 2026-09-16 (antes: AIKB_DIR . 'chatbot-system-prompt.md').
 	 */
 	public static function file_path() {
 		return Markdown_Store::base_dir() . '/chatbot-system-prompt.md';
@@ -44,7 +44,7 @@ class Chatbot_Prompt {
 
 	/** Ruta antigua (pre-consolidacion), solo para migrar una vez. */
 	protected static function legacy_file_path() {
-		return WOOKB_DIR . 'chatbot-system-prompt.md';
+		return AIKB_DIR . 'chatbot-system-prompt.md';
 	}
 
 	public static function read() {

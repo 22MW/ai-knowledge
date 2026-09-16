@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB;
+namespace AIKB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -51,7 +51,7 @@ class Llms_Txt {
 		// write_info_doc(), pestaña Prompt); si aun no existe, se omite la
 		// seccion sin romper nada.
 		$info_path = WP_CONTENT_DIR . '/llm/info.md';
-		if ( class_exists( '\WOOKB\Chatbot_Prompt_Builder' ) && file_exists( $info_path ) ) {
+		if ( class_exists( '\AIKB\Chatbot_Prompt_Builder' ) && file_exists( $info_path ) ) {
 			$info_body = trim( (string) file_get_contents( $info_path ) );
 			$info_lines = explode( "\n", $info_body );
 			array_shift( $info_lines );
@@ -139,13 +139,13 @@ class Llms_Txt {
 	protected static function category_label( $row ) {
 		// Documentos compuestos (Store_Info_Doc): no tienen taxonomía real que
 		// consultar, así que se resuelven aparte antes de caer al camino de producto.
-		if ( class_exists( '\WOOKB\Store_Info_Doc' ) ) {
+		if ( class_exists( '\AIKB\Store_Info_Doc' ) ) {
 			$composite_label = Store_Info_Doc::category_label_for( $row->source_type );
 			if ( $composite_label ) {
 				return $composite_label;
 			}
 		}
-		if ( class_exists( '\WOOKB\Llms_Faq' ) ) {
+		if ( class_exists( '\AIKB\Llms_Faq' ) ) {
 			$faq_label = Llms_Faq::category_label_for( $row->source_type );
 			if ( $faq_label ) {
 				return $faq_label;
@@ -186,7 +186,7 @@ class Llms_Txt {
 		// Documentos compuestos (Store_Info_Doc): no hay post real detrás de
 		// source_id, así que get_the_title()/get_the_excerpt() no sirven aquí.
 		// Título y descripción salen de las etiquetas fijas de la propia clase.
-		if ( class_exists( '\WOOKB\Store_Info_Doc' ) ) {
+		if ( class_exists( '\AIKB\Store_Info_Doc' ) ) {
 			$composite_title = Store_Info_Doc::title_for( $row->source_type, $row->lang );
 			if ( $composite_title ) {
 				$line = '[' . $composite_title . '](' . $url . ')';
@@ -194,7 +194,7 @@ class Llms_Txt {
 				return $description ? $line . ': ' . $description : $line;
 			}
 		}
-		if ( class_exists( '\WOOKB\Llms_Faq' ) && Llms_Faq::SOURCE_TYPE === $row->source_type ) {
+		if ( class_exists( '\AIKB\Llms_Faq' ) && Llms_Faq::SOURCE_TYPE === $row->source_type ) {
 			$line = '[' . Llms_Faq::title() . '](' . $url . ')';
 			return $line . ': ' . Llms_Faq::description();
 		}
@@ -236,7 +236,7 @@ class Llms_Txt {
 	 * quien puede corregirlo.
 	 */
 	protected static function summary() {
-		if ( class_exists( '\WOOKB\Chatbot_Prompt_Builder' ) ) {
+		if ( class_exists( '\AIKB\Chatbot_Prompt_Builder' ) ) {
 			$summary = Chatbot_Prompt_Builder::get_business_summary();
 			if ( '' !== trim( $summary ) ) {
 				return $summary;

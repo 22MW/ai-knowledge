@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB;
+namespace AIKB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -217,7 +217,7 @@ class Chatbot_Prompt_Builder {
 		wp_mkdir_p( $dir );
 		file_put_contents( $dir . '/info.md', $content ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_put_contents
 
-		if ( class_exists( '\WOOKB\Llms_Txt' ) ) {
+		if ( class_exists( '\AIKB\Llms_Txt' ) ) {
 			Llms_Txt::invalidate();
 		}
 
@@ -565,7 +565,7 @@ class Chatbot_Prompt_Builder {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
-		if ( ! isset( $_GET['page'] ) || 'woo-kb-generator' !== $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! isset( $_GET['page'] ) || 'ai-knowledge' !== $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			return;
 		}
 
@@ -574,7 +574,7 @@ class Chatbot_Prompt_Builder {
 			return;
 		}
 
-		$negocio_tab_url = admin_url( 'admin.php?page=woo-kb-generator&tab=negocio' );
+		$negocio_tab_url = admin_url( 'admin.php?page=ai-knowledge&tab=negocio' );
 
 		printf(
 			'<div class="notice notice-info is-dismissible"><p><strong>%1$s</strong> %2$s</p></div>',

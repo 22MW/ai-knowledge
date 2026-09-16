@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB;
+namespace AIKB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -216,7 +216,7 @@ class Chatbot_Relevance_Guard {
 	 * vacia como marca de sintetico).
 	 */
 	protected static function contact_doc() {
-		if ( ! class_exists( '\WOOKB\Chatbot_Prompt_Builder' ) ) {
+		if ( ! class_exists( '\AIKB\Chatbot_Prompt_Builder' ) ) {
 			return null;
 		}
 		$answers = Chatbot_Prompt_Builder::get_saved_answers();

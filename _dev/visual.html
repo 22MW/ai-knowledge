@@ -33,7 +33,7 @@
   <main>
     <header>
       <h1>AI Knowledge & Visibility — Estado</h1>
-      <p class="muted">Última actualización: 2026-09-16 (navegación admin + Generación masiva) · antes "woo-kb-generator"</p>
+      <p class="muted">Última actualización: 2026-09-16 (navegación admin + Generación masiva + rename interno completo de "woo-kb-generator" a "ai-knowledge")</p>
       <span class="badge ok">Fases 0-11 hechas y confirmadas.</span>
     </header>
 
@@ -146,7 +146,7 @@
       <article class="card wide">
         <h2>Últimas decisiones</h2>
         <ul>
-          <li>Nombre: <strong>AI Knowledge & Visibility</strong>, slug <code>ai-knowledge</code>. Namespace de código (<code>WOOKB</code>) y slug de menú se mantienen sin cambiar.</li>
+          <li>Nombre: <strong>AI Knowledge & Visibility</strong>, slug <code>ai-knowledge</code>. Rename interno completado (2026-09-16): archivo principal <code>ai-knowledge.php</code>, namespace <code>AIKB</code> y slug de menú <code>page=ai-knowledge</code>. Se conservan sin cambiar la tabla de BD <code>wookb_documents</code> y los nombres de función <code>wookb_activate()</code>/<code>wookb_deactivate()</code>, por compatibilidad con instalaciones existentes.</li>
           <li>El generador vía IA (OpenAI) + Support Genix sigue siendo el núcleo del producto; la capa de visibilidad (JSON, Markdown público, JSON-LD, etc.) se añade encima, no lo sustituye.</li>
           <li>Nunca se escribe <code>robots.txt</code> automáticamente sin confirmación explícita del usuario.</li>
           <li>Borrar <code>llms.txt</code> físico sí es posible desde el admin (Fase 6), pero siempre con confirmación fuerte en JS y explicando antes que el plugin genera el suyo dinámicamente al vuelo — nunca un borrado silencioso.</li>

@@ -16,29 +16,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WOOKB_VERSION', '1.0.8.6' );
-define( 'WOOKB_FILE', __FILE__ );
-define( 'WOOKB_DIR', plugin_dir_path( __FILE__ ) );
-define( 'WOOKB_URL', plugin_dir_url( __FILE__ ) );
-define( 'WOOKB_TABLE_DOCUMENTS', 'wookb_documents' );
+define( 'AIKB_VERSION', '1.0.8.6' );
+define( 'AIKB_FILE', __FILE__ );
+define( 'AIKB_DIR', plugin_dir_path( __FILE__ ) );
+define( 'AIKB_URL', plugin_dir_url( __FILE__ ) );
+define( 'AIKB_TABLE_DOCUMENTS', 'wookb_documents' );
 
 /**
  * Autoload muy simple por convención de nombre de archivo (class-xxx.php).
  */
 spl_autoload_register(
 	function ( $class ) {
-		if ( 0 !== strpos( $class, 'WOOKB\\' ) ) {
+		if ( 0 !== strpos( $class, 'AIKB\\' ) ) {
 			return;
 		}
-		$relative = substr( $class, strlen( 'WOOKB\\' ) );
+		$relative = substr( $class, strlen( 'AIKB\\' ) );
 		$parts    = explode( '\\', $relative );
 		$name     = array_pop( $parts );
 		$subdir   = $parts ? strtolower( implode( '/', $parts ) ) . '/' : '';
 		$filename = 'class-' . strtolower( str_replace( '_', '-', $name ) ) . '.php';
 
 		$candidates = array(
-			WOOKB_DIR . 'includes/' . $subdir . $filename,
-			WOOKB_DIR . 'admin/' . $filename,
+			AIKB_DIR . 'includes/' . $subdir . $filename,
+			AIKB_DIR . 'admin/' . $filename,
 		);
 
 		foreach ( $candidates as $path ) {
@@ -54,8 +54,8 @@ spl_autoload_register(
  * Activación: crea la tabla de registro y la carpeta wp-content/llm/.
  */
 function wookb_activate() {
-	require_once WOOKB_DIR . 'includes/class-registry.php';
-	\WOOKB\Registry::create_table();
+	require_once AIKB_DIR . 'includes/class-registry.php';
+	\AIKB\Registry::create_table();
 
 	$llm_dir = WP_CONTENT_DIR . '/llm';
 	if ( ! file_exists( $llm_dir ) ) {
@@ -68,11 +68,11 @@ function wookb_activate() {
 	// Flush de reglas de rewrite para llms.txt y para la ruta virtual de los .md
 	// (Markdown_Server: servidos vía PHP para fijar Content-Type: text/plain
 	// sin depender de la configuración MIME del servidor -- ver esa clase).
-	if ( class_exists( '\WOOKB\Llms_Txt' ) ) {
-		\WOOKB\Llms_Txt::add_rewrite_rule();
+	if ( class_exists( '\AIKB\Llms_Txt' ) ) {
+		\AIKB\Llms_Txt::add_rewrite_rule();
 	}
-	if ( class_exists( '\WOOKB\Markdown_Server' ) ) {
-		\WOOKB\Markdown_Server::add_rewrite_rule();
+	if ( class_exists( '\AIKB\Markdown_Server' ) ) {
+		\AIKB\Markdown_Server::add_rewrite_rule();
 	}
 	flush_rewrite_rules();
 }
@@ -92,17 +92,17 @@ register_deactivation_hook( __FILE__, 'wookb_deactivate' );
 add_action(
 	'plugins_loaded',
 	function () {
-		if ( get_option( 'wookb_db_version' ) === WOOKB_VERSION ) {
+		if ( get_option( 'wookb_db_version' ) === AIKB_VERSION ) {
 			return;
 		}
-		require_once WOOKB_DIR . 'includes/class-registry.php';
-		\WOOKB\Registry::create_table();
+		require_once AIKB_DIR . 'includes/class-registry.php';
+		\AIKB\Registry::create_table();
 		// Fase 11: tabla de logs de crawlers, creada por el mismo mecanismo de
 		// migracion (dbDelta es idempotente) que la tabla de documentos, en vez
 		// de un hook de activacion aparte.
-		require_once WOOKB_DIR . 'includes/class-crawler-log.php';
-		\WOOKB\Crawler_Log::create_table();
-		update_option( 'wookb_db_version', WOOKB_VERSION, false );
+		require_once AIKB_DIR . 'includes/class-crawler-log.php';
+		\AIKB\Crawler_Log::create_table();
+		update_option( 'wookb_db_version', AIKB_VERSION, false );
 	},
 	5
 );
@@ -113,8 +113,8 @@ add_action(
 add_action(
 	'plugins_loaded',
 	function () {
-		require_once WOOKB_DIR . 'includes/class-plugin.php';
-		\WOOKB\Plugin::instance()->init();
+		require_once AIKB_DIR . 'includes/class-plugin.php';
+		\AIKB\Plugin::instance()->init();
 	},
 	20
 );

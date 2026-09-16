@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB\Extractors;
+namespace AIKB\Extractors;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -24,7 +24,7 @@ class Extractor_Base {
 			'content'     => wp_strip_all_tags( $post->post_content ),
 			'excerpt'     => wp_strip_all_tags( $post->post_excerpt ),
 			'url'         => get_permalink( $post_id ),
-			'lang'        => \WOOKB\Wpml::element_language( $post_id ),
+			'lang'        => \AIKB\Wpml::element_language( $post_id ),
 			'taxonomies'  => $this->taxonomy_terms( $post_id, $post->post_type ),
 			'custom_fields' => $this->custom_fields( $post_id, $post->post_type ),
 			'price'       => null,
@@ -48,7 +48,7 @@ class Extractor_Base {
 	}
 
 	protected function custom_fields( $post_id, $post_type ) {
-		$keys = \WOOKB\Scope::custom_fields_for( $post_type );
+		$keys = \AIKB\Scope::custom_fields_for( $post_type );
 		$out  = array();
 		foreach ( (array) $keys as $key ) {
 			$value = get_post_meta( $post_id, $key, true );

@@ -1,6 +1,6 @@
 <?php
 
-namespace WOOKB;
+namespace AIKB;
 
 if (! defined('ABSPATH')) {
 	exit;
@@ -69,7 +69,7 @@ class Admin
 			__('Base de conocimiento IA', 'ai-knowledge'),
 			__('Base de conocimiento IA', 'ai-knowledge'),
 			self::capability(),
-			'woo-kb-generator',
+			'ai-knowledge',
 			array(__CLASS__, 'render'),
 			'dashicons-admin-generic',
 			58
@@ -83,16 +83,16 @@ class Admin
 
 	public static function assets($hook)
 	{
-		if (false === strpos($hook, 'woo-kb-generator')) {
+		if (false === strpos($hook, 'ai-knowledge')) {
 			return;
 		}
 		// Orden importa: Tabler primero (variables/base), luego nuestro tema
 		// (usa esas variables), luego admin.css (ajustes puntuales que ya
 		// existian antes de Tabler, se mantienen por si acaso).
-		wp_enqueue_style('wookb-tabler', WOOKB_URL . 'assets/tabler.min.css', array(), WOOKB_VERSION);
-		wp_enqueue_style('wookb-theme', WOOKB_URL . 'assets/wookb-theme.css', array('wookb-tabler'), WOOKB_VERSION);
-		wp_enqueue_style('wookb-admin', WOOKB_URL . 'assets/admin.css', array('wookb-theme'), WOOKB_VERSION);
-		wp_enqueue_script('wookb-admin', WOOKB_URL . 'assets/admin.js', array('jquery'), WOOKB_VERSION, true);
+		wp_enqueue_style('wookb-tabler', AIKB_URL . 'assets/tabler.min.css', array(), AIKB_VERSION);
+		wp_enqueue_style('wookb-theme', AIKB_URL . 'assets/wookb-theme.css', array('wookb-tabler'), AIKB_VERSION);
+		wp_enqueue_style('wookb-admin', AIKB_URL . 'assets/admin.css', array('wookb-theme'), AIKB_VERSION);
+		wp_enqueue_script('wookb-admin', AIKB_URL . 'assets/admin.js', array('jquery'), AIKB_VERSION, true);
 	}
 
 	public static function render()
@@ -145,12 +145,12 @@ class Admin
 		echo '<h2 class="nav-tab-wrapper">';
 		foreach ($tabs as $key => $label) {
 			$class = ($key === $tab) ? 'nav-tab nav-tab-active' : 'nav-tab';
-			$url   = admin_url('admin.php?page=woo-kb-generator&tab=' . $key);
+			$url   = admin_url('admin.php?page=ai-knowledge&tab=' . $key);
 			echo '<a class="' . esc_attr($class) . '" href="' . esc_url($url) . '">' . esc_html($label) . '</a>';
 		}
 		echo '</h2>';
 
-		$view_file = WOOKB_DIR . 'admin/views/tab-' . $tab . '.php';
+		$view_file = AIKB_DIR . 'admin/views/tab-' . $tab . '.php';
 		if (file_exists($view_file)) {
 			// Envoltorio visual "card" de Tabler: solo un <div> alrededor de
 			// todo el contenido de la pestaña, no toca nada dentro de la vista
@@ -170,7 +170,7 @@ class Admin
 	 */
 	protected static function render_registry_summary()
 	{
-		require_once WOOKB_DIR . 'admin/class-registry-table.php';
+		require_once AIKB_DIR . 'admin/class-registry-table.php';
 		$summary = Registry::summary();
 
 		$parts_lang = array();
@@ -200,7 +200,7 @@ class Admin
 
 	protected static function redirect($tab)
 	{
-		wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=' . $tab . '&wookb_notice=1'));
+		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=' . $tab . '&wookb_notice=1'));
 		exit;
 	}
 
@@ -497,7 +497,7 @@ class Admin
 			// ultima vez (bug real: el boton no hacia nada con ningun limite).
 			$result = Document_Pipeline::process($row->source_id, $row->lang, $char_limit > 0 ? $char_limit : null, true);
 			if (is_wp_error($result)) {
-				wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=registro&wookb_regen_error=' . rawurlencode($result->get_error_message())));
+				wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=registro&wookb_regen_error=' . rawurlencode($result->get_error_message())));
 				exit;
 			}
 		}
@@ -531,12 +531,12 @@ class Admin
 		}
 
 		if (! $post_id || ! get_post($post_id)) {
-			wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=registro&wookb_regen_error=' . rawurlencode(__('No se encontró ningún producto o página con ese ID/URL.', 'ai-knowledge'))));
+			wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=registro&wookb_regen_error=' . rawurlencode(__('No se encontró ningún producto o página con ese ID/URL.', 'ai-knowledge'))));
 			exit;
 		}
 
 		if (! Scope::is_included($post_id)) {
-			wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=registro&wookb_regen_error=' . rawurlencode(__('Ese contenido no está dentro del alcance configurado del plugin (pestaña Alcance/Exclusiones).', 'ai-knowledge'))));
+			wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=registro&wookb_regen_error=' . rawurlencode(__('Ese contenido no está dentro del alcance configurado del plugin (pestaña Alcance/Exclusiones).', 'ai-knowledge'))));
 			exit;
 		}
 
@@ -549,7 +549,7 @@ class Admin
 		}
 
 		if ($errors) {
-			wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=registro&wookb_regen_error=' . rawurlencode(implode(' | ', $errors))));
+			wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=registro&wookb_regen_error=' . rawurlencode(implode(' | ', $errors))));
 			exit;
 		}
 
@@ -623,7 +623,7 @@ class Admin
 		}
 
 		$remaining = max(0, count($ids) - count($batch));
-		$url       = admin_url('admin.php?page=woo-kb-generator&tab=registro');
+		$url       = admin_url('admin.php?page=ai-knowledge&tab=registro');
 		if ($remaining > 0) {
 			$url = add_query_arg('wookb_queue_remaining', $remaining, $url);
 		} else {
@@ -680,7 +680,7 @@ class Admin
 			return;
 		}
 
-		require_once WOOKB_DIR . 'admin/class-registry-table.php';
+		require_once AIKB_DIR . 'admin/class-registry-table.php';
 		$table  = new Registry_Table();
 		$action = $table->current_action();
 		if (! in_array($action, array('delete', 'regenerate'), true)) {
@@ -732,7 +732,7 @@ class Admin
 
 		self::exclude_from_scope($deleted_rows);
 
-		$redirect = admin_url('admin.php?page=woo-kb-generator&tab=registro&wookb_notice=1');
+		$redirect = admin_url('admin.php?page=ai-knowledge&tab=registro&wookb_notice=1');
 		if ($skipped_manual > 0) {
 			$redirect = add_query_arg('wookb_skipped_manual', $skipped_manual, $redirect);
 		}
@@ -744,7 +744,7 @@ class Admin
 	{
 		self::verify('wookb_sync_chatbot_prompt');
 		$result = Chatbot_Prompt::sync(true);
-		wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=ajustes&wookb_notice=1&wookb_sync_status=' . rawurlencode($result['status'])));
+		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=ajustes&wookb_notice=1&wookb_sync_status=' . rawurlencode($result['status'])));
 		exit;
 	}
 
@@ -834,7 +834,7 @@ class Admin
 			set_transient('wookb_prompt_draft', $draft, HOUR_IN_SECONDS);
 		}
 
-		wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=prompt'));
+		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=prompt'));
 		exit;
 	}
 
@@ -856,7 +856,7 @@ class Admin
 			set_transient('wookb_prompt_draft', $result, HOUR_IN_SECONDS);
 		}
 
-		wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=prompt'));
+		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=prompt'));
 		exit;
 	}
 
@@ -874,7 +874,7 @@ class Admin
 
 		$draft = isset($_POST['draft']) ? sanitize_textarea_field(wp_unslash($_POST['draft'])) : ''; // phpcs:ignore
 		if ('' === trim($draft)) {
-			wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=prompt'));
+			wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=prompt'));
 			exit;
 		}
 
@@ -884,7 +884,7 @@ class Admin
 		Chatbot_Prompt_Builder::write_info_doc();
 		delete_transient('wookb_prompt_draft');
 
-		wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=prompt&wookb_notice=1'));
+		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=prompt&wookb_notice=1'));
 		exit;
 	}
 
@@ -911,7 +911,7 @@ class Admin
 			delete_transient('wookb_store_docs_error');
 		}
 
-		wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=woocommerce&wookb_notice=1'));
+		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=woocommerce&wookb_notice=1'));
 		exit;
 	}
 
@@ -1029,7 +1029,7 @@ class Admin
 		Llms_Faq::persist_doc($lang);
 		delete_transient('wookb_faqs_draft_' . $lang);
 
-		wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=faqs&lang=' . $lang . '&wookb_notice=1'));
+		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=faqs&lang=' . $lang . '&wookb_notice=1'));
 		exit;
 	}
 
@@ -1044,7 +1044,7 @@ class Admin
 
 		$lang       = self::faqs_lang();
 		$answers    = Chatbot_Prompt_Builder::get_saved_answers();
-		$current    = class_exists('\WOOKB\Llms_Faq') ? Llms_Faq::read($lang) : '';
+		$current    = class_exists('\AIKB\Llms_Faq') ? Llms_Faq::read($lang) : '';
 		$extra_info = isset($_POST['extra_info']) ? sanitize_textarea_field(wp_unslash($_POST['extra_info'])) : ''; // phpcs:ignore
 		$draft      = Chatbot_Prompt_Builder::generate_faqs($answers, $current, $extra_info);
 
@@ -1054,7 +1054,7 @@ class Admin
 			set_transient('wookb_faqs_draft_' . $lang, $draft, HOUR_IN_SECONDS);
 		}
 
-		wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=faqs&lang=' . $lang . '&wookb_notice=1'));
+		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=faqs&lang=' . $lang . '&wookb_notice=1'));
 		exit;
 	}
 
@@ -1249,7 +1249,7 @@ class Admin
 			);
 			$result = Document_Pipeline::process($row->source_id, $row->lang, null, true);
 			if (is_wp_error($result)) {
-				wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=registro&wookb_regen_error=' . rawurlencode($result->get_error_message())));
+				wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=registro&wookb_regen_error=' . rawurlencode($result->get_error_message())));
 				exit;
 			}
 		}
@@ -1468,7 +1468,7 @@ class Admin
 			return;
 		}
 		$screen = function_exists('get_current_screen') ? get_current_screen() : null;
-		if (! $screen || false === strpos((string) $screen->id, 'woo-kb-generator')) {
+		if (! $screen || false === strpos((string) $screen->id, 'ai-knowledge')) {
 			return;
 		}
 
@@ -1477,7 +1477,7 @@ class Admin
 			return;
 		}
 
-		$url = admin_url('admin.php?page=woo-kb-generator&tab=registro&stale=1');
+		$url = admin_url('admin.php?page=ai-knowledge&tab=registro&stale=1');
 		echo '<div class="notice notice-warning"><p>';
 		printf(
 			/* translators: %d: numero de documentos con el origen actualizado desde que se fijaron a mano */
@@ -1511,7 +1511,7 @@ class Admin
 					esc_html__('KB IA: %d desactualizado(s)', 'ai-knowledge'),
 					(int) $count
 				),
-				'href'  => admin_url('admin.php?page=woo-kb-generator&tab=registro&stale=1'),
+				'href'  => admin_url('admin.php?page=ai-knowledge&tab=registro&stale=1'),
 			)
 		);
 	}

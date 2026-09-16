@@ -8,6 +8,20 @@ Ver `_dev/roadmap.md` para el plan completo por fases y `_dev/decisiones.md`
 para el porqué de la identidad/alcance. Este plugin sigue orientado a IA +
 Support Genix como núcleo; todo lo de abajo es capa añadida encima.
 
+### Cierre del rename de identidad interno (2026-09-16)
+
+- Eliminado todo rastro de "woo-kb-generator" del código: archivo principal
+  renombrado a `ai-knowledge.php`, namespace `WOOKB\` → `AIKB\`, constantes
+  `WOOKB_*` → `AIKB_*` y slug de menú admin `page=woo-kb-generator` →
+  `page=ai-knowledge`. Corregido también `readme.txt`, que indicaba subir
+  la carpeta `woo-kb-generator` en vez de `ai-knowledge`.
+- Sin cambios, por compatibilidad con instalaciones existentes: la tabla de
+  base de datos `wookb_documents`, las funciones de activación/desactivación
+  y la opción `wookb_db_version`.
+- Importante para quien actualice desde una versión anterior: al renombrarse
+  el archivo principal, WordPress desactiva el plugin automáticamente y hay
+  que reactivarlo a mano tras la actualización.
+
 ### Navegación del administrador más clara (2026-09-16)
 
 - «Carga inicial» pasa a llamarse «Generación masiva», porque también se usa

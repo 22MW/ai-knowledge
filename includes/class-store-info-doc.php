@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB;
+namespace AIKB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -346,8 +346,8 @@ class Store_Info_Doc {
 		// (Chatbot_Prompt_Builder, pestaña Negocio), ya validado por el
 		// cliente, para no duplicar el dato si es el mismo.
 		$contact = trim( (string) Scope::settings()['wc_contact_hours'] );
-		if ( '' === $contact && class_exists( '\WOOKB\Chatbot_Prompt_Builder' ) ) {
-			$answers = \WOOKB\Chatbot_Prompt_Builder::get_saved_answers();
+		if ( '' === $contact && class_exists( '\AIKB\Chatbot_Prompt_Builder' ) ) {
+			$answers = \AIKB\Chatbot_Prompt_Builder::get_saved_answers();
 			$contact = isset( $answers['contacto'] ) ? trim( (string) $answers['contacto'] ) : '';
 		}
 		if ( '' !== $contact ) {

@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB;
+namespace AIKB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -299,7 +299,7 @@ class Rest_Content {
 			'info'    => array(
 				'title'       => __( 'AI Knowledge & Visibility — API de contenido', 'ai-knowledge' ),
 				'description' => __( 'API pública de solo lectura del contenido dentro del alcance configurado del plugin, sin pasar por IA (Fase 3 del roadmap).', 'ai-knowledge' ),
-				'version'     => WOOKB_VERSION,
+				'version'     => AIKB_VERSION,
 			),
 			'servers' => array(
 				array( 'url' => home_url( '/wp-json/' . self::NAMESPACE_ ) ),

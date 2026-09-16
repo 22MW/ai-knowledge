@@ -1,11 +1,11 @@
 <?php
-namespace WOOKB;
+namespace AIKB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once WOOKB_DIR . 'admin/class-registry-table.php';
+require_once AIKB_DIR . 'admin/class-registry-table.php';
 
 $table = new Registry_Table();
 $table->prepare_items();
@@ -72,7 +72,7 @@ $table->prepare_items();
 
 <div class="wookb-toolbar-row">
 	<form method="get" class="wookb-toolbar-form">
-		<input type="hidden" name="page" value="woo-kb-generator" />
+		<input type="hidden" name="page" value="ai-knowledge" />
 		<input type="hidden" name="tab" value="registro" />
 		<select name="status">
 			<option value=""><?php esc_html_e( 'Todos los estados', 'ai-knowledge' ); ?></option>
@@ -124,7 +124,7 @@ $table->prepare_items();
 	pagina de menu) para el procesamiento real y la explicacion completa.
 	row_ids[] lo rellena Registry_Table::column_cb().
 -->
-<form method="post" action="<?php echo esc_url( admin_url( 'admin.php?page=woo-kb-generator&tab=registro' ) ); ?>" id="wookb-registro-bulk-form">
+<form method="post" action="<?php echo esc_url( admin_url( 'admin.php?page=ai-knowledge&tab=registro' ) ); ?>" id="wookb-registro-bulk-form">
 	<?php $table->display(); ?>
 </form>
 <script>

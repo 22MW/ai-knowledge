@@ -117,6 +117,26 @@ no inventar por pantalla.
   afirmaciones absolutas como «bloqueo real»: explican el efecto verificable
   de robots.txt y de las reglas del servidor.
 
+## 2026-09-16 — Cierre del rename interno (Fase 0.1)
+
+- La Fase 0 dejó a propósito sin tocar el namespace `WOOKB`, las constantes
+  `WOOKB_*` y el slug de menú `woo-kb-generator`, para no arriesgar antes de
+  tiempo. Se decide completarlo ahora porque el rastro seguía visible en
+  redirects, formularios y en `readme.txt` (que indicaba mal la carpeta de
+  instalación).
+- Namespace `WOOKB\` → `AIKB\`, constantes `WOOKB_*` → `AIKB_*`, archivo
+  principal `woo-kb-generator.php` → `ai-knowledge.php`, slug de menú
+  `page=woo-kb-generator` → `page=ai-knowledge`.
+- Se conserva sin cambiar, por compatibilidad con instalaciones existentes:
+  el valor string de la tabla `wookb_documents`, las funciones
+  `wookb_activate()`/`wookb_deactivate()`, la opción `wookb_db_version`, los
+  query args transitorios `wookb_notice`/`wookb_regen_error`/`wookb_sync_status`
+  y el archivo `assets/wookb-theme.css` con su handle de enqueue. Ninguno
+  estaba en el alcance pedido y tocarlos no aportaba nada, solo riesgo.
+- Efecto esperado y confirmado: al renombrar el archivo principal, WordPress
+  desactiva el plugin en cualquier instalación existente hasta reactivarlo
+  a mano. Reactivado en Local por el usuario, sin errores.
+
 ## 2026-09-16 — Descubribilidad de la API OpenAPI (Fase 7)
 
 Publicar `/wp-json/ai-knowledge/v1/openapi.json` no basta por sí solo: sin

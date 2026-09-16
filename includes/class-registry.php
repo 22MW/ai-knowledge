@@ -1,5 +1,5 @@
 <?php
-namespace WOOKB;
+namespace AIKB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -12,7 +12,7 @@ class Registry {
 
 	public static function table() {
 		global $wpdb;
-		return $wpdb->prefix . WOOKB_TABLE_DOCUMENTS;
+		return $wpdb->prefix . AIKB_TABLE_DOCUMENTS;
 	}
 
 	public static function create_table() {

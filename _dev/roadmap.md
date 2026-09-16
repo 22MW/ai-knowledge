@@ -31,6 +31,19 @@ mantiene sin reescribir. Todas las fases se añaden encima o al lado.
 
 ---
 
+## Fase 0.1 — Identidad, cierre del rename interno — HECHO (2026-09-16)
+
+**Qué hace:** completa lo que la Fase 0 dejó pendiente a propósito: elimina el rastro de "woo-kb-generator" que quedaba en código.
+
+**Pasos:**
+1. Renombrar `woo-kb-generator.php` → `ai-knowledge.php`.
+2. Slug de página de menú admin `page=woo-kb-generator` → `page=ai-knowledge` (8 archivos: `admin/class-admin.php`, tabs de vistas, `class-genix-hooks-guard.php`, `class-editor-metabox.php`, `class-chatbot-prompt-builder.php`) y el selector CSS dependiente en `assets/wookb-theme.css`.
+3. Namespace `WOOKB\` → `AIKB\` y constantes `WOOKB_VERSION/FILE/DIR/URL/TABLE_DOCUMENTS` → `AIKB_*` en 44 archivos PHP; autoload actualizado para el nuevo namespace.
+4. Se mantienen sin cambiar, por compatibilidad con instalaciones existentes: tabla `wookb_documents` (solo cambia el nombre de la constante que la referencia, no su valor), funciones `wookb_activate()`/`wookb_deactivate()`, opción `wookb_db_version`, query args transitorios `wookb_notice`/`wookb_regen_error`/`wookb_sync_status`, y el nombre de archivo `assets/wookb-theme.css` con su handle de enqueue.
+5. Activado manualmente en Local tras el rename del archivo principal (WordPress lo desactiva al cambiar la ruta del archivo). Confirmado OK por el usuario.
+
+---
+
 ## Fase 1 — Control manual de documentos + botón en el editor — HECHO
 
 **Qué hace:** permite fijar a mano el texto de un documento (sin que se
