@@ -203,7 +203,7 @@ class Generator {
 		$body = array(
 			'model'    => $model,
 			'messages' => array(
-				array( 'role' => 'system', 'content' => 'Eres un redactor técnico que genera documentos de base de conocimiento en Markdown para un chatbot de atención al cliente de una bodega/tienda online.' ),
+				array( 'role' => 'system', 'content' => 'Eres un redactor técnico que genera documentos de base de conocimiento en Markdown para un chatbot de atención al cliente de un negocio o tienda online.' ),
 				array( 'role' => 'user', 'content' => $prompt ),
 			),
 		);

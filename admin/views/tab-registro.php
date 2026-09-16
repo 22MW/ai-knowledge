@@ -80,12 +80,14 @@ $table->prepare_items();
 				<option value="<?php echo esc_attr( $s ); ?>" <?php selected( isset( $_GET['status'] ) && $_GET['status'] === $s ); // phpcs:ignore ?>><?php echo esc_html( Registry_Table::status_label( $s ) ); ?></option>
 			<?php endforeach; ?>
 		</select>
-		<select name="lang">
-			<option value=""><?php esc_html_e( 'Todos los idiomas', 'ai-knowledge' ); ?></option>
-			<?php foreach ( Wpml::active_languages() as $l ) : ?>
-				<option value="<?php echo esc_attr( $l ); ?>" <?php selected( isset( $_GET['lang'] ) && $_GET['lang'] === $l ); // phpcs:ignore ?>><?php echo esc_html( strtoupper( $l ) ); ?></option>
-			<?php endforeach; ?>
-		</select>
+		<?php if ( count( Wpml::active_languages() ) > 1 ) : ?>
+			<select name="lang">
+				<option value=""><?php esc_html_e( 'Todos los idiomas', 'ai-knowledge' ); ?></option>
+				<?php foreach ( Wpml::active_languages() as $l ) : ?>
+					<option value="<?php echo esc_attr( $l ); ?>" <?php selected( isset( $_GET['lang'] ) && $_GET['lang'] === $l ); // phpcs:ignore ?>><?php echo esc_html( strtoupper( $l ) ); ?></option>
+				<?php endforeach; ?>
+			</select>
+		<?php endif; ?>
 		<input type="search" name="s" value="<?php echo isset( $_GET['s'] ) ? esc_attr( wp_unslash( $_GET['s'] ) ) : ''; // phpcs:ignore ?>" placeholder="<?php esc_attr_e( 'Buscar por título…', 'ai-knowledge' ); ?>" />
 		<select name="per_page">
 			<?php foreach ( array( 20, 50, 100 ) as $pp ) : ?>

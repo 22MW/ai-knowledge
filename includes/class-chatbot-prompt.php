@@ -31,16 +31,35 @@ class Chatbot_Prompt {
 	const GENIX_OPTION = 'chatbot_custom_instructions';
 	const SYNCED_HASH_OPTION = 'wookb_chatbot_prompt_synced_hash';
 
+	/**
+	 * Origen editable (no publico, nunca servido por URL): guardado del
+	 * textarea de la pestaña Chatbot. Vive en wp-content/llm/ junto al
+	 * resto de contenido del plugin (documentos publicos, info.md, FAQ),
+	 * en vez de suelto en la carpeta del plugin -- consolidado a partir
+	 * del 2026-09-16 (antes: WOOKB_DIR . 'chatbot-system-prompt.md').
+	 */
 	public static function file_path() {
+		return Markdown_Store::base_dir() . '/chatbot-system-prompt.md';
+	}
+
+	/** Ruta antigua (pre-consolidacion), solo para migrar una vez. */
+	protected static function legacy_file_path() {
 		return WOOKB_DIR . 'chatbot-system-prompt.md';
 	}
 
 	public static function read() {
 		$path = self::file_path();
-		if ( ! file_exists( $path ) ) {
-			return '';
+		if ( file_exists( $path ) ) {
+			return trim( (string) file_get_contents( $path ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		}
-		return trim( (string) file_get_contents( $path ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		// Migracion lazy: si existe el archivo en la ruta antigua y no en la
+		// nueva, se lee de ahi (sin borrarlo, por si acaso) hasta el proximo save().
+		if ( file_exists( self::legacy_file_path() ) ) {
+			return trim( (string) file_get_contents( self::legacy_file_path() ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		}
+
+		return '';
 	}
 
 	/**

@@ -193,14 +193,14 @@ $contact_text     = isset( $contact_answers['contacto'] ) ? trim( (string) $cont
 				<?php if ( '' !== $contact_text ) : ?>
 					<p><?php echo nl2br( esc_html( $contact_text ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba ?></p>
 				<?php else : ?>
-					<p class="description"><?php esc_html_e( '[pendiente] Todavía no se ha rellenado en el cuestionario del Prompt.', 'ai-knowledge' ); ?></p>
+					<p class="description"><?php esc_html_e( '[pendiente] Todavía no se ha rellenado en el cuestionario de Negocio.', 'ai-knowledge' ); ?></p>
 				<?php endif; ?>
 				<p class="description">
 					<?php
 					printf(
-						/* translators: %s: enlace a la pestaña Prompt */
+						/* translators: %s: enlace a la pestaña Negocio */
 						esc_html__( 'Este dato se comparte con el prompt del chatbot: se edita en la pestaña %s.', 'ai-knowledge' ),
-						'<a href="' . esc_url( admin_url( 'admin.php?page=woo-kb-generator&tab=prompt' ) ) . '">' . esc_html__( 'Prompt', 'ai-knowledge' ) . '</a>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
+						'<a href="' . esc_url( admin_url( 'admin.php?page=woo-kb-generator&tab=negocio' ) ) . '">' . esc_html__( 'Negocio', 'ai-knowledge' ) . '</a>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
 					);
 					?>
 				</p>

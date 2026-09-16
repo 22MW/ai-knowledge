@@ -6,19 +6,29 @@
 `github.com/22MW/ai-knowledge`. Ruta:
 `app/public/wp-content/plugins/ai-knowledge/`.
 
-## Confirmado (Fases 0-11 completas)
+## Confirmado (Fases 0-11 completas + reestructuración Negocio/Chatbot/FAQs)
 
-Fase 10 (plan conjunto de UX del admin, 5 piezas) completa y probada en
-real por el usuario (2026-09-16): descripción por pestaña, pestaña
-"Contenido" (fusión Alcance+Exclusiones con checkbox simple por término,
-modo "todos los CPT", etiquetas de campos custom), y "Ajustes avanzados"
-en el Registro. Ver `_dev/roadmap.md` para el detalle completo de cada
-pieza.
+Fase 10 (plan conjunto de UX del admin, 5 piezas) completa. Además, tras
+probarla en real, se hizo una reestructuración más grande no planificada
+como fase (ver `_dev/roadmap.md`, sección "Reestructuración
+Negocio/Chatbot/FAQs"), probada en real y confirmada por el usuario
+(2026-09-16):
 
-Durante las pruebas se encontró y corrigió un bug real heredado de la
-pieza 5: la fila expandida del Registro anidaba `<form>` dentro del
-formulario grande de selección múltiple (HTML inválido), rompiendo
-"Borrar seleccionados"/"Regenerar seleccionados" en silencio.
+- Prompt genérico de generación corregido (ya no sesgado a "bodega").
+- Pestaña **Negocio** nueva: datos del negocio + generación IA del resumen
+  de `llms.txt`.
+- Pestaña **Chatbot** (antes "Prompt"): solo visible si Genix está activo.
+- Pestaña **FAQs** nueva (movida desde Ajustes): generación IA,
+  **multiidioma real** (antes un único archivo global).
+- Fix: sufijo "(ES)"/"(EN)" en `llms.txt`/Registro solo en sitios
+  multiidioma de verdad.
+- Bug real corregido (heredado de la pieza 5): formularios anidados en la
+  fila expandida del Registro rompían "Borrar seleccionados" en silencio.
+- Orígenes editables (`chatbot-system-prompt.md`, FAQ fuente) movidos de
+  la raíz del plugin a `wp-content/llm/`, junto al resto de contenido.
+  `chatbot-system-prompt.md` de la raíz (trackeado en git con datos
+  reales del cliente) se destrackeó con permiso explícito. `uninstall.php`
+  sigue sin borrar `wp-content/llm/` — confirmado, sin cambios ahí.
 
 Sin commitear todavía: pendiente de tu permiso.
 
@@ -26,7 +36,7 @@ Sin commitear todavía: pendiente de tu permiso.
 
 - No se ha podido ejecutar `php -l` en ninguna sesión reciente (no hay
   binario `php` accesible en este entorno) — validar sintaxis en real en
-  LocalWP antes de dar la Fase 10 por cerrada del todo.
+  LocalWP si aparece algo raro.
 - Hay ~100 filas de datos de PRUEBA en la tabla `wookb_crawler_log` (Fase
   11, botón temporal ya retirado). Inofensivas, dentro del tope de 500.
 
@@ -35,9 +45,15 @@ Sin commitear todavía: pendiente de tu permiso.
 - UX3 (WooCommerce: checkboxes + prompt por campo, cambio de arquitectura
   de datos, requiere `rol-analista`) y UX4 (visibilidad del botón de
   generar documentos de tienda).
+- WooCommerce: pendiente su propia herramienta de generación IA con
+  prompts propios — mencionado, decidido posponer ("puliremos más
+  tarde"), no tiene alcance cerrado todavía.
 - Estilos inline en PHP (`style="width:100%"`, etc. en varias vistas):
   detectado, no abordado.
-- [`llms-faq.md`](../llms-faq.md): contenido del sitio, en `.gitignore`, nunca se commitea.
+- FAQ fuente y `chatbot-system-prompt.md`: contenido real del sitio,
+  ahora en `wp-content/llm/` (fuera del repo del plugin por completo —
+  ya no hace falta ni `.gitignore` para ellos, aunque se mantienen las
+  entradas por si queda algún archivo de la migración en la raíz).
 - Bug sin repetir: botón del editor (Fase 1) sin feedback claro la primera
   vez que se probó.
 - Ideas sueltas sin fase (`analisis-jet-geo.md`): tags dinámicos en
@@ -59,14 +75,14 @@ Sin commitear todavía: pendiente de tu permiso.
   clase ya definida — ver `_dev/guia-estilo-visual.html` primero.
 - Antes de rediseñar una tabla/vista existente que ya funciona, confirmar
   el diseño exacto columna por columna con el usuario antes de escribir
-  código — un rediseño completo sin esa confirmación previa se hizo en la
-  pieza 5 (vista Simple/Avanzada) y hubo que revertirlo entero.
-- Al cambiar un comportamiento consolidado (p.ej. de "select de 3 estados"
-  a "checkbox simple" en términos), probar en real cuanto antes: el diseño
-  cerrado por escrito no sustituye ver el resultado en pantalla.
+  código.
+- Al cambiar un comportamiento consolidado, probar en real cuanto antes:
+  el diseño cerrado por escrito no sustituye ver el resultado en pantalla.
+- Los archivos de contenido real del sitio generados por el plugin viven
+  en `wp-content/llm/` (fuera del repo del plugin), no en su carpeta —
+  nunca se incluyen en commits.
 
 ## Relevo mínimo — siguiente paso
 
-Confirmar commit + push del estado actual (Fase 10 completa). Después:
-validar `php -l` en real en LocalWP, y decidir el siguiente foco (UX3/UX4,
-o una tarea nueva).
+Confirmar commit + push del estado actual. Después: decidir el siguiente
+foco (UX3/UX4, herramienta de IA propia para WooCommerce, u otra tarea).

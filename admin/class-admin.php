@@ -27,10 +27,14 @@ class Admin
 		add_action('admin_post_wookb_row_action', array(__CLASS__, 'row_action'));
 		add_action('admin_post_wookb_regenerate_single', array(__CLASS__, 'regenerate_single'));
 		add_action('admin_post_wookb_sync_chatbot_prompt', array(__CLASS__, 'sync_chatbot_prompt'));
+		add_action('admin_post_wookb_save_business_answers', array(__CLASS__, 'save_business_answers'));
+		add_action('admin_post_wookb_generate_business_summary_draft', array(__CLASS__, 'generate_business_summary_draft'));
+		add_action('admin_post_wookb_save_business_summary', array(__CLASS__, 'save_business_summary'));
 		add_action('admin_post_wookb_generate_prompt_draft', array(__CLASS__, 'generate_prompt_draft'));
 		add_action('admin_post_wookb_normalize_prompt', array(__CLASS__, 'normalize_prompt'));
 		add_action('admin_post_wookb_save_prompt_draft', array(__CLASS__, 'save_prompt_draft'));
 		add_action('admin_post_wookb_sync_store_docs', array(__CLASS__, 'sync_store_docs'));
+		add_action('admin_post_wookb_generate_faqs_draft', array(__CLASS__, 'generate_faqs_draft'));
 		add_action('admin_post_wookb_save_llms_faq', array(__CLASS__, 'save_llms_faq'));
 		add_action('admin_post_wookb_force_generate', array(__CLASS__, 'force_generate'));
 		add_action('admin_post_wookb_delete_all', array(__CLASS__, 'delete_all'));
@@ -99,8 +103,17 @@ class Admin
 		$tabs = array(
 			'registro'     => __('Registro', 'ai-knowledge'),
 			'contenido'    => __('Contenido', 'ai-knowledge'),
-			'prompt'       => __('Prompt', 'ai-knowledge'),
+			'negocio'      => __('Negocio', 'ai-knowledge'),
+			'faqs'         => __('FAQs', 'ai-knowledge'),
 		);
+		// Pestaña "Chatbot" solo si Support Genix esta activo -- sin el, el
+		// prompt de sistema no tiene a donde sincronizarse (chatbot-system-
+		// prompt.md solo lo consume Genix, ver Chatbot_Prompt::sync()), asi
+		// que la pestaña quedaria vacia de proposito real. Mismo patron que
+		// la pestaña WooCommerce de abajo.
+		if (Chatbot_Prompt::is_genix_ready()) {
+			$tabs['prompt'] = __('Chatbot', 'ai-knowledge');
+		}
 		// Fase 2: pestaña "WooCommerce" solo si WooCommerce esta activo -- sin
 		// el, no hay nada real que detectar (moneda, envios, impuestos, pagos)
 		// y la pestaña quedaria vacia/confusa.
@@ -716,6 +729,62 @@ class Admin
 	}
 
 	/**
+	 * Guarda solo las respuestas del grupo "negocio" (pestaña Negocio):
+	 * datos validos con o sin WooCommerce, no especificos del chatbot.
+	 * save_answers() ya solo sobreescribe las keys presentes, asi que no
+	 * borra lo guardado en la pestaña Chatbot. Regenera llm/info.md porque
+	 * estos datos tambien alimentan llms.txt, no solo el prompt del bot.
+	 */
+	public static function save_business_answers()
+	{
+		self::verify('wookb_save_business_answers');
+
+		$raw_answers = isset($_POST['answers']) && is_array($_POST['answers']) ? wp_unslash($_POST['answers']) : array(); // phpcs:ignore
+		Chatbot_Prompt_Builder::save_answers($raw_answers);
+		Chatbot_Prompt_Builder::write_info_doc();
+
+		self::redirect('negocio');
+	}
+
+	/**
+	 * Genera/pule con IA el resumen de negocio (campo 'negocio') a partir
+	 * del resto de datos ya guardados, y lo deja en transient para revisar
+	 * antes de guardar -- mismo patron que generate_prompt_draft().
+	 */
+	public static function generate_business_summary_draft()
+	{
+		self::verify('wookb_generate_business_summary_draft');
+
+		$answers    = Chatbot_Prompt_Builder::get_saved_answers();
+		$extra_info = isset($_POST['extra_info']) ? sanitize_textarea_field(wp_unslash($_POST['extra_info'])) : ''; // phpcs:ignore
+		$draft      = Chatbot_Prompt_Builder::generate_business_summary($answers, $extra_info);
+
+		if (is_wp_error($draft)) {
+			set_transient('wookb_business_summary_error', $draft->get_error_message(), MINUTE_IN_SECONDS);
+		} else {
+			set_transient('wookb_business_summary_draft', $draft, HOUR_IN_SECONDS);
+		}
+
+		self::redirect('negocio');
+	}
+
+	/**
+	 * Guarda el resumen (ya editado/revisado) como el campo 'negocio', y
+	 * regenera llm/info.md (misma fuente que la cita de apertura de llms.txt).
+	 */
+	public static function save_business_summary()
+	{
+		self::verify('wookb_save_business_summary');
+
+		$summary = isset($_POST['summary_draft']) ? sanitize_textarea_field(wp_unslash($_POST['summary_draft'])) : ''; // phpcs:ignore
+		Chatbot_Prompt_Builder::save_answers(array('negocio' => $summary));
+		Chatbot_Prompt_Builder::write_info_doc();
+		delete_transient('wookb_business_summary_draft');
+
+		self::redirect('negocio');
+	}
+
+	/**
 	 * Genera un borrador con IA a partir del cuestionario (+ paginas de
 	 * referencia opcionales) y lo deja en un transient para mostrarlo en el
 	 * textarea editable de la pestana Prompt -- no toca el .md todavia.
@@ -723,14 +792,22 @@ class Admin
 	public static function generate_prompt_draft()
 	{
 		self::verify('wookb_generate_prompt_draft');
+		// Defensa: la pestaña Chatbot solo se anuncia en el menu si Genix
+		// esta activo, pero esta accion es alcanzable via admin-post.php
+		// directamente -- sin Genix, chatbot-system-prompt.md no tiene a
+		// donde sincronizarse (ver Chatbot_Prompt::sync()).
+		if (! Chatbot_Prompt::is_genix_ready()) {
+			wp_die(esc_html__('Esta acción requiere Support Genix activo.', 'ai-knowledge'));
+		}
 
 		$raw_answers = isset($_POST['answers']) && is_array($_POST['answers']) ? wp_unslash($_POST['answers']) : array(); // phpcs:ignore
 		$answers     = Chatbot_Prompt_Builder::save_answers($raw_answers);
 
 		$reference_raw   = isset($_POST['reference_pages']) ? sanitize_text_field(wp_unslash($_POST['reference_pages'])) : ''; // phpcs:ignore
 		$reference_pages = Chatbot_Prompt_Builder::fetch_reference_content($reference_raw);
+		$extra_info      = isset($_POST['extra_info']) ? sanitize_textarea_field(wp_unslash($_POST['extra_info'])) : ''; // phpcs:ignore
 
-		$draft = Chatbot_Prompt_Builder::generate_draft($answers, $reference_pages);
+		$draft = Chatbot_Prompt_Builder::generate_draft($answers, $reference_pages, $extra_info);
 
 		if (is_wp_error($draft)) {
 			set_transient('wookb_prompt_draft_error', $draft->get_error_message(), MINUTE_IN_SECONDS);
@@ -772,6 +849,9 @@ class Admin
 	public static function save_prompt_draft()
 	{
 		self::verify('wookb_save_prompt_draft');
+		if (! Chatbot_Prompt::is_genix_ready()) {
+			wp_die(esc_html__('Esta acción requiere Support Genix activo.', 'ai-knowledge'));
+		}
 
 		$draft = isset($_POST['draft']) ? sanitize_textarea_field(wp_unslash($_POST['draft'])) : ''; // phpcs:ignore
 		if ('' === trim($draft)) {
@@ -779,6 +859,7 @@ class Admin
 			exit;
 		}
 
+		wp_mkdir_p(dirname(Chatbot_Prompt::file_path()));
 		file_put_contents(Chatbot_Prompt::file_path(), $draft . "\n"); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_put_contents
 		Chatbot_Prompt::sync(true);
 		Chatbot_Prompt_Builder::write_info_doc();
@@ -840,14 +921,60 @@ class Admin
 	 * llms.txt. Delega en Llms_Faq::save() (ver class-llms-faq.php para el
 	 * porqué de un archivo propio, distinto de chatbot-system-prompt.md).
 	 */
+	/**
+	 * Idioma de trabajo de la pestaña FAQs: el que venga en la peticion
+	 * (selector de idioma, solo visible si hay mas de uno activo), validado
+	 * contra los idiomas activos de verdad -- si no coincide con ninguno,
+	 * cae al primero. Mismo criterio en los 2 handlers de FAQs, para que
+	 * generar y guardar operen siempre sobre el mismo idioma.
+	 */
+	protected static function faqs_lang()
+	{
+		$requested = isset($_POST['lang']) ? sanitize_key(wp_unslash($_POST['lang'])) : ''; // phpcs:ignore
+		$active    = Wpml::active_languages();
+		if ($requested && in_array($requested, $active, true)) {
+			return $requested;
+		}
+		return $active ? $active[0] : 'es';
+	}
+
 	public static function save_llms_faq()
 	{
 		self::verify('wookb_save_llms_faq');
 
+		$lang    = self::faqs_lang();
 		$content = isset($_POST['llms_faq']) ? sanitize_textarea_field(wp_unslash($_POST['llms_faq'])) : ''; // phpcs:ignore
-		Llms_Faq::save($content);
+		Llms_Faq::save($content, $lang);
+		Llms_Faq::persist_doc($lang);
+		delete_transient('wookb_faqs_draft_' . $lang);
 
-		self::redirect('ajustes');
+		wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=faqs&lang=' . $lang . '&wookb_notice=1'));
+		exit;
+	}
+
+	/**
+	 * Genera/amplia con IA un borrador de FAQs a partir de los datos de
+	 * Negocio y del FAQ ya guardado (si hay), y lo deja en transient para
+	 * revisar antes de guardar -- mismo patron que generate_prompt_draft().
+	 */
+	public static function generate_faqs_draft()
+	{
+		self::verify('wookb_generate_faqs_draft');
+
+		$lang       = self::faqs_lang();
+		$answers    = Chatbot_Prompt_Builder::get_saved_answers();
+		$current    = class_exists('\WOOKB\Llms_Faq') ? Llms_Faq::read($lang) : '';
+		$extra_info = isset($_POST['extra_info']) ? sanitize_textarea_field(wp_unslash($_POST['extra_info'])) : ''; // phpcs:ignore
+		$draft      = Chatbot_Prompt_Builder::generate_faqs($answers, $current, $extra_info);
+
+		if (is_wp_error($draft)) {
+			set_transient('wookb_faqs_error_' . $lang, $draft->get_error_message(), MINUTE_IN_SECONDS);
+		} else {
+			set_transient('wookb_faqs_draft_' . $lang, $draft, HOUR_IN_SECONDS);
+		}
+
+		wp_safe_redirect(admin_url('admin.php?page=woo-kb-generator&tab=faqs&lang=' . $lang . '&wookb_notice=1'));
+		exit;
 	}
 
 	/**

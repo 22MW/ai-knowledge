@@ -86,6 +86,12 @@ class Llms_Txt {
 		// "## Enoturismo (EN)", etc. -- mas cercano al formato de la spec de
 		// llms.txt (secciones tematicas con descripcion corta por enlace) que
 		// la lista plana anterior, solo agrupada por idioma sin contexto.
+		// Sufijo "(ES)"/"(EN)" solo en sitios multiidioma de verdad: en un
+		// sitio de un solo idioma no aporta nada y es ruido en cada
+		// encabezado -- Wpml::active_languages() ya cae a array('es') sin
+		// WPML activo, así que basta con contar cuántos hay.
+		$show_lang_suffix = count( Wpml::active_languages() ) > 1;
+
 		$groups = array();
 		foreach ( $rows as $row ) {
 			$category = self::category_label( $row );
@@ -96,7 +102,7 @@ class Llms_Txt {
 		foreach ( $groups as $category => $by_lang ) {
 			ksort( $by_lang );
 			foreach ( $by_lang as $lang => $items ) {
-				$lines[] = '## ' . $category . ' (' . strtoupper( $lang ) . ')';
+				$lines[] = '## ' . $category . ( $show_lang_suffix ? ' (' . strtoupper( $lang ) . ')' : '' );
 				foreach ( $items as $row ) {
 					$lines[] = '- ' . self::link_line( $row );
 				}
@@ -104,19 +110,6 @@ class Llms_Txt {
 			}
 		}
 
-		// FAQ pública: contenido editorial libre de llms-faq.md (ver class-llms-faq.php
-		// para por qué es un archivo separado de chatbot-system-prompt.md). Se omite
-		// la sección entera si el administrador no ha escrito nada todavía, en vez de
-		// mostrar un encabezado vacío.
-		if ( class_exists( '\WOOKB\Llms_Faq' ) ) {
-			$faq = Llms_Faq::read();
-			if ( '' !== $faq ) {
-				$lines[] = '## Preguntas frecuentes';
-				$lines[] = '';
-				$lines[] = $faq;
-				$lines[] = '';
-			}
-		}
 
 		$output = implode( "\n", $lines );
 		set_transient( 'wookb_llms_txt', $output, DAY_IN_SECONDS );
@@ -150,6 +143,12 @@ class Llms_Txt {
 			$composite_label = Store_Info_Doc::category_label_for( $row->source_type );
 			if ( $composite_label ) {
 				return $composite_label;
+			}
+		}
+		if ( class_exists( '\WOOKB\Llms_Faq' ) ) {
+			$faq_label = Llms_Faq::category_label_for( $row->source_type );
+			if ( $faq_label ) {
+				return $faq_label;
 			}
 		}
 
@@ -194,6 +193,10 @@ class Llms_Txt {
 				$description = Store_Info_Doc::description_for( $row->source_type, $row->lang );
 				return $description ? $line . ': ' . $description : $line;
 			}
+		}
+		if ( class_exists( '\WOOKB\Llms_Faq' ) && Llms_Faq::SOURCE_TYPE === $row->source_type ) {
+			$line = '[' . Llms_Faq::title() . '](' . $url . ')';
+			return $line . ': ' . Llms_Faq::description();
 		}
 
 		$title = wp_strip_all_tags( get_the_title( $row->source_id ) ); // quita <br> y similares sueltos en el titulo.

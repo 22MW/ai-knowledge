@@ -4,3 +4,5 @@ Thumbs.db
 .env
 .env.*
 llms-faq.md
+llms-faq-*.md
+chatbot-system-prompt.md

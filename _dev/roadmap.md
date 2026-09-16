@@ -544,6 +544,105 @@ aplicarlo — en vez de configurar pestaña por pestaña sin guía, como hoy.
 
 ---
 
+## Reestructuración Negocio/Chatbot/FAQs — HECHO (2026-09-16, posterior a la Fase 10)
+
+Trabajo no planificado como fase con código, surgido de pruebas reales
+sobre la pestaña Prompt original. Cambia bastante la superficie de datos
+del cuestionario y las pestañas del admin, por eso se documenta con
+detalle aquí en vez de en una línea suelta del changelog.
+
+**Motivación:** la pestaña "Prompt" original mezclaba datos del negocio
+(dirección, contacto...) con comportamiento del chatbot, y el prompt de
+generación de documentos (`Generator::build_prompt()` / system prompt de
+`class-generator.php`) tenía "bodega/tienda online" hardcodeado — sesgado
+al sitio de pruebas (Bodegas Vi Rei), afectando a cualquier cliente real
+del plugin. Corregido a "negocio/tienda online".
+
+**Reparto final de pestañas:**
+- **Negocio** (siempre visible): datos puros del negocio — nombre/marca,
+  dirección, enfoque del negocio, público objetivo, idioma, horario de
+  atención humana, contacto. Válidos con o sin WooCommerce/Genix. Incluye
+  su propia mini-herramienta de generación IA para el resumen usado como
+  cita de apertura de `llms.txt` (campo `negocio` en
+  `Chatbot_Prompt_Builder::questions()`), con campo libre "Información
+  extra" para pegar instrucciones sueltas antes de generar.
+- **Chatbot** (pestaña "Prompt" internamente, mismo slug de siempre —
+  visible en el menú **solo si Support Genix está activo**, igual patrón
+  que la pestaña WooCommerce): tono, qué hacer sin info, límites, cómo
+  cerrar conversación, longitud de respuesta, uso de emojis. Cuestionario +
+  borrador con IA + pulir + guardar y sincronizar con Genix. Sin Genix, la
+  vista y los 3 handlers relacionados (`generate_prompt_draft`,
+  `save_prompt_draft`, más la vista misma) se bloquean con un aviso, no
+  solo se ocultan del menú — por si alguien fuerza la URL a mano.
+- **FAQs** (nueva pestaña, siempre visible, antes vivía dentro de
+  Ajustes): igual patrón de generación con IA + campo "Información extra".
+
+**Migración de datos:** `Scope::settings()`-equivalente para el
+cuestionario (`Chatbot_Prompt_Builder::save_answers()`) ahora parte de lo
+ya guardado y solo sobreescribe las keys presentes en cada envío — antes
+rellenaba con `''` cualquier key ausente, lo que habría borrado datos de
+una pestaña al guardar la otra si no se hubiera corregido.
+
+**Documentos ahora generados con IA, con historial editable (mismo patrón
+que el borrador del chatbot: generar → revisar/editar → guardar, repetible
+las veces que haga falta):**
+- Resumen de negocio para `llms.txt` (pestaña Negocio).
+- FAQs (pestaña FAQs), con generación multiidioma real (ver abajo).
+
+**FAQ como documento compuesto multiidioma (mismo patrón que
+`Store_Info_Doc`, sentinel `source_id` 900000003, `source_type`
+`wookb-faq`):**
+- Antes: un único archivo global `llms-faq.md` sin idioma, insertado tal
+  cual como bloque inline en `llms.txt`.
+- Ahora: un archivo por idioma activo (`llms-faq-{lang}.md`, gitignored
+  igual que el antiguo), una fila de Registro por idioma (aparece en la
+  pestaña Registro, con su `.md` público), y un enlace normal en
+  `llms.txt` (sección `## FAQ`) igual que el resto de documentos — ya no
+  hay bloque inline aparte. Selector de idioma en la pestaña FAQs, solo
+  visible si el sitio es multiidioma de verdad. Migración automática lazy
+  del contenido del `llms-faq.md` antiguo al primer idioma activo.
+
+**Bug real encontrado durante las pruebas: sufijo "(ES)" en sitios
+mono-idioma.** `Llms_Txt::build()` añadía siempre "(ES)"/"(EN)" a cada
+encabezado de sección, incluso en sitios con un solo idioma activo, donde
+no aporta nada. Corregido: el sufijo solo se añade si
+`count(Wpml::active_languages()) > 1`. Mismo criterio aplicado a la
+columna "Idioma" y al filtro de idioma de la pestaña Registro (antes
+siempre visibles, ahora solo si el sitio es multiidioma).
+
+**Consolidación de orígenes editables en `wp-content/llm/` (mismo día,
+tras revisión del usuario).** `chatbot-system-prompt.md` y el FAQ fuente
+vivían sueltos en la raíz del plugin, junto al código PHP — igual que ya
+pasa con los documentos públicos generados (`Markdown_Store`, base
+`wp-content/llm/`), pero sin estar realmente en el mismo sitio. Movidos:
+- `chatbot-system-prompt.md` → `wp-content/llm/chatbot-system-prompt.md`
+  (global, no es contenido por idioma).
+- FAQ fuente → `wp-content/llm/{lang}/faq-fuente.md` (nombre distinto del
+  `.md` público `preguntas-frecuentes.md`, mismo directorio).
+- Migración automática lazy en cadena desde las rutas antiguas (sin
+  borrarlas hasta el primer `save()` en la ruta nueva) — implementada,
+  pero además migrada a mano en real y las rutas viejas borradas: los 3
+  archivos sueltos de la raíz del plugin (`chatbot-system-prompt.md`,
+  `llms-faq.md`, `llms-faq-es.md`) ya no existen. `chatbot-system-prompt.md`
+  estaba trackeado en git desde antes (con datos reales del cliente
+  Bodegas Vi Rei) — destrackeado (`git rm --cached`) con permiso explícito
+  del usuario, contenido conservado en `wp-content/llm/`.
+- Decisión confirmada por el usuario: `uninstall.php` sigue sin borrar
+  `wp-content/llm/` al desinstalar el plugin (contenido generado, no del
+  plugin) — no se ha tocado ese archivo.
+
+**Archivos tocados:** `includes/class-generator.php`,
+`includes/class-chatbot-prompt-builder.php`, `includes/class-chatbot-prompt.php`,
+`includes/class-llms-faq.php`, `includes/class-llms-txt.php`,
+`admin/class-admin.php`, `admin/class-registry-table.php`,
+`admin/views/tab-negocio.php` (nuevo), `admin/views/tab-faqs.php` (nuevo),
+`admin/views/tab-prompt.php`, `admin/views/tab-ajustes.php` (ya no tiene
+la sección FAQ), `admin/views/tab-woocommerce.php` (enlace a "Contacto y
+horario" actualizado a la pestaña Negocio), `admin/views/tab-registro.php`,
+`.gitignore` (`llms-faq.md`, `llms-faq-*.md`, `chatbot-system-prompt.md`).
+
+---
+
 ## UX pendiente de rediseño (detalle completo en [`qa-resultados-fase-0-a-5.md`](qa-resultados-fase-0-a-5.md))
 
 - **UX2 — "Carga inicial" confusa — HECHO.** Botón único sustituido por

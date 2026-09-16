@@ -33,7 +33,7 @@
   <main>
     <header>
       <h1>AI Knowledge & Visibility — Estado</h1>
-      <p class="muted">Última actualización: 2026-09-16 (Fase 10 completa: pestaña "Contenido" fusiona Alcance+Exclusiones, modo "todos los CPT", "Ajustes avanzados" en el Registro) · antes "woo-kb-generator"</p>
+      <p class="muted">Última actualización: 2026-09-16 (reestructuración Negocio/Chatbot/FAQs: pestañas Negocio y FAQs nuevas, Chatbot solo con Genix, FAQs multiidioma reales) · antes "woo-kb-generator"</p>
       <span class="badge ok">Fases 0-11 hechas y confirmadas.</span>
     </header>
 
@@ -114,6 +114,11 @@
       <article class="card wide">
         <h2>UX2 — Carga inicial rediseñada (2026-09-16)</h2>
         <p>Botón único sustituido por "Generar pendientes" (seguro repetirlo, no regenera lo que no cambió) y "Reiniciar todo" (fuerza regenerar también lo ya sincronizado, confirmación fuerte), en fila, con las variantes de botón ya existentes. Límite diario/tamaño de lote/debounce movidos aquí desde Ajustes, con guardado propio para no arriesgar el resto de Ajustes. El resumen "Total de documentos" ahora es visible en todas las pestañas. Nuevo ajuste general "Largo del texto generado (caracteres)" en Ajustes (antes fijo en código, 1000, sin sitio donde verlo/cambiarlo).</p>
+      </article>
+
+      <article class="card wide">
+        <h2>Reestructuración Negocio/Chatbot/FAQs (2026-09-16)</h2>
+        <p>Prompt genérico de generación corregido (ya no "bodega", ahora "negocio"). Pestaña Prompt original dividida: <strong>Negocio</strong> (siempre visible, datos puros + generación IA del resumen de llms.txt), <strong>Chatbot</strong> (solo visible si Support Genix está activo, con guardas también en los handlers), y <strong>FAQs</strong> nueva (movida desde Ajustes, generación IA, ahora <strong>multiidioma real</strong>: un documento/.md por idioma con fila propia en Registro, en vez del archivo global único de antes). Fix: el sufijo "(ES)"/"(EN)" en llms.txt y en el Registro ya solo aparece en sitios realmente multiidioma. Bug real corregido de paso: formularios anidados en la fila expandida del Registro rompían "Borrar seleccionados" en silencio (heredado de la pieza 5 de la Fase 10). De paso: orígenes editables (<code>chatbot-system-prompt.md</code>, FAQ fuente) movidos de la raíz del plugin a <code>wp-content/llm/</code>, junto al resto de contenido — el <code>chatbot-system-prompt.md</code> viejo, que llevaba trackeado en git con datos reales del cliente, se destrackeó.</p>
       </article>
 
       <article class="card wide">

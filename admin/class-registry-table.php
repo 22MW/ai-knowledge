@@ -33,16 +33,23 @@ class Registry_Table extends \WP_List_Table {
 	}
 
 	public function get_columns() {
-		return array(
+		$columns = array(
 			'cb'     => '<input type="checkbox" />',
 			'source' => __( 'Origen', 'ai-knowledge' ),
-			'lang'   => __( 'Idioma', 'ai-knowledge' ),
-			'status' => __( 'Estado', 'ai-knowledge' ),
-			'updated' => __( 'Actualizado', 'ai-knowledge' ),
-			'links'  => __( 'Enlaces', 'ai-knowledge' ),
-			'manual' => __( 'Control manual', 'ai-knowledge' ),
-			'actions' => __( 'Acciones', 'ai-knowledge' ),
 		);
+		// Columna Idioma: solo si el sitio es multiidioma de verdad -- en un
+		// sitio de un solo idioma, todas las filas dirían lo mismo, es
+		// ruido. Mismo criterio que el sufijo "(ES)"/"(EN)" de llms.txt
+		// (Llms_Txt::build()).
+		if ( count( Wpml::active_languages() ) > 1 ) {
+			$columns['lang'] = __( 'Idioma', 'ai-knowledge' );
+		}
+		$columns['status']  = __( 'Estado', 'ai-knowledge' );
+		$columns['updated'] = __( 'Actualizado', 'ai-knowledge' );
+		$columns['links']   = __( 'Enlaces', 'ai-knowledge' );
+		$columns['manual']  = __( 'Control manual', 'ai-knowledge' );
+		$columns['actions'] = __( 'Acciones', 'ai-knowledge' );
+		return $columns;
 	}
 
 	/** Valores permitidos para el selector "por página" de la toolbar. */
@@ -120,6 +127,9 @@ class Registry_Table extends \WP_List_Table {
 					if ( $composite_title ) {
 						return esc_html( $composite_title );
 					}
+				}
+				if ( class_exists( '\WOOKB\Llms_Faq' ) && Llms_Faq::SOURCE_TYPE === $item->source_type ) {
+					return esc_html( Llms_Faq::title() );
 				}
 				$title = get_the_title( $item->source_id );
 				$edit  = get_edit_post_link( $item->source_id );

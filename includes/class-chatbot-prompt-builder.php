@@ -31,44 +31,111 @@ class Chatbot_Prompt_Builder {
 	const SUMMARY_MIN_LENGTH_RECOMMENDED = 1000;
 
 	/**
-	 * Preguntas del cuestionario. 'key' => [label, placeholder, required].
-	 * El usuario pidió explícitamente: tono, dirección de negocio, qué hacer
-	 * sin respuesta, "y las que creas necesario" -- se añaden idioma
-	 * principal, límites (qué no debe hacer nunca) y contacto de reserva por
-	 * si difiere del que ya usa el prompt actual.
+	 * Preguntas del cuestionario. 'key' => [label, placeholder, type, group].
+	 * 'group' separa qué pregunta vive en qué pestaña del admin: 'negocio'
+	 * (datos del negocio en si, validos con o sin WooCommerce -- lo
+	 * especifico de WooCommerce vive en su propia pestaña) o 'chatbot'
+	 * (como debe comportarse el bot). generate_draft() recorre TODAS sin
+	 * distinguir grupo: el prompt final combina ambos.
+	 *
+	 * Se guardan todas en una sola option (ANSWERS_OPTION) pase lo que pase
+	 * -- save_answers() solo sobreescribe las keys presentes en cada envio,
+	 * para que guardar la pestaña Negocio no borre lo ya guardado en
+	 * Chatbot y viceversa.
 	 */
 	public static function questions() {
 		return array(
-			'tono'            => array(
-				'label'       => __( 'Tono de la marca', 'ai-knowledge' ),
-				'placeholder' => __( 'Ej: cercano, profesional, cálido — bodega familiar, sin lenguaje robótico.', 'ai-knowledge' ),
+			// --- Grupo "negocio": tambien alimenta llm/info.md y llms.txt
+			// (ver write_info_doc()), no solo el prompt del chatbot.
+			'nombre_negocio'    => array(
+				'label'       => __( 'Nombre del negocio / marca', 'ai-knowledge' ),
+				'placeholder' => __( 'Ej: el nombre con el que el chatbot debe referirse al negocio.', 'ai-knowledge' ),
 				'type'        => 'text',
+				'group'       => 'negocio',
 			),
-			'negocio'         => array(
-				'label'       => __( 'Dirección / enfoque del negocio', 'ai-knowledge' ),
-				'placeholder' => __( 'Ej: bodega familiar en Mallorca, vende vino propio y experiencias enoturísticas (visitas, catas, eventos).', 'ai-knowledge' ),
+			'direccion'         => array(
+				'label'       => __( 'Dirección', 'ai-knowledge' ),
+				'placeholder' => __( 'Dirección postal del negocio, si es relevante para el cliente (local físico, recogida, visitas...).', 'ai-knowledge' ),
+				'type'        => 'text',
+				'group'       => 'negocio',
+			),
+			'negocio'           => array(
+				'label'       => __( 'Enfoque del negocio', 'ai-knowledge' ),
+				'placeholder' => __( 'Ej: negocio familiar, qué vende o qué servicios ofrece (productos propios, experiencias, citas...).', 'ai-knowledge' ),
 				'type'        => 'textarea',
+				'group'       => 'negocio',
 			),
-			'sin_respuesta'   => array(
-				'label'       => __( 'Qué hacer cuando no hay información', 'ai-knowledge' ),
-				'placeholder' => __( 'Ej: no inventar ni dar largas, decir que no se tiene esa información y dar el contacto directo.', 'ai-knowledge' ),
+			'publico_objetivo'  => array(
+				'label'       => __( 'Público objetivo', 'ai-knowledge' ),
+				'placeholder' => __( 'Ej: tipo de cliente habitual — ayuda al chatbot a calibrar tono y nivel de detalle.', 'ai-knowledge' ),
 				'type'        => 'textarea',
+				'group'       => 'negocio',
 			),
-			'idioma_principal' => array(
+			'idioma_principal'  => array(
 				'label'       => __( 'Idioma principal del negocio', 'ai-knowledge' ),
 				'placeholder' => __( 'Ej: español, aunque la web está también en inglés y alemán.', 'ai-knowledge' ),
 				'type'        => 'text',
+				'group'       => 'negocio',
 			),
-			'limites'         => array(
+			'horario_atencion'  => array(
+				'label'       => __( 'Horario de atención humana', 'ai-knowledge' ),
+				'placeholder' => __( 'Cuándo hay alguien real disponible, aparte del chatbot (que suele estar activo 24/7).', 'ai-knowledge' ),
+				'type'        => 'text',
+				'group'       => 'negocio',
+			),
+			'contacto'          => array(
+				'label'       => __( 'Datos de contacto directo', 'ai-knowledge' ),
+				'placeholder' => __( 'Teléfono, WhatsApp, email... deja vacío para mantener los que ya haya en el prompt actual.', 'ai-knowledge' ),
+				'type'        => 'textarea',
+				'group'       => 'negocio',
+			),
+			// --- Grupo "chatbot": como debe comportarse el bot.
+			'tono'              => array(
+				'label'       => __( 'Tono de la marca', 'ai-knowledge' ),
+				'placeholder' => __( 'Ej: cercano, profesional, cálido, sin lenguaje robótico.', 'ai-knowledge' ),
+				'type'        => 'text',
+				'group'       => 'chatbot',
+			),
+			'sin_respuesta'     => array(
+				'label'       => __( 'Qué hacer cuando no hay información', 'ai-knowledge' ),
+				'placeholder' => __( 'Ej: no inventar ni dar largas, decir que no se tiene esa información y dar el contacto directo.', 'ai-knowledge' ),
+				'type'        => 'textarea',
+				'group'       => 'chatbot',
+			),
+			'limites'           => array(
 				'label'       => __( 'Qué NO debe hacer nunca el chatbot', 'ai-knowledge' ),
 				'placeholder' => __( 'Ej: no gestionar pagos ni reclamaciones directamente, no prometer descuentos, no inventar precios ni stock.', 'ai-knowledge' ),
 				'type'        => 'textarea',
+				'group'       => 'chatbot',
 			),
-			'contacto'        => array(
-				'label'       => __( 'Datos de contacto directo (si difieren de los ya usados)', 'ai-knowledge' ),
-				'placeholder' => __( 'Teléfono, WhatsApp, email... deja vacío para mantener los que ya haya en el prompt actual.', 'ai-knowledge' ),
-				'type'        => 'textarea',
+			'cierre_conversacion' => array(
+				'label'       => __( 'Cómo cerrar una conversación', 'ai-knowledge' ),
+				'placeholder' => __( 'Ej: despedirse con cordialidad e invitar a seguir preguntando si hace falta.', 'ai-knowledge' ),
+				'type'        => 'text',
+				'group'       => 'chatbot',
 			),
+			'longitud_respuesta'  => array(
+				'label'       => __( 'Longitud de respuesta preferida', 'ai-knowledge' ),
+				'placeholder' => __( 'Ej: respuestas cortas y directas, o explicadas con más detalle.', 'ai-knowledge' ),
+				'type'        => 'text',
+				'group'       => 'chatbot',
+			),
+			'uso_emojis'        => array(
+				'label'       => __( 'Uso de emojis', 'ai-knowledge' ),
+				'placeholder' => __( 'Ej: sin emojis, o alguno puntual con moderación.', 'ai-knowledge' ),
+				'type'        => 'text',
+				'group'       => 'chatbot',
+			),
+		);
+	}
+
+	/** Preguntas de un grupo concreto ('negocio'|'chatbot'), mismo orden. */
+	public static function questions_by_group( $group ) {
+		return array_filter(
+			self::questions(),
+			function ( $q ) use ( $group ) {
+				return $group === $q['group'];
+			}
 		);
 	}
 
@@ -77,10 +144,17 @@ class Chatbot_Prompt_Builder {
 		return wp_parse_args( get_option( self::ANSWERS_OPTION, array() ), $defaults );
 	}
 
+	/**
+	 * Parte de lo ya guardado (no de un array vacio): las pestañas Negocio y
+	 * Chatbot envian cada una solo las keys de su propio grupo, y guardar
+	 * una no debe borrar lo ya guardado de la otra.
+	 */
 	public static function save_answers( array $answers ) {
-		$clean = array();
+		$clean = self::get_saved_answers();
 		foreach ( self::questions() as $key => $q ) {
-			$clean[ $key ] = isset( $answers[ $key ] ) ? sanitize_textarea_field( $answers[ $key ] ) : '';
+			if ( isset( $answers[ $key ] ) ) {
+				$clean[ $key ] = sanitize_textarea_field( $answers[ $key ] );
+			}
 		}
 		update_option( self::ANSWERS_OPTION, $clean, false );
 		return $clean;
@@ -99,10 +173,20 @@ class Chatbot_Prompt_Builder {
 		// El resumen ("negocio") ya se muestra en la cita "> ..." de llms.txt
 		// (Llms_Txt::summary(), misma fuente) -- no se repite aquí para evitar
 		// que el mismo texto aparezca dos veces seguidas en llms.txt.
+		$titulo  = ! empty( $answers['nombre_negocio'] ) ? $answers['nombre_negocio'] : get_bloginfo( 'name' );
 		$lines   = array();
-		$lines[] = '# ' . get_bloginfo( 'name' );
+		$lines[] = '# ' . $titulo;
+		if ( ! empty( $answers['direccion'] ) ) {
+			$lines[] = 'Dirección: ' . $answers['direccion'];
+		}
+		if ( ! empty( $answers['publico_objetivo'] ) ) {
+			$lines[] = 'Público objetivo: ' . $answers['publico_objetivo'];
+		}
 		if ( ! empty( $answers['idioma_principal'] ) ) {
 			$lines[] = 'Idiomas: ' . $answers['idioma_principal'];
+		}
+		if ( ! empty( $answers['horario_atencion'] ) ) {
+			$lines[] = 'Horario de atención humana: ' . $answers['horario_atencion'];
 		}
 		if ( ! empty( $answers['contacto'] ) ) {
 			$lines[] = 'Contacto: ' . $answers['contacto'];
@@ -123,6 +207,70 @@ class Chatbot_Prompt_Builder {
 
 	public static function info_doc_url() {
 		return content_url( '/llm/info.md' );
+	}
+
+	/**
+	 * Genera/pule con IA el resumen de negocio (campo 'negocio', usado como
+	 * cita de apertura publica de llms.txt via Llms_Txt::summary()), a
+	 * partir del resto de respuestas del grupo "negocio" ya guardadas. Mismo
+	 * patron que generate_draft() pero para un solo campo, no el prompt
+	 * completo del chatbot.
+	 */
+	public static function generate_business_summary( array $answers, $extra_info = '' ) {
+		$config = Generator::ai_config();
+		if ( ! $config ) {
+			return new \WP_Error( 'wookb_no_ai_key', __( 'No hay clave de IA configurada (ni Genix ni propia).', 'ai-knowledge' ) );
+		}
+
+		$prompt = "Redacta un resumen breve y claro del negocio, en prosa (no en lista), a partir de estos datos:\n\n";
+		foreach ( self::questions_by_group( 'negocio' ) as $key => $q ) {
+			if ( 'negocio' === $key || empty( $answers[ $key ] ) ) {
+				continue;
+			}
+			$prompt .= '- ' . $q['label'] . ': ' . $answers[ $key ] . "\n";
+		}
+		if ( ! empty( $answers['negocio'] ) ) {
+			$prompt .= "\nBorrador actual a mejorar (parte de aquí si tiene sentido, no lo ignores):\n" . $answers['negocio'] . "\n";
+		}
+		if ( '' !== trim( (string) $extra_info ) ) {
+			$prompt .= "\nInformación extra a tener en cuenta:\n" . trim( $extra_info ) . "\n";
+		}
+		$prompt .= "\nEste texto se usa como cita de apertura pública en llms.txt, el archivo que leen los buscadores de IA para entender de qué trata la web: debe ser una descripción útil y concreta, no vacía ni genérica.\n";
+		$prompt .= "No inventes datos que no se hayan dado.\n";
+		$prompt .= 'Responde solo con el texto final (contando saltos de línea, no debe superar los ' . self::MAX_LENGTH . ' caracteres), en prosa, sin encabezados Markdown, sin explicaciones ni comillas envolventes.';
+
+		return self::enforce_length( self::call_ai( $config, $prompt ) );
+	}
+
+	/**
+	 * Genera un borrador de FAQs en Markdown (para Llms_Faq / /llms.txt), a
+	 * partir de las respuestas del grupo "negocio" y, si hay, el contenido
+	 * actual de FAQ ya guardado (para ampliar/mejorar, no partir de cero
+	 * cada vez). Mismo formato libre que ya consume Llms_Txt::build(): cada
+	 * pregunta como encabezado "### ..." seguida de su respuesta.
+	 */
+	public static function generate_faqs( array $answers, $current_faq = '', $extra_info = '' ) {
+		$config = Generator::ai_config();
+		if ( ! $config ) {
+			return new \WP_Error( 'wookb_no_ai_key', __( 'No hay clave de IA configurada (ni Genix ni propia).', 'ai-knowledge' ) );
+		}
+
+		$prompt = "Genera preguntas frecuentes (FAQ) en Markdown para publicar públicamente en llms.txt, a partir de estos datos del negocio:\n\n";
+		foreach ( self::questions_by_group( 'negocio' ) as $key => $q ) {
+			if ( ! empty( $answers[ $key ] ) ) {
+				$prompt .= '- ' . $q['label'] . ': ' . $answers[ $key ] . "\n";
+			}
+		}
+		if ( '' !== trim( (string) $current_faq ) ) {
+			$prompt .= "\nFAQ ya existente (amplía o mejora, no la descartes sin motivo):\n\n" . $current_faq . "\n";
+		}
+		if ( '' !== trim( (string) $extra_info ) ) {
+			$prompt .= "\nInformación extra a tener en cuenta:\n" . trim( $extra_info ) . "\n";
+		}
+		$prompt .= "\nFormato: entre 4 y 8 preguntas, cada una como encabezado \"### ¿Pregunta?\" seguido de la respuesta en el párrafo siguiente. No inventes datos de contacto, precios, horarios ni políticas que no se hayan dado — si falta un dato para responder bien, omite esa pregunta en vez de inventar.\n";
+		$prompt .= 'Responde solo con el Markdown final, sin explicaciones envolventes.';
+
+		return self::call_ai( $config, $prompt );
 	}
 
 	/**
@@ -164,7 +312,7 @@ class Chatbot_Prompt_Builder {
 	 * Genera el borrador completo a partir de las respuestas del cuestionario
 	 * y, si hay, el contenido de las páginas de referencia.
 	 */
-	public static function generate_draft( array $answers, array $reference_pages = array() ) {
+	public static function generate_draft( array $answers, array $reference_pages = array(), $extra_info = '' ) {
 		$config = Generator::ai_config();
 		if ( ! $config ) {
 			return new \WP_Error( 'wookb_no_ai_key', __( 'No hay clave de IA configurada (ni Genix ni propia).', 'ai-knowledge' ) );
@@ -182,6 +330,10 @@ class Chatbot_Prompt_Builder {
 			foreach ( $reference_pages as $page ) {
 				$prompt .= '### ' . $page['title'] . ' (' . $page['url'] . ")\n" . $page['content'] . "\n\n";
 			}
+		}
+
+		if ( '' !== trim( (string) $extra_info ) ) {
+			$prompt .= "\nInformación extra a tener en cuenta:\n" . trim( $extra_info ) . "\n";
 		}
 
 		$prompt .= "\nInstrucciones de formato:\n";
@@ -314,17 +466,17 @@ class Chatbot_Prompt_Builder {
 			return;
 		}
 
-		$prompt_tab_url = admin_url( 'admin.php?page=woo-kb-generator&tab=prompt' );
+		$negocio_tab_url = admin_url( 'admin.php?page=woo-kb-generator&tab=negocio' );
 
 		printf(
 			'<div class="notice notice-info is-dismissible"><p><strong>%1$s</strong> %2$s</p></div>',
 			esc_html__( 'WOO Knowledge Base Generator:', 'ai-knowledge' ),
 			sprintf(
-				/* translators: 1: longitud actual en caracteres, 2: mínimo recomendado, 3: enlace a la pestaña Prompt */
-				esc_html__( 'El resumen del negocio (pestaña Prompt, "Dirección / enfoque del negocio") tiene %1$d caracteres. Se usa como cita de apertura en /llms.txt: ampliarlo a al menos %2$d caracteres da más contexto útil a los crawlers de IA. %3$s', 'ai-knowledge' ),
+				/* translators: 1: longitud actual en caracteres, 2: mínimo recomendado, 3: enlace a la pestaña Negocio */
+				esc_html__( 'El resumen del negocio (pestaña Negocio, "Enfoque del negocio") tiene %1$d caracteres. Se usa como cita de apertura en /llms.txt: ampliarlo a al menos %2$d caracteres da más contexto útil a los crawlers de IA. %3$s', 'ai-knowledge' ),
 				(int) $length,
 				(int) self::SUMMARY_MIN_LENGTH_RECOMMENDED,
-				'<a href="' . esc_url( $prompt_tab_url ) . '">' . esc_html__( 'Ir a la pestaña Prompt', 'ai-knowledge' ) . '</a>'
+				'<a href="' . esc_url( $negocio_tab_url ) . '">' . esc_html__( 'Ir a la pestaña Negocio', 'ai-knowledge' ) . '</a>'
 			)
 		);
 	}

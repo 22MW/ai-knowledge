@@ -8,6 +8,34 @@ Ver `_dev/roadmap.md` para el plan completo por fases y `_dev/decisiones.md`
 para el porqué de la identidad/alcance. Este plugin sigue orientado a IA +
 Support Genix como núcleo; todo lo de abajo es capa añadida encima.
 
+### Reestructuración Negocio/Chatbot/FAQs (2026-09-16)
+
+- Prompt genérico de generación de documentos corregido: ya no dice
+  "bodega/tienda online" (sesgado al sitio de pruebas), ahora
+  "negocio/tienda online" — afecta a todos los clientes del plugin.
+- Nueva pestaña **Negocio** (siempre visible): datos puros del negocio,
+  independientes de WooCommerce/Genix. Incluye generación con IA del
+  resumen para `llms.txt`, con campo "Información extra" opcional.
+- Pestaña **Chatbot** (antes "Prompt"): ahora solo visible en el menú si
+  Support Genix está activo (mismo patrón que la pestaña WooCommerce),
+  con guardas también en los handlers por si se accede por URL directa.
+- Nueva pestaña **FAQs** (movida desde Ajustes): generación con IA,
+  información extra opcional, y ahora **multiidioma real** — un
+  documento/`.md` por idioma activo, con fila propia en Registro y enlace
+  normal desde `llms.txt` (ya no bloque inline aparte). Migración
+  automática del FAQ antiguo (mono-idioma) al primer idioma activo.
+- Fix: sufijo "(ES)"/"(EN)" en encabezados de `llms.txt`, columna Idioma
+  del Registro y filtro de idioma — ahora solo aparecen si el sitio es
+  multiidioma de verdad (antes siempre visibles, incluso con un solo
+  idioma).
+- `save_answers()` del cuestionario ahora parte de lo ya guardado en vez
+  de sobreescribir con vacío las keys no presentes en cada envío —
+  evita que guardar una pestaña borre datos de otra.
+- Orígenes editables (chatbot-system-prompt.md, FAQ fuente) movidos de la
+  raíz del plugin a `wp-content/llm/`, junto al resto de contenido
+  generado. `chatbot-system-prompt.md` de la raíz, que estaba trackeado en
+  git con datos reales del cliente, se destrackeó.
+
 ### Fase 10, piezas 2/3/4: pestaña "Contenido" (2026-09-16)
 
 - `tab-alcance.php` + `tab-exclusiones.php` fusionadas en una sola pestaña

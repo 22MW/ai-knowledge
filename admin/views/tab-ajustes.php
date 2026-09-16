@@ -7,7 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $settings        = Scope::settings();
 $ai_cfg          = Generator::ai_config();
-$faq_content     = class_exists( '\WOOKB\Llms_Faq' ) ? Llms_Faq::read() : '';
 ?>
 <p class="description">
 	<?php esc_html_e( 'Configuración general del generador de documentos: largo del texto, clave de IA a usar, instrucciones adicionales del prompt, y qué post_types muestran el botón de añadir a la base de conocimiento desde su editor.', 'ai-knowledge' ); ?>
@@ -152,14 +151,3 @@ $faq_content     = class_exists( '\WOOKB\Llms_Faq' ) ? Llms_Faq::read() : '';
 </p>
 <hr />
 <?php endif; ?>
-
-<h2><?php esc_html_e( 'FAQ pública (llms.txt)', 'ai-knowledge' ); ?></h2>
-<p class="description">
-	<?php esc_html_e( 'Contenido libre en Markdown que se publica bajo el encabezado "## Preguntas frecuentes" de /llms.txt, visible para crawlers de IA. Distinto del prompt del chatbot: esto es contenido público, no instrucciones internas.', 'ai-knowledge' ); ?>
-</p>
-<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-	<input type="hidden" name="action" value="wookb_save_llms_faq" />
-	<?php wp_nonce_field( 'wookb_save_llms_faq' ); ?>
-	<textarea name="llms_faq" rows="10" class="large-text code" placeholder="### ¿Puedo devolver un producto?&#10;Respuesta..."><?php echo esc_textarea( $faq_content ); ?></textarea>
-	<?php submit_button( __( 'Guardar FAQ', 'ai-knowledge' ) ); ?>
-</form>
