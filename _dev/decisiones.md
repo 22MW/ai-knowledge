@@ -46,18 +46,21 @@ no inventar por pantalla.
 - **Sin bordes decorativos** en cajas, paneles, botones, chips. La jerarquía
   visual se marca con color de fondo sólido + contraste de texto. Excepción:
   campos de formulario y separadores de fila de tabla (bordes funcionales).
-- **Paleta de 6 variantes de botón**, mismo tamaño siempre
+- **Paleta de 5 variantes de botón**, mismo tamaño siempre
   (`padding:6px 14px; font-size:14px`), solo cambia color de fondo/texto:
-  neutro, primario, peligro, éxito, aviso, info. Hover/foco: oscurecer el
+  neutro, primario, peligro, éxito, info. Hover/foco: oscurecer el
   propio fondo (`filter: brightness(0.92)`), nunca añadir un color ni un
-  contorno nuevo.
+  contorno nuevo. **No crear una 6ª variante ("aviso" u otra) sin necesidad
+  real** — confirmado 2026-09-16: para una acción fuerte pero no
+  destructiva ("Reiniciar todo" de Carga inicial) se reutilizó el neutro
+  ya existente en vez de añadir una variante nueva.
 - Motivo: tras varias rondas de ajustes puntuales de CSS sin una referencia
   común, cada pantalla del plugin había terminado con su propio criterio de
   color/tamaño (botones de distinto tamaño entre sí, colores inventados por
   bloque). Se corrige fijando una única fuente de verdad visual.
 - **Regla permanente: ningún botón/color/estilo nuevo se inventa.** Se usa
   siempre una variable real de Tabler (`--tblr-*`, ver `assets/tabler.min.css`)
-  y una de las 6 clases ya definidas en `assets/wookb-theme.css`
+  y una de las 5 clases ya definidas en `assets/wookb-theme.css`
   (`.button`, `.button-primary`, `.button-link-delete`/`.delete`,
   `.wookb-btn-success`, `.wookb-btn-info`). No crear una clase de botón
   nueva sin añadirla antes a `_dev/guia-estilo-visual.html` y a esta lista.
@@ -77,3 +80,22 @@ no inventar por pantalla.
   `select` en `wookb-theme.css` usa `!important` por el mismo motivo. Si
   aparece un tercer caso igual (otro elemento nativo con hover/foco pisado
   por WordPress core), se resuelve igual, no como excepción rara.
+
+## 2026-09-16 — Descubribilidad de la API OpenAPI (Fase 7)
+
+Publicar `/wp-json/ai-knowledge/v1/openapi.json` no basta por sí solo: sin
+que nada enlace a él, depende de que alguien lo visite por su cuenta o lo
+configure a mano en una integración (ej. una Action de un GPT
+personalizado) — ningún crawler ni IA lo "descubre solo".
+
+**Decisión:** `llms.txt` (`Llms_Txt::build()`) enlaza siempre a
+`openapi.json` en una sección `## API` propia, justo después del
+resumen/info y antes de las categorías de contenido. Motivo: `llms.txt` es
+el punto de entrada real que ya leen los crawlers de IA (mismo criterio que
+el resto de la capa de visibilidad — Markdown público, JSON-LD); un
+documento técnico sin nada que apunte a él es, en la práctica, invisible.
+
+**Nota de caché:** `llms.txt` se cachea 24h (`wookb_llms_txt` transient).
+Este cambio no se ve reflejado hasta que expire el caché o se llame a
+`Llms_Txt::invalidate()` (se dispara ya con la sincronización normal de
+contenido) — no se forzó una invalidación especial para este cambio de código.

@@ -8,40 +8,28 @@
 
 ## Commiteado y pusheado (confirmado en `git log`)
 
-9 commits en `knowBaseDev`, Fases 0-6 del roadmap completas, los bugs de la
-primera ronda de QA arreglados, rediseño del CSS del admin (commit
-`20ae873`) y Fase 6 — panel "Visibilidad IA" (commit `334492e`). Detalle en
-[`CHANGELOG.md`](../CHANGELOG.md); regla visual permanente en
+10 commits en `knowBaseDev`, Fases 0-6 del roadmap completas, UX2 (Carga
+inicial rediseñada) y el ajuste general de largo de texto (commit
+`768d239`, sobre `334492e` — Fase 6 — y `20ae873` — rediseño CSS). Detalle
+completo en [`CHANGELOG.md`](../CHANGELOG.md); regla visual permanente en
 [`decisiones.md`](decisiones.md).
 
-## Confirmado por el usuario, autorizado para commit (pendiente de commitear)
+## En curso ahora mismo
 
-**UX2 — rediseño de "Carga inicial", completo:**
-- Botón único sustituido por "Generar pendientes" (comportamiento de
-  siempre) + "Reiniciar todo" (fuerza regenerar también lo ya sincronizado,
-  confirmación JS fuerte), en fila. `$force` propagado por toda la cadena
-  async en `includes/class-queue.php`.
-- Límite diario/tamaño de lote/debounce movidos aquí desde Ajustes, acción
-  de guardado propia `wookb_save_queue_settings` (`Scope::update_settings()`
-  con merge — no reescribe el resto de Ajustes; se corrigió a mitad de
-  implementación un bug real donde `save_settings()` seguía reseteando
-  esas 3 claves a su valor por defecto).
-- Resumen "Total de documentos" visible en todas las pestañas, no solo Registro.
-- Botones de variantes ya existentes (neutro/primario), sin crear estilo nuevo.
-
-**Nuevo ajuste general "Largo del texto generado (caracteres)"** en
-Ajustes: antes fijo en código (`Generator::BODY_CHAR_LIMIT = 1000`), sin
-ningún sitio del admin donde verlo o cambiarlo. El límite por documento del
-Registro (Fase 1) sigue teniendo prioridad si está puesto.
-
-Archivos: `includes/class-queue.php`, `admin/class-admin.php`,
-`admin/views/tab-carga-inicial.php`, `admin/views/tab-ajustes.php`,
-`assets/wookb-theme.css`, `includes/class-generator.php`,
-`includes/class-scope.php`.
+**Fase 7 — API pública documentada.** Evaluada y planificada, plan
+aprobado por el usuario, pendiente de implementar:
+- Documento OpenAPI 3.0 **real, escrito a mano** (no el índice nativo de
+  WordPress, que no es formato OpenAPI — hallazgo de `evaluar-cambio`) en
+  `GET /wp-json/ai-knowledge/v1/openapi.json`.
+- Describe las 2 rutas ya existentes de Fase 3 (`/content/{id}`,
+  `/{post_type}`) y su respuesta tipada según `Extractor_Base`/`Extractor_Woo`.
+- Detalle completo del plan en `_dev/roadmap.md`, sección Fase 7.
+- Archivo a tocar: `includes/class-rest-content.php` (nueva ruta + método
+  `get_openapi_spec()`).
 
 ## Pendiente real (sin empezar)
 
-- Fases 7-11 del roadmap.
+- Fases 8-11 del roadmap.
 - UX3 (WooCommerce: checkboxes + prompt por campo, cambio de arquitectura
   de datos, requiere `rol-analista`) y UX4 (visibilidad del botón de
   generar documentos de tienda) — ver `_dev/roadmap.md`, sección "UX
@@ -66,6 +54,6 @@ Archivos: `includes/class-queue.php`, `admin/class-admin.php`,
 
 ## Relevo mínimo — siguiente paso
 
-Con el commit de UX2 + límite de caracteres hecho: decidir con el usuario
-si sigue la Fase 7 (API pública documentada) o UX3 (WooCommerce, con
+Implementar Fase 7 (plan ya aprobado, ver arriba) con `implementar-cambio`.
+Después: decidir con el usuario si sigue la Fase 8 o UX3 (WooCommerce, con
 `rol-analista` primero por ser cambio de arquitectura de datos).

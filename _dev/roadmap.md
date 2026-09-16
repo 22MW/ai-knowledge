@@ -167,13 +167,47 @@ contenido está bien expuesto a IA/buscadores.
 
 ---
 
-## Fase 7 — API pública documentada — PENDIENTE
+## Fase 7 — API pública documentada — EN CURSO (plan aprobado)
 
-**Qué hace:** describe la API de la Fase 2 para que un agente pueda
-descubrirla solo.
+**Qué hace:** describe la API REST de la Fase 3 (`class-rest-content.php`)
+para que un agente pueda descubrirla solo.
 
-**Pasos:**
-1. Generar `/wp-json/ai-knowledge/v1/openapi.json` a partir de las rutas ya registradas en la Fase 2 (usar el propio schema de REST de WordPress, no escribirlo a mano).
+**Hallazgo tras `evaluar-cambio`:** el enunciado original ("usar el propio
+schema de REST de WordPress, no escribirlo a mano") no era del todo
+aplicable — WordPress genera solo un índice de descubrimiento propio en
+`/wp-json/ai-knowledge/v1` (no es formato OpenAPI). Decisión tomada: un
+documento **OpenAPI 3.0 real, escrito a mano** (son solo 2 rutas, poco
+trabajo), en vez de renombrar el índice nativo de WordPress como si fuera
+OpenAPI sin serlo.
+
+**MVP aprobado:**
+1. Nueva ruta `GET /ai-knowledge/v1/openapi.json` en
+   `Rest_Content::register_routes()`, pública (mismo criterio que las
+   otras 2 rutas).
+2. Nuevo método `Rest_Content::get_openapi_spec()`: `info` (título, versión
+   = `WOOKB_VERSION`), `servers` (`home_url('/wp-json/ai-knowledge/v1')`),
+   `paths` para `/content/{id}` y `/{post_type}` (con `page`/`per_page`),
+   respuesta 200 + 404 genérico.
+3. `components.schemas.ContentItem` tipado según
+   `Extractor_Base::extract()`/`Extractor_Woo`: `id` (integer),
+   `post_type`/`title`/`content`/`excerpt`/`url`/`lang` (string),
+   `taxonomies`/`custom_fields` (object), `price`/`stock`/`sku` (string,
+   nullable — solo poblados si es un producto WooCommerce),
+   `variants` (array de objetos).
+
+**Excluido:** rutas de `sgkb-docs`/`wp/v2` (protegidas por `Rest_Guard`, no
+públicas a propósito); validación automática contra un validador OpenAPI
+externo (solo manual).
+
+**Validación:** `php -l`; prueba manual — pedir el endpoint y revisar la
+estructura (`openapi`, `info`, `paths`, `components.schemas.ContentItem`).
+
+**Ampliación (descubribilidad):** publicar el endpoint no basta si nada
+enlaza a él. `llms.txt` (`Llms_Txt::build()`) ahora incluye una sección
+`## API` con enlace a `openapi.json`, justo después del resumen/info y
+antes de las categorías de contenido — ver decisión en `decisiones.md`.
+Nota: `llms.txt` se cachea 24h, este cambio tarda en verse reflejado hasta
+que expire el caché o se sincronice contenido (`Llms_Txt::invalidate()`).
 
 ---
 

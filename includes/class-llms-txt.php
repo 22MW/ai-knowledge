@@ -63,6 +63,15 @@ class Llms_Txt {
 			$lines[] = '';
 		}
 
+		// Fase 7: enlace a la documentacion OpenAPI, para que un crawler que
+		// ya esta leyendo llms.txt (el punto de entrada real) descubra la API
+		// tecnica sin depender de que la visite por su cuenta -- publicar
+		// openapi.json solo no basta si nada enlaza a el (ver _dev/decisiones.md).
+		$lines[] = '## API';
+		$lines[] = '';
+		$lines[] = '- [' . __( 'Documentación técnica de la API (OpenAPI)', 'ai-knowledge' ) . '](' . rest_url( 'ai-knowledge/v1/openapi.json' ) . '): ' . __( 'para desarrolladores e integraciones.', 'ai-knowledge' );
+		$lines[] = '';
+
 		// Categoria+idioma combinados (pedido explicito): "## Vinos (ES)",
 		// "## Enoturismo (EN)", etc. -- mas cercano al formato de la spec de
 		// llms.txt (secciones tematicas con descripcion corta por enlace) que

@@ -64,6 +64,16 @@ class Rest_Content {
 				'permission_callback' => '__return_true',
 			)
 		);
+
+		register_rest_route(
+			self::NAMESPACE_,
+			'/openapi.json',
+			array(
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => array( __CLASS__, 'get_openapi_spec' ),
+				'permission_callback' => '__return_true',
+			)
+		);
 	}
 
 	/**
@@ -153,6 +163,176 @@ class Rest_Content {
 		$response->header( 'X-WP-Total', (string) $total );
 		$response->header( 'X-WP-TotalPages', (string) $total_pages );
 		return $response;
+	}
+
+	/**
+	 * Fase 7: GET /ai-knowledge/v1/openapi.json -- documento OpenAPI 3.0
+	 * REAL, escrito a mano (decisión de evaluar-cambio: el índice de
+	 * descubrimiento nativo de WordPress en /wp-json/ai-knowledge/v1 no es
+	 * formato OpenAPI, así que no vale renombrarlo). Describe exactamente
+	 * las 2 rutas de arriba -- si cambian sus parámetros o su respuesta, hay
+	 * que actualizar esto a mano tambien, no se genera solo.
+	 */
+	public static function get_openapi_spec() {
+		$response = rest_ensure_response( self::openapi_document() );
+		$response->header( 'Cache-Control', self::CACHE_CONTROL );
+		return $response;
+	}
+
+	protected static function openapi_document() {
+		$content_item_schema = array(
+			'type'       => 'object',
+			'properties' => array(
+				'id'            => array( 'type' => 'integer' ),
+				'post_type'     => array( 'type' => 'string' ),
+				'title'         => array( 'type' => 'string' ),
+				'content'       => array( 'type' => 'string' ),
+				'excerpt'       => array( 'type' => 'string' ),
+				'url'           => array(
+					'type'   => 'string',
+					'format' => 'uri',
+				),
+				'lang'          => array( 'type' => 'string' ),
+				'taxonomies'    => array(
+					'type'        => 'object',
+					'description' => __( 'Mapa taxonomía => lista de nombres de término.', 'ai-knowledge' ),
+					'additionalProperties' => array(
+						'type'  => 'array',
+						'items' => array( 'type' => 'string' ),
+					),
+				),
+				'custom_fields' => array(
+					'type'                 => 'object',
+					'description'          => __( 'Solo los campos personalizados seleccionados en Alcance.', 'ai-knowledge' ),
+					'additionalProperties'  => true,
+				),
+				'price'         => array(
+					'type'        => 'string',
+					'nullable'    => true,
+					'description' => __( 'Solo poblado si el contenido es un producto WooCommerce.', 'ai-knowledge' ),
+				),
+				'stock'         => array(
+					'type'     => 'string',
+					'enum'     => array( 'in_stock', 'out_of_stock' ),
+					'nullable' => true,
+				),
+				'sku'           => array(
+					'type'     => 'string',
+					'nullable' => true,
+				),
+				'variants'      => array(
+					'type'  => 'array',
+					'items' => array( 'type' => 'object' ),
+				),
+			),
+		);
+
+		$not_found_response = array(
+			'description' => __( 'No encontrado (origen inexistente, no publicado, fuera de alcance, o post_type inexistente/no público).', 'ai-knowledge' ),
+			'content'     => array(
+				'application/json' => array(
+					'schema' => array(
+						'type'       => 'object',
+						'properties' => array(
+							'code'    => array( 'type' => 'string' ),
+							'message' => array( 'type' => 'string' ),
+							'data'    => array(
+								'type'       => 'object',
+								'properties' => array( 'status' => array( 'type' => 'integer' ) ),
+							),
+						),
+					),
+				),
+			),
+		);
+
+		return array(
+			'openapi' => '3.0.3',
+			'info'    => array(
+				'title'       => __( 'AI Knowledge & Visibility — API de contenido', 'ai-knowledge' ),
+				'description' => __( 'API pública de solo lectura del contenido dentro del alcance configurado del plugin, sin pasar por IA (Fase 3 del roadmap).', 'ai-knowledge' ),
+				'version'     => WOOKB_VERSION,
+			),
+			'servers' => array(
+				array( 'url' => home_url( '/wp-json/' . self::NAMESPACE_ ) ),
+			),
+			'paths'   => array(
+				'/content/{id}' => array(
+					'get' => array(
+						'summary'    => __( 'Un contenido por ID.', 'ai-knowledge' ),
+						'parameters' => array(
+							array(
+								'name'     => 'id',
+								'in'       => 'path',
+								'required' => true,
+								'schema'   => array( 'type' => 'integer' ),
+							),
+						),
+						'responses'  => array(
+							'200' => array(
+								'description' => __( 'Contenido encontrado.', 'ai-knowledge' ),
+								'content'     => array(
+									'application/json' => array(
+										'schema' => array( '$ref' => '#/components/schemas/ContentItem' ),
+									),
+								),
+							),
+							'404' => $not_found_response,
+						),
+					),
+				),
+				'/{post_type}'  => array(
+					'get' => array(
+						'summary'    => __( 'Listado paginado de un post_type dentro del alcance.', 'ai-knowledge' ),
+						'parameters' => array(
+							array(
+								'name'        => 'post_type',
+								'in'          => 'path',
+								'required'    => true,
+								'schema'      => array( 'type' => 'string' ),
+								'description' => __( 'Ej. "product" (WooCommerce) o cualquier otro post_type público dentro del alcance.', 'ai-knowledge' ),
+							),
+							array(
+								'name'   => 'page',
+								'in'     => 'query',
+								'schema' => array(
+									'type'    => 'integer',
+									'default' => 1,
+								),
+							),
+							array(
+								'name'   => 'per_page',
+								'in'     => 'query',
+								'schema' => array(
+									'type'    => 'integer',
+									'default' => self::DEFAULT_PER_PAGE,
+									'maximum' => self::MAX_PER_PAGE,
+								),
+							),
+						),
+						'responses'  => array(
+							'200' => array(
+								'description' => __( 'Listado paginado (cabeceras X-WP-Total/X-WP-TotalPages).', 'ai-knowledge' ),
+								'content'     => array(
+									'application/json' => array(
+										'schema' => array(
+											'type'  => 'array',
+											'items' => array( '$ref' => '#/components/schemas/ContentItem' ),
+										),
+									),
+								),
+							),
+							'404' => $not_found_response,
+						),
+					),
+				),
+			),
+			'components' => array(
+				'schemas' => array(
+					'ContentItem' => $content_item_schema,
+				),
+			),
+		);
 	}
 
 	/**
