@@ -163,6 +163,14 @@ body.toplevel_page_woo-kb-generator #wpcontent {
    misma especificidad que la regla de arriba -- en oscuro deja el texto
    del select invisible sobre fondo oscuro en hover. Mismo caso confirmado
    ya documentado para botones en decisiones.md: se fuerza con !important. */
+/* La caja cerrada del select ya usa las variables de arriba, pero el
+   navegador pinta la LISTA desplegable (las <option>) con su blanco nativo
+   por defecto si no se les pone color explicito -- no hereda del <select>
+   padre. Mismo caso que el hover de abajo, pieza distinta del problema. */
+.wookb-wrap select option {
+  background: var(--tblr-form-select-bg, var(--tblr-body-bg));
+  color: var(--tblr-body-color);
+}
 .wookb-wrap select:hover,
 .wookb-wrap select:focus {
   color: var(--tblr-body-color) !important;
@@ -219,6 +227,18 @@ body.toplevel_page_woo-kb-generator #wpcontent {
 .wookb-wrap .button.wookb-btn-info {
   background: var(--tblr-azure, #4299e1);
   color: #fff;
+}
+/* Deshabilitado: cualquier variante (incluida ".delete" roja) debe verse
+   claramente apagada, no como si fuera pulsable -- sin esta regla, un
+   boton disabled seguia mostrando el color solido de su variante porque
+   ninguna regla de color de arriba distingue el estado :disabled. */
+.wookb-wrap .button:disabled,
+.wookb-wrap .button[disabled] {
+  background: var(--tblr-secondary-bg, #e5e7eb) !important;
+  color: var(--tblr-secondary-color, #9ca3af) !important;
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none !important;
 }
 /* Hover/foco de cualquier boton: oscurece su propio fondo, sin color ni
    contorno añadido. WP core (.wp-core-ui .button:hover) fuerza su propio
@@ -317,7 +337,8 @@ body.toplevel_page_woo-kb-generator #wpcontent {
     background 0.1s ease,
     color 0.1s ease;
 }
-.wookb-wrap .wookb-chip input[type="checkbox"] {
+.wookb-wrap .wookb-chip input[type="checkbox"],
+.wookb-wrap .wookb-chip input[type="radio"] {
   position: absolute;
   opacity: 0;
   width: 0;
@@ -558,4 +579,54 @@ body.toplevel_page_woo-kb-generator #wpcontent {
 }
 .wookb-wrap .wookb-manual-expand-cell .button {
   margin-right: 0;
+}
+
+/* ==========================================================================
+   Fase 11: seccion "Gestion de crawlers de IA". Propio en vez de tocar las
+   reglas generales de .wookb-card h2 (margin-top:0, pensada para un unico
+   titulo por pestaña) -- aqui hay varios h2/h3 seguidos con <hr> entre
+   medias, y la regla general los dejaba todos pegados al separador de
+   arriba. Scoped a esta seccion para no afectar al resto de pestañas. */
+.wookb-crawler-section h2 {
+  margin-top: 32px;
+  margin-bottom: 8px;
+}
+.wookb-crawler-section h3 {
+  font-size: 1.1rem;
+  margin: 28px 0 8px;
+}
+.wookb-crawler-section > p.description {
+  margin: 0 0 14px;
+}
+.wookb-crawler-section table {
+  margin-bottom: 14px;
+}
+.wookb-crawler-section textarea {
+  margin-bottom: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+.wookb-crawler-section .submit-row {
+  margin: 10px 0 4px;
+}
+/* Actual/vista previa lado a lado (comparar de un vistazo) en vez de
+   apiladas y con el mismo contenido casi duplicado. Se apilan solas en
+   pantallas estrechas por el flex-wrap, sin media query aparte. */
+.wookb-crawler-compare {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tblr-spacer-3, 1rem);
+  margin-bottom: 14px;
+}
+.wookb-crawler-compare > div {
+  flex: 1 1 320px;
+  min-width: 280px;
+}
+.wookb-crawler-compare textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+.wookb-crawler-compare p.description {
+  margin: 0 0 4px;
+  font-weight: 600;
 }

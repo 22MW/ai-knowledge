@@ -43,6 +43,11 @@ class Admin
 		add_action('admin_post_wookb_save_woocommerce_settings', array(__CLASS__, 'save_woocommerce_settings'));
 		add_action('admin_post_wookb_check_accessibility', array(__CLASS__, 'check_accessibility'));
 		add_action('admin_post_wookb_delete_physical_llms_txt', array(__CLASS__, 'delete_physical_llms_txt'));
+		add_action('admin_post_wookb_save_crawler_actions', array(__CLASS__, 'save_crawler_actions'));
+		add_action('admin_post_wookb_download_robots_backup', array(__CLASS__, 'download_robots_backup'));
+		add_action('admin_post_wookb_apply_robots_block', array(__CLASS__, 'apply_robots_block'));
+		add_action('admin_post_wookb_download_htaccess_backup', array(__CLASS__, 'download_htaccess_backup'));
+		add_action('admin_post_wookb_apply_htaccess_block', array(__CLASS__, 'apply_htaccess_block'));
 		add_action('admin_enqueue_scripts', array(__CLASS__, 'assets'));
 		add_action('admin_notices', array(__CLASS__, 'maybe_stale_notice'));
 		add_action('admin_bar_menu', array(__CLASS__, 'admin_bar_stale_node'), 100);
@@ -1022,6 +1027,146 @@ class Admin
 		if (file_exists($path)) {
 			wp_delete_file($path);
 		}
+
+		self::redirect('visibilidad-ia');
+	}
+
+	/**
+	 * Fase 11 (revision UX 2026-09-16): guarda la tabla unica de configuracion
+	 * por bot (Permitir/Bloquear). El user_agent NUNCA se acepta como texto
+	 * libre del POST: se resuelve exclusivamente contra Crawler_Catalog::all(),
+	 * y el valor de accion se restringe a 'allow'|'block' via sanitize_key()
+	 * mas una lista blanca -- esta tabla es la fuente unica que alimentan
+	 * despues robots.txt y .htaccess (Crawler_Catalog::blocked_user_agents()).
+	 */
+	public static function save_crawler_actions()
+	{
+		self::verify('wookb_save_crawler_actions');
+
+		$posted = isset($_POST['crawler_action']) && is_array($_POST['crawler_action']) ? wp_unslash($_POST['crawler_action']) : array(); // phpcs:ignore
+
+		$actions = array();
+		foreach (Crawler_Catalog::all() as $entry) {
+			$ua = $entry['user_agent'];
+			if (! isset($posted[$ua])) {
+				continue;
+			}
+			$value = sanitize_key($posted[$ua]);
+			if (in_array($value, array('allow', 'block'), true)) {
+				$actions[$ua] = $value;
+			}
+		}
+
+		Scope::update_settings(array('crawler_actions' => $actions));
+
+		self::redirect('visibilidad-ia');
+	}
+
+	/**
+	 * Fase 11 (revision UX 2026-09-16): fuerza la descarga real de robots.txt
+	 * actual. Si no existe como archivo fisico (caso normal: WordPress sirve
+	 * una version virtual), descarga esa version virtual leyendola por HTTP,
+	 * igual que hace la pieza 1 de solo lectura de la propia pestaña.
+	 */
+	public static function download_robots_backup()
+	{
+		self::verify('wookb_download_robots_backup');
+
+		if (file_exists(Robots_Txt_Guard::path())) {
+			$content = (string) file_get_contents(Robots_Txt_Guard::path()); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_get_contents
+		} else {
+			$response = wp_remote_get(home_url('/robots.txt'));
+			if (is_wp_error($response)) {
+				wp_die(esc_html__('No se pudo leer el robots.txt actual (ni físico ni virtual) para generar la copia de seguridad.', 'ai-knowledge'));
+			}
+			$content = wp_remote_retrieve_body($response);
+		}
+
+		Robots_Txt_Guard::mark_backup_confirmed();
+
+		nocache_headers();
+		header('Content-Type: application/octet-stream');
+		header('Content-Disposition: attachment; filename="robots-backup-' . gmdate('Ymd-His') . '.txt"');
+		header('Content-Length: ' . strlen($content));
+		echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- descarga de archivo, no HTML.
+		exit;
+	}
+
+	/**
+	 * Fase 11 (revision UX 2026-09-16): aplica de verdad el bloqueo via
+	 * robots.txt, mismo criterio de seguridad que apply_htaccess_block():
+	 * exige el transient de descarga confirmada, y los bots a bloquear salen
+	 * siempre de Crawler_Catalog::blocked_user_agents() (la tabla unica),
+	 * nunca de texto libre del POST.
+	 */
+	public static function apply_robots_block()
+	{
+		self::verify('wookb_apply_robots_block');
+
+		if (! Robots_Txt_Guard::backup_confirmed()) {
+			wp_die(esc_html__('Antes de aplicar el bloqueo tienes que descargar la copia actual de robots.txt. Pulsa "Descargar copia actual" y vuelve a intentarlo.', 'ai-knowledge'));
+		}
+
+		if (! Robots_Txt_Guard::is_available()) {
+			wp_die(esc_html__('robots.txt no es escribible en este servidor (permisos de la carpeta raíz).', 'ai-knowledge'));
+		}
+
+		Robots_Txt_Guard::apply_block(Crawler_Catalog::blocked_user_agents());
+		// Uso unico: la confirmacion de descarga solo vale para esta aplicacion.
+		Robots_Txt_Guard::clear_backup_confirmation();
+
+		self::redirect('visibilidad-ia');
+	}
+
+	/**
+	 * Fase 11, pieza 5: fuerza la descarga real del .htaccess actual (backup
+	 * en mano del usuario, no solo una copia interna) y marca el transient de
+	 * confirmacion de corta duracion que habilita "Aplicar bloqueo" -- doble
+	 * proteccion server-side, no basta con deshabilitar el boton en el HTML.
+	 */
+	public static function download_htaccess_backup()
+	{
+		self::verify('wookb_download_htaccess_backup');
+
+		if (! Htaccess_Guard::is_available()) {
+			wp_die(esc_html__('No se encontró un .htaccess editable en este servidor (nginx u otra configuración): usa el bloque de código manual en su lugar.', 'ai-knowledge'));
+		}
+
+		$path = Htaccess_Guard::path();
+
+		Htaccess_Guard::mark_backup_confirmed();
+
+		nocache_headers();
+		header('Content-Type: application/octet-stream');
+		header('Content-Disposition: attachment; filename="htaccess-backup-' . gmdate('Ymd-His') . '.txt"');
+		header('Content-Length: ' . filesize($path));
+		readfile($path); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_readfile
+		exit;
+	}
+
+	/**
+	 * Fase 11, pieza 5: aplica de verdad el bloqueo via .htaccess. Antes de
+	 * nada comprueba el transient de descarga confirmada -- si no existe,
+	 * wp_die() con mensaje claro pidiendo descargar antes, sin tocar el
+	 * archivo. Revision UX 2026-09-16: los bots a bloquear ya no salen de
+	 * checkboxes de categoría, sino de la tabla unica de configuracion
+	 * (Crawler_Catalog::blocked_user_agents()), misma fuente que robots.txt.
+	 */
+	public static function apply_htaccess_block()
+	{
+		self::verify('wookb_apply_htaccess_block');
+
+		if (! Htaccess_Guard::backup_confirmed()) {
+			wp_die(esc_html__('Antes de aplicar el bloqueo tienes que descargar la copia actual de .htaccess. Pulsa "Descargar copia actual" y vuelve a intentarlo.', 'ai-knowledge'));
+		}
+
+		if (! Htaccess_Guard::is_available()) {
+			wp_die(esc_html__('No se encontró un .htaccess editable en este servidor (nginx u otra configuración): usa el bloque de código manual en su lugar.', 'ai-knowledge'));
+		}
+
+		Htaccess_Guard::apply_block(Crawler_Catalog::blocked_user_agents());
+		// Uso unico: la confirmacion de descarga solo vale para esta aplicacion.
+		Htaccess_Guard::clear_backup_confirmation();
 
 		self::redirect('visibilidad-ia');
 	}

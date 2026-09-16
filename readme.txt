@@ -86,8 +86,8 @@ El plugin detecta el borrado/despublicación y elimina automáticamente el docum
 
 Ver `CHANGELOG.md` para el historial completo y detallado de cambios.
 
-= 1.0.8.2 =
-Pestaña WooCommerce con impuestos/IVA autodetectados, control manual por documento, API REST de contenido, descubrimiento de Markdown público, JSON-LD, panel "Visibilidad IA" con comprobación de accesibilidad, documentación OpenAPI de la API, aviso en tiempo real a buscadores compatibles con IndexNow, y feeds especializados (Google Merchant y JSON) enlazados desde llms.txt y desde el `<head>` del sitio.
+= 1.0.8.4 =
+Pestaña WooCommerce con impuestos/IVA autodetectados, control manual por documento, API REST de contenido, descubrimiento de Markdown público, JSON-LD, panel "Visibilidad IA" con comprobación de accesibilidad, documentación OpenAPI de la API, aviso en tiempo real a buscadores compatibles con IndexNow, feeds especializados (Google Merchant y JSON) enlazados desde llms.txt y desde el `<head>` del sitio, y gestión de crawlers de IA (catálogo de bots conocidos, bloqueo real por robots.txt/.htaccess con descarga obligatoria de seguridad, y logs de accesos).
 
 = 1.0.7 =
 Ajustes de aspecto del panel de administración (tema visual), corrección de un bug de enrutado que hacía que algunos enlaces del chatbot llevaran a la página de inicio en vez de al contenido real, y corrección del bug de "Carga inicial" que generaba filas de cola huérfanas cuando el contenido se regeneraba desde cero.

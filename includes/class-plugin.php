@@ -45,9 +45,14 @@ class Plugin {
 		require_once WOOKB_DIR . 'includes/class-chatbot-prompt-builder.php';
 		require_once WOOKB_DIR . 'includes/class-chatbot-relevance-guard.php';
 		require_once WOOKB_DIR . 'includes/class-genix-hooks-guard.php';
+		require_once WOOKB_DIR . 'includes/class-crawler-catalog.php';
+		require_once WOOKB_DIR . 'includes/class-crawler-log.php';
+		require_once WOOKB_DIR . 'includes/class-htaccess-guard.php';
+		require_once WOOKB_DIR . 'includes/class-robots-txt-guard.php';
 
 		Queue::init();
 		Sync::init();
+		Crawler_Log::init();
 		Indexnow::init();
 		Doc_Redirect::init();
 		Markdown_Discovery::init();

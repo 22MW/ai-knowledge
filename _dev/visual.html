@@ -33,8 +33,8 @@
   <main>
     <header>
       <h1>AI Knowledge & Visibility — Estado</h1>
-      <p class="muted">Última actualización: 2026-09-16 (Fase 9 hecha y confirmada: feeds enlazados en llms.txt y en el &lt;head&gt;) · antes "woo-kb-generator"</p>
-      <span class="badge ok">Fases 0-9 hechas y confirmadas.</span>
+      <p class="muted">Última actualización: 2026-09-16 (Fase 11 hecha y confirmada: robots.txt/.htaccess aplicados en real) · antes "woo-kb-generator"</p>
+      <span class="badge ok">Fases 0-9 y 11 hechas y confirmadas. Fase 10 replanteada y en pausa (ver roadmap).</span>
     </header>
 
     <section class="grid">
@@ -75,7 +75,7 @@
           <tr><td>8</td><td>Aviso a buscadores en tiempo real (IndexNow): clave del sitio autogenerada, interruptor en Ajustes, aviso no bloqueante con debounce (ver <a href="roadmap.md">roadmap.md</a>). Google no soporta IndexNow.</td><td><span class="badge ok">Hecho y confirmado en real (HTTP 202)</span></td></tr>
           <tr><td>9</td><td>Feeds especializados: <code>feeds/products.xml</code> (Google Merchant) y <code>feeds/content.json</code>, enlazados desde <code>llms.txt</code> y desde el <code>&lt;head&gt;</code> de todas las páginas (ver <a href="roadmap.md">roadmap.md</a>).</td><td><span class="badge ok">Hecho y confirmado en real</span></td></tr>
           <tr><td>10</td><td>Replanteada (2026-09-16): rediseño Alcance/Exclusiones (selectores casi idénticos, fácil confundir incluir/excluir) + campos personalizados ACF/Meta Box/Pods (el dato ya es seleccionable, falta etiqueta legible) + modo "todos los CPT públicos" en Scope — las tres juntas porque tocan la misma pestaña (ver <a href="roadmap.md">roadmap.md</a>)</td><td><span class="badge warn">En pausa, pendiente de evaluar-cambio/rol-analista conjunto</span></td></tr>
-          <tr><td>11</td><td>Gestión de crawlers de IA (robots.txt)</td><td><span class="badge warn">Pendiente — ver ideas de JetGEO en <a href="analisis-jet-geo.md">analisis-jet-geo.md</a></span></td></tr>
+          <tr><td>11</td><td>Gestión de crawlers de IA: catálogo de ~28 bots conocidos (Permitir/Bloquear por bot), bloqueo real por <code>robots.txt</code> y <code>.htaccess</code> con descarga obligatoria de seguridad y vista previa, logs de accesos (ver <a href="roadmap.md">roadmap.md</a>)</td><td><span class="badge ok">Hecho y confirmado en real</span></td></tr>
         </table>
       </article>
 
@@ -130,7 +130,7 @@
 
       <article class="card wide">
         <h2>Próximo paso</h2>
-        <p>Fase 9 confirmada. Decidir con el usuario: Fase 10, Fase 11 o UX3 (WooCommerce, con <code>rol-analista</code> primero).</p>
+        <p>Fase 11 confirmada. Decidir con el usuario: retomar Fase 10 (requiere <code>evaluar-cambio</code>/<code>rol-analista</code>) o UX3 (WooCommerce, con <code>rol-analista</code> primero).</p>
       </article>
 
     </section>

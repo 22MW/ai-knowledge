@@ -196,6 +196,14 @@ class Queue {
 		foreach ( $orphans as $row ) {
 			Sync::delete_documents_for( $row->source_id );
 		}
+
+		// Fase 11: tope duro de filas del log de crawlers aplicado aqui (cron
+		// semanal ya existente), no en el hook de 'init' de cada peticion --
+		// prioriza rendimiento en el hook ligero, tal como pide el requisito
+		// explicito del usuario.
+		if ( class_exists( '\WOOKB\Crawler_Log' ) ) {
+			Crawler_Log::trim_to_limit();
+		}
 	}
 
 	public static function noop() {}

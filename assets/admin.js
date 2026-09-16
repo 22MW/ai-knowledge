@@ -54,4 +54,54 @@
 			}
 		} );
 	} );
+
+	/**
+	 * Fase 11 (revision UX): descarga de robots.txt/.htaccess por fetch() en
+	 * vez de un submit normal, para poder habilitar el boton "Aplicar"
+	 * hermano en cuanto termina, sin recargar la pestaña. La proteccion real
+	 * sigue siendo server-side (el transient que comprueba class-admin.php
+	 * al aplicar) -- esto es solo comodidad de interfaz, quitar el atributo
+	 * "disabled" aqui no salta esa comprobacion.
+	 */
+	$( function () {
+		$( '.wookb-download-form' ).on( 'submit', function ( e ) {
+			e.preventDefault();
+			var $form = $( this );
+			var type  = $form.data( 'wookb-unlock' );
+			var formData = new FormData( this );
+
+			fetch( $form.attr( 'action' ), {
+				method: 'POST',
+				body: formData,
+				credentials: 'same-origin'
+			} ).then( function ( response ) {
+				if ( ! response.ok ) {
+					throw new Error( 'HTTP ' + response.status );
+				}
+				var disposition = response.headers.get( 'Content-Disposition' ) || '';
+				var match = disposition.match( /filename="?([^"]+)"?/ );
+				var filename = match ? match[1] : ( type + '-backup.txt' );
+				return response.blob().then( function ( blob ) {
+					return { blob: blob, filename: filename };
+				} );
+			} ).then( function ( result ) {
+				var url = window.URL.createObjectURL( result.blob );
+				var $link = $( '<a></a>' ).attr( { href: url, download: result.filename } ).hide();
+				$( 'body' ).append( $link );
+				$link[0].click();
+				$link.remove();
+				window.URL.revokeObjectURL( url );
+
+				// Descarga confirmada: habilita el boton "Aplicar" hermano sin
+				// recargar. El servidor ya marco el transient de confirmacion
+				// dentro de la misma peticion fetch de arriba.
+				$( '[data-wookb-apply="' + type + '"]' ).prop( 'disabled', false );
+				$( '[data-wookb-unlock-notice="' + type + '"]' ).hide();
+			} ).catch( function () {
+				// Si falla la descarga por fetch, se cae al comportamiento normal
+				// del navegador (submit real del formulario) como red de seguridad.
+				HTMLFormElement.prototype.submit.call( $form[0] );
+			} );
+		} );
+	} );
 })(jQuery);

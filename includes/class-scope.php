@@ -45,6 +45,10 @@ class Scope {
 			// nunca se rellena a mano desde aquí.
 			'indexnow_enabled' => false,
 			'indexnow_key'     => '',
+			// Fase 11 (revision UX 2026-09-16): mapa user_agent => 'allow'|'block',
+			// unica fuente de verdad para robots.txt y .htaccess. Si un bot del
+			// catalogo no aparece aqui, se usa su default_action (Crawler_Catalog).
+			'crawler_actions' => array(),
 		);
 		$saved = get_option( 'wookb_settings', array() );
 		return wp_parse_args( $saved, $defaults );

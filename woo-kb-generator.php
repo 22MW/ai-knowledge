@@ -3,7 +3,7 @@
  * Plugin Name: AI Knowledge & Visibility
  * Plugin URI: https://22mw.online/
  * Description: Genera documentos de base de conocimiento (.md + posts sgkb-docs de Support Genix) a partir de productos WooCommerce u otros CPTs, con cola, límite diario, WPML y publicación pública GEO vía llms.txt.
- * Version: 1.0.8.2
+ * Version: 1.0.8.4
  * Author: 22MW
  * Author URI: https://22mw.online/
  * Text Domain: ai-knowledge
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WOOKB_VERSION', '1.0.8.2' );
+define( 'WOOKB_VERSION', '1.0.8.4' );
 define( 'WOOKB_FILE', __FILE__ );
 define( 'WOOKB_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WOOKB_URL', plugin_dir_url( __FILE__ ) );
@@ -97,6 +97,11 @@ add_action(
 		}
 		require_once WOOKB_DIR . 'includes/class-registry.php';
 		\WOOKB\Registry::create_table();
+		// Fase 11: tabla de logs de crawlers, creada por el mismo mecanismo de
+		// migracion (dbDelta es idempotente) que la tabla de documentos, en vez
+		// de un hook de activacion aparte.
+		require_once WOOKB_DIR . 'includes/class-crawler-log.php';
+		\WOOKB\Crawler_Log::create_table();
 		update_option( 'wookb_db_version', WOOKB_VERSION, false );
 	},
 	5

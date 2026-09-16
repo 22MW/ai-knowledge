@@ -2,7 +2,7 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
-## [1.0.8.2] - 2026-09-15/16
+## [1.0.8.4] - 2026-09-15/16
 
 Ver `_dev/roadmap.md` para el plan completo por fases y `_dev/decisiones.md`
 para el porqué de la identidad/alcance. Este plugin sigue orientado a IA +
@@ -46,6 +46,7 @@ Support Genix como núcleo; todo lo de abajo es capa añadida encima.
 - **Fase 7 — API pública documentada:** `GET /wp-json/ai-knowledge/v1/openapi.json`, documento OpenAPI 3.0 real (escrito a mano, no el índice nativo de WordPress) describiendo `/content/{id}` y `/{post_type}` con sus parámetros y el schema `ContentItem`. `llms.txt` enlaza ahora a este documento en una sección `## API` propia, para que los crawlers que ya lo leen lo descubran sin depender de visitarlo por su cuenta.
 - **Fase 8 — Aviso a buscadores en tiempo real (IndexNow):** al crear, actualizar o borrar contenido del alcance, se avisa a buscadores compatibles con IndexNow (Bing y otros; Google no lo soporta) en vez de esperar a que rastreen. Interruptor on/off en Ajustes, clave del sitio autogenerada y servida por rewrite (`/{key}.txt`), aviso no bloqueante con el mismo debounce que ya usa la cola de generación de documentos. Verificado en real: respuesta `HTTP 202` de `api.indexnow.org` al guardar un producto.
 - **Fase 9 — Feeds especializados:** `GET /wp-json/ai-knowledge/v1/feeds/products.xml` (formato Google Merchant, solo si WooCommerce activo, reutilizando `Extractor_Woo`) y `GET /wp-json/ai-knowledge/v1/feeds/content.json` (JSON sin paginar con el resto del contenido del alcance). Enlazados desde `llms.txt` (sección `## Feeds`) y desde el `<head>` de todas las páginas (`<link rel="alternate">` sitewide, no por post, para herramientas que no leen `llms.txt`). Verificado en real: enlaces funcionando en `llms.txt` y en el código fuente de las páginas.
+- **Fase 11 — Gestión de crawlers de IA:** nueva sección "Gestión de crawlers de IA" en la pestaña Visibilidad IA, con catálogo de ~28 crawlers conocidos (OpenAI, Anthropic, Google, Meta, Apple, Bing, Perplexity, DuckDuckGo, You.com, Cohere, ByteDance, Amazon, xAI, y agregadores de datasets), clasificados en 3 categorías de propósito (búsqueda/citas IA, uso bajo demanda, entrenamiento de modelos) con una acción Permitir/Bloquear configurable por bot — tabla única que alimenta tanto el bloqueo por `robots.txt` como por `.htaccess`. Ambos archivos se pueden aplicar de verdad (no solo copiar/pegar), siempre exigiendo primero descargar una copia real del archivo actual (dos protecciones: botón deshabilitado en pantalla y comprobación en el servidor), con vista previa del bloque exacto que se insertará antes de aplicar. Escritura vía `insert_with_markers()` de WordPress: sustituye el bloque propio en cada aplicación sin duplicar ni tocar el resto del archivo. Logs de accesos de crawlers conocidos (tabla propia, tope de 500 filas, sin IP, sin registrar tráfico humano ni bots desconocidos). Verificado en real: aplicación de `robots.txt` confirmada funcionando.
 
 ### Corregido
 - El botón "Generar" de una fila del Registro no reflejaba el límite de caracteres ya guardado para esa fila, mostraba siempre el valor por defecto general.

@@ -310,24 +310,125 @@ son solo maquetación.
 
 ---
 
-## Fase 11 — Gestión de crawlers de IA — PENDIENTE
+## Fase 11 — Gestión de crawlers de IA — HECHO (confirmado en real: robots.txt aplicado correctamente)
 
 **Qué hace:** distingue crawlers de búsqueda/retrieval (OpenAI, Claude,
-Perplexity, Google, Bing) de crawlers de entrenamiento, y deja ver/ajustar
-`robots.txt` en consecuencia.
+Perplexity, Google, Bing) de crawlers de entrenamiento, deja ver/ajustar
+`robots.txt` en consecuencia, y permite bloquear un bot concreto de verdad
+(vía `.htaccess`, no solo `robots.txt`, que es una petición educada que un
+bot puede ignorar).
 
-**Pasos:**
-1. Lectura de `robots.txt` actual (solo lectura) en el panel de la Fase 5.
-2. Edición asistida: requiere permiso explícito del usuario antes de escribir en `robots.txt` (archivo sensible, fuera del propio plugin) — no se automatiza sin esa confirmación en cada caso.
-3. Logs de accesos de crawlers conocidos, con límite de filas para no llenar la base de datos.
+**Alcance confirmado por el usuario (2026-09-16): completo** — lectura +
+catálogo, generador de bloque, y logs de accesos.
 
-**Anotación ([`analisis-jet-geo.md`](analisis-jet-geo.md)):** concretar con 3 categorías de
-propósito de bot (`ai_search` / `user_requested_assistant` /
-`model_training`, estándar del sector) y un catálogo base de ~24 crawlers
-conocidos con filtro de extensión propio (`apply_filters`). Auto-generar el
-bloque de `robots.txt` a partir de 3 preguntas sí/no al admin — pero solo
-proponerlo para copiar/aplicar con confirmación explícita, nunca escribirlo
-solo (mantiene la decisión ya tomada arriba).
+**Piezas:**
+1. Lectura de `robots.txt` actual (solo lectura) en el panel de Visibilidad IA (Fase 6, `tab-visibilidad-ia.php`).
+2. Catálogo de ~24 crawlers de IA conocidos, clasificados en 3 categorías de propósito (estándar del sector): `ai_search` (indexan para buscadores/IA), `user_requested_assistant` (visitan bajo demanda de un usuario de un asistente IA), `model_training` (solo recopilan para entrenar modelos). Filtro de extensión propio (`apply_filters`) para añadir crawlers no listados.
+3. Generador de bloque de `robots.txt` a partir de preguntas sí/no al admin — nunca se escribe solo, solo se propone para copiar/aplicar.
+4. **Bloqueo real de un bot concreto vía `.htaccess`:** añade una regla (`RewriteCond %{HTTP_USER_AGENT}` + `RewriteRule`, o equivalente) para el user-agent elegido. Sensible: modifica un archivo fuera del propio plugin que puede tumbar el sitio entero si se rompe la sintaxis.
+5. **Logs de accesos de crawlers conocidos**, con límite de filas — requisito explícito del usuario: **bajo impacto de rendimiento, sin llenar la base de datos**. Enfoque: hook ligero (`init` o similar) que compara el User-Agent contra el catálogo conocido ANTES de cualquier registro — si no coincide con ningún user-agent del catálogo, no se guarda nada (no se registra tráfico humano ni bots desconocidos). Tabla propia con límite duro de filas (borrado de las más antiguas al superar el tope, mismo espíritu que `Registry`), no `wp_options` ni post meta.
+
+**Requisito de seguridad explícito del usuario, aplica a `robots.txt` Y a
+`.htaccess` por igual:**
+- Cualquier modificación debe llevar un **aviso extra** (más fuerte que el
+  aviso normal de confirmación que ya usa el plugin en otras acciones
+  destructivas).
+- **Descarga obligatoria de la versión actual del archivo antes de poder
+  modificarlo** (backup manual en la mano del usuario, no solo una copia
+  interna del plugin) — sin esa descarga hecha, el botón de aplicar no
+  debe estar disponible.
+
+**Anotación ([`analisis-jet-geo.md`](analisis-jet-geo.md)):** catálogo base de ~24 crawlers
+conocidos, 3 categorías de propósito de bot — ya incorporado arriba.
+
+**Decisiones técnicas propuestas (2026-09-16, pendientes de aprobación del usuario):**
+
+1. **Tabla de logs:** tabla propia nueva vía `dbDelta` (`wp_wookb_crawler_log`): `id`, `bot_name` (del catálogo, no el user-agent crudo completo), `category`, `url`, `timestamp`. Tope duro de **500 filas**: al insertar la 501, se borra la más antigua (mismo espíritu que `Registry`, sin cron aparte). Sin guardar IP completa (dato personal innecesario para el propósito de "qué bot pasó por aquí").
+2. **Escritura en `.htaccess`:** vía `insert_with_markers()` de WordPress (la misma función que usa WordPress core para sus propias reglas de reescritura), con un marcador propio (`# BEGIN AI Knowledge crawlers` / `# END AI Knowledge crawlers`) — evita pisar reglas de otros plugins o de WordPress, y permite quitar el bloque limpiamente si se desactiva el bloqueo.
+3. **Si `.htaccess` no es editable** (permisos, o servidor nginx sin `.htaccess` real — `is_writable()` falso o archivo inexistente en Apache): no se oculta la función, se avisa con mensaje claro y se ofrece el bloque de código para que el usuario lo aplique a mano en su configuración de servidor (nginx no lee `.htaccess`, necesita su propia sintaxis — fuera del alcance de escritura automática, solo se le muestra qué añadir).
+4. **Descarga obligatoria antes de modificar:** botón "Descargar copia actual" (fuerza la descarga real del archivo, no una copia interna) que, al pulsarse, marca un aviso de sesión de corta duración (transient, ~10 minutos) confirmando que se descargó. El botón "Aplicar cambios" permanece desactivado hasta que ese aviso existe — así no basta con "decir que sí", hay que haber pulsado descargar de verdad.
+
+**Primera implementación (2026-09-16): hecha, con `php -l` OK, pendiente de
+probar en real.** Archivos: `class-crawler-catalog.php`,
+`class-crawler-log.php`, `class-htaccess-guard.php`, más las acciones
+`admin_post` en `class-admin.php` y la UI en `tab-visibilidad-ia.php`.
+
+**Revisión de UX tras ver la primera versión (2026-09-16) — el usuario la
+encontró confusa y pidió rehacer la interfaz. Cambios de alcance
+aprobados, sustituyen las piezas 3 y 4 de arriba:**
+
+1. **Selección por bot individual, no por categoría.** En vez de 2
+   checkboxes ("bloquear entrenamiento" / "bloquear Amazonbot"), una
+   **tabla única estilo Registro**: una fila por cada uno de los ~28 bots
+   del catálogo, con columnas Bot / Operador / Categoría / Descripción /
+   Acción (selector Permitir/Bloquear, valor inicial = `default_action`
+   del catálogo). Un botón "Guardar configuración de crawlers" persiste la
+   elección en `Scope::settings()['crawler_actions']` (mapa
+   `user_agent => 'allow'|'block'`). Esta tabla es la ÚNICA fuente de
+   verdad: alimenta tanto el bloque de `robots.txt` como el de
+   `.htaccess`, no se vuelve a preguntar en cada sitio.
+2. **`robots.txt` pasa a tener el MISMO tratamiento que `.htaccess`**
+   (cambio de decisión, antes era "nunca se escribe solo"): escritura real
+   del archivo físico, con el mismo requisito de descarga obligatoria +
+   aviso fuerte antes de aplicar. Nueva clase `Robots_Txt_Guard` (mismo
+   patrón que `Htaccess_Guard`: `is_available()`, transient de backup
+   confirmado propio y separado del de `.htaccess` — son archivos
+   distintos —, `apply_block()`). Si `robots.txt` no existe como archivo
+   físico todavía, se crea; si ya existe (con o sin bloque previo del
+   plugin), se actualiza con `insert_with_markers()` igual que
+   `.htaccess`, marcador propio.
+3. **Reorganización visual — agrupar por bloque, no intercalar:** la
+   pestaña Visibilidad IA reordena así (de arriba abajo):
+   1. Tabla única de configuración de crawlers (pieza 1 de esta revisión).
+   2. Todo lo de `robots.txt` junto: vista previa actual + descarga +
+      aplicar (usa la tabla de arriba).
+   3. Todo lo de `.htaccess` junto: aviso + descarga + aplicar (usa la
+      misma tabla).
+   4. Logs de accesos.
+   El contenido ya existente de la Fase 6 (estado de exposición,
+   comprobación de accesibilidad, gestión de `llms.txt` físico) se
+   mantiene en la misma pestaña pero claramente separado de este bloque
+   nuevo de crawlers, no mezclado.
+
+**Revisión implementada (2026-09-16):** tabla única con `<select>`
+Permitir/Bloquear por bot (se probó primero con chips/radios estilo
+Registro, pero el usuario prefirió el desplegable nativo una vez arreglado
+su estilo oscuro), `Robots_Txt_Guard` nueva clase con el mismo patrón que
+`Htaccess_Guard`, y la pestaña reorganizada en el orden pedido.
+
+**Ajustes visuales finales tras QA del usuario (2026-09-16):**
+- Las `<option>` de los `<select>` no heredaban el tema oscuro (solo la
+  caja cerrada lo tenía) — el navegador pinta la lista desplegable con su
+  blanco nativo si no se le pone color explícito a `option`. Añadida la
+  regla que faltaba en `wookb-theme.css`.
+- Las dos tablas nuevas (config. por bot y logs) usaban `widefat striped`
+  sin la clase `wp-list-table` — por eso salían con fondo blanco de
+  WordPress core en vez del tema oscuro del plugin (todo el estilo oscuro
+  de tablas está condicionado a esa clase). Añadida, más un contenedor con
+  `overflow-x:auto` para pantallas estrechas (sigue siendo un `<table>`
+  real, no divs).
+- Botones deshabilitados (antes de descargar la copia) se veían con el
+  color sólido de su variante como si estuvieran activos — faltaba una
+  regla `:disabled` en todo el plugin (nunca hizo falta antes: es el primer
+  botón deshabilitado que tiene el plugin).
+- Espaciado: `.wookb-card h2 { margin-top: 0; }` es una regla pensada para
+  un único título por pestaña; con varios `<h2>`/`<h3>` seguidos en esta
+  sección quedaban todos pegados al `<hr>` de arriba. Solución con una
+  clase propia `.wookb-crawler-section` (scoped, sin tocar el resto de
+  pestañas).
+- `robots.txt` actual + vista previa del bloque a insertar: pasan a verse
+  lado a lado (`.wookb-crawler-compare`, se apila solo en pantalla
+  estrecha) en vez de apiladas y con texto duplicado.
+- Aviso "descarga la copia primero" movido encima de los dos botones
+  (antes solo estaba pegado al de "Aplicar"), mismo criterio en
+  `robots.txt` y `.htaccess`.
+- Descarga por `fetch()` en `admin.js`: dispara el archivo igual, pero
+  habilita el botón "Aplicar" hermano al momento sin recargar la pestaña
+  (con fallback a submit normal si `fetch` fallara). La protección real
+  sigue siendo 100% server-side (el transient que comprueba
+  `class-admin.php` al aplicar); esto es solo comodidad de interfaz.
+- Título de la sección sin "(Fase 11)" — el plugin no expone su propio
+  roadmap interno al usuario final.
 
 ---
 

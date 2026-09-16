@@ -48,6 +48,43 @@ $accessibility_result = get_transient( 'wookb_accessibility_result' );
 $accessibility_error  = get_transient( 'wookb_accessibility_error' );
 delete_transient( 'wookb_accessibility_result' );
 delete_transient( 'wookb_accessibility_error' );
+
+// Fase 11: lectura en vivo de robots.txt actual (pieza 1, solo lectura).
+$robots_txt_content = '';
+$robots_txt_error   = '';
+$robots_response     = wp_remote_get( home_url( '/robots.txt' ) );
+if ( is_wp_error( $robots_response ) ) {
+	$robots_txt_error = $robots_response->get_error_message();
+} else {
+	$robots_txt_content = wp_remote_retrieve_body( $robots_response );
+}
+
+// Fase 11 (revision UX 2026-09-16): disponibilidad real de robots.txt/.htaccess
+// y confirmacion de descarga vigente, comprobadas en cada render (doble
+// proteccion server-side, no basta con deshabilitar el boton en el HTML).
+$robots_available   = Robots_Txt_Guard::is_available();
+$robots_confirmed   = Robots_Txt_Guard::backup_confirmed();
+$htaccess_available = Htaccess_Guard::is_available();
+$htaccess_confirmed = Htaccess_Guard::backup_confirmed();
+
+$crawler_saved_actions = Scope::settings()['crawler_actions'];
+
+// Fase 11, pieza 3: ultimos accesos registrados del catalogo de crawlers.
+$crawler_log_rows = Crawler_Log::recent( 50 );
+$crawler_log_total = Crawler_Log::count_rows();
+
+// Fase 11 (revision UX): vista previa del bloque que se insertaria con la
+// configuracion actual de la tabla -- no es una simulacion del archivo
+// completo (insert_with_markers ya garantiza que solo se reemplaza el
+// bloque propio, el resto del archivo queda intacto), solo el contenido
+// exacto que ira dentro del marcador, para que el usuario vea el efecto de
+// sus elecciones antes de aplicar.
+$crawler_blocked_bots  = Crawler_Catalog::blocked_user_agents();
+$robots_block_preview   = implode( "\n", Robots_Txt_Guard::build_rules( $crawler_blocked_bots ) );
+// "RewriteEngine On" se antepone en Htaccess_Guard::apply_block() al escribir
+// de verdad; se replica aqui solo para que la vista previa sea fiel a lo que
+// se escribira.
+$htaccess_block_preview = "RewriteEngine On\n" . implode( "\n", Htaccess_Guard::build_rules( $crawler_blocked_bots ) );
 ?>
 
 <p class="description">
@@ -202,3 +239,170 @@ delete_transient( 'wookb_accessibility_error' );
 		<?php submit_button( __( 'Comprobar accesibilidad', 'ai-knowledge' ), 'secondary', 'submit', false ); ?>
 	</form>
 <?php endif; ?>
+
+<hr />
+
+<div class="wookb-crawler-section">
+
+<h2><?php esc_html_e( 'Gestión de crawlers de IA', 'ai-knowledge' ); ?></h2>
+
+<h3><?php esc_html_e( 'Configuración por bot', 'ai-knowledge' ); ?></h3>
+<p class="description">
+	<?php esc_html_e( 'Catálogo de crawlers de IA conocidos, con su categoría de propósito y una acción por bot (Permitir/Bloquear). Esta tabla es la única fuente de verdad: alimenta tanto el bloqueo por robots.txt como el bloqueo por .htaccess de más abajo.', 'ai-knowledge' ); ?>
+</p>
+<?php
+$category_labels = array(
+	'ai_search'                => __( 'Búsqueda/citas IA', 'ai-knowledge' ),
+	'user_requested_assistant' => __( 'Uso bajo demanda', 'ai-knowledge' ),
+	'model_training'           => __( 'Entrenamiento de modelos', 'ai-knowledge' ),
+);
+?>
+<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+	<input type="hidden" name="action" value="wookb_save_crawler_actions" />
+	<?php wp_nonce_field( 'wookb_save_crawler_actions' ); ?>
+	<div style="overflow-x:auto;">
+	<table class="wp-list-table widefat striped" style="min-width:800px;">
+		<thead>
+			<tr>
+				<th><?php esc_html_e( 'Bot', 'ai-knowledge' ); ?></th>
+				<th><?php esc_html_e( 'Operador', 'ai-knowledge' ); ?></th>
+				<th><?php esc_html_e( 'Categoría', 'ai-knowledge' ); ?></th>
+				<th><?php esc_html_e( 'Descripción', 'ai-knowledge' ); ?></th>
+				<th style="width:140px;"><?php esc_html_e( 'Acción', 'ai-knowledge' ); ?></th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php foreach ( Crawler_Catalog::all() as $entry ) :
+				$ua       = $entry['user_agent'];
+				$current  = isset( $crawler_saved_actions[ $ua ] ) ? $crawler_saved_actions[ $ua ] : $entry['default_action'];
+				?>
+				<tr>
+					<td><?php echo esc_html( $ua ); ?></td>
+					<td><?php echo esc_html( $entry['operator'] ); ?></td>
+					<td><?php echo esc_html( isset( $category_labels[ $entry['category'] ] ) ? $category_labels[ $entry['category'] ] : $entry['category'] ); ?></td>
+					<td><?php echo esc_html( $entry['description'] ); ?></td>
+					<td>
+						<select name="crawler_action[<?php echo esc_attr( $ua ); ?>]">
+							<option value="allow" <?php selected( 'allow', $current ); ?>><?php esc_html_e( 'Permitir', 'ai-knowledge' ); ?></option>
+							<option value="block" <?php selected( 'block', $current ); ?>><?php esc_html_e( 'Bloquear', 'ai-knowledge' ); ?></option>
+							<?php if ( 'ask' === $current ) : ?>
+								<option value="ask" selected="selected" disabled="disabled"><?php esc_html_e( 'Sin decidir (uso mixto)', 'ai-knowledge' ); ?></option>
+							<?php endif; ?>
+						</select>
+					</td>
+				</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+	</div>
+	<div class="submit-row"><?php submit_button( __( 'Guardar configuración de crawlers', 'ai-knowledge' ), 'primary', 'submit', false ); ?></div>
+</form>
+
+<h3><?php esc_html_e( 'robots.txt', 'ai-knowledge' ); ?></h3>
+<div class="wookb-crawler-compare">
+	<div>
+		<p class="description"><?php esc_html_e( 'Actual (lo que vería un crawler ahora mismo)', 'ai-knowledge' ); ?></p>
+		<?php if ( $robots_txt_error ) : ?>
+			<div class="notice notice-error inline"><p><?php echo esc_html( $robots_txt_error ); ?></p></div>
+		<?php else : ?>
+			<textarea readonly rows="8"><?php echo esc_textarea( $robots_txt_content ); ?></textarea>
+		<?php endif; ?>
+	</div>
+	<div>
+		<p class="description"><?php esc_html_e( 'Bloque que se insertará (el resto del archivo no se toca)', 'ai-knowledge' ); ?></p>
+		<textarea readonly rows="8"><?php echo esc_textarea( $robots_block_preview ); ?></textarea>
+	</div>
+</div>
+
+<p><strong><?php esc_html_e( '⚠ Escribe de verdad el archivo robots.txt del sitio. Descarga la copia actual antes de continuar.', 'ai-knowledge' ); ?></strong></p>
+
+<?php if ( ! $robots_available ) : ?>
+	<div class="notice notice-warning inline">
+		<p><?php esc_html_e( 'robots.txt no es escribible en este servidor (permisos de la carpeta raíz).', 'ai-knowledge' ); ?></p>
+	</div>
+<?php else : ?>
+	<p class="description" data-wookb-unlock-notice="robots" <?php echo $robots_confirmed ? 'style="display:none;"' : ''; ?>><?php esc_html_e( 'Descarga la copia actual primero (botón de la izquierda); se habilitará automáticamente al terminar.', 'ai-knowledge' ); ?></p>
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wookb-download-form" data-wookb-unlock="robots" style="display:inline-block;margin-right:10px;">
+		<input type="hidden" name="action" value="wookb_download_robots_backup" />
+		<?php wp_nonce_field( 'wookb_download_robots_backup' ); ?>
+		<?php submit_button( __( 'Descargar copia actual de robots.txt', 'ai-knowledge' ), 'secondary', 'submit', false ); ?>
+	</form>
+
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;" onsubmit="return confirm('<?php echo esc_js( __( 'Vas a modificar el robots.txt real del sitio con los bots marcados como Bloquear en la tabla de arriba. ¿Confirmas que ya descargaste la copia y quieres continuar?', 'ai-knowledge' ) ); ?>');">
+		<input type="hidden" name="action" value="wookb_apply_robots_block" />
+		<?php wp_nonce_field( 'wookb_apply_robots_block' ); ?>
+		<?php submit_button( __( 'Aplicar bloqueo a robots.txt', 'ai-knowledge' ), 'delete', 'submit', false, $robots_confirmed ? array( 'data-wookb-apply' => 'robots' ) : array( 'disabled' => 'disabled', 'data-wookb-apply' => 'robots' ) ); ?>
+	</form>
+<?php endif; ?>
+
+<hr />
+
+<h3><?php esc_html_e( 'Bloqueo real vía .htaccess', 'ai-knowledge' ); ?></h3>
+<p class="description">
+	<?php esc_html_e( 'robots.txt es una petición educada que un bot puede ignorar. Esto bloquea de verdad a nivel de servidor a los bots marcados como Bloquear en la tabla de arriba.', 'ai-knowledge' ); ?>
+</p>
+<p><strong><?php esc_html_e( '⚠ Modifica un archivo fuera de este plugin que puede afectar a todo el sitio si algo sale mal. Descarga la copia actual antes de continuar.', 'ai-knowledge' ); ?></strong></p>
+
+<p class="description"><?php esc_html_e( 'Bloque que se insertará (el resto del archivo no se toca)', 'ai-knowledge' ); ?></p>
+<textarea readonly rows="6" style="width:100%;max-width:800px;"><?php echo esc_textarea( $htaccess_block_preview ); ?></textarea>
+
+<?php if ( ! $htaccess_available ) : ?>
+	<div class="notice notice-warning inline">
+		<p><?php esc_html_e( 'No se encontró un .htaccess editable en este servidor (por ejemplo, nginx no lo usa, o los permisos no permiten escribirlo). Añade el bloque de arriba a mano en la configuración de tu servidor.', 'ai-knowledge' ); ?></p>
+	</div>
+<?php else : ?>
+	<p class="description" data-wookb-unlock-notice="htaccess" <?php echo $htaccess_confirmed ? 'style="display:none;"' : ''; ?>><?php esc_html_e( 'Descarga la copia actual primero (botón de la izquierda); se habilitará automáticamente al terminar.', 'ai-knowledge' ); ?></p>
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wookb-download-form" data-wookb-unlock="htaccess" style="display:inline-block;margin-right:10px;">
+		<input type="hidden" name="action" value="wookb_download_htaccess_backup" />
+		<?php wp_nonce_field( 'wookb_download_htaccess_backup' ); ?>
+		<?php submit_button( __( 'Descargar copia actual de .htaccess', 'ai-knowledge' ), 'secondary', 'submit', false ); ?>
+	</form>
+
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;" onsubmit="return confirm('<?php echo esc_js( __( 'Vas a modificar el .htaccess real del sitio para bloquear los bots marcados como Bloquear en la tabla de arriba. Un error aquí puede afectar a TODO el sitio. ¿Confirmas que ya descargaste la copia y quieres continuar?', 'ai-knowledge' ) ); ?>');">
+		<input type="hidden" name="action" value="wookb_apply_htaccess_block" />
+		<?php wp_nonce_field( 'wookb_apply_htaccess_block' ); ?>
+		<?php submit_button( __( 'Aplicar bloqueo por .htaccess', 'ai-knowledge' ), 'delete', 'submit', false, $htaccess_confirmed ? array( 'data-wookb-apply' => 'htaccess' ) : array( 'disabled' => 'disabled', 'data-wookb-apply' => 'htaccess' ) ); ?>
+	</form>
+<?php endif; ?>
+
+<hr />
+
+<h3><?php esc_html_e( 'Logs de accesos de crawlers de IA', 'ai-knowledge' ); ?></h3>
+<p class="description">
+	<?php
+	printf(
+		/* translators: %d: numero maximo de filas guardadas */
+		esc_html__( 'Solo se registra tráfico que coincide con el catálogo de arriba (nunca tráfico humano ni bots desconocidos). Límite duro de %d filas: al superarlo se borran las más antiguas.', 'ai-knowledge' ),
+		(int) Crawler_Log::MAX_ROWS
+	);
+	?>
+</p>
+<p><strong><?php esc_html_e( 'Total registrado:', 'ai-knowledge' ); ?></strong> <?php echo (int) $crawler_log_total; ?></p>
+<?php if ( empty( $crawler_log_rows ) ) : ?>
+	<p class="description"><?php esc_html_e( 'Todavía no se ha registrado ningún acceso de un crawler conocido.', 'ai-knowledge' ); ?></p>
+<?php else : ?>
+	<div style="overflow-x:auto;">
+	<table class="wp-list-table widefat striped" style="min-width:700px;">
+		<thead>
+			<tr>
+				<th><?php esc_html_e( 'Bot', 'ai-knowledge' ); ?></th>
+				<th><?php esc_html_e( 'Categoría', 'ai-knowledge' ); ?></th>
+				<th><?php esc_html_e( 'URL', 'ai-knowledge' ); ?></th>
+				<th><?php esc_html_e( 'Fecha', 'ai-knowledge' ); ?></th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php foreach ( $crawler_log_rows as $log_row ) : ?>
+				<tr>
+					<td><?php echo esc_html( $log_row->bot_name ); ?></td>
+					<td><?php echo esc_html( $log_row->category ); ?></td>
+					<td><?php echo esc_html( $log_row->url ); ?></td>
+					<td><?php echo esc_html( $log_row->created_at ); ?></td>
+				</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+	</div>
+<?php endif; ?>
+
+</div><?php // cierra .wookb-crawler-section ?>
