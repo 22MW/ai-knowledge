@@ -183,8 +183,26 @@ limpieza posterior de Ajustes/Chatbot, como `a332da1`.
   por IA, solo "pulir redacción" sin tocar datos — decisión reafirmada
   explícitamente en la ronda 2 tras planteárselo al usuario.
 
+## Fix — Alcance vacío para todos los post_types (2026-09-17, v1.1.0.1)
+
+- Bug real confirmado en real (feeds `/feeds/products.xml` y
+  `/feeds/content.json` de Fase 9 devolvían vacío sin error): con más de
+  una taxonomía en `term_actions` a la vez (p.ej. `category` para posts y
+  `product_cat` para productos), `Scope::resolve_ids()` construía un
+  `tax_query` sin `relation`, que `WP_Query` trata como `AND` — exigía
+  ambas taxonomías a la vez y dejaba el alcance vacío para todo: no solo
+  los feeds, también generación de documentos y `/llms.txt`.
+- Fix: `'relation' => 'OR'` cuando hay más de una taxonomía con términos
+  incluidos. Verificado en real contra `https://plugins.local` (feeds
+  pasaron de vacíos a con contenido real).
+- Pendiente de decidir junto al diff de `is_included()` ya presente antes
+  de este fix (ver más abajo, "Cambio actual — Conectores WordPress 7.0"
+  no lo menciona; ese diff toca IDs forzados a incluir, no relacionado con
+  este bug de `tax_query`).
+
 ## Relevo mínimo — siguiente paso
 
-Confirmar commit + push del estado actual (rondas 1 y 2). Después:
-probar la pestaña WooCommerce en real (checkboxes, snapshot editable,
-pulido con IA) y decidir el siguiente foco (UX3/UX4 u otra tarea).
+Confirmar commit + push del fix de `tax_query` (v1.1.0.1) y del diff
+pendiente de `is_included()`. Después: probar la pestaña WooCommerce en
+real (checkboxes, snapshot editable, pulido con IA) y decidir el
+siguiente foco (UX3/UX4 u otra tarea).

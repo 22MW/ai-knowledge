@@ -2,6 +2,19 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [1.1.0.1] - 2026-09-17
+
+### Fix: Alcance vacío para todos los post_types
+
+- `Scope::resolve_ids()` combinaba las taxonomías con términos incluidos
+  (p.ej. `category` para posts y `product_cat` para productos) con `AND`
+  implícito de `WP_Query`, en vez de tratarlas como alternativas. Con
+  ambas configuradas a la vez, el alcance quedaba vacío para todo:
+  generación de documentos, `/llms.txt` y los feeds de Fase 9
+  (`/feeds/products.xml` y `/feeds/content.json`).
+- Corregido añadiendo `'relation' => 'OR'` cuando hay más de una taxonomía
+  con términos incluidos.
+
 ## [1.1.0] - 2026-09-17
 
 Ver `_dev/roadmap.md` para el plan completo por fases y `_dev/decisiones.md`
