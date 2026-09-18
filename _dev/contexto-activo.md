@@ -222,3 +222,9 @@ siguiente foco (UX3/UX4 u otra tarea).
 - El merge automático del script hacia `main` quedó bloqueado por conflictos
   de rutas `_dev/` y `docs/`; el merge fue abortado y no se forzó una
   resolución sin decisión sobre esos archivos.
+
+## Release 1.1.2 — preparación
+
+- Incluye navegación contextual desde títulos del admin hacia secciones de
+  documentación, enlaces internos con anclas y ajustes finales de contraste.
+- QA técnico pendiente de ejecutar antes de publicar el release.

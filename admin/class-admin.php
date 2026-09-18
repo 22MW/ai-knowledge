@@ -177,7 +177,7 @@ class Admin
 		$tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'registro'; // phpcs:ignore
 		$tabs = self::tabs();
 
-		echo '<div class="wookb-wrap">';
+		echo '<div class="wookb-wrap" data-wookb-doc-tab="' . esc_attr($tab) . '">';
 		// Fase 1, arreglo del salto de tema: script inline SINCRONO, impreso
 		// justo al abrir .wookb-wrap, antes de que se pinte el resto del
 		// contenido. Pone data-bs-theme en este mismo elemento leyendo
@@ -257,8 +257,14 @@ class Admin
 		$content = self::markdown_to_html((string) file_get_contents($file));
 		echo '<div class="wookb-doc-backdrop" data-wookb-doc-close></div>';
 		echo '<aside class="wookb-doc-drawer" data-wookb-doc-drawer role="dialog" aria-modal="true" aria-label="' . esc_attr($title) . '" aria-hidden="true">';
-		echo '<div class="wookb-doc-drawer-header"><h2>' . esc_html($title) . '</h2><button type="button" class="button-link" data-wookb-doc-close aria-label="' . esc_attr__('Cerrar documentación', 'ai-knowledge') . '">×</button></div>';
+		echo '<div class="wookb-doc-drawer-header"><button type="button" class="button-link wookb-doc-back" data-wookb-doc-back hidden>←</button><h2>' . esc_html($title) . '</h2><button type="button" class="button-link" data-wookb-doc-close aria-label="' . esc_attr__('Cerrar documentación', 'ai-knowledge') . '">×</button></div>';
 		echo '<div class="wookb-doc-drawer-content">' . $content . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitizado por markdown_to_html
+		foreach ($docs as $doc_file) {
+			if ($doc_file === $docs[$tab] || ! is_readable(AIKB_DIR . 'docs/' . $doc_file)) {
+				continue;
+			}
+			echo '<template data-wookb-doc-template="' . esc_attr($doc_file) . '">' . self::markdown_to_html((string) file_get_contents(AIKB_DIR . 'docs/' . $doc_file)) . '</template>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
 		echo '</aside>';
 	}
 
@@ -291,7 +297,8 @@ class Admin
 					$list_tag = '';
 				}
 				$level = strlen(strstr($line, ' ', true));
-				$html .= '<h' . $level . '>' . self::markdown_inline($match[1]) . '</h' . $level . '>';
+				$heading_id = sanitize_title(wp_strip_all_tags($match[1]));
+				$html .= '<h' . $level . ' id="' . esc_attr($heading_id) . '">' . self::markdown_inline($match[1]) . '</h' . $level . '>';
 				continue;
 			}
 			if (preg_match('/^[-*]\s+(.+)$/', $line, $match)) {
@@ -336,10 +343,15 @@ class Admin
 		$text = esc_html($text);
 		$text = preg_replace('/\*\*(.+?)\*\*/', '<strong>$1</strong>', $text);
 		$text = preg_replace('/`([^`]+)`/', '<code>$1</code>', $text);
-		$text = preg_replace_callback('/\[([^]]+)\]\((https?:\/\/[^)]+|[^)]+\.md)\)/', static function ($match) {
+		$text = preg_replace_callback('/\[([^]]+)\]\((https?:\/\/[^)]+|[^)]+\.md(?:#[^)]+)?)\)/', static function ($match) {
 			$url = $match[2];
-			if ('.md' === substr($url, -3)) {
-				$url = AIKB_URL . 'docs/' . basename($url);
+			$parts = explode('#', $url, 2);
+			if ('.md' === substr($parts[0], -3)) {
+				if (false !== stripos($match[1], 'volver al índice')) {
+					return '';
+				}
+				$anchor = isset($parts[1]) ? sanitize_title($parts[1]) : '';
+				return '<a href="#" data-wookb-doc-link="' . esc_attr(basename($parts[0])) . '"' . ( $anchor ? ' data-wookb-doc-anchor="' . esc_attr($anchor) . '"' : '' ) . '>' . esc_html($match[1]) . '</a>';
 			}
 			return '<a href="' . esc_url($url) . '" target="_blank" rel="noopener">' . $match[1] . '</a>';
 		}, $text);

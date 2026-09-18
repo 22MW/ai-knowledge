@@ -3,15 +3,26 @@
 .wookb-spinner { display: inline-block; width: 13px; height: 13px; margin-right: 7px; vertical-align: -2px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: wookb-spin .7s linear infinite; }
 .wookb-spinner-sibling { margin-left: 8px; }
 @keyframes wookb-spin { to { transform: rotate(360deg); } }
-.wookb-doc-backdrop { display: none; position: fixed; inset: 0; z-index: 100000; background: rgba(0,0,0,.45); }
+.wookb-doc-backdrop { display: none; position: fixed; inset: 0; z-index: 100000; pointer-events: none; background: transparent; }
 .wookb-doc-backdrop.is-open { display: block; }
 .wookb-doc-drawer { position: fixed; top: 32px; right: 0; bottom: 0; z-index: 100001; width: 50vw; max-width: 760px; min-width: 360px; transform: translateX(100%); transition: transform .2s ease; overflow-y: auto; background: var(--tblr-bg-surface, #fff); color: var(--tblr-body-color, #1d273b); box-shadow: -8px 0 24px rgba(0,0,0,.2); }
 .wookb-doc-drawer.is-open { transform: translateX(0); }
 .wookb-doc-drawer-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 24px; border-bottom: 1px solid var(--tblr-border-color, #dce1e7); position: sticky; top: 0; background: inherit; }
 .wookb-doc-drawer-header h2 { margin: 0; }
 .wookb-doc-drawer-header button { font-size: 26px; line-height: 1; text-decoration: none; }
-.wookb-doc-drawer-content { padding: 24px; line-height: 1.6; }
+.wookb-doc-back, .wookb-doc-drawer-header [data-wookb-doc-close], .wookb-doc-drawer-content a { text-decoration: none; }
+.wookb-doc-heading-link { display: inline-flex; align-items: center; justify-content: center; width: 21px; height: 21px; margin-left: 6px; padding: 0; border-radius: 100px; background: #333435 !important; color: #fff !important; font-size: 15px; font-weight: 700; line-height: 1; text-decoration: none !important; }
+.wookb-doc-heading-link:hover, .wookb-doc-heading-link:focus { background: var(--tblr-warning, #f76707) !important; color: #fff !important; opacity: 1; text-decoration: none !important; }
+.wp-core-ui .button-link.wookb-doc-heading-link { background: #333435 !important; color: #fff !important; -webkit-text-fill-color: #fff; }
+.wp-core-ui .button-link.wookb-doc-heading-link:hover,
+.wp-core-ui .button-link.wookb-doc-heading-link:focus { background: var(--tblr-warning, #f76707) !important; color: #fff !important; -webkit-text-fill-color: #fff; }
+.wookb-wrap[data-bs-theme="dark"] .wookb-doc-heading-link:hover,
+.wookb-wrap[data-bs-theme="dark"] .wookb-doc-heading-link:focus { background: var(--tblr-warning, #f76707); color: #fff; }
+.wookb-doc-drawer-content { padding: 24px; line-height: 1.6; font-size: calc(1em + 4px); }
+.wookb-wrap[data-bs-theme="dark"] .wookb-doc-drawer-content a,
+.wookb-wrap[data-bs-theme="dark"] .wookb-doc-drawer-header button { color: var(--tblr-warning, #f76707); }
 .wookb-doc-drawer-content h1, .wookb-doc-drawer-content h2, .wookb-doc-drawer-content h3 { margin: 1.2em 0 .5em; }
+.wookb-doc-drawer-content h2, .wookb-doc-drawer-content h3 { scroll-margin-top: 90px; }
 .wookb-doc-drawer-content h1:first-child, .wookb-doc-drawer-content h2:first-child { margin-top: 0; }
 .wookb-doc-drawer-content li { margin: .35em 0; }
 .wookb-doc-drawer-content code { padding: 2px 4px; border-radius: 3px; background: var(--tblr-bg-surface-secondary, #f0f2f5); }

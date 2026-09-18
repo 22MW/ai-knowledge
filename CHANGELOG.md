@@ -2,6 +2,17 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [1.1.2] - 2026-09-18
+
+### Documentación contextual en el admin
+
+- Los títulos `h2` y `h3` con sección documentada muestran un botón `?` para
+  abrir el popup y saltar directamente al apartado correspondiente.
+- Los enlaces internos con ancla mantienen la navegación dentro del popup.
+- El popup deja interactuar con el contenido lateral y conserva su estado al
+  pulsar los accesos de sección.
+- Ajustado el contraste, tamaño y estado hover de los botones de navegación.
+
 ## [1.1.1] - 2026-09-18
 
 ### UX del administrador y documentación

@@ -29,6 +29,13 @@ Archivo de consulta: recoge trabajo cerrado y su evidencia ya registrada. No es 
   spinner visible.
 - Se publicó el release `1.1.1` con ZIP limpio y documentación actualizada.
 
+### Release 1.1.2 (2026-09-18)
+
+- Navegación contextual desde títulos del admin hacia secciones concretas de
+  la documentación.
+- Enlaces Markdown con anclas dentro del popup y ajustes finales de contraste,
+  hover, tamaño y cierre del panel.
+
 ### Negocio, Chatbot y FAQs (2026-09-16)
 
 - Pestañas separadas para Negocio, Chatbot condicional y FAQs.

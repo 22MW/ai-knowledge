@@ -163,16 +163,73 @@
 		var $wrap = $( '.wookb-wrap' );
 		var $drawer = $wrap.find( '[data-wookb-doc-drawer]' );
 		var $backdrop = $wrap.find( '[data-wookb-doc-close]' ).filter( '.wookb-doc-backdrop' );
+		var $content = $drawer.find( '.wookb-doc-drawer-content' );
+		var $title = $drawer.find( '.wookb-doc-drawer-header h2' );
+		var $back = $drawer.find( '[data-wookb-doc-back]' );
+		var initialContent = $content.html();
+		var initialTitle = $title.text();
+		function slugifyHeading( text ) {
+			return text.toString().toLowerCase().normalize( 'NFD' ).replace( /[\u0300-\u036f]/g, '' ).replace( /[^a-z0-9\s-]/g, '' ).trim().replace( /\s+/g, '-' );
+		}
+		$wrap.find( '.wookb-card h2, .wookb-card h3' ).each( function () {
+			var $heading = $( this );
+			if ( $heading.find( '[data-wookb-doc-open]' ).length ) { return; }
+			var anchor = slugifyHeading( $heading.clone().children().remove().end().text() );
+			var validInCurrent = $content.find( '#' + anchor ).length > 0;
+			var validInTemplate = $drawer.find( 'template' ).toArray().some( function ( template ) {
+				return $( template.innerHTML ).filter( '#' + anchor ).length > 0;
+			} );
+			if ( validInCurrent || validInTemplate ) {
+				$heading.append( ' <button type="button" class="button-link wookb-doc-heading-link" data-wookb-doc-open="' + $wrap.data( 'wookb-doc-tab' ) + '" data-wookb-doc-anchor="' + anchor + '" aria-label="Abrir esta sección de documentación">?</button>' );
+			}
+		} );
 		function closeDocs() {
 			$drawer.removeClass( 'is-open' ).attr( 'aria-hidden', 'true' );
 			$backdrop.removeClass( 'is-open' );
 		}
 		$wrap.on( 'click', '[data-wookb-doc-open]', function () {
+			var alreadyOpen = $drawer.hasClass( 'is-open' );
+			if ( ! alreadyOpen ) {
+				initialContent = $content.html();
+				initialTitle = $title.text();
+				$back.prop( 'hidden', true );
+			}
 			$drawer.addClass( 'is-open' ).attr( 'aria-hidden', 'false' );
 			$backdrop.addClass( 'is-open' );
 			$drawer.find( '[data-wookb-doc-close]' ).not( '.wookb-doc-backdrop' ).trigger( 'focus' );
+			var anchor = String( $( this ).data( 'wookb-doc-anchor' ) || '' );
+			if ( anchor ) {
+				window.setTimeout( function () {
+					var $target = $content.find( '#' + anchor );
+					if ( $target.length ) { $target[ 0 ].scrollIntoView( { block: 'start' } ); }
+				}, 50 );
+			}
 		} );
-		$wrap.on( 'click', '[data-wookb-doc-close]', closeDocs );
+		$wrap.on( 'click', '[data-wookb-doc-link]', function ( e ) {
+			e.preventDefault();
+			var file = $( this ).data( 'wookb-doc-link' );
+			var template = $drawer.find( '[data-wookb-doc-template="' + file + '"]' )[ 0 ];
+			if ( ! template ) { return; }
+			$content.html( template.innerHTML );
+			$title.text( 'Documentación' );
+			$back.prop( 'hidden', false ).trigger( 'focus' );
+			var anchor = String( $( this ).data( 'wookb-doc-anchor' ) || '' );
+			if ( anchor ) {
+				var $target = $content.find( '#' + anchor );
+				if ( $target.length ) { $target[ 0 ].scrollIntoView( { block: 'start' } ); }
+			}
+		} );
+		$wrap.on( 'click', '[data-wookb-doc-anchor-only]', function ( e ) {
+			e.preventDefault();
+			var target = document.getElementById( $( this ).data( 'wookb-doc-anchor-only' ) );
+			if ( target ) { target.scrollIntoView( { block: 'start' } ); }
+		} );
+		$wrap.on( 'click', '[data-wookb-doc-back]', function () {
+			$content.html( initialContent );
+			$title.text( initialTitle );
+			$back.prop( 'hidden', true );
+		} );
+		$wrap.on( 'click', '[data-wookb-doc-close]:not(.wookb-doc-backdrop)', closeDocs );
 		$( document ).on( 'keydown.wookbDocs', function ( e ) {
 			if ( 'Escape' === e.key ) { closeDocs(); }
 		} );

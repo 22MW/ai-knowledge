@@ -67,3 +67,8 @@ Hay estilos inline como `style="width:100%"` en varias vistas. Detectado, no abo
   estable del plugin con `knowBaseDev` antes de volver a automatizar el merge
   del script de release. No se debe resolver eliminando o restaurando `_dev/`
   sin una decisión explícita.
+
+## Release 1.1.2 — preparación
+
+- Pendiente publicar la navegación contextual del popup y sus ajustes visuales
+  después de ejecutar la validación técnica y preparar el ZIP.

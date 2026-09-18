@@ -176,3 +176,10 @@ contenido) — no se forzó una invalidación especial para este cambio de códi
 - El release puede publicarse con el ZIP y el tag sin hacer un merge ciego:
   primero se revisa el contenido de la rama estable y se decide cómo tratar
   la documentación interna.
+
+## 2026-09-18 — Navegación contextual de documentación
+
+- Los accesos `?` solo aparecen junto a títulos del admin cuyo anclaje existe
+  realmente en la guía correspondiente.
+- El popup conserva su contenido al pulsar un acceso mientras ya está abierto;
+  el clic fuera no lo cierra y el cierre explícito queda en `×` o Escape.
