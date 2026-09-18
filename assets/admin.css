@@ -1,5 +1,8 @@
 .wookb-wrap .form-table th { width: 260px; }
 .wookb-documentation-link { margin: -4px 0 18px; }
+.wookb-spinner { display: inline-block; width: 13px; height: 13px; margin-right: 7px; vertical-align: -2px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: wookb-spin .7s linear infinite; }
+.wookb-spinner-sibling { margin-left: 8px; }
+@keyframes wookb-spin { to { transform: rotate(360deg); } }
 .wookb-doc-backdrop { display: none; position: fixed; inset: 0; z-index: 100000; background: rgba(0,0,0,.45); }
 .wookb-doc-backdrop.is-open { display: block; }
 .wookb-doc-drawer { position: fixed; top: 32px; right: 0; bottom: 0; z-index: 100001; width: 50vw; max-width: 760px; min-width: 360px; transform: translateX(100%); transition: transform .2s ease; overflow-y: auto; background: var(--tblr-bg-surface, #fff); color: var(--tblr-body-color, #1d273b); box-shadow: -8px 0 24px rgba(0,0,0,.2); }

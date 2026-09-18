@@ -70,26 +70,54 @@
 			'wookb_save_woocommerce_settings',
 			'wookb_save_llms_faq',
 			'wookb_save_crawler_actions',
-			'wookb_save_crawler_visibility'
+			'wookb_save_crawler_visibility',
+			'wookb_generate_business_summary_draft',
+			'wookb_generate_faqs_draft',
+			'wookb_generate_prompt_draft',
+			'wookb_normalize_prompt',
+			'wookb_polish_store_doc'
 		];
 
 		$( '.wookb-wrap' ).on( 'submit', 'form', function ( e ) {
 			var form = this;
 			var $form = $( form );
 			var action = String( $form.find( 'input[name="action"]' ).first().val() || '' );
+			var submitter = e.originalEvent && e.originalEvent.submitter ? e.originalEvent.submitter : null;
+			var submitterParams = null;
+			if ( ! action && submitter && submitter.formAction ) {
+				try {
+					submitterParams = new URL( submitter.formAction, window.location.href ).searchParams;
+					action = submitterParams.get( 'action' ) || '';
+				} catch ( error ) {
+					// El navegador no soporta URL: se conserva el POST tradicional.
+				}
+			}
 			if ( -1 === ajaxActions.indexOf( action ) || form.dataset.wookbAjaxBusy ) {
 				return;
 			}
 
 			e.preventDefault();
 			form.dataset.wookbAjaxBusy = '1';
-			var $submit = $form.find( ':submit' );
-			$submit.prop( 'disabled', true ).attr( 'aria-busy', 'true' );
+			var $submit = submitter ? $( submitter ) : $form.find( ':submit' ).first();
+			var isInputSubmit = 'INPUT' === $submit.prop( 'tagName' );
+			var originalSubmitText = isInputSubmit ? $submit.val() : $submit.html();
+			$submit.data( 'wookb-original-text', originalSubmitText ).prop( 'disabled', true ).attr( 'aria-busy', 'true' );
+			if ( isInputSubmit ) {
+				$submit.val( 'Procesando…' );
+				$submit.after( '<span class="wookb-spinner wookb-spinner-sibling" aria-hidden="true"></span>' );
+			} else {
+				$submit.html( '<span class="wookb-spinner" aria-hidden="true"></span><span>Procesando…</span>' );
+			}
 			$form.next( '.wookb-ajax-notice' ).remove();
 
+			var formData = new FormData( form );
+			formData.set( 'action', action );
+			if ( submitterParams && submitterParams.get( '_wpnonce' ) ) {
+				formData.set( '_wpnonce', submitterParams.get( '_wpnonce' ) );
+			}
 			fetch( window.ajaxurl, {
 				method: 'POST',
-				body: new FormData( form ),
+				body: formData,
 				credentials: 'same-origin'
 			} ).then( function ( response ) {
 				if ( ! response.ok ) {
@@ -101,6 +129,18 @@
 					throw new Error( result.data && result.data.message ? result.data.message : 'No se pudo guardar.' );
 				}
 				var message = result.data && result.data.message ? result.data.message : 'Guardado.';
+				var value = result.data && (result.data.draft || result.data.polished);
+				if ( value ) {
+					if ( 'wookb_generate_business_summary_draft' === action ) {
+						$form.closest( '.wookb-card' ).find( 'textarea[name="summary_draft"]' ).val( value );
+					} else if ( 'wookb_generate_faqs_draft' === action ) {
+						$form.closest( '.wookb-card' ).find( 'textarea[name="llms_faq"]' ).val( value );
+					} else if ( 'wookb_generate_prompt_draft' === action || 'wookb_normalize_prompt' === action ) {
+						$form.closest( '.wookb-card' ).find( 'textarea[name="draft"]' ).val( value );
+					} else if ( 'wookb_polish_store_doc' === action ) {
+						$form.nextAll( 'textarea[readonly]' ).first().val( value );
+					}
+				}
 				$form.after( '<div class="notice notice-success inline wookb-ajax-notice"><p></p></div>' );
 				$form.next( '.wookb-ajax-notice' ).find( 'p' ).text( message );
 			} ).catch( function ( error ) {
@@ -108,6 +148,12 @@
 				$form.next( '.wookb-ajax-notice' ).find( 'p' ).text( 'No se pudo guardar sin recargar. Revisa la sesión y vuelve a intentarlo. (' + error.message + ')' );
 			} ).finally( function () {
 				delete form.dataset.wookbAjaxBusy;
+				if ( isInputSubmit ) {
+					$submit.val( $submit.data( 'wookb-original-text' ) || originalSubmitText );
+					$submit.next( '.wookb-spinner-sibling' ).remove();
+				} else {
+					$submit.html( $submit.data( 'wookb-original-text' ) || originalSubmitText );
+				}
 				$submit.prop( 'disabled', false ).removeAttr( 'aria-busy' );
 			} );
 		} );

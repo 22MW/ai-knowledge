@@ -29,6 +29,11 @@ class Admin
 			'wookb_save_llms_faq' => 'save_llms_faq',
 			'wookb_save_crawler_actions' => 'save_crawler_actions',
 			'wookb_save_crawler_visibility' => 'save_crawler_visibility',
+			'wookb_generate_business_summary_draft' => 'generate_business_summary_draft',
+			'wookb_generate_faqs_draft' => 'generate_faqs_draft',
+			'wookb_generate_prompt_draft' => 'generate_prompt_draft',
+			'wookb_normalize_prompt' => 'normalize_prompt',
+			'wookb_polish_store_doc' => 'polish_store_doc',
 		);
 		foreach ($ajax_actions as $action => $callback) {
 			add_action('wp_ajax_' . $action, array(__CLASS__, $callback));
@@ -967,8 +972,14 @@ class Admin
 
 		if (is_wp_error($draft)) {
 			set_transient('wookb_business_summary_error', $draft->get_error_message(), MINUTE_IN_SECONDS);
+			if (wp_doing_ajax()) {
+				wp_send_json_error(array('message' => $draft->get_error_message()), 422);
+			}
 		} else {
 			set_transient('wookb_business_summary_draft', $draft, HOUR_IN_SECONDS);
+			if (wp_doing_ajax()) {
+				wp_send_json_success(array('message' => __('Borrador generado.', 'ai-knowledge'), 'draft' => $draft));
+			}
 		}
 
 		self::redirect('negocio');
@@ -1002,6 +1013,9 @@ class Admin
 		// directamente -- sin Genix, chatbot-system-prompt.md no tiene a
 		// donde sincronizarse (ver Chatbot_Prompt::sync()).
 		if (! Chatbot_Prompt::is_genix_ready()) {
+			if (wp_doing_ajax()) {
+				wp_send_json_error(array('message' => __('Esta acción requiere Support Genix activo.', 'ai-knowledge')), 422);
+			}
 			wp_die(esc_html__('Esta acción requiere Support Genix activo.', 'ai-knowledge'));
 		}
 
@@ -1016,8 +1030,14 @@ class Admin
 
 		if (is_wp_error($draft)) {
 			set_transient('wookb_prompt_draft_error', $draft->get_error_message(), MINUTE_IN_SECONDS);
+			if (wp_doing_ajax()) {
+				wp_send_json_error(array('message' => $draft->get_error_message()), 422);
+			}
 		} else {
 			set_transient('wookb_prompt_draft', $draft, HOUR_IN_SECONDS);
+			if (wp_doing_ajax()) {
+				wp_send_json_success(array('message' => __('Borrador generado.', 'ai-knowledge'), 'draft' => $draft));
+			}
 		}
 
 		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=prompt'));
@@ -1038,8 +1058,14 @@ class Admin
 		if (is_wp_error($result)) {
 			set_transient('wookb_prompt_draft_error', $result->get_error_message(), MINUTE_IN_SECONDS);
 			set_transient('wookb_prompt_draft', $draft, HOUR_IN_SECONDS);
+			if (wp_doing_ajax()) {
+				wp_send_json_error(array('message' => $result->get_error_message()), 422);
+			}
 		} else {
 			set_transient('wookb_prompt_draft', $result, HOUR_IN_SECONDS);
+			if (wp_doing_ajax()) {
+				wp_send_json_success(array('message' => __('Texto pulido.', 'ai-knowledge'), 'draft' => $result));
+			}
 		}
 
 		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=prompt'));
@@ -1129,10 +1155,16 @@ class Admin
 
 		if (is_wp_error($polished)) {
 			set_transient('wookb_store_docs_error', $polished->get_error_message(), MINUTE_IN_SECONDS);
+			if (wp_doing_ajax()) {
+				wp_send_json_error(array('message' => $polished->get_error_message()), 422);
+			}
 			self::redirect('woocommerce');
 		}
 
 		self::publish_manual_text($row, $polished);
+		if (wp_doing_ajax()) {
+			wp_send_json_success(array('message' => __('Texto pulido.', 'ai-knowledge'), 'polished' => $polished, 'row_id' => $row_id));
+		}
 
 		self::redirect('woocommerce');
 	}
@@ -1245,8 +1277,14 @@ class Admin
 
 		if (is_wp_error($draft)) {
 			set_transient('wookb_faqs_error_' . $lang, $draft->get_error_message(), MINUTE_IN_SECONDS);
+			if (wp_doing_ajax()) {
+				wp_send_json_error(array('message' => $draft->get_error_message()), 422);
+			}
 		} else {
 			set_transient('wookb_faqs_draft_' . $lang, $draft, HOUR_IN_SECONDS);
+			if (wp_doing_ajax()) {
+				wp_send_json_success(array('message' => __('FAQ generada.', 'ai-knowledge'), 'draft' => $draft, 'lang' => $lang));
+			}
 		}
 
 		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=faqs&lang=' . $lang . '&wookb_notice=1'));

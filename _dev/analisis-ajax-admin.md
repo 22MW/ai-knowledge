@@ -225,3 +225,15 @@ Aplicada en código el 2026-09-18, pendiente de QA real por el usuario.
 - La interfaz bloquea doble envío y muestra éxito o error junto al formulario.
 - No incluye generación IA, Registro, cola operativa, borrados, descargas ni
   escritura de archivos físicos.
+
+### Fase 2 — generación y pulido con IA
+
+Aplicada en código el 2026-09-18, pendiente de QA real por el usuario.
+
+- Generación AJAX de resumen de Negocio, FAQs y borrador del Chatbot.
+- Normalización AJAX del texto del Chatbot.
+- Pulido AJAX de documentos de tienda WooCommerce.
+- Los borradores y resultados se insertan en sus campos sin recargar la
+  pestaña.
+- Los errores del proveedor se devuelven como error visible y se conserva el
+  fallback tradicional.
