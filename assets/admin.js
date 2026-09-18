@@ -55,6 +55,64 @@
 		} );
 	} );
 
+	/**
+	 * Fase AJAX 1: guardados simples. El action del formulario se conserva
+	 * para que admin-post.php siga funcionando si JavaScript no esta activo.
+	 */
+	$( function () {
+		var ajaxActions = [
+			'wookb_save_content',
+			'wookb_save_settings',
+			'wookb_save_chatbot_settings',
+			'wookb_save_queue_settings',
+			'wookb_save_business_answers',
+			'wookb_save_business_summary',
+			'wookb_save_woocommerce_settings',
+			'wookb_save_llms_faq',
+			'wookb_save_crawler_actions',
+			'wookb_save_crawler_visibility'
+		];
+
+		$( '.wookb-wrap' ).on( 'submit', 'form', function ( e ) {
+			var form = this;
+			var $form = $( form );
+			var action = String( $form.find( 'input[name="action"]' ).first().val() || '' );
+			if ( -1 === ajaxActions.indexOf( action ) || form.dataset.wookbAjaxBusy ) {
+				return;
+			}
+
+			e.preventDefault();
+			form.dataset.wookbAjaxBusy = '1';
+			var $submit = $form.find( ':submit' );
+			$submit.prop( 'disabled', true ).attr( 'aria-busy', 'true' );
+			$form.next( '.wookb-ajax-notice' ).remove();
+
+			fetch( window.ajaxurl, {
+				method: 'POST',
+				body: new FormData( form ),
+				credentials: 'same-origin'
+			} ).then( function ( response ) {
+				if ( ! response.ok ) {
+					throw new Error( 'HTTP ' + response.status );
+				}
+				return response.json();
+			} ).then( function ( result ) {
+				if ( ! result.success ) {
+					throw new Error( result.data && result.data.message ? result.data.message : 'No se pudo guardar.' );
+				}
+				var message = result.data && result.data.message ? result.data.message : 'Guardado.';
+				$form.after( '<div class="notice notice-success inline wookb-ajax-notice"><p></p></div>' );
+				$form.next( '.wookb-ajax-notice' ).find( 'p' ).text( message );
+			} ).catch( function ( error ) {
+				$form.after( '<div class="notice notice-error inline wookb-ajax-notice"><p></p></div>' );
+				$form.next( '.wookb-ajax-notice' ).find( 'p' ).text( 'No se pudo guardar sin recargar. Revisa la sesión y vuelve a intentarlo. (' + error.message + ')' );
+			} ).finally( function () {
+				delete form.dataset.wookbAjaxBusy;
+				$submit.prop( 'disabled', false ).removeAttr( 'aria-busy' );
+			} );
+		} );
+	} );
+
 	$( function () {
 		var $wrap = $( '.wookb-wrap' );
 		var $drawer = $wrap.find( '[data-wookb-doc-drawer]' );

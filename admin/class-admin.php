@@ -18,6 +18,21 @@ class Admin
 	public static function init()
 	{
 		add_action('admin_menu', array(__CLASS__, 'menu'));
+		$ajax_actions = array(
+			'wookb_save_content' => 'save_content',
+			'wookb_save_settings' => 'save_settings',
+			'wookb_save_chatbot_settings' => 'save_chatbot_settings',
+			'wookb_save_queue_settings' => 'save_queue_settings',
+			'wookb_save_business_answers' => 'save_business_answers',
+			'wookb_save_business_summary' => 'save_business_summary',
+			'wookb_save_woocommerce_settings' => 'save_woocommerce_settings',
+			'wookb_save_llms_faq' => 'save_llms_faq',
+			'wookb_save_crawler_actions' => 'save_crawler_actions',
+			'wookb_save_crawler_visibility' => 'save_crawler_visibility',
+		);
+		foreach ($ajax_actions as $action => $callback) {
+			add_action('wp_ajax_' . $action, array(__CLASS__, $callback));
+		}
 		add_action('admin_post_wookb_save_content', array(__CLASS__, 'save_content'));
 		add_action('admin_post_wookb_save_settings', array(__CLASS__, 'save_settings'));
 		add_action('admin_post_wookb_save_chatbot_settings', array(__CLASS__, 'save_chatbot_settings'));
@@ -205,7 +220,7 @@ class Admin
 		if (empty($docs[$tab])) {
 			return;
 		}
-		echo '<p class="wookb-documentation-link"><button type="button" class="button-link" data-wookb-doc-open="' . esc_attr($tab) . '">' . esc_html__('Leer documentación', 'ai-knowledge') . '</button></p>';
+		echo '<button type="button" class="button wookb-btn-info" data-wookb-doc-open="' . esc_attr($tab) . '">' . esc_html__('Leer documentación', 'ai-knowledge') . '</button>';
 	}
 
 	protected static function documentation_map()
@@ -258,33 +273,56 @@ class Admin
 			$line = trim($line);
 			if ('' === $line) {
 				$flush();
-				if ($list_tag) { $html .= '</' . $list_tag . '>'; $list_tag = ''; }
+				if ($list_tag) {
+					$html .= '</' . $list_tag . '>';
+					$list_tag = '';
+				}
 				continue;
 			}
 			if (preg_match('/^#{1,3}\s+(.+)$/', $line, $match)) {
 				$flush();
-				if ($list_tag) { $html .= '</' . $list_tag . '>'; $list_tag = ''; }
+				if ($list_tag) {
+					$html .= '</' . $list_tag . '>';
+					$list_tag = '';
+				}
 				$level = strlen(strstr($line, ' ', true));
 				$html .= '<h' . $level . '>' . self::markdown_inline($match[1]) . '</h' . $level . '>';
 				continue;
 			}
 			if (preg_match('/^[-*]\s+(.+)$/', $line, $match)) {
 				$flush();
-				if ('ul' !== $list_tag) { if ($list_tag) { $html .= '</' . $list_tag . '>'; } $html .= '<ul>'; $list_tag = 'ul'; }
+				if ('ul' !== $list_tag) {
+					if ($list_tag) {
+						$html .= '</' . $list_tag . '>';
+					}
+					$html .= '<ul>';
+					$list_tag = 'ul';
+				}
 				$html .= '<li>' . self::markdown_inline($match[1]) . '</li>';
 				continue;
 			}
 			if (preg_match('/^\d+\.\s+(.+)$/', $line, $match)) {
 				$flush();
-				if ('ol' !== $list_tag) { if ($list_tag) { $html .= '</' . $list_tag . '>'; } $html .= '<ol>'; $list_tag = 'ol'; }
+				if ('ol' !== $list_tag) {
+					if ($list_tag) {
+						$html .= '</' . $list_tag . '>';
+					}
+					$html .= '<ol>';
+					$list_tag = 'ol';
+				}
 				$html .= '<li>' . self::markdown_inline($match[1]) . '</li>';
 				continue;
 			}
-			if ($list_tag) { $html .= '</' . $list_tag . '>'; $list_tag = ''; }
+			if ($list_tag) {
+				$html .= '</' . $list_tag . '>';
+				$list_tag = '';
+			}
 			$paragraph[] = self::markdown_inline($line);
 		}
 		$flush();
-		if ($list_tag) { $html .= '</' . $list_tag . '>'; }
+		if ($list_tag) {
+			$html .= '</' . $list_tag . '>';
+		}
 		return wp_kses_post($html);
 	}
 
@@ -340,6 +378,14 @@ class Admin
 
 	protected static function redirect($tab)
 	{
+		if (wp_doing_ajax()) {
+			wp_send_json_success(
+				array(
+					'message' => __('Guardado.', 'ai-knowledge'),
+					'tab' => $tab,
+				)
+			);
+		}
 		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=' . $tab . '&wookb_notice=1'));
 		exit;
 	}
@@ -1168,6 +1214,15 @@ class Admin
 		Llms_Faq::save($content, $lang);
 		Llms_Faq::persist_doc($lang);
 		delete_transient('wookb_faqs_draft_' . $lang);
+		if (wp_doing_ajax()) {
+			wp_send_json_success(
+				array(
+					'message' => __('FAQ guardada.', 'ai-knowledge'),
+					'tab' => 'faqs',
+					'lang' => $lang,
+				)
+			);
+		}
 
 		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=faqs&lang=' . $lang . '&wookb_notice=1'));
 		exit;
