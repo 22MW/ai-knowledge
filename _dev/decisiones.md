@@ -164,3 +164,15 @@ contenido) — no se forzó una invalidación especial para este cambio de códi
   archivos físicos conservan el flujo tradicional por riesgo y trazabilidad.
 - Cada acción AJAX conserva el formulario POST como fallback y muestra estado
   de proceso, incluyendo spinner para los botones generados por WordPress.
+## 2026-09-18 — Flujo de release y ramas
+
+- `main` dentro del repositorio `ai-knowledge` es la rama estable del plugin;
+  `main` del workspace es otra cosa y no debe recibir archivos del plugin.
+- Antes de ejecutar `_dev/deploy-release.sh` hay que comprobar la divergencia
+  entre `knowBaseDev`, `release` y `main`.
+- El script elimina `_dev/` en la rama de distribución. Si `main` conserva o
+  elimina rutas distintas, el merge puede producir conflictos de
+  `modify/delete` o `rename/delete`; no se resuelven automáticamente.
+- El release puede publicarse con el ZIP y el tag sin hacer un merge ciego:
+  primero se revisa el contenido de la rama estable y se decide cómo tratar
+  la documentación interna.

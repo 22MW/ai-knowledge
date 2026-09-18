@@ -30,55 +30,10 @@ No presentar este flujo como validado hasta realizar esas pruebas.
 
 ## Próximas mejoras, sin empezar
 
-### Plan propuesto — Visibilidad IA, reglas y `llms.txt`
+### Visibilidad IA, reglas y `llms.txt`
 
-**Implementación actual:** modo global «Solo permitir visibilidad de
-`llms.txt`», `llms.txt` físico gestionado y regenerado automáticamente,
-comparación de reglas y vista de archivo actual/propuesto. En `robots.txt`,
-las reglas externas contradictorias se comentan y el bloque del plugin se
-reemplaza entero. En `.htaccess`, la propuesta conserva el contenido actual
-y genera un bloque nuevo para copiar o descargar; no se sobrescribe
-automáticamente.
-
-**Pendiente de QA real:** confirmar con el archivo de cada sitio que las
-reglas antiguas se comentan correctamente, que el bloque nuevo no se duplica
-y que los bots bloqueados solo reciben `200` en `/llms.txt` y `404` en el
-resto. Mantener dos bloques visibles en la pantalla («Actual» y «Después
-del cambio») para revisar antes de copiar o guardar.
-
-1. **Definir el modo de visibilidad.** Añadir «Solo visibilidad de
-   `llms.txt`» como opción explícita para los crawlers seleccionados: permitir
-   `/llms.txt` y limitar el resto de rutas según el agente, sin cambiar la
-   visibilidad para usuarios normales.
-2. **Analizar antes de escribir.** Leer el `robots.txt` y `.htaccess` reales,
-   identificar reglas originales y compararlas con las reglas que produciría
-   la configuración actual. Mostrar advertencias claras cuando haya
-   contradicciones.
-3. **Separar reglas externas y del plugin.** Mantener las reglas originales;
-   encapsular las del plugin entre marcadores propios, con comentarios que
-   expliquen cualquier conflicto detectado. Nunca borrar silenciosamente una
-   regla externa.
-4. **Actualizar de forma idempotente.** En cada aplicación, reemplazar
-   únicamente el bloque gestionado por AI Knowledge. No duplicar reglas. Si
-   la configuración queda vacía, eliminar solo el bloque del plugin y dejar
-   intacto todo lo demás.
-5. **Proteger cada modificación.** Antes de aplicar cambios, exigir lectura y
-   descarga de la copia actual de cada archivo, confirmación fuerte y una
-   comprobación final del contenido escrito. `robots.txt` y `.htaccess` deben
-   tener copias y confirmaciones independientes.
-6. **Convertir `llms.txt` en archivo físico.** Generarlo en la raíz del sitio;
-   si ya existe, leerlo y exigir su descarga previa antes de sustituirlo.
-   Marcar el archivo generado para que las actualizaciones futuras sustituyan
-   solo el contenido gestionado por el plugin, sin confundirlo con un archivo
-   externo.
-7. **Validar en staging/local.** Probar reglas sin conflicto, conflicto con
-   reglas originales, segunda actualización sin duplicados, configuración
-   vacía, archivo inexistente y archivo existente. Comprobar además que un
-   agente puede leer `/llms.txt` en el modo nuevo.
-
-Este plan requiere `planificar-cambio` antes de tocar código. Las decisiones
-sobre el formato exacto de los comentarios, los marcadores y la prioridad de
-las reglas quedan pendientes de esa planificación.
+La implementación está cerrada y trasladada al histórico. Solo queda el QA
+real indicado arriba.
 
 ### UX3 — WooCommerce: selección y prompt por campo a nivel de producto
 
@@ -106,10 +61,9 @@ Hay estilos inline como `style="width:100%"` en varias vistas. Detectado, no abo
 - [`contexto-activo.md`](contexto-activo.md): relevo de la tarea activa.
 - [`docs/index.md`](../docs/index.md): índice de documentación del plugin.
 
-## Cambio aplicado — documentación en el admin (2026-09-18)
+## Release 1.1.1 — seguimiento Git
 
-- La documentación pública del plugin vive ahora en `docs/`, fuera de `_dev/`.
-- Cada pestaña enlaza su guía correspondiente mediante «Leer documentación».
-- La guía se abre en un panel lateral derecho y se muestra como lectura normal.
-- Pendiente de QA visual real: comprobar el ancho, el cierre, Escape y la
-  lectura en cada pestaña.
+- Pendiente separado: resolver la divergencia histórica de la rama `main`
+  estable del plugin con `knowBaseDev` antes de volver a automatizar el merge
+  del script de release. No se debe resolver eliminando o restaurando `_dev/`
+  sin una decisión explícita.

@@ -64,6 +64,7 @@ if ( is_wp_error( $robots_response ) ) {
 // proteccion server-side, no basta con deshabilitar el boton en el HTML).
 $robots_available   = Robots_Txt_Guard::is_available();
 $robots_confirmed   = Robots_Txt_Guard::backup_confirmed();
+$llms_backup_confirmed = (bool) get_transient( 'wookb_llms_backup_confirmed_' . get_current_user_id() );
 $htaccess_available = Htaccess_Guard::is_available();
 $htaccess_confirmed = Htaccess_Guard::backup_confirmed();
 
@@ -130,7 +131,7 @@ $htaccess_conflicts = Htaccess_Guard::conflicts( $crawler_blocked_bots, $crawler
 			<p class="description"><?php esc_html_e( 'AI Knowledge puede guardar llms.txt como archivo real en la raíz de tu web.', 'ai-knowledge' ); ?></p>
 			<?php if ( Llms_Txt::physical_file_exists() ) : ?>
 				<p class="description"><?php esc_html_e( 'Ya existe un llms.txt. Descarga una copia antes de sustituirlo.', 'ai-knowledge' ); ?></p>
-				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;margin-right:10px;">
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wookb-download-form" data-wookb-unlock="llms" style="display:inline-block;margin-right:10px;">
 					<input type="hidden" name="action" value="wookb_download_llms_backup" />
 					<?php wp_nonce_field( 'wookb_download_llms_backup' ); ?>
 					<?php submit_button( __( 'Descargar copia actual de llms.txt', 'ai-knowledge' ), 'secondary', 'submit', false ); ?>
@@ -138,10 +139,11 @@ $htaccess_conflicts = Htaccess_Guard::conflicts( $crawler_blocked_bots, $crawler
 			<?php else : ?>
 				<p class="description"><?php esc_html_e( 'Todavía no existe un archivo físico. Puedes crearlo con el contenido generado por AI Knowledge.', 'ai-knowledge' ); ?></p>
 			<?php endif; ?>
+			<p class="description" data-wookb-unlock-notice="llms" <?php echo ( ! Llms_Txt::physical_file_exists() || $llms_backup_confirmed ) ? 'style="display:none;"' : ''; ?>><?php esc_html_e( 'Descarga la copia actual primero; el botón se habilitará automáticamente al terminar.', 'ai-knowledge' ); ?></p>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;" onsubmit="return confirm('<?php echo esc_js( Llms_Txt::physical_file_exists() ? __( 'Vas a sustituir el llms.txt físico de la raíz por el generado por AI Knowledge. ¿Confirmas que ya descargaste la copia?', 'ai-knowledge' ) : __( 'Vas a crear un llms.txt físico en la raíz con el contenido generado por AI Knowledge. ¿Quieres continuar?', 'ai-knowledge' ) ); ?>');">
 				<input type="hidden" name="action" value="wookb_apply_llms_physical" />
 				<?php wp_nonce_field( 'wookb_apply_llms_physical' ); ?>
-				<?php submit_button( Llms_Txt::physical_file_exists() ? __( 'Sustituir por el generado', 'ai-knowledge' ) : __( 'Crear archivo físico', 'ai-knowledge' ), Llms_Txt::physical_file_exists() ? 'delete' : 'primary', 'submit', false ); ?>
+				<?php submit_button( Llms_Txt::physical_file_exists() ? __( 'Sustituir por el generado', 'ai-knowledge' ) : __( 'Crear archivo físico', 'ai-knowledge' ), Llms_Txt::physical_file_exists() ? 'delete' : 'primary', 'submit', false, ( ! Llms_Txt::physical_file_exists() || $llms_backup_confirmed ) ? array( 'data-wookb-apply' => 'llms' ) : array( 'disabled' => 'disabled', 'data-wookb-apply' => 'llms' ) ); ?>
 			</form>
 		</td>
 	</tr>

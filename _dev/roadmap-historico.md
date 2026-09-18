@@ -18,6 +18,17 @@ Archivo de consulta: recoge trabajo cerrado y su evidencia ya registrada. No es 
 
 ## Rondas cerradas posteriores
 
+### Documentación y UX AJAX (2026-09-18)
+
+- La documentación pública se movió de `_dev/docs/` a `docs/`, fuera de la
+  memoria interna, conservando sus enlaces y archivos Markdown.
+- Cada pestaña del admin abre su guía en un panel lateral derecho con lectura
+  normal, cierre y adaptación responsive.
+- Los guardados simples y las generaciones/pulidos con IA usan AJAX con
+  fallback tradicional, estados de proceso, protección contra doble envío y
+  spinner visible.
+- Se publicó el release `1.1.1` con ZIP limpio y documentación actualizada.
+
 ### Negocio, Chatbot y FAQs (2026-09-16)
 
 - Pestañas separadas para Negocio, Chatbot condicional y FAQs.

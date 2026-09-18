@@ -218,3 +218,7 @@ siguiente foco (UX3/UX4 u otra tarea).
 - QA visual confirmado por el usuario para el spinner; queda pendiente la
   validación completa de proveedores, WooCommerce y errores reales de IA.
 - Release preparado localmente; no implica deploy.
+- La GitHub Release y el ZIP están publicados usando el tag `1.1.1`.
+- El merge automático del script hacia `main` quedó bloqueado por conflictos
+  de rutas `_dev/` y `docs/`; el merge fue abortado y no se forzó una
+  resolución sin decisión sobre esos archivos.
