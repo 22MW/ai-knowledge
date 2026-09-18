@@ -2,6 +2,16 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [1.1.1] - 2026-09-18
+
+### UX del administrador y documentación
+
+- La documentación de cada pestaña vive en `docs/` y se puede abrir desde el
+  admin en un panel lateral de lectura.
+- Los guardados simples y las generaciones/pulidos con IA usan AJAX, con
+  fallback tradicional, mensajes de estado y protección contra doble envío.
+- Los botones AJAX muestran un spinner mientras se procesa la petición.
+
 ## [1.1.0.2] - 2026-09-18
 
 ### Visibilidad IA y archivos de rastreo

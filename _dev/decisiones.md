@@ -155,3 +155,12 @@ documento técnico sin nada que apunte a él es, en la práctica, invisible.
 Este cambio no se ve reflejado hasta que expire el caché o se llame a
 `Llms_Txt::invalidate()` (se dispara ya con la sincronización normal de
 contenido) — no se forzó una invalidación especial para este cambio de código.
+## 2026-09-18 — Release 1.1.1 y AJAX progresivo
+
+- La documentación de uso se distribuye en `docs/`, fuera de `_dev/`, y se
+  abre desde cada pestaña del admin en un panel lateral.
+- Los guardados simples y las operaciones de generación/pulido con IA usan
+  AJAX de forma progresiva; las colas, descargas, borrados y escrituras de
+  archivos físicos conservan el flujo tradicional por riesgo y trazabilidad.
+- Cada acción AJAX conserva el formulario POST como fallback y muestra estado
+  de proceso, incluyendo spinner para los botones generados por WordPress.

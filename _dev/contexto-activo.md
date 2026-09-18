@@ -209,3 +209,12 @@ Confirmar commit + push del fix de `tax_query` (v1.1.0.1) y del diff
 pendiente de `is_included()`. Después: probar la pestaña WooCommerce en
 real (checkboxes, snapshot editable, pulido con IA) y decidir el
 siguiente foco (UX3/UX4 u otra tarea).
+
+## Release 1.1.1 — 2026-09-18
+
+- Documentación de pestañas movida a `docs/` con panel lateral de lectura.
+- Guardados simples y generación/pulido con IA disponibles por AJAX con
+  fallback tradicional y spinner.
+- QA visual confirmado por el usuario para el spinner; queda pendiente la
+  validación completa de proveedores, WooCommerce y errores reales de IA.
+- Release preparado localmente; no implica deploy.
