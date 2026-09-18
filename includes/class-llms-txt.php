@@ -42,6 +42,7 @@ class Llms_Txt {
 		$lines[] = '# ' . get_bloginfo( 'name' );
 		$lines[] = '';
 		$lines[] = '> ' . self::summary();
+		$lines[] = '> ' . __( 'Última actualización:', 'ai-knowledge' ) . ' ' . wp_date( 'c' );
 		$lines[] = '';
 
 		// info.md: mismo resumen+contacto que ya lleva la cita de arriba,

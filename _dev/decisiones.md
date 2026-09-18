@@ -183,3 +183,9 @@ contenido) — no se forzó una invalidación especial para este cambio de códi
   realmente en la guía correspondiente.
 - El popup conserva su contenido al pulsar un acceso mientras ya está abierto;
   el clic fuera no lo cierra y el cierre explícito queda en `×` o Escape.
+
+## 2026-09-19 — Fecha de actualización de llms.txt
+
+- La salida de `llms.txt` incluye en su cabecera la fecha y hora de la última
+  generación en formato ISO 8601, tanto en la ruta virtual como en el archivo
+  físico regenerado. Así los lectores pueden valorar la frescura del contenido.

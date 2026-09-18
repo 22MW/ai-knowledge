@@ -21,7 +21,9 @@ Un resumen de las distintas formas en que se publica tu contenido:
   dónde encontrar la información más importante. Es una convención
   emergente (todavía no un estándar oficial), pero cada vez más usada. El
   plugin lo crea y lo regenera cuando cambian los documentos o los datos que
-  lo alimentan.
+  lo alimentan. Su encabezado incluye la fecha y hora de la última generación
+  en formato ISO 8601, para que los lectores puedan comprobar si la
+  información está actualizada.
 - **Markdown público** — el mismo contenido que usa tu chatbot, servido
   como archivo de texto plano, fácil de leer para cualquier IA sin tener
   que procesar HTML.

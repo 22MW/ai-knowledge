@@ -228,3 +228,10 @@ siguiente foco (UX3/UX4 u otra tarea).
 - Incluye navegación contextual desde títulos del admin hacia secciones de
   documentación, enlaces internos con anclas y ajustes finales de contraste.
 - QA técnico pendiente de ejecutar antes de publicar el release.
+
+## Cambio posterior — fecha de llms.txt (2026-09-19)
+
+- `llms.txt` incluye la fecha y hora de su última generación en formato ISO
+  8601, también cuando se escribe como archivo físico.
+- Validado con `php -l` y `git diff --check`; pendiente probar el contenido en
+  el sitio real.

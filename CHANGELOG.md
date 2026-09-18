@@ -2,6 +2,12 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [1.1.2.1] - Desarrollo
+
+### Frescura de llms.txt
+
+- `llms.txt` incluye la fecha ISO 8601 de su última generación.
+
 ## [1.1.2] - 2026-09-18
 
 ### Documentación contextual en el admin
