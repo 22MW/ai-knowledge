@@ -13,6 +13,7 @@ $wp_ai_models    = $wp_ai_available ? AI_Client::available_models() : array();
 <p class="description">
 	<?php esc_html_e( 'Configuración general del generador de documentos: largo del texto, origen de IA y qué post_types muestran el botón de añadir a la base de conocimiento desde su editor.', 'ai-knowledge' ); ?>
 </p>
+<?php Admin::documentation_link( 'ajustes' ); ?>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 	<input type="hidden" name="action" value="wookb_save_settings" />
 	<?php wp_nonce_field( 'wookb_save_settings' ); ?>

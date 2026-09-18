@@ -83,6 +83,9 @@ class Scope {
 			// unica fuente de verdad para robots.txt y .htaccess. Si un bot del
 			// catalogo no aparece aqui, se usa su default_action (Crawler_Catalog).
 			'crawler_actions' => array(),
+			// Visibilidad especial: los bots bloqueados pueden seguir leyendo
+			// /llms.txt sin rastrear el resto del sitio.
+			'crawler_visibility_mode' => 'site',
 		);
 		$saved = get_option( 'wookb_settings', array() );
 
@@ -199,6 +202,13 @@ class Scope {
 				}
 			}
 			if ( $tax_query ) {
+				// Varias taxonomias con include (p.ej. category para posts y
+				// product_cat para productos) son alternativas, no requisitos
+				// simultaneos: sin 'relation', WP_Query usa AND por defecto y
+				// deja el alcance vacio para todos los post_types a la vez.
+				if ( count( $tax_query ) > 1 ) {
+					$tax_query['relation'] = 'OR';
+				}
 				$args['tax_query'] = $tax_query; // phpcs:ignore
 			}
 
@@ -218,13 +228,23 @@ class Scope {
 	}
 
 	/**
-	 * Un ID individual está incluido si no está excluido por ID ni por término.
+	 * Un ID individual está incluido si su tipo de contenido está en el
+	 * alcance (salvo que un "ID a incluir" lo fuerce, sin importar su tipo,
+	 * como ya documenta Contenido), no está excluido por ID ni por término.
 	 */
 	public static function is_included( $post_id ) {
-		$settings = self::settings();
+		$settings   = self::settings();
+		$id_action  = $settings['id_actions'][ (int) $post_id ] ?? null;
 
-		if ( isset( $settings['id_actions'][ (int) $post_id ] ) && 'exclude' === $settings['id_actions'][ (int) $post_id ] ) {
+		if ( 'exclude' === $id_action ) {
 			return false;
+		}
+
+		if ( 'include' !== $id_action ) {
+			$post_type = get_post_type( $post_id );
+			if ( ! $post_type || ! in_array( $post_type, self::effective_post_types(), true ) ) {
+				return false;
+			}
 		}
 
 		foreach ( (array) $settings['term_actions'] as $taxonomy => $terms ) {

@@ -119,6 +119,8 @@ class Llms_Txt {
 
 	public static function invalidate() {
 		delete_transient( 'wookb_llms_txt' );
+		// El archivo físico es la publicación oficial de llms.txt.
+		self::write_physical();
 	}
 
 	/**
@@ -249,5 +251,20 @@ class Llms_Txt {
 	/** Detecta si existe un llms.txt físico que taparía el rewrite. */
 	public static function physical_file_exists() {
 		return file_exists( ABSPATH . 'llms.txt' );
+	}
+
+	public static function physical_path() {
+		return ABSPATH . 'llms.txt';
+	}
+
+	public static function write_physical() {
+		$path = self::physical_path();
+		if ( file_exists( $path ) && ! is_writable( $path ) ) {
+			return false;
+		}
+		if ( ! file_exists( $path ) && ! is_writable( ABSPATH ) ) {
+			return false;
+		}
+		return false !== file_put_contents( $path, self::build(), LOCK_EX ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_put_contents
 	}
 }

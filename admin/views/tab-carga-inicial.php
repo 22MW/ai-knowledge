@@ -15,6 +15,7 @@ $counted   = Registry::count( array( 'status' => 'synced' ) );
 <p class="description">
 	<?php esc_html_e( 'Genera de golpe los documentos de todo el contenido dentro del alcance, y ajusta aquí el límite diario, el tamaño de lote y el debounce de la cola.', 'ai-knowledge' ); ?>
 </p>
+<?php Admin::documentation_link( 'carga-inicial' ); ?>
 <p>
 	<?php
 	printf(

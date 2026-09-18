@@ -65,6 +65,7 @@ $returns_value     = '' !== $settings['wc_returns_text'] ? $settings['wc_returns
 <p class="description">
 	<?php esc_html_e( 'Información de tu tienda que se genera como documentos propios (envíos, impuestos, pagos, condiciones, catálogo) para que el chatbot y los buscadores de IA la conozcan. WooCommerce te lo detecta solo, pero todos los campos se guardan y son editables: lo que se guarda una vez ya no desaparece aunque cambies o borres algo en WooCommerce.', 'ai-knowledge' ); ?>
 </p>
+<?php Admin::documentation_link( 'woocommerce' ); ?>
 
 <hr />
 

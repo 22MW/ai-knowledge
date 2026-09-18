@@ -16,6 +16,7 @@ if ( false === $summary_draft ) {
 <p class="description">
 	<?php esc_html_e( 'Datos del negocio en sí: válidos con o sin WooCommerce (lo específico de WooCommerce vive en su propia pestaña). Se usan para el prompt del chatbot (pestaña Chatbot, si Genix está activo) y para llms.txt/llm/info.md.', 'ai-knowledge' ); ?>
 </p>
+<?php Admin::documentation_link( 'negocio' ); ?>
 
 <h2><?php esc_html_e( '1. Datos', 'ai-knowledge' ); ?></h2>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">

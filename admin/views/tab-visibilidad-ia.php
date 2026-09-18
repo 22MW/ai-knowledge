@@ -64,10 +64,12 @@ if ( is_wp_error( $robots_response ) ) {
 // proteccion server-side, no basta con deshabilitar el boton en el HTML).
 $robots_available   = Robots_Txt_Guard::is_available();
 $robots_confirmed   = Robots_Txt_Guard::backup_confirmed();
+$llms_backup_confirmed = (bool) get_transient( 'wookb_llms_backup_confirmed_' . get_current_user_id() );
 $htaccess_available = Htaccess_Guard::is_available();
 $htaccess_confirmed = Htaccess_Guard::backup_confirmed();
 
 $crawler_saved_actions = Scope::settings()['crawler_actions'];
+$crawler_visibility_mode = Scope::settings()['crawler_visibility_mode'];
 
 // Fase 11, pieza 3: ultimos accesos registrados del catalogo de crawlers.
 $crawler_log_rows = Crawler_Log::recent( 50 );
@@ -79,34 +81,33 @@ $crawler_log_total = Crawler_Log::count_rows();
 // bloque propio, el resto del archivo queda intacto), solo el contenido
 // exacto que ira dentro del marcador, para que el usuario vea el efecto de
 // sus elecciones antes de aplicar.
-$crawler_blocked_bots  = Crawler_Catalog::blocked_user_agents();
-$robots_block_preview   = implode( "\n", Robots_Txt_Guard::build_rules( $crawler_blocked_bots ) );
+$crawler_actions = Crawler_Catalog::effective_actions();
+$crawler_blocked_bots  = array_keys( array_filter( $crawler_actions, function ( $action ) { return 'block' === $action; } ) );
+$robots_block_preview   = implode( "\n", Robots_Txt_Guard::build_action_rules( $crawler_actions, $crawler_visibility_mode ) );
+$robots_full_preview = Robots_Txt_Guard::generate_full_file( $crawler_actions, $crawler_visibility_mode );
 // "RewriteEngine On" se antepone en Htaccess_Guard::apply_block() al escribir
 // de verdad; se replica aqui solo para que la vista previa sea fiel a lo que
 // se escribira.
-$htaccess_block_preview = "RewriteEngine On\n" . implode( "\n", Htaccess_Guard::build_rules( $crawler_blocked_bots ) );
+$htaccess_block_preview = "RewriteEngine On\n" . implode( "\n", Htaccess_Guard::build_action_rules( $crawler_actions, $crawler_visibility_mode ) );
+$htaccess_full_preview = Htaccess_Guard::generate_full_file( $crawler_actions, $crawler_visibility_mode );
+$htaccess_current_content = Htaccess_Guard::is_available() ? (string) file_get_contents( Htaccess_Guard::path() ) : ''; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+$robots_conflicts = Robots_Txt_Guard::action_conflicts( $crawler_actions );
+$htaccess_conflicts = Htaccess_Guard::conflicts( $crawler_blocked_bots, $crawler_visibility_mode );
 ?>
 
 <p class="description">
 	<?php esc_html_e( 'Comprueba cómo se publica el contenido para buscadores y agentes de IA, revisa si las páginas sincronizadas pueden rastrearse y decide qué crawlers de IA pueden acceder a la web. El estado de exposición y la comprobación de accesibilidad son de solo lectura. Las acciones sobre robots.txt y .htaccess modifican archivos reales y siempre requieren confirmación.', 'ai-knowledge' ); ?>
 </p>
+<?php Admin::documentation_link( 'visibilidad-ia' ); ?>
 
 <h2><?php esc_html_e( 'Estado de exposición', 'ai-knowledge' ); ?></h2>
 <table class="form-table">
 	<tr>
 		<th><?php esc_html_e( 'llms.txt', 'ai-knowledge' ); ?></th>
 		<td>
-			<p class="description">
-				<?php
-				printf(
-					/* translators: %s: enlace a la propuesta oficial de llms.txt */
-					esc_html__( 'Un archivo Markdown propuesto en la raíz del sitio que da a los LLM (modelos de lenguaje) un índice curado de tu contenido más importante. Convención emergente, no un estándar ratificado todavía. %s', 'ai-knowledge' ),
-					'<a href="https://llmstxt.org/" target="_blank" rel="noopener">' . esc_html__( 'Ver la propuesta oficial de llms.txt', 'ai-knowledge' ) . '</a>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
-				);
-				?>
-			</p>
+			<p class="description"><?php esc_html_e( 'Este archivo ayuda a los asistentes de IA a entender qué contiene tu web y dónde encontrar la información más importante.', 'ai-knowledge' ); ?></p>
 			<?php if ( Llms_Txt::physical_file_exists() ) : ?>
-				<span class="description"><?php esc_html_e( '⚠ Hay un archivo físico llms.txt en la raíz del sitio. Ese archivo sustituye al que genera el plugin.', 'ai-knowledge' ); ?></span>
+				<span class="description"><?php esc_html_e( 'Archivo físico gestionado por AI Knowledge.', 'ai-knowledge' ); ?></span>
 				<?php if ( $llms_physical_mtime ) : ?>
 					<p class="description">
 						<?php
@@ -121,24 +122,29 @@ $htaccess_block_preview = "RewriteEngine On\n" . implode( "\n", Htaccess_Guard::
 				<?php if ( '' !== $llms_physical_preview ) : ?>
 					<pre style="white-space:pre-wrap;margin:4px 0;"><?php echo esc_html( $llms_physical_preview ); ?></pre>
 				<?php endif; ?>
-				<p class="description">
-					<?php
-					printf(
-						/* translators: %s: enlace para abrir el archivo físico */
-						esc_html__( 'El plugin no necesita un archivo físico: publica llms.txt automáticamente mediante una ruta virtual. Si no creaste este archivo a propósito ni lo necesita otro plugin, puedes borrarlo para utilizar la versión generada por AI Knowledge. %s', 'ai-knowledge' ),
-						'<a href="' . esc_url( home_url( '/llms.txt' ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Ver el archivo actual', 'ai-knowledge' ) . '</a>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
-					);
-					?>
-				</p>
-				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" onsubmit="return confirm('<?php echo esc_js( __( 'Vas a borrar el archivo físico llms.txt de la raíz del sitio. Esto NO se puede deshacer. El plugin seguirá sirviendo su propio llms.txt generado al vuelo. ¿Seguro que quieres continuar?', 'ai-knowledge' ) ); ?>');">
-					<input type="hidden" name="action" value="wookb_delete_physical_llms_txt" />
-					<?php wp_nonce_field( 'wookb_delete_physical_llms_txt' ); ?>
-					<?php submit_button( __( 'Borrar archivo físico', 'ai-knowledge' ), 'delete', 'submit', false ); ?>
+				<p class="description"><a href="<?php echo esc_url( home_url( '/llms.txt' ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Ver el archivo actual', 'ai-knowledge' ); ?></a></p>
+			<?php else : ?>
+				<p><strong><?php esc_html_e( 'Estado:', 'ai-knowledge' ); ?></strong> <?php esc_html_e( 'Todavía no existe el archivo físico.', 'ai-knowledge' ); ?></p>
+				<a href="<?php echo esc_url( home_url( '/llms.txt' ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Ver llms.txt', 'ai-knowledge' ); ?></a>
+			<?php endif; ?>
+			<p><strong><?php esc_html_e( 'Guardar una copia física', 'ai-knowledge' ); ?></strong></p>
+			<p class="description"><?php esc_html_e( 'AI Knowledge puede guardar llms.txt como archivo real en la raíz de tu web.', 'ai-knowledge' ); ?></p>
+			<?php if ( Llms_Txt::physical_file_exists() ) : ?>
+				<p class="description"><?php esc_html_e( 'Ya existe un llms.txt. Descarga una copia antes de sustituirlo.', 'ai-knowledge' ); ?></p>
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wookb-download-form" data-wookb-unlock="llms" style="display:inline-block;margin-right:10px;">
+					<input type="hidden" name="action" value="wookb_download_llms_backup" />
+					<?php wp_nonce_field( 'wookb_download_llms_backup' ); ?>
+					<?php submit_button( __( 'Descargar copia actual de llms.txt', 'ai-knowledge' ), 'secondary', 'submit', false ); ?>
 				</form>
 			<?php else : ?>
-				<span class="description"><?php esc_html_e( 'Activo, servido por el plugin.', 'ai-knowledge' ); ?></span>
-				<a href="<?php echo esc_url( home_url( '/llms.txt' ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Ver', 'ai-knowledge' ); ?></a>
+				<p class="description"><?php esc_html_e( 'Todavía no existe un archivo físico. Puedes crearlo con el contenido generado por AI Knowledge.', 'ai-knowledge' ); ?></p>
 			<?php endif; ?>
+			<p class="description" data-wookb-unlock-notice="llms" <?php echo ( ! Llms_Txt::physical_file_exists() || $llms_backup_confirmed ) ? 'style="display:none;"' : ''; ?>><?php esc_html_e( 'Descarga la copia actual primero; el botón se habilitará automáticamente al terminar.', 'ai-knowledge' ); ?></p>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;" onsubmit="return confirm('<?php echo esc_js( Llms_Txt::physical_file_exists() ? __( 'Vas a sustituir el llms.txt físico de la raíz por el generado por AI Knowledge. ¿Confirmas que ya descargaste la copia?', 'ai-knowledge' ) : __( 'Vas a crear un llms.txt físico en la raíz con el contenido generado por AI Knowledge. ¿Quieres continuar?', 'ai-knowledge' ) ); ?>');">
+				<input type="hidden" name="action" value="wookb_apply_llms_physical" />
+				<?php wp_nonce_field( 'wookb_apply_llms_physical' ); ?>
+				<?php submit_button( Llms_Txt::physical_file_exists() ? __( 'Sustituir por el generado', 'ai-knowledge' ) : __( 'Crear archivo físico', 'ai-knowledge' ), Llms_Txt::physical_file_exists() ? 'delete' : 'primary', 'submit', false, ( ! Llms_Txt::physical_file_exists() || $llms_backup_confirmed ) ? array( 'data-wookb-apply' => 'llms' ) : array( 'disabled' => 'disabled', 'data-wookb-apply' => 'llms' ) ); ?>
+			</form>
 		</td>
 	</tr>
 	<tr>
@@ -307,19 +313,32 @@ $category_labels = array(
 	<div class="submit-row"><?php submit_button( __( 'Guardar configuración de crawlers', 'ai-knowledge' ), 'primary', 'submit', false ); ?></div>
 </form>
 
+<h3><?php esc_html_e( 'Visibilidad para los bots bloqueados', 'ai-knowledge' ); ?></h3>
+<p class="description"><?php esc_html_e( 'Puedes bloquear el resto del sitio y mantener visible únicamente /llms.txt para los bots configurados como Bloquear.', 'ai-knowledge' ); ?></p>
+<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+	<input type="hidden" name="action" value="wookb_save_crawler_visibility" />
+	<?php wp_nonce_field( 'wookb_save_crawler_visibility' ); ?>
+	<select name="crawler_visibility_mode">
+		<option value="site" <?php selected( 'site', $crawler_visibility_mode ); ?>><?php esc_html_e( 'Bloquear el sitio completo', 'ai-knowledge' ); ?></option>
+		<option value="llms_only" <?php selected( 'llms_only', $crawler_visibility_mode ); ?>><?php esc_html_e( 'Solo permitir visibilidad de llms.txt', 'ai-knowledge' ); ?></option>
+	</select>
+	<?php submit_button( __( 'Guardar modo de visibilidad', 'ai-knowledge' ), 'secondary', 'submit', false ); ?>
+</form>
+
 <h3><?php esc_html_e( 'robots.txt', 'ai-knowledge' ); ?></h3>
+<?php if ( $robots_conflicts ) : ?><div class="notice notice-warning inline"><p><?php esc_html_e( 'Se han detectado reglas originales que contradicen el bloque propuesto. Al aplicar, se conservarán y se comentarán para dejar constancia del conflicto:', 'ai-knowledge' ); ?></p><ul><?php foreach ( $robots_conflicts as $conflict ) : ?><li><code><?php echo esc_html( $conflict ); ?></code></li><?php endforeach; ?></ul></div><?php endif; ?>
 <div class="wookb-crawler-compare">
 	<div>
 		<p class="description"><?php esc_html_e( 'Actual (lo que vería un crawler ahora mismo)', 'ai-knowledge' ); ?></p>
 		<?php if ( $robots_txt_error ) : ?>
 			<div class="notice notice-error inline"><p><?php echo esc_html( $robots_txt_error ); ?></p></div>
 		<?php else : ?>
-			<textarea readonly rows="8"><?php echo esc_textarea( $robots_txt_content ); ?></textarea>
+			<textarea readonly rows="12"><?php echo esc_textarea( $robots_txt_content ); ?></textarea>
 		<?php endif; ?>
 	</div>
 	<div>
-		<p class="description"><?php esc_html_e( 'Bloque que se insertará (el resto del archivo no se toca)', 'ai-knowledge' ); ?></p>
-		<textarea readonly rows="8"><?php echo esc_textarea( $robots_block_preview ); ?></textarea>
+		<p class="description"><?php esc_html_e( 'Archivo completo después del cambio', 'ai-knowledge' ); ?></p>
+		<textarea readonly rows="12"><?php echo esc_textarea( $robots_full_preview ); ?></textarea>
 	</div>
 </div>
 
@@ -347,31 +366,30 @@ $category_labels = array(
 <hr />
 
 <h3><?php esc_html_e( 'Bloqueo en el servidor mediante .htaccess', 'ai-knowledge' ); ?></h3>
+<?php if ( $htaccess_conflicts ) : ?><div class="notice notice-warning inline"><p><?php esc_html_e( 'Se han detectado reglas originales de .htaccess que contradicen el bloque propuesto. Al aplicar, se conservarán y se comentarán.', 'ai-knowledge' ); ?></p><ul><?php foreach ( $htaccess_conflicts as $conflict ) : ?><li><code><?php echo esc_html( $conflict ); ?></code></li><?php endforeach; ?></ul></div><?php endif; ?>
 <p class="description">
 	<?php esc_html_e( 'robots.txt comunica preferencias de rastreo, pero un bot puede ignorarlas. Estas reglas rechazan en el servidor las solicitudes que se identifican como alguno de los bots marcados como Bloquear.', 'ai-knowledge' ); ?>
 </p>
 <p><strong><?php esc_html_e( '⚠ Modifica un archivo fuera de este plugin que puede afectar a todo el sitio si algo sale mal. Descarga la copia actual antes de continuar.', 'ai-knowledge' ); ?></strong></p>
 
-<p class="description"><?php esc_html_e( 'Bloque que se insertará (el resto del archivo no se toca)', 'ai-knowledge' ); ?></p>
-<textarea readonly rows="6" style="width:100%;max-width:800px;"><?php echo esc_textarea( $htaccess_block_preview ); ?></textarea>
+<p class="description"><?php esc_html_e( 'Archivo completo preparado. Puedes copiarlo y pegarlo manualmente en tu servidor o descargarlo. AI Knowledge no sobrescribe el .htaccess real.', 'ai-knowledge' ); ?></p>
+<p class="description"><?php esc_html_e( 'Archivo actual', 'ai-knowledge' ); ?></p>
+<textarea readonly rows="16" style="width:100%;max-width:1000px;"><?php echo esc_textarea( $htaccess_current_content ); ?></textarea>
+<p class="description"><?php esc_html_e( 'Archivo completo después del cambio', 'ai-knowledge' ); ?></p>
+<textarea readonly rows="16" style="width:100%;max-width:1000px;" id="wookb-generated-htaccess"><?php echo esc_textarea( $htaccess_full_preview ); ?></textarea>
+<p><button type="button" class="button" data-wookb-copy-target="wookb-generated-htaccess"><?php esc_html_e( 'Copiar código', 'ai-knowledge' ); ?></button>
+<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;margin-left:8px;">
+	<input type="hidden" name="action" value="wookb_download_htaccess_generated" />
+	<?php wp_nonce_field( 'wookb_download_htaccess_generated' ); ?>
+	<?php submit_button( __( 'Descargar .htaccess preparado', 'ai-knowledge' ), 'secondary', 'submit', false ); ?>
+</form></p>
 
 <?php if ( ! $htaccess_available ) : ?>
 	<div class="notice notice-warning inline">
 		<p><?php esc_html_e( 'No se encontró un .htaccess editable en este servidor (por ejemplo, nginx no lo usa, o los permisos no permiten escribirlo). Añade el bloque de arriba a mano en la configuración de tu servidor.', 'ai-knowledge' ); ?></p>
 	</div>
 <?php else : ?>
-	<p class="description" data-wookb-unlock-notice="htaccess" <?php echo $htaccess_confirmed ? 'style="display:none;"' : ''; ?>><?php esc_html_e( 'Descarga la copia actual primero (botón de la izquierda); se habilitará automáticamente al terminar.', 'ai-knowledge' ); ?></p>
-	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wookb-download-form" data-wookb-unlock="htaccess" style="display:inline-block;margin-right:10px;">
-		<input type="hidden" name="action" value="wookb_download_htaccess_backup" />
-		<?php wp_nonce_field( 'wookb_download_htaccess_backup' ); ?>
-		<?php submit_button( __( 'Descargar copia actual de .htaccess', 'ai-knowledge' ), 'secondary', 'submit', false ); ?>
-	</form>
-
-	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;" onsubmit="return confirm('<?php echo esc_js( __( 'Vas a modificar el .htaccess real del sitio para bloquear los bots marcados como Bloquear en la tabla de arriba. Un error aquí puede afectar a TODO el sitio. ¿Confirmas que ya descargaste la copia y quieres continuar?', 'ai-knowledge' ) ); ?>');">
-		<input type="hidden" name="action" value="wookb_apply_htaccess_block" />
-		<?php wp_nonce_field( 'wookb_apply_htaccess_block' ); ?>
-		<?php submit_button( __( 'Aplicar bloqueo por .htaccess', 'ai-knowledge' ), 'delete', 'submit', false, $htaccess_confirmed ? array( 'data-wookb-apply' => 'htaccess' ) : array( 'disabled' => 'disabled', 'data-wookb-apply' => 'htaccess' ) ); ?>
-	</form>
+	<p class="description"><?php esc_html_e( 'El archivo real no se modifica desde aquí. Copia el contenido generado o descarga el archivo preparado y sustitúyelo manualmente después de conservar tu copia original.', 'ai-knowledge' ); ?></p>
 <?php endif; ?>
 
 <hr />

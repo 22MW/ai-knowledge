@@ -287,4 +287,13 @@ class Crawler_Catalog {
 		}
 		return $blocked;
 	}
+
+	public static function effective_actions() {
+		$saved = Scope::settings()['crawler_actions'];
+		$actions = array();
+		foreach ( self::all() as $entry ) {
+			$actions[ $entry['user_agent'] ] = isset( $saved[ $entry['user_agent'] ] ) ? $saved[ $entry['user_agent'] ] : $entry['default_action'];
+		}
+		return $actions;
+	}
 }

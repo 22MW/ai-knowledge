@@ -2,6 +2,54 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [1.1.2] - 2026-09-18
+
+### Documentación contextual en el admin
+
+- Los títulos `h2` y `h3` con sección documentada muestran un botón `?` para
+  abrir el popup y saltar directamente al apartado correspondiente.
+- Los enlaces internos con ancla mantienen la navegación dentro del popup.
+- El popup deja interactuar con el contenido lateral y conserva su estado al
+  pulsar los accesos de sección.
+- Ajustado el contraste, tamaño y estado hover de los botones de navegación.
+
+## [1.1.1] - 2026-09-18
+
+### UX del administrador y documentación
+
+- La documentación de cada pestaña vive en `docs/` y se puede abrir desde el
+  admin en un panel lateral de lectura.
+- Los guardados simples y las generaciones/pulidos con IA usan AJAX, con
+  fallback tradicional, mensajes de estado y protección contra doble envío.
+- Los botones AJAX muestran un spinner mientras se procesa la petición.
+
+## [1.1.0.2] - 2026-09-18
+
+### Visibilidad IA y archivos de rastreo
+
+- `llms.txt` se gestiona como archivo físico y se regenera cuando cambian
+  los documentos o los datos que lo alimentan.
+- Visibilidad global para permitir que los bots bloqueados lean solo
+  `/llms.txt` y reciban `404` en el resto del sitio mediante `.htaccess`.
+- `robots.txt` y `.htaccess` comparan las reglas existentes, conservan las
+  externas y comentan las que contradicen la configuración activa.
+- La pantalla muestra el archivo actual y la propuesta completa. El
+  `.htaccess` se puede copiar o descargar sin sobrescribirlo automáticamente.
+- Documentación de Visibilidad IA, roadmap y vista de estado actualizadas.
+
+## [1.1.0.1] - 2026-09-17
+
+### Fix: Alcance vacío para todos los post_types
+
+- `Scope::resolve_ids()` combinaba las taxonomías con términos incluidos
+  (p.ej. `category` para posts y `product_cat` para productos) con `AND`
+  implícito de `WP_Query`, en vez de tratarlas como alternativas. Con
+  ambas configuradas a la vez, el alcance quedaba vacío para todo:
+  generación de documentos, `/llms.txt` y los feeds de Fase 9
+  (`/feeds/products.xml` y `/feeds/content.json`).
+- Corregido añadiendo `'relation' => 'OR'` cuando hay más de una taxonomía
+  con términos incluidos.
+
 ## [1.1.0] - 2026-09-17
 
 Ver `_dev/roadmap.md` para el plan completo por fases y `_dev/decisiones.md`
