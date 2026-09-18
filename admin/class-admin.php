@@ -48,11 +48,15 @@ class Admin
 		add_action('admin_post_wookb_save_woocommerce_settings', array(__CLASS__, 'save_woocommerce_settings'));
 		add_action('admin_post_wookb_check_accessibility', array(__CLASS__, 'check_accessibility'));
 		add_action('admin_post_wookb_delete_physical_llms_txt', array(__CLASS__, 'delete_physical_llms_txt'));
+		add_action('admin_post_wookb_download_llms_backup', array(__CLASS__, 'download_llms_backup'));
+		add_action('admin_post_wookb_apply_llms_physical', array(__CLASS__, 'apply_llms_physical'));
 		add_action('admin_post_wookb_save_crawler_actions', array(__CLASS__, 'save_crawler_actions'));
+		add_action('admin_post_wookb_save_crawler_visibility', array(__CLASS__, 'save_crawler_visibility'));
 		add_action('admin_post_wookb_download_robots_backup', array(__CLASS__, 'download_robots_backup'));
 		add_action('admin_post_wookb_apply_robots_block', array(__CLASS__, 'apply_robots_block'));
 		add_action('admin_post_wookb_download_htaccess_backup', array(__CLASS__, 'download_htaccess_backup'));
 		add_action('admin_post_wookb_apply_htaccess_block', array(__CLASS__, 'apply_htaccess_block'));
+		add_action('admin_post_wookb_download_htaccess_generated', array(__CLASS__, 'download_htaccess_generated'));
 		add_action('admin_enqueue_scripts', array(__CLASS__, 'assets'));
 		add_action('admin_notices', array(__CLASS__, 'maybe_stale_notice'));
 		add_action('admin_bar_menu', array(__CLASS__, 'admin_bar_stale_node'), 100);
@@ -79,6 +83,55 @@ class Admin
 		// imprimir ningun HTML) en vez de via admin_post.php. Ver
 		// maybe_handle_bulk_action() para el porque.
 		add_action('load-' . $hook, array(__CLASS__, 'maybe_handle_bulk_action'));
+
+		// Mismas tabs que render(), tambien como entradas de submenu: acceso
+		// directo desde la barra lateral de WordPress, ademas de las tabs
+		// internas. El slug con query string ('ai-knowledge&tab=xxx') esta
+		// soportado por WordPress core (wp-admin/menu-header.php construye el
+		// href y detecta la entrada activa tratando explicitamente el '?'
+		// dentro del slug), no es un hack fragil.
+		foreach (self::tabs() as $key => $label) {
+			$slug = ('registro' === $key) ? 'ai-knowledge' : 'ai-knowledge&tab=' . $key;
+			add_submenu_page(
+				'ai-knowledge',
+				$label,
+				$label,
+				self::capability(),
+				$slug,
+				array(__CLASS__, 'render')
+			);
+		}
+	}
+
+	/**
+	 * Listado de tabs del admin, en el orden en que se muestran. Compartido
+	 * entre render() (tabs internas) y menu() (entradas de submenu): una
+	 * unica fuente de verdad para no desincronizar ambos listados.
+	 */
+	protected static function tabs()
+	{
+		$tabs = array(
+			'registro'  => __('Registro', 'ai-knowledge'),
+			'contenido' => __('Contenido', 'ai-knowledge'),
+			'negocio'   => __('Negocio', 'ai-knowledge'),
+			'faqs'      => __('FAQs', 'ai-knowledge'),
+		);
+		// Fase 2: pestaña "WooCommerce" solo si WooCommerce esta activo -- sin
+		// el, no hay nada real que detectar (moneda, envios, impuestos, pagos)
+		// y la pestaña quedaria vacia/confusa.
+		if (class_exists('WooCommerce')) {
+			$tabs['woocommerce'] = __('WooCommerce', 'ai-knowledge');
+		}
+		// Chatbot va despues de WooCommerce y solo aparece si Support Genix
+		// esta activo: sin el, el prompt no tiene un consumidor real.
+		if (Chatbot_Prompt::is_genix_ready()) {
+			$tabs['prompt'] = __('Chatbot', 'ai-knowledge');
+		}
+		$tabs['visibilidad-ia'] = __('Visibilidad IA', 'ai-knowledge');
+		$tabs['carga-inicial']  = __('Generación masiva', 'ai-knowledge');
+		$tabs['ajustes']        = __('Ajustes', 'ai-knowledge');
+
+		return $tabs;
 	}
 
 	public static function assets($hook)
@@ -102,26 +155,7 @@ class Admin
 		}
 
 		$tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'registro'; // phpcs:ignore
-		$tabs = array(
-			'registro'     => __('Registro', 'ai-knowledge'),
-			'contenido'    => __('Contenido', 'ai-knowledge'),
-			'negocio'      => __('Negocio', 'ai-knowledge'),
-			'faqs'         => __('FAQs', 'ai-knowledge'),
-		);
-		// Fase 2: pestaña "WooCommerce" solo si WooCommerce esta activo -- sin
-		// el, no hay nada real que detectar (moneda, envios, impuestos, pagos)
-		// y la pestaña quedaria vacia/confusa.
-		if (class_exists('WooCommerce')) {
-			$tabs['woocommerce'] = __('WooCommerce', 'ai-knowledge');
-		}
-		// Chatbot va despues de WooCommerce y solo aparece si Support Genix
-		// esta activo: sin el, el prompt no tiene un consumidor real.
-		if (Chatbot_Prompt::is_genix_ready()) {
-			$tabs['prompt'] = __('Chatbot', 'ai-knowledge');
-		}
-		$tabs['visibilidad-ia'] = __('Visibilidad IA', 'ai-knowledge');
-		$tabs['carga-inicial']  = __('Generación masiva', 'ai-knowledge');
-		$tabs['ajustes']        = __('Ajustes', 'ai-knowledge');
+		$tabs = self::tabs();
 
 		echo '<div class="wookb-wrap">';
 		// Fase 1, arreglo del salto de tema: script inline SINCRONO, impreso
@@ -1318,6 +1352,33 @@ class Admin
 		self::redirect('visibilidad-ia');
 	}
 
+	public static function download_llms_backup()
+	{
+		self::verify('wookb_download_llms_backup');
+		$path = Llms_Txt::physical_path();
+		$content = file_exists($path) ? (string) file_get_contents($path) : ''; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		set_transient('wookb_llms_backup_confirmed_' . get_current_user_id(), 1, 10 * MINUTE_IN_SECONDS);
+		nocache_headers();
+		header('Content-Type: application/octet-stream');
+		header('Content-Disposition: attachment; filename="llms-backup-' . gmdate('Ymd-His') . '.txt"');
+		echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		exit;
+	}
+
+	public static function apply_llms_physical()
+	{
+		self::verify('wookb_apply_llms_physical');
+		$key = 'wookb_llms_backup_confirmed_' . get_current_user_id();
+		if (Llms_Txt::physical_file_exists() && ! get_transient($key)) {
+			wp_die(esc_html__('Antes de sustituir llms.txt tienes que descargar la copia actual.', 'ai-knowledge'));
+		}
+		if (! Llms_Txt::write_physical()) {
+			wp_die(esc_html__('No se pudo escribir el llms.txt físico en la raíz del sitio.', 'ai-knowledge'));
+		}
+		delete_transient($key);
+		self::redirect('visibilidad-ia');
+	}
+
 	/**
 	 * Fase 11 (revision UX 2026-09-16): guarda la tabla unica de configuracion
 	 * por bot (Permitir/Bloquear). El user_agent NUNCA se acepta como texto
@@ -1346,6 +1407,18 @@ class Admin
 
 		Scope::update_settings(array('crawler_actions' => $actions));
 
+		self::redirect('visibilidad-ia');
+	}
+
+	/** Guarda el modo de visibilidad aplicado a los bloques de crawler. */
+	public static function save_crawler_visibility()
+	{
+		self::verify('wookb_save_crawler_visibility');
+		$mode = isset($_POST['crawler_visibility_mode']) ? sanitize_key(wp_unslash($_POST['crawler_visibility_mode'])) : 'site'; // phpcs:ignore
+		if (! in_array($mode, array('site', 'llms_only'), true)) {
+			$mode = 'site';
+		}
+		Scope::update_settings(array('crawler_visibility_mode' => $mode));
 		self::redirect('visibilidad-ia');
 	}
 
@@ -1398,7 +1471,7 @@ class Admin
 			wp_die(esc_html__('robots.txt no es escribible en este servidor (permisos de la carpeta raíz).', 'ai-knowledge'));
 		}
 
-		Robots_Txt_Guard::apply_block(Crawler_Catalog::blocked_user_agents());
+		Robots_Txt_Guard::apply_actions(Crawler_Catalog::effective_actions(), Scope::settings()['crawler_visibility_mode']);
 		// Uso unico: la confirmacion de descarga solo vale para esta aplicacion.
 		Robots_Txt_Guard::clear_backup_confirmation();
 
@@ -1451,11 +1524,22 @@ class Admin
 			wp_die(esc_html__('No se encontró un .htaccess editable en este servidor (nginx u otra configuración): usa el bloque de código manual en su lugar.', 'ai-knowledge'));
 		}
 
-		Htaccess_Guard::apply_block(Crawler_Catalog::blocked_user_agents());
+		Htaccess_Guard::apply_actions(Crawler_Catalog::effective_actions(), Scope::settings()['crawler_visibility_mode']);
 		// Uso unico: la confirmacion de descarga solo vale para esta aplicacion.
 		Htaccess_Guard::clear_backup_confirmation();
 
 		self::redirect('visibilidad-ia');
+	}
+
+	public static function download_htaccess_generated()
+	{
+		self::verify('wookb_download_htaccess_generated');
+		$content = Htaccess_Guard::generate_full_file(Crawler_Catalog::blocked_user_agents(), Scope::settings()['crawler_visibility_mode']);
+		nocache_headers();
+		header('Content-Type: application/octet-stream');
+		header('Content-Disposition: attachment; filename="htaccess-ai-knowledge-' . gmdate('Ymd-His') . '.txt"');
+		echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		exit;
 	}
 
 	/**

@@ -64,6 +64,16 @@
 	 * "disabled" aqui no salta esa comprobacion.
 	 */
 	$( function () {
+		$( '[data-wookb-copy-target]' ).on( 'click', function () {
+			var target = document.getElementById( $( this ).data( 'wookb-copy-target' ) );
+			if ( ! target ) {
+				return;
+			}
+			navigator.clipboard.writeText( target.value ).then( function () {
+				window.alert( 'Código copiado.' );
+			} );
+		} );
+
 		$( '.wookb-download-form' ).on( 'submit', function ( e ) {
 			e.preventDefault();
 			var $form = $( this );

@@ -83,6 +83,9 @@ class Scope {
 			// unica fuente de verdad para robots.txt y .htaccess. Si un bot del
 			// catalogo no aparece aqui, se usa su default_action (Crawler_Catalog).
 			'crawler_actions' => array(),
+			// Visibilidad especial: los bots bloqueados pueden seguir leyendo
+			// /llms.txt sin rastrear el resto del sitio.
+			'crawler_visibility_mode' => 'site',
 		);
 		$saved = get_option( 'wookb_settings', array() );
 

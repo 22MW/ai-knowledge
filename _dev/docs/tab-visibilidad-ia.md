@@ -16,14 +16,12 @@ cuáles no.
 
 Un resumen de las distintas formas en que se publica tu contenido:
 
-- **llms.txt** — el archivo que leen los buscadores de IA para tener un
-  índice de tu contenido más importante. Es una convención emergente
-  (todavía no un estándar oficial), pero cada vez más usada. El plugin lo
-  sirve automáticamente sin necesidad de crear ningún archivo físico. Si
-  detecta que ya existe un `llms.txt` físico en la raíz de tu web (creado
-  por ti o por otro plugin), te avisa: ese archivo físico tiene prioridad
-  y tapa al que genera el plugin. Puedes borrarlo desde aquí mismo si fue
-  sin querer.
+- **llms.txt** — el archivo físico que gestiona AI Knowledge en la raíz de
+  tu web. Ayuda a los asistentes de IA a entender qué contiene tu sitio y
+  dónde encontrar la información más importante. Es una convención
+  emergente (todavía no un estándar oficial), pero cada vez más usada. El
+  plugin lo crea y lo regenera cuando cambian los documentos o los datos que
+  lo alimentan.
 - **Markdown público** — el mismo contenido que usa tu chatbot, servido
   como archivo de texto plano, fácil de leer para cualquier IA sin tener
   que procesar HTML.
@@ -58,21 +56,28 @@ por `.htaccess` de más abajo.
 ### Bloqueo por robots.txt
 
 `robots.txt` es una petición educada: la mayoría de bots serios la
-respetan, pero técnicamente un bot puede ignorarla. Antes de aplicar el
-bloqueo, el plugin **te obliga a descargar una copia de seguridad** del
-`robots.txt` actual — es una protección doble (también a nivel de
-servidor, no solo deshabilitando el botón en pantalla).
+respetan, pero técnicamente un bot puede ignorarla. El plugin muestra el
+archivo actual y una propuesta completa antes de guardar. Antes de aplicar
+el cambio, **te obliga a descargar una copia de seguridad**.
+
+El plugin conserva las reglas externas. Si una regla original contradice la
+configuración elegida, la comenta sin borrarla y añade sus reglas activas en
+un bloque propio. En cada actualización sustituye entero solo ese bloque.
 
 ### Bloqueo real por .htaccess
 
 Esto sí es un bloqueo de verdad a nivel de servidor: si un bot marcado
 como "Bloquear" en la tabla intenta acceder, el servidor rechaza la
-petición directamente, la respete o no. Modifica un archivo fuera del
-propio plugin que puede afectar a todo tu sitio si algo sale mal, así que
-también exige descargar una copia de seguridad antes de aplicar cambios.
+petición directamente, la respete o no. En modo «Solo permitir visibilidad
+de `llms.txt`», esos bots pueden leer `/llms.txt` y reciben `404` en el resto
+del sitio.
 
-> Nunca se escribe `robots.txt` ni `.htaccess` automáticamente. Ambas
-> acciones piden tu confirmación explícita cada vez.
+El plugin muestra el `.htaccess` actual y el archivo completo propuesto. El
+archivo real no se sobrescribe automáticamente: puedes copiar el código o
+descargar el archivo preparado y sustituirlo manualmente.
+
+> `robots.txt` se guarda con confirmación y copia previa. `.htaccess` se
+> prepara para copiar o descargar, pero no se sobrescribe automáticamente.
 
 ### Registro de accesos de crawlers de IA
 
@@ -81,19 +86,18 @@ veas de un vistazo quién te está leyendo de verdad.
 
 ## Preguntas frecuentes
 
-**¿Qué pasa si borro mi llms.txt físico por error?**
-El plugin sigue sirviendo su propia versión generada automáticamente en
-la misma ruta, así que tu web no se queda sin `llms.txt` en ningún
-momento.
+**¿Qué pasa si todavía no existe un llms.txt físico?**
+La pestaña te lo indica y ofrece crearlo. Después AI Knowledge lo regenera
+cuando cambian los documentos o los datos que alimentan el archivo.
 
 **¿Bloquear un bot en robots.txt es suficiente para que no me lea?**
 No siempre — algunos bots lo ignoran. Si quieres una garantía real, usa
 también el bloqueo por `.htaccess`, que actúa a nivel de servidor.
 
-**¿Por qué me pide descargar una copia antes de aplicar el bloqueo?**
-Porque tanto `robots.txt` como `.htaccess` son archivos delicados: si algo
-sale mal, quieres poder restaurar la versión anterior sin depender de
-nadie más.
+**¿Por qué me pide descargar una copia antes de cambiar robots.txt?**
+Porque es un archivo real del sitio. La copia te permite restaurar la
+versión anterior si algo sale mal. Para `.htaccess`, además, el plugin te
+entrega el archivo completo para que lo revises y lo sustituyas manualmente.
 
 **¿Este bloqueo afecta también a Google?**
 No de forma especial: solo afecta a los bots que tú marques como

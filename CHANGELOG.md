@@ -2,6 +2,20 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [1.1.0.2] - 2026-09-18
+
+### Visibilidad IA y archivos de rastreo
+
+- `llms.txt` se gestiona como archivo físico y se regenera cuando cambian
+  los documentos o los datos que lo alimentan.
+- Visibilidad global para permitir que los bots bloqueados lean solo
+  `/llms.txt` y reciban `404` en el resto del sitio mediante `.htaccess`.
+- `robots.txt` y `.htaccess` comparan las reglas existentes, conservan las
+  externas y comentan las que contradicen la configuración activa.
+- La pantalla muestra el archivo actual y la propuesta completa. El
+  `.htaccess` se puede copiar o descargar sin sobrescribirlo automáticamente.
+- Documentación de Visibilidad IA, roadmap y vista de estado actualizadas.
+
 ## [1.1.0.1] - 2026-09-17
 
 ### Fix: Alcance vacío para todos los post_types
