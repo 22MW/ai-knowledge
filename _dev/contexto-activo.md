@@ -112,12 +112,15 @@ limpieza posterior de Ajustes/Chatbot, como `a332da1`.
   query args `wookb_notice`/`wookb_regen_error`/`wookb_sync_status`,
   `assets/wookb-theme.css` y su handle de enqueue.
 
-## Documentación pública + técnica (Fase 0.2, 2026-09-16)
+## Documentación pública + técnica (Fase 0.2, actualizada 2026-09-18)
 
-- `_dev/docs/` (11 archivos): `index.md`, `instalacion.md` y un `.md` por
+- `docs/` (11 archivos): `index.md`, `instalacion.md` y un `.md` por
   cada una de las 9 tabs del admin, tono VerifacWOO, enlazados entre sí,
   con FAQ al final de cada uno. 13 etiquetas `[SCREENSHOT]`/`[VIDEO]`
   pendientes de sustituir por medios reales antes de publicar en la web.
+- Cada pestaña del admin ofrece «Leer documentación» y abre su guía en un
+  panel lateral derecho de aproximadamente el 50% de la pantalla, con
+  Markdown convertido a lectura normal y sanitizado.
 - `_dev/documentacion-tecnica.md`: documento técnico para desarrolladores,
   se queda en el plugin, no se publica.
 - De paso, corregido `readme.txt` (tabs "Alcance"/"Exclusiones" → ya

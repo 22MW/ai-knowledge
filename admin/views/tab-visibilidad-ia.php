@@ -97,6 +97,7 @@ $htaccess_conflicts = Htaccess_Guard::conflicts( $crawler_blocked_bots, $crawler
 <p class="description">
 	<?php esc_html_e( 'Comprueba cómo se publica el contenido para buscadores y agentes de IA, revisa si las páginas sincronizadas pueden rastrearse y decide qué crawlers de IA pueden acceder a la web. El estado de exposición y la comprobación de accesibilidad son de solo lectura. Las acciones sobre robots.txt y .htaccess modifican archivos reales y siempre requieren confirmación.', 'ai-knowledge' ); ?>
 </p>
+<?php Admin::documentation_link( 'visibilidad-ia' ); ?>
 
 <h2><?php esc_html_e( 'Estado de exposición', 'ai-knowledge' ); ?></h2>
 <table class="form-table">

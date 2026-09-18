@@ -193,8 +193,114 @@ class Admin
 			require $view_file;
 			echo '</div>';
 		}
+		self::render_documentation_drawer($tab);
 
 		echo '</div>';
+	}
+
+	/** Renderiza el acceso a la guía de la pestaña actual. */
+	public static function documentation_link($tab)
+	{
+		$docs = self::documentation_map();
+		if (empty($docs[$tab])) {
+			return;
+		}
+		echo '<p class="wookb-documentation-link"><button type="button" class="button-link" data-wookb-doc-open="' . esc_attr($tab) . '">' . esc_html__('Leer documentación', 'ai-knowledge') . '</button></p>';
+	}
+
+	protected static function documentation_map()
+	{
+		return array(
+			'registro' => 'tab-registro.md',
+			'contenido' => 'tab-contenido.md',
+			'negocio' => 'tab-negocio.md',
+			'faqs' => 'tab-faqs.md',
+			'woocommerce' => 'tab-woocommerce.md',
+			'prompt' => 'tab-chatbot.md',
+			'visibilidad-ia' => 'tab-visibilidad-ia.md',
+			'carga-inicial' => 'tab-generacion-masiva.md',
+			'ajustes' => 'tab-ajustes.md',
+		);
+	}
+
+	protected static function render_documentation_drawer($tab)
+	{
+		$docs = self::documentation_map();
+		if (empty($docs[$tab])) {
+			return;
+		}
+		$file = AIKB_DIR . 'docs/' . $docs[$tab];
+		if (!is_readable($file)) {
+			return;
+		}
+		$title = __('Documentación', 'ai-knowledge');
+		$content = self::markdown_to_html((string) file_get_contents($file));
+		echo '<div class="wookb-doc-backdrop" data-wookb-doc-close></div>';
+		echo '<aside class="wookb-doc-drawer" data-wookb-doc-drawer role="dialog" aria-modal="true" aria-label="' . esc_attr($title) . '" aria-hidden="true">';
+		echo '<div class="wookb-doc-drawer-header"><h2>' . esc_html($title) . '</h2><button type="button" class="button-link" data-wookb-doc-close aria-label="' . esc_attr__('Cerrar documentación', 'ai-knowledge') . '">×</button></div>';
+		echo '<div class="wookb-doc-drawer-content">' . $content . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitizado por markdown_to_html
+		echo '</aside>';
+	}
+
+	protected static function markdown_to_html($markdown)
+	{
+		$lines = preg_split('/\r\n|\r|\n/', $markdown);
+		$html = '';
+		$paragraph = array();
+		$list_tag = '';
+		$flush = static function () use (&$html, &$paragraph) {
+			if ($paragraph) {
+				$html .= '<p>' . implode(' ', $paragraph) . '</p>';
+				$paragraph = array();
+			}
+		};
+		foreach ($lines as $line) {
+			$line = trim($line);
+			if ('' === $line) {
+				$flush();
+				if ($list_tag) { $html .= '</' . $list_tag . '>'; $list_tag = ''; }
+				continue;
+			}
+			if (preg_match('/^#{1,3}\s+(.+)$/', $line, $match)) {
+				$flush();
+				if ($list_tag) { $html .= '</' . $list_tag . '>'; $list_tag = ''; }
+				$level = strlen(strstr($line, ' ', true));
+				$html .= '<h' . $level . '>' . self::markdown_inline($match[1]) . '</h' . $level . '>';
+				continue;
+			}
+			if (preg_match('/^[-*]\s+(.+)$/', $line, $match)) {
+				$flush();
+				if ('ul' !== $list_tag) { if ($list_tag) { $html .= '</' . $list_tag . '>'; } $html .= '<ul>'; $list_tag = 'ul'; }
+				$html .= '<li>' . self::markdown_inline($match[1]) . '</li>';
+				continue;
+			}
+			if (preg_match('/^\d+\.\s+(.+)$/', $line, $match)) {
+				$flush();
+				if ('ol' !== $list_tag) { if ($list_tag) { $html .= '</' . $list_tag . '>'; } $html .= '<ol>'; $list_tag = 'ol'; }
+				$html .= '<li>' . self::markdown_inline($match[1]) . '</li>';
+				continue;
+			}
+			if ($list_tag) { $html .= '</' . $list_tag . '>'; $list_tag = ''; }
+			$paragraph[] = self::markdown_inline($line);
+		}
+		$flush();
+		if ($list_tag) { $html .= '</' . $list_tag . '>'; }
+		return wp_kses_post($html);
+	}
+
+	protected static function markdown_inline($text)
+	{
+		$text = esc_html($text);
+		$text = preg_replace('/\*\*(.+?)\*\*/', '<strong>$1</strong>', $text);
+		$text = preg_replace('/`([^`]+)`/', '<code>$1</code>', $text);
+		$text = preg_replace_callback('/\[([^]]+)\]\((https?:\/\/[^)]+|[^)]+\.md)\)/', static function ($match) {
+			$url = $match[2];
+			if ('.md' === substr($url, -3)) {
+				$url = AIKB_URL . 'docs/' . basename($url);
+			}
+			return '<a href="' . esc_url($url) . '" target="_blank" rel="noopener">' . $match[1] . '</a>';
+		}, $text);
+		return $text;
 	}
 
 	/**

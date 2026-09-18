@@ -28,6 +28,7 @@ if ( false === $draft ) {
 <p class="description">
 	<?php esc_html_e( 'Cómo debe comportarse el chatbot de Support Genix: tono, qué hacer cuando no sabe algo, qué no debe hacer nunca. Los datos del negocio en sí (dirección, contacto, horario...) se rellenan en la pestaña Negocio — este cuestionario los combina automáticamente con estos al generar el borrador. Responde lo que sepas, opcionalmente añade páginas del sitio como referencia, y genera un primer borrador con IA. Puedes editarlo a mano antes de guardar, pulirlo con IA después de tus cambios, o añadir más respuestas al cuestionario y volver a generar para mejorar el resultado — no hace falta acertar a la primera.', 'ai-knowledge' ); ?>
 </p>
+<?php Admin::documentation_link( 'prompt' ); ?>
 
 <?php if ( $draft_error ) : ?>
 	<div class="notice notice-error"><p><?php echo esc_html( $draft_error ); ?></p></div>

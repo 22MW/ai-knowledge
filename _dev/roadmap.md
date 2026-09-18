@@ -104,4 +104,12 @@ Hay estilos inline como `style="width:100%"` en varias vistas. Detectado, no abo
 - [`roadmap-historico.md`](roadmap-historico.md): fases, rondas y evidencia de trabajo cerrado.
 - [`decisiones.md`](decisiones.md): decisiones permanentes.
 - [`contexto-activo.md`](contexto-activo.md): relevo de la tarea activa.
-- [`docs/index.md`](docs/index.md): índice de documentación del plugin.
+- [`docs/index.md`](../docs/index.md): índice de documentación del plugin.
+
+## Cambio aplicado — documentación en el admin (2026-09-18)
+
+- La documentación pública del plugin vive ahora en `docs/`, fuera de `_dev/`.
+- Cada pestaña enlaza su guía correspondiente mediante «Leer documentación».
+- La guía se abre en un panel lateral derecho y se muestra como lectura normal.
+- Pendiente de QA visual real: comprobar el ancho, el cierre, Escape y la
+  lectura en cada pestaña.

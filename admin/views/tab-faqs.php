@@ -21,6 +21,7 @@ if ( false === $faq_content ) {
 <p class="description">
 	<?php esc_html_e( 'Contenido en Markdown que se publica como documento propio (enlazado desde /llms.txt, igual que el resto de documentos) y aparece en la pestaña Registro. Distinto del prompt del chatbot: esto es contenido público, no instrucciones internas.', 'ai-knowledge' ); ?>
 </p>
+<?php Admin::documentation_link( 'faqs' ); ?>
 
 <?php if ( count( $active_langs ) > 1 ) : ?>
 	<form method="get" class="wookb-toolbar-form">

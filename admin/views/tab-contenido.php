@@ -12,6 +12,7 @@ $effective_post_types = Scope::effective_post_types();
 <p class="description">
 	<?php esc_html_e( 'Qué contenido de tu web entra en la base de conocimiento: qué tipos de contenido, qué categorías/etiquetas concretas, IDs sueltos adicionales o excluidos, y qué campos personalizados se envían a la IA. Nada se genera para lo que no esté incluido aquí, y un ID excluido nunca genera documento aunque su tipo de contenido o término esté incluido.', 'ai-knowledge' ); ?>
 </p>
+<?php Admin::documentation_link( 'contenido' ); ?>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 	<input type="hidden" name="action" value="wookb_save_content" />
 	<?php wp_nonce_field( 'wookb_save_content' ); ?>

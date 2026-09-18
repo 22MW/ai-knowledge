@@ -55,6 +55,25 @@
 		} );
 	} );
 
+	$( function () {
+		var $wrap = $( '.wookb-wrap' );
+		var $drawer = $wrap.find( '[data-wookb-doc-drawer]' );
+		var $backdrop = $wrap.find( '[data-wookb-doc-close]' ).filter( '.wookb-doc-backdrop' );
+		function closeDocs() {
+			$drawer.removeClass( 'is-open' ).attr( 'aria-hidden', 'true' );
+			$backdrop.removeClass( 'is-open' );
+		}
+		$wrap.on( 'click', '[data-wookb-doc-open]', function () {
+			$drawer.addClass( 'is-open' ).attr( 'aria-hidden', 'false' );
+			$backdrop.addClass( 'is-open' );
+			$drawer.find( '[data-wookb-doc-close]' ).not( '.wookb-doc-backdrop' ).trigger( 'focus' );
+		} );
+		$wrap.on( 'click', '[data-wookb-doc-close]', closeDocs );
+		$( document ).on( 'keydown.wookbDocs', function ( e ) {
+			if ( 'Escape' === e.key ) { closeDocs(); }
+		} );
+	} );
+
 	/**
 	 * Fase 11 (revision UX): descarga de robots.txt/.htaccess por fetch() en
 	 * vez de un submit normal, para poder habilitar el boton "Aplicar"
