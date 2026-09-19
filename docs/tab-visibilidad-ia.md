@@ -50,6 +50,10 @@ pero `noindex` lo bloquea), te avisa del conflicto para que lo revises.
 
 ## Gestión de crawlers de IA
 
+La tabla incluye crawlers de IA, herramientas SEO y scraping, buscadores
+tradicionales, servicios de archivado y scanners automatizados. Puedes filtrar
+la lista por tipo y por estado sin recargar la página, y combinar ambos filtros.
+
 Un catálogo de crawlers de IA conocidos, agrupados por su propósito, con
 una acción por cada uno: **permitir** o **bloquear**. Esta configuración
 es la que alimenta tanto el bloqueo por `robots.txt` como el bloqueo real
@@ -73,6 +77,10 @@ como "Bloquear" en la tabla intenta acceder, el servidor rechaza la
 petición directamente, la respete o no. En modo «Solo permitir visibilidad
 de `llms.txt`», esos bots pueden leer `/llms.txt` y reciben `404` en el resto
 del sitio.
+
+Las reglas de `.htaccess` se agrupan por comportamiento para evitar bloques
+repetidos y se colocan antes de las reglas de WordPress, de modo que el bloqueo
+se evalúe antes de enviar la petición a `index.php`.
 
 El plugin muestra el `.htaccess` actual y el archivo completo propuesto. El
 archivo real no se sobrescribe automáticamente: puedes copiar el código o

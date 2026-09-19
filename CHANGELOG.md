@@ -2,10 +2,13 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
-## [1.1.2.1] - Desarrollo
+## [1.1.2.2] - Desarrollo
 
-### Frescura de llms.txt
+### Crawlers y reglas del servidor
 
+- Ampliado el catálogo de crawlers con filtros por tipo y estado.
+- Reglas `.htaccess` agrupadas y ordenadas antes de WordPress.
+- `Amazonbot` permitido por defecto; eliminado el estado «Sin decidir».
 - `llms.txt` incluye la fecha ISO 8601 de su última generación.
 
 ## [1.1.2] - 2026-09-18

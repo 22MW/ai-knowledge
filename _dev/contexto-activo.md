@@ -235,3 +235,18 @@ siguiente foco (UX3/UX4 u otra tarea).
   8601, también cuando se escribe como archivo físico.
 - Validado con `php -l` y `git diff --check`; pendiente probar el contenido en
   el sitio real.
+
+## Cambio posterior — filtros de crawlers (2026-09-19)
+
+- La tabla de Visibilidad IA permite filtrar sin recarga por tipo y por estado
+  (`permitidos`, `bloqueados` o `sin decidir`), combinando ambos criterios.
+- El catálogo incorpora herramientas SEO/scraping, buscadores tradicionales,
+  archivado/datasets y scanners automatizados, todos configurables por bot.
+- `.htaccess` agrupa condiciones con el mismo comportamiento y coloca el bloque
+  propio antes de WordPress, también en la descarga del archivo propuesto.
+- La tabla muestra inicialmente 10 crawlers y permite desplegar el resto con
+  «Ver todos»; los filtros siguen buscando en el catálogo completo.
+- `Amazonbot` queda permitido por defecto y se elimina el estado «Sin decidir»;
+  cualquier valor histórico `ask` se normaliza a `allow`.
+- Validación técnica ejecutada; queda pendiente comprobar visualmente los
+  filtros y aplicar ambos modos sobre un `.htaccess` real con copia previa.

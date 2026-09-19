@@ -28,6 +28,11 @@
 .wookb-doc-drawer-content code { padding: 2px 4px; border-radius: 3px; background: var(--tblr-bg-surface-secondary, #f0f2f5); }
 @media (max-width: 782px) { .wookb-doc-drawer { top: 46px; width: 92vw; min-width: 0; } }
 .wookb-wrap select[multiple] { padding: 4px; }
+.wookb-crawler-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 12px 0; }
+.wookb-crawler-filters .description { margin: 0; }
+.wookb-crawler-actions { display: flex; align-items: center; gap: 10px; }
+.wookb-crawler-actions [data-wookb-crawler-toggle] { margin-left: auto; }
+.wookb-crawler-section table select[name^="crawler_action"] { width: 100%; text-align: center; }
 
 /* Tabla de Registro: columnas de datos cortos (lang/status/bridge/hash) no
    necesitan tanto ancho como el navegador les da por defecto -- eso dejaba

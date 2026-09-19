@@ -181,13 +181,13 @@ class Crawler_Catalog {
 				'description'    => __( 'Rastreador agresivo de ByteDance para entrenar sus modelos de IA.', 'ai-knowledge' ),
 				'default_action' => 'block',
 			),
-			// Amazon: caso especial, sin recomendacion unica (uso mixto documentado).
+			// Amazon: permitido para Alexa y servicios de consulta de Amazon.
 			array(
 				'user_agent'     => 'Amazonbot',
 				'operator'       => 'Amazon',
 				'category'       => 'ai_search',
 				'description'    => __( 'Alimenta Alexa y otros productos IA de Amazon (uso mixto: también entrenamiento).', 'ai-knowledge' ),
-				'default_action' => 'ask',
+				'default_action' => 'allow',
 			),
 			// xAI / Grok.
 			array(
@@ -242,6 +242,55 @@ class Crawler_Catalog {
 			),
 		);
 
+		$additional_groups = array(
+			'seo_scraper' => array(
+				'description' => __( 'Crawler comercial de SEO, indexación o extracción automatizada de contenido.', 'ai-knowledge' ),
+				'bots' => array(
+					array( 'meta-webindexer', 'Meta' ), array( 'MJ12bot', 'Majestic' ), array( 'AhrefsBot', 'Ahrefs' ),
+					array( 'SemrushBot', 'Semrush' ), array( 'python-requests', 'Genérico' ), array( 'AliyunSecBot', 'Alibaba' ),
+					array( 'Scrapy', 'Genérico' ), array( 'httpclient', 'Genérico' ), array( 'DataForSeoBot', 'DataForSEO' ),
+					array( 'DotBot', 'Moz' ), array( 'BLEXBot', 'BLEX' ), array( 'serpstatbot', 'Serpstat' ),
+					array( 'SiteAuditBot', 'SEO PowerSuite' ), array( 'RogerBot', 'Moz' ), array( 'linkdexbot', 'Linkdex' ),
+					array( 'Exabot', 'Exalead' ), array( 'ZoominfoBot', 'ZoomInfo' ), array( 'MegaIndex', 'MegaIndex' ),
+					array( 'GeedoShop', 'Geedo' ), array( 'ZeroBot', 'Genérico' ), array( 'Terra Cotta', 'Genérico' ),
+				),
+			),
+			'security_scanner' => array(
+				'description' => __( 'Herramienta automatizada de escaneo, reconocimiento o pruebas de seguridad.', 'ai-knowledge' ),
+				'bots' => array(
+					array( 'masscan', 'Masscan' ), array( 'nikto', 'Nikto' ), array( 'sqlmap', 'sqlmap' ),
+					array( 'nmap', 'Nmap' ), array( 'WPScan', 'WPScan' ), array( 'zgrab', 'ZMap' ),
+					array( 'CensysInspect', 'Censys' ),
+				),
+			),
+			'traditional_search' => array(
+				'description' => __( 'Crawler de buscador tradicional o regional configurado aquí para bloqueo explícito.', 'ai-knowledge' ),
+				'bots' => array(
+					array( 'SeznamBot', 'Seznam' ), array( 'SeekportBot', 'Seekport' ), array( 'PetalBot', 'Huawei' ),
+					array( 'Baiduspider', 'Baidu' ), array( 'YandexBot', 'Yandex' ), array( 'YandexImages', 'Yandex' ),
+					array( 'Sogou', 'Sogou' ),
+				),
+			),
+			'archive_dataset' => array(
+				'description' => __( 'Crawler de archivado, control de originalidad o creación de datasets.', 'ai-knowledge' ),
+				'bots' => array(
+					array( 'ia_archiver', 'Alexa/Internet Archive' ), array( 'archive.org_bot', 'Internet Archive' ),
+					array( 'TurnitinBot', 'Turnitin' ),
+				),
+			),
+		);
+		foreach ( $additional_groups as $category => $group ) {
+			foreach ( $group['bots'] as $bot ) {
+				$catalog[] = array(
+					'user_agent'     => $bot[0],
+					'operator'       => $bot[1],
+					'category'       => $category,
+					'description'    => $group['description'],
+					'default_action' => 'block',
+				);
+			}
+		}
+
 		/**
 		 * Extensibilidad ya decidida en el roadmap: permite añadir/editar
 		 * crawlers sin tocar el core del plugin cuando cambien alias o
@@ -292,7 +341,10 @@ class Crawler_Catalog {
 		$saved = Scope::settings()['crawler_actions'];
 		$actions = array();
 		foreach ( self::all() as $entry ) {
-			$actions[ $entry['user_agent'] ] = isset( $saved[ $entry['user_agent'] ] ) ? $saved[ $entry['user_agent'] ] : $entry['default_action'];
+				$action = isset( $saved[ $entry['user_agent'] ] ) ? $saved[ $entry['user_agent'] ] : $entry['default_action'];
+				// Migración silenciosa: Amazonbot deja de usar el antiguo estado ask.
+				if ( 'Amazonbot' === $entry['user_agent'] && 'ask' === $action ) { $action = 'allow'; }
+				$actions[ $entry['user_agent'] ] = $action;
 		}
 		return $actions;
 	}

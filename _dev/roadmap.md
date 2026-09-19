@@ -35,6 +35,26 @@ No presentar este flujo como validado hasta realizar esas pruebas.
 La implementación está cerrada y trasladada al histórico. Solo queda el QA
 real indicado arriba.
 
+### Gestión avanzada de crawlers — pendiente de QA real
+
+Ampliar la gestión de crawlers de la pestaña Visibilidad IA sin cambiar todavía
+las reglas reales del servidor:
+
+- Organizar la tabla por tipo: búsqueda IA, entrenamiento, asistente bajo
+  demanda, SEO/scraping y scanners de seguridad.
+- Mantener el bloque propio sustituible, las reglas originales conservadas y
+  comentadas si contradicen la propuesta, y las vistas «Actual» y «Después
+  del cambio».
+- Avisar de que el `User-Agent` puede falsificarse y no autentica al crawler.
+
+La interfaz, el catálogo ampliado, las reglas agrupadas y el orden anterior a
+WordPress están implementados. La tabla muestra inicialmente 10 crawlers y se
+puede desplegar completa; los filtros siguen actuando sobre todo el catálogo.
+`Amazonbot` queda permitido y ya no existe el estado «Sin decidir».
+Queda pendiente validar visualmente la tabla y probar en un `.htaccess` real
+los modos de bloqueo total y `llms_only`, con copia previa y comprobación de
+que WordPress sigue respondiendo correctamente.
+
 ### UX3 — WooCommerce: selección y prompt por campo a nivel de producto
 
 Nueva arquitectura para seleccionar y aportar texto por campo de cada producto. Es distinta de la selección ya implementada de envíos, impuestos, pagos y categorías. Requiere `rol-analista` antes de tocar código.

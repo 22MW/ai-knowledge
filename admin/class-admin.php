@@ -1745,7 +1745,7 @@ class Admin
 	public static function download_htaccess_generated()
 	{
 		self::verify('wookb_download_htaccess_generated');
-		$content = Htaccess_Guard::generate_full_file(Crawler_Catalog::blocked_user_agents(), Scope::settings()['crawler_visibility_mode']);
+		$content = Htaccess_Guard::generate_full_file(Crawler_Catalog::effective_actions(), Scope::settings()['crawler_visibility_mode']);
 		nocache_headers();
 		header('Content-Type: application/octet-stream');
 		header('Content-Disposition: attachment; filename="htaccess-ai-knowledge-' . gmdate('Ymd-His') . '.txt"');

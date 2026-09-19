@@ -68,7 +68,7 @@ $llms_backup_confirmed = (bool) get_transient( 'wookb_llms_backup_confirmed_' . 
 $htaccess_available = Htaccess_Guard::is_available();
 $htaccess_confirmed = Htaccess_Guard::backup_confirmed();
 
-$crawler_saved_actions = Scope::settings()['crawler_actions'];
+$crawler_saved_actions = Crawler_Catalog::effective_actions();
 $crawler_visibility_mode = Scope::settings()['crawler_visibility_mode'];
 
 // Fase 11, pieza 3: ultimos accesos registrados del catalogo de crawlers.
@@ -270,8 +270,32 @@ $category_labels = array(
 	'ai_search'                => __( 'Búsqueda/citas IA', 'ai-knowledge' ),
 	'user_requested_assistant' => __( 'Uso bajo demanda', 'ai-knowledge' ),
 	'model_training'           => __( 'Entrenamiento de modelos', 'ai-knowledge' ),
+	'seo_scraper'              => __( 'SEO y scraping', 'ai-knowledge' ),
+	'security_scanner'         => __( 'Scanners de seguridad', 'ai-knowledge' ),
+	'traditional_search'       => __( 'Buscadores tradicionales', 'ai-knowledge' ),
+	'archive_dataset'          => __( 'Archivado y datasets', 'ai-knowledge' ),
 );
 ?>
+<div class="wookb-crawler-filters" data-wookb-crawler-filters>
+	<label>
+		<span class="screen-reader-text"><?php esc_html_e( 'Filtrar por tipo', 'ai-knowledge' ); ?></span>
+		<select data-wookb-crawler-filter="category">
+			<option value="all"><?php esc_html_e( 'Todos los tipos', 'ai-knowledge' ); ?></option>
+			<?php foreach ( $category_labels as $category => $label ) : ?>
+				<option value="<?php echo esc_attr( $category ); ?>"><?php echo esc_html( $label ); ?></option>
+			<?php endforeach; ?>
+		</select>
+	</label>
+	<label>
+		<span class="screen-reader-text"><?php esc_html_e( 'Filtrar por estado', 'ai-knowledge' ); ?></span>
+		<select data-wookb-crawler-filter="action">
+			<option value="all"><?php esc_html_e( 'Todos los estados', 'ai-knowledge' ); ?></option>
+			<option value="allow"><?php esc_html_e( 'Permitidos', 'ai-knowledge' ); ?></option>
+			<option value="block"><?php esc_html_e( 'Bloqueados', 'ai-knowledge' ); ?></option>
+		</select>
+	</label>
+	<span class="description" data-wookb-crawler-count aria-live="polite"></span>
+</div>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 	<input type="hidden" name="action" value="wookb_save_crawler_actions" />
 	<?php wp_nonce_field( 'wookb_save_crawler_actions' ); ?>
@@ -287,11 +311,11 @@ $category_labels = array(
 			</tr>
 		</thead>
 		<tbody>
-			<?php foreach ( Crawler_Catalog::all() as $entry ) :
+			<?php foreach ( Crawler_Catalog::all() as $index => $entry ) :
 				$ua       = $entry['user_agent'];
 				$current  = isset( $crawler_saved_actions[ $ua ] ) ? $crawler_saved_actions[ $ua ] : $entry['default_action'];
 				?>
-				<tr>
+				<tr data-wookb-crawler-row data-crawler-index="<?php echo (int) $index; ?>" data-crawler-category="<?php echo esc_attr( $entry['category'] ); ?>" data-crawler-action="<?php echo esc_attr( $current ); ?>">
 					<td><?php echo esc_html( $ua ); ?></td>
 					<td><?php echo esc_html( $entry['operator'] ); ?></td>
 					<td><?php echo esc_html( isset( $category_labels[ $entry['category'] ] ) ? $category_labels[ $entry['category'] ] : $entry['category'] ); ?></td>
@@ -300,9 +324,6 @@ $category_labels = array(
 						<select name="crawler_action[<?php echo esc_attr( $ua ); ?>]">
 							<option value="allow" <?php selected( 'allow', $current ); ?>><?php esc_html_e( 'Permitir', 'ai-knowledge' ); ?></option>
 							<option value="block" <?php selected( 'block', $current ); ?>><?php esc_html_e( 'Bloquear', 'ai-knowledge' ); ?></option>
-							<?php if ( 'ask' === $current ) : ?>
-								<option value="ask" selected="selected" disabled="disabled"><?php esc_html_e( 'Sin decidir (uso mixto)', 'ai-knowledge' ); ?></option>
-							<?php endif; ?>
 						</select>
 					</td>
 				</tr>
@@ -310,7 +331,10 @@ $category_labels = array(
 		</tbody>
 	</table>
 	</div>
-	<div class="submit-row"><?php submit_button( __( 'Guardar configuración de crawlers', 'ai-knowledge' ), 'primary', 'submit', false ); ?></div>
+	<div class="submit-row wookb-crawler-actions">
+		<?php submit_button( __( 'Guardar configuración de crawlers', 'ai-knowledge' ), 'primary', 'submit', false ); ?>
+		<button type="button" class="button" data-wookb-crawler-toggle><?php esc_html_e( 'Ver todos los crawlers', 'ai-knowledge' ); ?></button>
+	</div>
 </form>
 
 <h3><?php esc_html_e( 'Visibilidad para los bots bloqueados', 'ai-knowledge' ); ?></h3>

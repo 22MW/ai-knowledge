@@ -55,6 +55,44 @@
 		} );
 	} );
 
+	// Filtros locales de crawlers: combinan tipo y estado sin recargar la página.
+	$( function () {
+		var $wrap = $( '.wookb-wrap' );
+		var $filters = $( '[data-wookb-crawler-filters]' );
+		if ( ! $filters.length ) { return; }
+		var $rows = $( '[data-wookb-crawler-row]' );
+		var $count = $filters.find( '[data-wookb-crawler-count]' );
+		var $toggle = $filters.closest( '.wookb-crawler-section' ).find( '[data-wookb-crawler-toggle]' );
+		var expanded = false;
+		function applyCrawlerFilters() {
+			var category = $filters.find( '[data-wookb-crawler-filter="category"]' ).val();
+			var action = $filters.find( '[data-wookb-crawler-filter="action"]' ).val();
+			var filtering = 'all' !== category || 'all' !== action;
+			var visible = 0;
+			$rows.each( function () {
+				var $row = $( this );
+				var matches = ( 'all' === category || category === $row.attr( 'data-crawler-category' ) ) && ( 'all' === action || action === $row.attr( 'data-crawler-action' ) );
+				var inInitialPage = parseInt( $row.attr( 'data-crawler-index' ), 10 ) < 10;
+				var show = matches && ( expanded || filtering || inInitialPage );
+				$row.toggle( show );
+				if ( matches ) { visible++; }
+			} );
+			$count.text( visible + ' de ' + $rows.length );
+			$toggle.toggle( ! filtering && $rows.length > 10 );
+			$toggle.text( expanded ? 'Mostrar menos crawlers' : 'Ver todos los crawlers' );
+		}
+		$filters.on( 'change', 'select', applyCrawlerFilters );
+		$toggle.on( 'click', function () {
+			expanded = ! expanded;
+			applyCrawlerFilters();
+		} );
+		$wrap.on( 'change', '[data-wookb-crawler-row] select[name^="crawler_action"]', function () {
+			$( this ).closest( '[data-wookb-crawler-row]' ).attr( 'data-crawler-action', $( this ).val() );
+			applyCrawlerFilters();
+		} );
+		applyCrawlerFilters();
+	} );
+
 	/**
 	 * Fase AJAX 1: guardados simples. El action del formulario se conserva
 	 * para que admin-post.php siga funcionando si JavaScript no esta activo.
