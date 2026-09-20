@@ -360,7 +360,9 @@
 	$(document).on('submit', '[data-assistant-form]', function (e) {
 		e.preventDefault();
 		var $form=$(this), action=$form.find(':focus').val() || 'continue', current=$form.find('input[name="assistant_step"]').val();
-		$.post(data.ajaxUrl, { action:'aikb_assistant_navigate', nonce:data.nonce, step:current, assistant_action:action }).done(function (response) { if (response.success) render(response.data.step, response.data.completed); });
+		var payload = { action:'aikb_assistant_navigate', nonce:data.nonce, step:current, assistant_action:action };
+	$('.wookb-assistant-screen-section [name], [data-assistant-form] [name]').each(function () { if (this.name !== 'assistant_step' && this.name !== 'aikb_assistant_nonce') payload[this.name] = $(this).val(); });
+		$.post(data.ajaxUrl, payload).done(function (response) { if (response.success) render(response.data.step, response.data.completed); });
 	});
 	$(document).on('click', '[data-assistant-step-link]', function (e) { e.preventDefault(); render($(this).closest('li').data('assistant-step'), []); });
 })(jQuery);

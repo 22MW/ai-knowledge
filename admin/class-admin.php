@@ -247,6 +247,18 @@ class Admin
 
 	protected static function assistant_screen_content($step)
 	{
+		if ('ai' === $step) {
+			$settings = Scope::settings();
+			$available = AI_Client::wordpress_available();
+			$models = $available ? AI_Client::available_models() : array();
+			$html = '<section class="wookb-assistant-screen-section"><h3>' . esc_html__('Conexiones de IA', 'ai-knowledge') . '</h3><p>' . esc_html__('Selecciona una conexión existente. Las claves se gestionan en el conector correspondiente y no se guardan en AI Knowledge.', 'ai-knowledge') . '</p><div class="wookb-assistant-fields">';
+			$html .= '<label class="wookb-assistant-field"><span>' . esc_html__('Origen de IA', 'ai-knowledge') . '</span><select name="assistant_ai_key_source" data-assistant-preview-field><option value="genix"' . selected('genix', $settings['ai_key_source'], false) . '>' . esc_html__('Support Genix', 'ai-knowledge') . '</option>';
+			if ($available) $html .= '<option value="wp_connectors"' . selected('wp_connectors', $settings['ai_key_source'], false) . '>' . esc_html__('Conectores de WordPress', 'ai-knowledge') . '</option>';
+			$html .= '</select></label><label class="wookb-assistant-field"><span>' . esc_html__('Modelo', 'ai-knowledge') . '</span><select name="assistant_wp_ai_model" data-assistant-preview-field><option value="' . esc_attr(AI_Client::MODEL_AUTO) . '"' . selected(AI_Client::MODEL_AUTO, $settings['wp_ai_model'], false) . '>' . esc_html__('Automático (recomendado)', 'ai-knowledge') . '</option>';
+			foreach ($models as $key => $model) $html .= '<option value="' . esc_attr($key) . '"' . selected($key, $settings['wp_ai_model'], false) . '>' . esc_html($model['name'] . ' (' . $model['model'] . ')') . '</option>';
+			$html .= '</select></label></div><div class="wookb-assistant-external-links"><p>' . esc_html__('Si falta una conexión, configúrala y vuelve después a este paso:', 'ai-knowledge') . '</p><a class="button" target="_blank" rel="noopener noreferrer" href="' . esc_url(admin_url('options-connectors.php')) . '">' . esc_html__('Configurar Conectores de WordPress', 'ai-knowledge') . '</a> <a class="button" target="_blank" rel="noopener noreferrer" href="' . esc_url(admin_url('plugins.php')) . '">' . esc_html__('Abrir Support Genix', 'ai-knowledge') . '</a></div></section>';
+			return $html;
+		}
 		$content = array(
 			'ai' => array(__('Conexiones detectadas', 'ai-knowledge'), __('Revisa qué origen de IA está disponible. Si no hay ninguno conectado, puedes continuar sin IA y volver a este paso más adelante.', 'ai-knowledge')),
 			'content' => array(__('Alcance inicial', 'ai-knowledge'), __('Selecciona los tipos de contenido públicos que quieres incluir. La configuración avanzada de taxonomías, términos e identificadores se conserva para completarla después.', 'ai-knowledge')),
@@ -302,6 +314,13 @@ class Admin
 		$action = isset($_POST['assistant_action']) ? sanitize_key(wp_unslash($_POST['assistant_action'])) : 'continue';
 		if (!isset($steps[$current])) wp_send_json_error(array('message' => __('Paso no válido.', 'ai-knowledge')), 400);
 		$state = get_option('aikb_setup_assistant', array());
+		if ('ai' === $current && in_array($action, array('continue', 'finish'), true)) {
+			$source = isset($_POST['assistant_ai_key_source']) ? sanitize_key(wp_unslash($_POST['assistant_ai_key_source'])) : 'genix';
+			$model = isset($_POST['assistant_wp_ai_model']) ? sanitize_text_field(wp_unslash($_POST['assistant_wp_ai_model'])) : AI_Client::MODEL_AUTO;
+			if (!in_array($source, array('genix', 'wp_connectors'), true) || ('wp_connectors' === $source && !AI_Client::wordpress_available())) $source = 'genix';
+			if (AI_Client::MODEL_AUTO !== $model && !isset(AI_Client::available_models()[$model])) $model = AI_Client::MODEL_AUTO;
+			Scope::update_settings(array('ai_key_source' => $source, 'wp_ai_model' => $model));
+		}
 		$state['initiated'] = true;
 		$state['last_opened'] = current_time('mysql');
 		if ('skip' === $action) $state['skipped'] = array_values(array_unique(array_merge((array) ($state['skipped'] ?? array()), array($current))));
