@@ -228,8 +228,12 @@ class Admin
 		if ('welcome' !== $current) {
 			echo '<button class="button" name="assistant_action" value="skip">' . esc_html__('Saltar este paso', 'ai-knowledge') . '</button> ';
 		}
-		$primary_label = 'welcome' === $current ? __('Continuar', 'ai-knowledge') : ('finish' === $current ? __('Guardar y terminar', 'ai-knowledge') : __('Guardar y continuar', 'ai-knowledge'));
-		echo '<button class="button button-primary" name="assistant_action" value="' . esc_attr('finish' === $current ? 'finish' : 'continue') . '">' . esc_html($primary_label) . '</button></p></form></div></div>';
+		if ('welcome' !== $current) {
+			echo '<button class="button" name="assistant_action" value="save">' . esc_html__('Guardar', 'ai-knowledge') . '</button> ';
+		}
+		$primary_action = 'finish' === $current ? 'finish' : 'continue';
+		$primary_label = 'welcome' === $current ? __('Continuar', 'ai-knowledge') : ('finish' === $current ? __('Guardar y terminar', 'ai-knowledge') : __('Continuar', 'ai-knowledge'));
+		echo '<button class="button button-primary" name="assistant_action" value="' . esc_attr($primary_action) . '">' . esc_html($primary_label) . '</button></p><div class="wookb-assistant-feedback" data-assistant-feedback role="status" aria-live="polite"></div></form></div></div>';
 	}
 
 	protected static function assistant_steps()
@@ -315,7 +319,7 @@ class Admin
 		$action = isset($_POST['assistant_action']) ? sanitize_key(wp_unslash($_POST['assistant_action'])) : 'continue';
 		if (!isset($steps[$current])) wp_send_json_error(array('message' => __('Paso no válido.', 'ai-knowledge')), 400);
 		$state = get_option('aikb_setup_assistant', array());
-		if ('ai' === $current && in_array($action, array('continue', 'finish'), true)) {
+		if ('ai' === $current && in_array($action, array('save', 'continue', 'finish'), true)) {
 			$source = isset($_POST['assistant_ai_key_source']) ? sanitize_key(wp_unslash($_POST['assistant_ai_key_source'])) : 'genix';
 			$model = isset($_POST['assistant_wp_ai_model']) ? sanitize_text_field(wp_unslash($_POST['assistant_wp_ai_model'])) : AI_Client::MODEL_AUTO;
 			if (!in_array($source, array('genix', 'wp_connectors'), true) || ('wp_connectors' === $source && !AI_Client::wordpress_available())) $source = 'genix';
@@ -324,13 +328,15 @@ class Admin
 		}
 		$state['initiated'] = true;
 		$state['last_opened'] = current_time('mysql');
-		if ('skip' === $action) $state['skipped'] = array_values(array_unique(array_merge((array) ($state['skipped'] ?? array()), array($current))));
+		if ('save' === $action) {
+			$state['current'] = $current;
+		} elseif ('skip' === $action) $state['skipped'] = array_values(array_unique(array_merge((array) ($state['skipped'] ?? array()), array($current))));
 		elseif ('finish' === $action) $state['finished'] = true;
 		elseif ('back' !== $action) $state['completed'] = array_values(array_unique(array_merge((array) ($state['completed'] ?? array()), array($current))));
-		$next = self::assistant_next_step($current, $steps, $action);
+		$next = 'save' === $action ? $current : self::assistant_next_step($current, $steps, $action);
 		$state['current'] = $next;
 		update_option('aikb_setup_assistant', $state, false);
-		wp_send_json_success(array('step' => $next, 'completed' => (array) ($state['completed'] ?? array()), 'finished' => !empty($state['finished'])));
+		wp_send_json_success(array('step' => $next, 'completed' => (array) ($state['completed'] ?? array()), 'finished' => !empty($state['finished']), 'message' => __('Guardado correctamente.', 'ai-knowledge')));
 	}
 
 	protected static function assistant_next_step($current, $steps, $action)
