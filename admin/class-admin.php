@@ -201,7 +201,6 @@ class Admin
 		update_option('aikb_setup_assistant', $state, false);
 		echo '<div class="wookb-wrap wookb-assistant">';
 		echo '<div class="wookb-assistant-header"><div class="wookb-assistant-brand"><strong>' . esc_html__('AI Knowledge & Visibility', 'ai-knowledge') . '</strong><span>' . esc_html(sprintf(__('Versión %s', 'ai-knowledge'), AIKB_VERSION)) . '</span></div><a class="button" href="' . esc_url(admin_url('admin.php?page=ai-knowledge')) . '">' . esc_html__('Salir', 'ai-knowledge') . '</a></div>';
-		echo '<div class="wookb-assistant-heading"><h1>' . esc_html__('Asistente de configuración', 'ai-knowledge') . '</h1><div class="wookb-assistant-breadcrumb"><span>' . esc_html__('Asistente de configuración', 'ai-knowledge') . '</span><span aria-hidden="true">&gt;</span><strong data-assistant-breadcrumb>' . esc_html($steps[$current]['title']) . '</strong></div></div>';
 		echo '<ol class="wookb-assistant-progress" aria-label="' . esc_attr__('Progreso del asistente', 'ai-knowledge') . '">';
 		$step_position = 0;
 		$current_position = array_search($current, array_keys($steps), true);
@@ -214,7 +213,8 @@ class Admin
 			$step_position++;
 		}
 		echo '</ol>';
-		echo '<div class="wookb-card" data-assistant-panel><h2 data-assistant-title>' . esc_html($steps[$current]['title']) . '</h2><p data-assistant-description>' . esc_html($steps[$current]['description']) . '</p>';
+		echo '<div class="wookb-assistant-breadcrumb"><span>' . esc_html__('Asistente de configuración', 'ai-knowledge') . '</span><span aria-hidden="true">&gt;</span><strong data-assistant-breadcrumb>' . esc_html($steps[$current]['title']) . '</strong></div>';
+		echo '<div class="wookb-card" data-assistant-panel><p data-assistant-description>' . esc_html($steps[$current]['description']) . '</p>';
 		if ('welcome' === $current) {
 			echo '<div class="wookb-assistant-welcome-copy">';
 			echo '<h3>' . esc_html__('Qué revisaremos', 'ai-knowledge') . '</h3><ul>';
@@ -257,8 +257,29 @@ class Admin
 			'visibility' => array(__('Publicación y crawlers', 'ai-knowledge'), __('Revisa la publicación de llms.txt, Markdown, JSON y JSON-LD, junto con las familias de crawlers que podrán acceder a cada recurso.', 'ai-knowledge')),
 			'finish' => array(__('Revisión final', 'ai-knowledge'), __('Comprueba los límites de generación, guarda la configuración y decide si quieres iniciar ahora la cola de documentos.', 'ai-knowledge')),
 		);
+		$fields = array(
+			'ai' => array(__('Origen de IA', 'ai-knowledge'), __('Modelo', 'ai-knowledge'), __('Estado de la conexión', 'ai-knowledge')),
+			'content' => array(__('Modo de selección', 'ai-knowledge'), __('Tipos de contenido incluidos', 'ai-knowledge'), __('Tipos de contenido excluidos', 'ai-knowledge')),
+			'business' => array(__('Nombre del negocio', 'ai-knowledge'), __('Dirección y país', 'ai-knowledge'), __('Idioma principal', 'ai-knowledge'), __('Público objetivo', 'ai-knowledge'), __('Contacto', 'ai-knowledge'), __('Horario', 'ai-knowledge'), __('Enfoque del negocio', 'ai-knowledge')),
+			'woocommerce' => array(__('Nombre de la tienda', 'ai-knowledge'), __('Moneda y país base', 'ai-knowledge'), __('Pedido mínimo o envío gratis', 'ai-knowledge'), __('Recogida en tienda', 'ai-knowledge'), __('Plazo de entrega', 'ai-knowledge'), __('Contacto y horario', 'ai-knowledge')),
+			'chatbot' => array(__('Límite de documentos relacionados', 'ai-knowledge'), __('Páginas de referencia', 'ai-knowledge'), __('Información adicional', 'ai-knowledge'), __('Comportamiento del chatbot', 'ai-knowledge'), __('Borrador editable', 'ai-knowledge')),
+			'visibility' => array(__('Formatos públicos', 'ai-knowledge'), __('Búsqueda y citas IA', 'ai-knowledge'), __('Asistentes bajo demanda', 'ai-knowledge'), __('Entrenamiento', 'ai-knowledge'), __('SEO y scraping', 'ai-knowledge'), __('Archivado y datasets', 'ai-knowledge'), __('Scanners de seguridad', 'ai-knowledge'), __('robots.txt', 'ai-knowledge'), __('.htaccess', 'ai-knowledge')),
+			'finish' => array(__('Largo del texto', 'ai-knowledge'), __('Tokens de salida', 'ai-knowledge'), __('IndexNow', 'ai-knowledge'), __('Generación inicial', 'ai-knowledge')),
+		);
 		if (!isset($content[$step])) return '';
-		return '<section class="wookb-assistant-screen-section"><h3>' . esc_html($content[$step][0]) . '</h3><p>' . esc_html($content[$step][1]) . '</p><div class="wookb-assistant-placeholder">' . esc_html__('Los campos específicos de este paso se cargarán aquí y reutilizarán la configuración existente del plugin.', 'ai-knowledge') . '</div></section>';
+		$html = '<section class="wookb-assistant-screen-section"><h3>' . esc_html($content[$step][0]) . '</h3><p>' . esc_html($content[$step][1]) . '</p><div class="wookb-assistant-fields">';
+		foreach ((array) ($fields[$step] ?? array()) as $index => $label) {
+			$html .= '<label class="wookb-assistant-field"><span>' . esc_html($label) . '</span>';
+			if (in_array($label, array(__('Información adicional', 'ai-knowledge'), __('Comportamiento del chatbot', 'ai-knowledge'), __('Borrador editable', 'ai-knowledge'), __('Enfoque del negocio', 'ai-knowledge')), true)) {
+				$html .= '<textarea rows="3" data-assistant-preview-field></textarea>';
+			} elseif (false !== strpos(strtolower($label), 'estado') || false !== strpos(strtolower($label), 'modo') || false !== strpos(strtolower($label), 'origen') || false !== strpos(strtolower($label), 'generación')) {
+				$html .= '<select data-assistant-preview-field><option>' . esc_html__('Seleccionar', 'ai-knowledge') . '</option></select>';
+			} else {
+				$html .= '<input type="text" data-assistant-preview-field />';
+			}
+			$html .= '</label>';
+		}
+		return $html . '</div></section>';
 	}
 
 	protected static function assistant_available_steps()
@@ -344,10 +365,15 @@ class Admin
 		wp_enqueue_script('wookb-admin', AIKB_URL . 'assets/admin.js', array('jquery', 'wp-i18n'), AIKB_VERSION, true);
 		wp_set_script_translations('wookb-admin', 'ai-knowledge', AIKB_DIR . 'languages');
 		if (false !== strpos($hook, 'ai-knowledge-assistant')) {
+			$screen_content = array();
+			foreach (array_keys(self::assistant_available_steps()) as $step_key) {
+				$screen_content[$step_key] = self::assistant_screen_content($step_key);
+			}
 			wp_localize_script('wookb-admin', 'aikbAssistant', array(
 				'ajaxUrl' => admin_url('admin-ajax.php'),
 				'nonce' => wp_create_nonce('aikb_assistant_ajax'),
 				'steps' => self::assistant_available_steps(),
+				'screenContent' => $screen_content,
 			));
 		}
 	}
