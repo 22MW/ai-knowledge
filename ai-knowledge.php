@@ -64,6 +64,15 @@ spl_autoload_register(
  * Activación: crea la tabla de registro y la carpeta wp-content/llm/.
  */
 function wookb_activate() {
+	update_option( 'aikb_setup_assistant', array(
+		'version'    => '1',
+		'initiated'  => false,
+		'current'    => 'welcome',
+		'completed'  => array(),
+		'skipped'    => array(),
+		'finished'   => false,
+		'last_opened'=> current_time( 'mysql' ),
+	), false );
 	require_once AIKB_DIR . 'includes/class-registry.php';
 	\AIKB\Registry::create_table();
 

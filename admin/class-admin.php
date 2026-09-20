@@ -18,6 +18,9 @@ class Admin
 	public static function init()
 	{
 		add_action('admin_menu', array(__CLASS__, 'menu'));
+		add_filter('plugin_action_links_' . plugin_basename(AIKB_FILE), array(__CLASS__, 'plugin_action_links'));
+		add_action('admin_init', array(__CLASS__, 'maybe_open_assistant'));
+		add_action('wp_ajax_aikb_assistant_navigate', array(__CLASS__, 'assistant_navigate'));
 		$ajax_actions = array(
 			'wookb_save_content' => 'save_content',
 			'wookb_save_settings' => 'save_settings',
@@ -121,6 +124,156 @@ class Admin
 				array(__CLASS__, 'render')
 			);
 		}
+		add_submenu_page(
+			'ai-knowledge',
+			__('Asistente de configuración', 'ai-knowledge'),
+			__('Asistente', 'ai-knowledge'),
+			self::capability(),
+			'ai-knowledge-assistant',
+			array(__CLASS__, 'render_assistant')
+		);
+	}
+
+	public static function plugin_action_links($links)
+	{
+		if (current_user_can(self::capability())) {
+			array_unshift($links, '<a href="' . esc_url(admin_url('admin.php?page=ai-knowledge-assistant')) . '">' . esc_html__('Abrir asistente', 'ai-knowledge') . '</a>');
+		}
+		return $links;
+	}
+
+	public static function maybe_open_assistant()
+	{
+		if (!is_admin() || !current_user_can(self::capability()) || wp_doing_ajax() || (empty($_GET['activate']) && empty($_GET['activate-multi']))) { // phpcs:ignore
+			return;
+		}
+		$state = get_option('aikb_setup_assistant', array());
+		if (!empty($state['initiated']) || !empty($state['finished'])) {
+			return;
+		}
+		$state['initiated'] = true;
+		$state['last_opened'] = current_time('mysql');
+		update_option('aikb_setup_assistant', $state, false);
+		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge-assistant'));
+		exit;
+	}
+
+	public static function render_assistant()
+	{
+		if (!current_user_can(self::capability())) {
+			wp_die(esc_html__('No tienes permisos suficientes.', 'ai-knowledge'));
+		}
+		$steps = self::assistant_available_steps();
+		$state = get_option('aikb_setup_assistant', array('current' => 'welcome', 'completed' => array(), 'skipped' => array()));
+		$current = isset($_GET['step']) ? sanitize_key(wp_unslash($_GET['step'])) : (isset($state['current']) ? $state['current'] : 'welcome'); // phpcs:ignore
+		if (!isset($steps[$current])) {
+			$current = 'welcome';
+		}
+		if ('POST' === $_SERVER['REQUEST_METHOD'] && isset($_POST['aikb_assistant_nonce'])) { // phpcs:ignore
+			check_admin_referer('aikb_assistant', 'aikb_assistant_nonce');
+			$action = isset($_POST['assistant_action']) ? sanitize_key(wp_unslash($_POST['assistant_action'])) : 'continue';
+			$current = isset($_POST['assistant_step']) ? sanitize_key(wp_unslash($_POST['assistant_step'])) : $current;
+			if (!isset($steps[$current])) {
+				$current = 'welcome';
+			}
+			$state['initiated'] = true;
+			$state['current'] = $current;
+			$state['last_opened'] = current_time('mysql');
+			if ('skip' === $action) {
+				$state['skipped'] = array_values(array_unique(array_merge((array) ($state['skipped'] ?? array()), array($current))));
+			} elseif ('finish' === $action) {
+				$state['finished'] = true;
+				$state['completed'] = array_values(array_unique(array_merge((array) ($state['completed'] ?? array()), array($current))));
+			} elseif ('exit' !== $action) {
+				$state['completed'] = array_values(array_unique(array_merge((array) ($state['completed'] ?? array()), array($current))));
+			}
+			$next = self::assistant_next_step($current, $steps, $action);
+			if ('exit' === $action) {
+				update_option('aikb_setup_assistant', $state, false);
+				wp_safe_redirect(admin_url('admin.php?page=ai-knowledge'));
+				exit;
+			}
+			$state['current'] = $next;
+			update_option('aikb_setup_assistant', $state, false);
+			$current = $next;
+		}
+		$state['last_opened'] = current_time('mysql');
+		update_option('aikb_setup_assistant', $state, false);
+		echo '<div class="wookb-wrap wookb-assistant">';
+		echo '<div class="wookb-header-row"><h1>' . esc_html__('Asistente de configuración', 'ai-knowledge') . '</h1><a class="button" href="' . esc_url(admin_url('admin.php?page=ai-knowledge')) . '">' . esc_html__('Salir', 'ai-knowledge') . '</a></div>';
+		echo '<ol class="wookb-assistant-progress" aria-label="' . esc_attr__('Progreso del asistente', 'ai-knowledge') . '">';
+		$step_position = 0;
+		$current_position = array_search($current, array_keys($steps), true);
+		foreach ($steps as $key => $step) {
+			$active = $key === $current ? ' is-active' : '';
+			$done = in_array($key, (array) ($state['completed'] ?? array()), true) ? ' is-done' : '';
+			$past = ($step_position < $current_position) ? ' is-past' : '';
+			$future = ($step_position > $current_position) ? ' is-future' : '';
+			echo '<li class="' . esc_attr($active . $done . $past . $future) . '" data-assistant-step="' . esc_attr($key) . '" aria-label="' . esc_attr($step['title']) . '" title="' . esc_attr($step['title']) . '"><span>' . esc_html($step['number']) . '</span></li>';
+			$step_position++;
+		}
+		echo '</ol>';
+		echo '<div class="wookb-card" data-assistant-panel><h2 data-assistant-title>' . esc_html($steps[$current]['title']) . '</h2><p data-assistant-description>' . esc_html($steps[$current]['description']) . '</p>';
+		if (!empty($steps[$current]['link'])) {
+			echo '<p data-assistant-link-wrap><a class="button" data-assistant-link target="_blank" rel="noopener noreferrer" href="' . esc_url($steps[$current]['link']) . '">' . esc_html__('Abrir configuración completa', 'ai-knowledge') . '</a></p>';
+		}
+		echo '<form method="post" data-assistant-form>' . wp_nonce_field('aikb_assistant', 'aikb_assistant_nonce', true, false) . '<input type="hidden" name="assistant_step" value="' . esc_attr($current) . '"><p class="submit">';
+		if ('welcome' !== $current) {
+			echo '<button class="button" name="assistant_action" value="back">' . esc_html__('Atrás', 'ai-knowledge') . '</button> ';
+		}
+		echo '<button class="button" name="assistant_action" value="skip">' . esc_html__('Saltar este paso', 'ai-knowledge') . '</button> <button class="button button-primary" name="assistant_action" value="' . esc_attr('finish' === $current ? 'finish' : 'continue') . '">' . esc_html('finish' === $current ? __('Terminar', 'ai-knowledge') : __('Continuar', 'ai-knowledge')) . '</button></p></form></div></div>';
+	}
+
+	protected static function assistant_steps()
+	{
+		return array(
+			'welcome' => array('number' => 1, 'title' => __('Bienvenida', 'ai-knowledge'), 'description' => __('AI Knowledge convierte el contenido de tu sitio en documentos preparados para buscadores, asistentes y sistemas de inteligencia artificial. Este recorrido revisará contigo las decisiones principales sin borrar una configuración existente. Puedes saltar cualquier paso, salir cuando quieras y continuar más adelante desde el mismo punto.', 'ai-knowledge')),
+			'ai' => array('number' => 2, 'title' => __('Origen de IA', 'ai-knowledge'), 'description' => __('Elige el servicio que ayudará a redactar y mejorar los documentos. AI Knowledge utiliza las conexiones ya configuradas mediante los Conectores de WordPress o Support Genix y nunca guarda aquí sus claves. Si todavía no existe una conexión, puedes continuar sin IA y configurarla después.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=ajustes')),
+			'content' => array('number' => 3, 'title' => __('Contenido y alcance', 'ai-knowledge'), 'description' => __('Decide qué tipos de contenido público deben formar parte de la base de conocimiento. La selección determina qué entradas, páginas, productos u otros contenidos podrán generar documentos. Las taxonomías, términos, identificadores y campos personalizados permanecen disponibles en la configuración avanzada.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=contenido')),
+			'business' => array('number' => 4, 'title' => __('Negocio', 'ai-knowledge'), 'description' => __('Añade la información estable que una IA necesita para comprender correctamente tu negocio: identidad, ubicación, público, contacto, horario y enfoque. Estos datos complementan el contenido del sitio y ayudan a producir respuestas coherentes sin inventar información.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=negocio')),
+			'woocommerce' => array('number' => 5, 'title' => __('WooCommerce', 'ai-knowledge'), 'description' => __('Revisa los datos generales de la tienda, el país, la moneda, las condiciones de compra, la recogida, los plazos y el contacto. Los envíos, impuestos, pagos, categorías y otras opciones avanzadas pueden completarse después en una ventana nueva sin perder el progreso.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=woocommerce')),
+			'chatbot' => array('number' => 6, 'title' => __('Chatbot', 'ai-knowledge'), 'description' => __('Configura cómo Support Genix utilizará la base de conocimiento, cuántos documentos relacionados podrá consultar y qué información adicional debe tener en cuenta. Este paso solo aparece cuando la integración está disponible.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=prompt')),
+			'visibility' => array('number' => 7, 'title' => __('Visibilidad IA', 'ai-knowledge'), 'description' => __('Controla cómo se publican llms.txt, Markdown, JSON y JSON-LD, y decide qué familias de crawlers pueden acceder al sitio. Antes de aplicar cambios en robots.txt o .htaccess podrás revisar la propuesta y conservar una copia de seguridad.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=visibilidad-ia')),
+			'finish' => array('number' => 8, 'title' => __('Ajustes y final', 'ai-knowledge'), 'description' => __('Comprueba los límites de texto y generación antes de terminar. Puedes guardar la configuración sin crear documentos o iniciar la generación utilizando la cola existente y su límite diario. Los pasos omitidos seguirán disponibles cuando vuelvas a abrir el asistente.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=ajustes')),
+		);
+	}
+
+	protected static function assistant_available_steps()
+	{
+		$steps = self::assistant_steps();
+		if (!class_exists('WooCommerce')) unset($steps['woocommerce']);
+		if (!Chatbot_Prompt::is_genix_ready()) unset($steps['chatbot']);
+		return $steps;
+	}
+
+	public static function assistant_navigate()
+	{
+		if (!current_user_can(self::capability())) wp_send_json_error(array('message' => __('No tienes permisos suficientes.', 'ai-knowledge')), 403);
+		check_ajax_referer('aikb_assistant_ajax', 'nonce');
+		$steps = self::assistant_available_steps();
+		$current = isset($_POST['step']) ? sanitize_key(wp_unslash($_POST['step'])) : 'welcome';
+		$action = isset($_POST['assistant_action']) ? sanitize_key(wp_unslash($_POST['assistant_action'])) : 'continue';
+		if (!isset($steps[$current])) wp_send_json_error(array('message' => __('Paso no válido.', 'ai-knowledge')), 400);
+		$state = get_option('aikb_setup_assistant', array());
+		$state['initiated'] = true;
+		$state['last_opened'] = current_time('mysql');
+		if ('skip' === $action) $state['skipped'] = array_values(array_unique(array_merge((array) ($state['skipped'] ?? array()), array($current))));
+		elseif ('finish' === $action) $state['finished'] = true;
+		elseif ('back' !== $action) $state['completed'] = array_values(array_unique(array_merge((array) ($state['completed'] ?? array()), array($current))));
+		$next = self::assistant_next_step($current, $steps, $action);
+		$state['current'] = $next;
+		update_option('aikb_setup_assistant', $state, false);
+		wp_send_json_success(array('step' => $next, 'completed' => (array) ($state['completed'] ?? array()), 'finished' => !empty($state['finished'])));
+	}
+
+	protected static function assistant_next_step($current, $steps, $action)
+	{
+		$keys = array_keys($steps);
+		$index = array_search($current, $keys, true);
+		if ('back' === $action) {
+			return $keys[max(0, $index - 1)];
+		}
+		return $keys[min(count($keys) - 1, $index + 1)];
 	}
 
 	/**
@@ -167,6 +320,13 @@ class Admin
 		wp_enqueue_style('wookb-admin', AIKB_URL . 'assets/admin.css', array('wookb-theme'), AIKB_VERSION);
 		wp_enqueue_script('wookb-admin', AIKB_URL . 'assets/admin.js', array('jquery', 'wp-i18n'), AIKB_VERSION, true);
 		wp_set_script_translations('wookb-admin', 'ai-knowledge', AIKB_DIR . 'languages');
+		if (false !== strpos($hook, 'ai-knowledge-assistant')) {
+			wp_localize_script('wookb-admin', 'aikbAssistant', array(
+				'ajaxUrl' => admin_url('admin-ajax.php'),
+				'nonce' => wp_create_nonce('aikb_assistant_ajax'),
+				'steps' => self::assistant_available_steps(),
+			));
+		}
 	}
 
 	public static function render()

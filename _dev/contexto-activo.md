@@ -16,6 +16,19 @@
 - Los planes y documentos temporales se conservan en `_dev/temp/`; la
   documentación vigente permanece fuera de esa carpeta.
 
+## Asistente de configuración — implementación inicial — 2026-09-20
+
+- Añadido el estado persistente `aikb_setup_assistant`, sin duplicar ajustes
+  del plugin ni almacenar credenciales.
+- Añadidos menú propio, enlace desde la fila del plugin y apertura única tras
+  activación para usuarios con la capability existente.
+- Implementada navegación con progreso, continuar, atrás, saltar, salir,
+  reanudación y finalización.
+- WooCommerce y Chatbot aparecen solo cuando sus dependencias están activas;
+  cada paso enlaza a la pantalla completa existente.
+- Pendiente de QA manual en WordPress: activación, permisos, reanudación,
+  modo oscuro, enlaces de configuración y flujo con JavaScript desactivado.
+
 ## Confirmado (Fases 0-11 completas + reestructuración Negocio/Chatbot/FAQs/WooCommerce)
 
 Fase 10 (plan conjunto de UX del admin, 5 piezas) completa. Además, tras
