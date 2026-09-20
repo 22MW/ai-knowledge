@@ -1,5 +1,6 @@
 (function ($) {
 	'use strict';
+	var __ = window.wp && window.wp.i18n ? window.wp.i18n.__ : function (text) { return text; };
 
 	/**
 	 * Tema oscuro/claro (Tabler), encapsulado en .wookb-wrap: no se toca
@@ -79,7 +80,7 @@
 			} );
 			$count.text( visible + ' de ' + $rows.length );
 			$toggle.toggle( ! filtering && $rows.length > 10 );
-			$toggle.text( expanded ? 'Mostrar menos crawlers' : 'Ver todos los crawlers' );
+			$toggle.text( expanded ? __( 'Mostrar menos crawlers', 'ai-knowledge' ) : __( 'Ver todos los crawlers', 'ai-knowledge' ) );
 		}
 		$filters.on( 'change', 'select', applyCrawlerFilters );
 		$toggle.on( 'click', function () {
@@ -141,10 +142,10 @@
 			var originalSubmitText = isInputSubmit ? $submit.val() : $submit.html();
 			$submit.data( 'wookb-original-text', originalSubmitText ).prop( 'disabled', true ).attr( 'aria-busy', 'true' );
 			if ( isInputSubmit ) {
-				$submit.val( 'Procesando…' );
+				$submit.val( __( 'Procesando…', 'ai-knowledge' ) );
 				$submit.after( '<span class="wookb-spinner wookb-spinner-sibling" aria-hidden="true"></span>' );
 			} else {
-				$submit.html( '<span class="wookb-spinner" aria-hidden="true"></span><span>Procesando…</span>' );
+				$submit.html( '<span class="wookb-spinner" aria-hidden="true"></span><span>' + __( 'Procesando…', 'ai-knowledge' ) + '</span>' );
 			}
 			$form.next( '.wookb-ajax-notice' ).remove();
 
@@ -164,9 +165,9 @@
 				return response.json();
 			} ).then( function ( result ) {
 				if ( ! result.success ) {
-					throw new Error( result.data && result.data.message ? result.data.message : 'No se pudo guardar.' );
+					throw new Error( result.data && result.data.message ? result.data.message : __( 'No se pudo guardar.', 'ai-knowledge' ) );
 				}
-				var message = result.data && result.data.message ? result.data.message : 'Guardado.';
+				var message = result.data && result.data.message ? result.data.message : __( 'Guardado.', 'ai-knowledge' );
 				var value = result.data && (result.data.draft || result.data.polished);
 				if ( value ) {
 					if ( 'wookb_generate_business_summary_draft' === action ) {
@@ -183,7 +184,7 @@
 				$form.next( '.wookb-ajax-notice' ).find( 'p' ).text( message );
 			} ).catch( function ( error ) {
 				$form.after( '<div class="notice notice-error inline wookb-ajax-notice"><p></p></div>' );
-				$form.next( '.wookb-ajax-notice' ).find( 'p' ).text( 'No se pudo guardar sin recargar. Revisa la sesión y vuelve a intentarlo. (' + error.message + ')' );
+				$form.next( '.wookb-ajax-notice' ).find( 'p' ).text( __( 'No se pudo guardar sin recargar. Revisa la sesión y vuelve a intentarlo.', 'ai-knowledge' ) + ' (' + error.message + ')' );
 			} ).finally( function () {
 				delete form.dataset.wookbAjaxBusy;
 				if ( isInputSubmit ) {
@@ -218,7 +219,7 @@
 				return $( template.innerHTML ).filter( '#' + anchor ).length > 0;
 			} );
 			if ( validInCurrent || validInTemplate ) {
-				$heading.append( ' <button type="button" class="button-link wookb-doc-heading-link" data-wookb-doc-open="' + $wrap.data( 'wookb-doc-tab' ) + '" data-wookb-doc-anchor="' + anchor + '" aria-label="Abrir esta sección de documentación">?</button>' );
+			$heading.append( ' <button type="button" class="button-link wookb-doc-heading-link" data-wookb-doc-open="' + $wrap.data( 'wookb-doc-tab' ) + '" data-wookb-doc-anchor="' + anchor + '" aria-label="' + __( 'Abrir esta sección de documentación', 'ai-knowledge' ) + '">?</button>' );
 			}
 		} );
 		function closeDocs() {
@@ -249,7 +250,7 @@
 			var template = $drawer.find( '[data-wookb-doc-template="' + file + '"]' )[ 0 ];
 			if ( ! template ) { return; }
 			$content.html( template.innerHTML );
-			$title.text( 'Documentación' );
+			$title.text( __( 'Documentación', 'ai-knowledge' ) );
 			$back.prop( 'hidden', false ).trigger( 'focus' );
 			var anchor = String( $( this ).data( 'wookb-doc-anchor' ) || '' );
 			if ( anchor ) {
@@ -288,7 +289,7 @@
 				return;
 			}
 			navigator.clipboard.writeText( target.value ).then( function () {
-				window.alert( 'Código copiado.' );
+				window.alert( __( 'Código copiado.', 'ai-knowledge' ) );
 			} );
 		} );
 

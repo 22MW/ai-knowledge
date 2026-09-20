@@ -165,7 +165,8 @@ class Admin
 		wp_enqueue_style('wookb-tabler', AIKB_URL . 'assets/tabler.min.css', array(), AIKB_VERSION);
 		wp_enqueue_style('wookb-theme', AIKB_URL . 'assets/wookb-theme.css', array('wookb-tabler'), AIKB_VERSION);
 		wp_enqueue_style('wookb-admin', AIKB_URL . 'assets/admin.css', array('wookb-theme'), AIKB_VERSION);
-		wp_enqueue_script('wookb-admin', AIKB_URL . 'assets/admin.js', array('jquery'), AIKB_VERSION, true);
+		wp_enqueue_script('wookb-admin', AIKB_URL . 'assets/admin.js', array('jquery', 'wp-i18n'), AIKB_VERSION, true);
+		wp_set_script_translations('wookb-admin', 'ai-knowledge', AIKB_DIR . 'languages');
 	}
 
 	public static function render()
@@ -249,7 +250,7 @@ class Admin
 		if (empty($docs[$tab])) {
 			return;
 		}
-		$file = AIKB_DIR . 'docs/' . $docs[$tab];
+		$file = self::documentation_file($docs[$tab]);
 		if (!is_readable($file)) {
 			return;
 		}
@@ -260,12 +261,27 @@ class Admin
 		echo '<div class="wookb-doc-drawer-header"><button type="button" class="button-link wookb-doc-back" data-wookb-doc-back hidden>←</button><h2>' . esc_html($title) . '</h2><button type="button" class="button-link" data-wookb-doc-close aria-label="' . esc_attr__('Cerrar documentación', 'ai-knowledge') . '">×</button></div>';
 		echo '<div class="wookb-doc-drawer-content">' . $content . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitizado por markdown_to_html
 		foreach ($docs as $doc_file) {
-			if ($doc_file === $docs[$tab] || ! is_readable(AIKB_DIR . 'docs/' . $doc_file)) {
+			$doc_path = self::documentation_file($doc_file);
+			if ($doc_file === $docs[$tab] || ! is_readable($doc_path)) {
 				continue;
 			}
-			echo '<template data-wookb-doc-template="' . esc_attr($doc_file) . '">' . self::markdown_to_html((string) file_get_contents(AIKB_DIR . 'docs/' . $doc_file)) . '</template>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<template data-wookb-doc-template="' . esc_attr($doc_file) . '">' . self::markdown_to_html((string) file_get_contents($doc_path)) . '</template>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 		echo '</aside>';
+	}
+
+	/**
+	 * Returns a locale-specific documentation file, falling back to Spanish.
+	 */
+	protected static function documentation_file($filename)
+	{
+		$filename = basename((string) $filename);
+		$locale   = function_exists('determine_locale') ? determine_locale() : get_locale();
+		$localized = AIKB_DIR . 'docs/' . sanitize_file_name($locale) . '/' . $filename;
+		if (is_readable($localized)) {
+			return $localized;
+		}
+		return AIKB_DIR . 'docs/' . $filename;
 	}
 
 	protected static function markdown_to_html($markdown)

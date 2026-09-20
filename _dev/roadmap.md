@@ -30,6 +30,34 @@ No presentar este flujo como validado hasta realizar esas pruebas.
 
 ## Próximas mejoras, sin empezar
 
+### Internacionalización del plugin y documentación por idioma
+
+Implementación local realizada; queda pendiente la prueba visual y la
+traducción lingüística real de los catálogos:
+
+- Crear `languages/ai-knowledge.pot` como plantilla universal.
+- Crear inicialmente `languages/ai-knowledge-es_ES.po`; el español es el
+  idioma base.
+- Revisar todos los textos visibles del plugin: PHP, JavaScript, botones,
+  errores, avisos y mensajes AJAX.
+- Internacionalizar los textos dinámicos de `assets/admin.js` y generar el
+  JSON de traducción JavaScript si WordPress lo necesita.
+- Mantener `docs/` como documentación base en español.
+- Permitir traducciones opcionales en `docs/{locale}/`, por ejemplo
+  `docs/en_US/` o `docs/fr_FR/`.
+- Si existe `docs/{locale}/archivo.md`, usarlo; si no existe, usar
+  `docs/archivo.md` como fallback.
+- No crear ahora copias traducidas de los `.md`, ni sustituir ni borrar la
+  documentación española.
+
+Implementado: `class-admin.php` selecciona `docs/{locale}/archivo.md` cuando
+existe y vuelve a `docs/archivo.md` cuando no existe; `admin.js` usa
+`wp.i18n`; el script se encola con `wp-i18n` y carga sus traducciones.
+
+Los catálogos inglés y catalán están completados; sus `.mo` y JSON JavaScript
+se incluyen en el release `1.1.3`. Pendiente únicamente el QA visual en
+WordPress con cada locale activo.
+
 ### Visibilidad IA, reglas y `llms.txt`
 
 La implementación está cerrada y trasladada al histórico. Solo queda el QA
@@ -70,7 +98,8 @@ Hay estilos inline como `style="width:100%"` en varias vistas. Detectado, no abo
 ## Ideas sin planificar
 
 - Tags dinámicos en prompts y texto manual (`{post.title}`, datos de producto, etc.).
-- Onboarding por pasos para la primera configuración.
+- Asistente de configuración por pasos: consultar el plan de asistente en _dev.
+  MVP pendiente de validación funcional antes de implementar.
 - Cobertura de Google en avisos en tiempo real mediante Search Console Indexing API con OAuth propio. IndexNow no cubre Google.
 - Actualizar OpenAPI con las rutas de feeds. Está explícitamente fuera del alcance actual.
 

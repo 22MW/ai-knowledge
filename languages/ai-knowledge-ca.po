@@ -1,0 +1,1895 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: AI Knowledge & Visibility 1.1.2.2\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/ai-knowledge\n"
+"Last-Translator: \n"
+"Language-Team: Catalan\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-09-19T12:52:21+00:00\n"
+"PO-Revision-Date: 2026-09-19 17:46+0200\n"
+"Language: ca\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.9\n"
+"X-Domain: ai-knowledge\n"
+
+#. Plugin Name of the plugin
+msgid "AI Knowledge & Visibility"
+msgstr "AI Knowledge & Visibility"
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+msgid "https://22mw.online/"
+msgstr "https://22mw.online/"
+
+#. Description of the plugin
+msgid "Genera documentos de base de conocimiento (.md + posts sgkb-docs de Support Genix) a partir de productos WooCommerce u otros CPTs, con cola, límite diario, WPML y publicación pública GEO vía llms.txt."
+msgstr "Genera documents de base de coneixement (.md + posts sgkb-docs de Support Genix) a partir de productes WooCommerce o altres CPT, amb cua, límit diari, WPML i publicació pública GEO mitjançant llms.txt."
+
+#. Author of the plugin
+msgid "22MW"
+msgstr "22MW"
+
+#: admin/class-admin.php:93
+#: admin/class-admin.php:94
+#: admin/class-admin.php:191
+#: includes/class-editor-metabox.php:50
+msgid "Base de conocimiento IA"
+msgstr "Base de coneixement IA"
+
+#: admin/class-admin.php:134
+msgid "Registro"
+msgstr "Registre"
+
+#: admin/class-admin.php:135
+msgid "Contenido"
+msgstr "Contingut"
+
+#: admin/class-admin.php:136
+#: admin/views/tab-woocommerce.php:270
+msgid "Negocio"
+msgstr "Negoci"
+
+#: admin/class-admin.php:137
+msgid "FAQs"
+msgstr "FAQs"
+
+#: admin/class-admin.php:143
+#: admin/views/tab-ajustes.php:162
+msgid "WooCommerce"
+msgstr "WooCommerce"
+
+#: admin/class-admin.php:148
+msgid "Chatbot"
+msgstr "Chatbot"
+
+#: admin/class-admin.php:150
+msgid "Visibilidad IA"
+msgstr "Visibilitat IA"
+
+#: admin/class-admin.php:151
+#: admin/views/tab-ajustes.php:26
+msgid "Generación masiva"
+msgstr "Generació massiva"
+
+#: admin/class-admin.php:152
+msgid "Ajustes"
+msgstr "Configuració"
+
+#: admin/class-admin.php:175
+#: admin/class-admin.php:407
+#: includes/class-editor-metabox.php:61
+#: includes/class-editor-metabox.php:102
+msgid "No tienes permisos suficientes."
+msgstr "No tens permisos suficients."
+
+#: admin/class-admin.php:192
+msgid "Modo oscuro"
+msgstr "Mode fosc"
+
+#: admin/class-admin.php:197
+#: admin/class-admin.php:417
+#: assets/admin.js:170
+msgid "Guardado."
+msgstr "Desat."
+
+#: admin/class-admin.php:229
+msgid "Leer documentación"
+msgstr "Llegeix la documentació"
+
+#: admin/class-admin.php:257
+#: assets/admin.js:253
+msgid "Documentación"
+msgstr "Documentació"
+
+#: admin/class-admin.php:261
+msgid "Cerrar documentación"
+msgstr "Tanca la documentació"
+
+#: admin/class-admin.php:398
+msgid "Total de documentos:"
+msgstr "Total de documents:"
+
+#: admin/class-admin.php:753
+msgid "No se encontró ningún producto o página con ese ID/URL."
+msgstr "No s'ha trobat cap producte o pàgina amb aquest ID/URL."
+
+#: admin/class-admin.php:758
+msgid "Ese contenido no está dentro del alcance configurado del plugin (pestaña Alcance/Exclusiones)."
+msgstr "Aquest contingut no està dins de l'abast configurat del plugin (pestanya Abast/Exclusions)."
+
+#: admin/class-admin.php:1009
+#: admin/class-admin.php:1067
+msgid "Borrador generado."
+msgstr "Esborrany generat."
+
+#: admin/class-admin.php:1045
+#: admin/class-admin.php:1047
+#: admin/class-admin.php:1112
+msgid "Esta acción requiere Support Genix activo."
+msgstr "Aquesta acció requereix que Support Genix estigui actiu."
+
+#: admin/class-admin.php:1095
+#: admin/class-admin.php:1194
+msgid "Texto pulido."
+msgstr "Text polit."
+
+#: admin/class-admin.php:1280
+msgid "FAQ guardada."
+msgstr "FAQ desada."
+
+#: admin/class-admin.php:1314
+msgid "FAQ generada."
+msgstr "FAQ generada."
+
+#: admin/class-admin.php:1541
+msgid "Selección no válida: elige una de las opciones de la lista."
+msgstr "Selecció no vàlida: tria una de les opcions de la llista."
+
+#: admin/class-admin.php:1547
+msgid "No se pudo resolver la URL pública de ese contenido."
+msgstr "No s'ha pogut resoldre l'URL pública d'aquest contingut."
+
+#: admin/class-admin.php:1600
+msgid "Antes de sustituir llms.txt tienes que descargar la copia actual."
+msgstr "Abans de substituir llms.txt has de descarregar la còpia actual."
+
+#: admin/class-admin.php:1603
+msgid "No se pudo escribir el llms.txt físico en la raíz del sitio."
+msgstr "No s'ha pogut escriure el llms.txt físic a l'arrel del lloc."
+
+#: admin/class-admin.php:1667
+msgid "No se pudo leer el robots.txt actual (ni físico ni virtual) para generar la copia de seguridad."
+msgstr "No s'ha pogut llegir el robots.txt actual (ni físic ni virtual) per generar la còpia de seguretat."
+
+#: admin/class-admin.php:1694
+msgid "Antes de aplicar el bloqueo tienes que descargar la copia actual de robots.txt. Pulsa \"Descargar copia actual\" y vuelve a intentarlo."
+msgstr "Abans d'aplicar el bloqueig has de descarregar la còpia actual de robots.txt. Prem \"Descarrega la còpia actual\" i torna-ho a provar."
+
+#: admin/class-admin.php:1698
+#: admin/views/tab-visibilidad-ia.php:373
+msgid "robots.txt no es escribible en este servidor (permisos de la carpeta raíz)."
+msgstr "robots.txt no es pot escriure en aquest servidor (permisos de la carpeta arrel)."
+
+#: admin/class-admin.php:1719
+#: admin/class-admin.php:1751
+msgid "No se encontró un .htaccess editable en este servidor (nginx u otra configuración): usa el bloque de código manual en su lugar."
+msgstr "No s'ha trobat cap .htaccess editable en aquest servidor (nginx o una altra configuració): utilitza el bloc de codi manual al seu lloc."
+
+#: admin/class-admin.php:1747
+msgid "Antes de aplicar el bloqueo tienes que descargar la copia actual de .htaccess. Pulsa \"Descargar copia actual\" y vuelve a intentarlo."
+msgstr "Abans d'aplicar el bloqueig has de descarregar la còpia actual de .htaccess. Prem \"Descarrega la còpia actual\" i torna-ho a provar."
+
+#. translators: %d: numero de documentos con el origen actualizado desde que se fijaron a mano
+#: admin/class-admin.php:1795
+msgid "%d documento en modo manual tiene el origen actualizado desde que se fijó el texto. %s"
+msgid_plural "%d documentos en modo manual tienen el origen actualizado desde que se fijó el texto. %s"
+msgstr[0] "%d document en mode manual té l'origen actualitzat des que es va fixar el text. %s"
+msgstr[1] "%d documents en mode manual tenen l'origen actualitzat des que es va fixar el text. %s"
+
+#: admin/class-admin.php:1797
+msgid "Revisar en el Registro"
+msgstr "Revisa al Registre"
+
+#. translators: %d: numero de documentos con el origen actualizado desde que se fijaron a mano
+#: admin/class-admin.php:1822
+msgid "KB IA: %d desactualizado(s)"
+msgstr "KB IA: %d desactualitzat(s)"
+
+#: admin/class-registry-table.php:16
+msgid "En cola"
+msgstr "A la cua"
+
+#: admin/class-registry-table.php:17
+msgid "Generando"
+msgstr "Generant"
+
+#: admin/class-registry-table.php:18
+msgid "Listo"
+msgstr "Llest"
+
+#: admin/class-registry-table.php:19
+msgid "Error"
+msgstr "Error"
+
+#: admin/class-registry-table.php:20
+msgid "Sin origen"
+msgstr "Sense origen"
+
+#: admin/class-registry-table.php:38
+msgid "Origen"
+msgstr "Origen"
+
+#: admin/class-registry-table.php:45
+msgid "Idioma"
+msgstr "Idioma"
+
+#: admin/class-registry-table.php:47
+msgid "Estado"
+msgstr "Estat"
+
+#: admin/class-registry-table.php:48
+msgid "Actualizado"
+msgstr "Actualitzat"
+
+#: admin/class-registry-table.php:49
+msgid "Enlaces"
+msgstr "Enllaços"
+
+#: admin/class-registry-table.php:50
+msgid "Control manual"
+msgstr "Control manual"
+
+#: admin/class-registry-table.php:51
+msgid "Acciones"
+msgstr "Accions"
+
+#: admin/class-registry-table.php:112
+msgid "Borrar seleccionados"
+msgstr "Esborra els seleccionats"
+
+#: admin/class-registry-table.php:113
+msgid "Regenerar seleccionados"
+msgstr "Regenera els seleccionats"
+
+#: admin/class-registry-table.php:226
+msgid "Manual"
+msgstr "Manual"
+
+#: admin/class-registry-table.php:228
+msgid "Auto"
+msgstr "Auto"
+
+#: admin/class-registry-table.php:231
+msgid "Origen actualizado"
+msgstr "Origen actualitzat"
+
+#: admin/class-registry-table.php:232
+msgid "Marcar revisado"
+msgstr "Marca com a revisat"
+
+#: admin/class-registry-table.php:290
+msgid "Vuelve a modo automatico y regenera este documento con IA ahora mismo. ¿Continuar?"
+msgstr "Torna al mode automàtic i regenera aquest document amb IA ara mateix. Vols continuar?"
+
+#: admin/class-registry-table.php:306
+msgid "Ajustes avanzados"
+msgstr "Configuració avançada"
+
+#: admin/class-registry-table.php:308
+msgid "Puente:"
+msgstr "Pont:"
+
+#: admin/class-registry-table.php:309
+msgid "Sí"
+msgstr "Sí"
+
+#: admin/class-registry-table.php:311
+msgid "Hash:"
+msgstr "Hash:"
+
+#: admin/class-registry-table.php:317
+msgid "Límite de caracteres"
+msgstr "Límit de caràcters"
+
+#: admin/class-registry-table.php:330
+msgid "Guardar límite"
+msgstr "Desa el límit"
+
+#: admin/class-registry-table.php:331
+msgid "Guardar cambios"
+msgstr "Desa els canvis"
+
+#: admin/class-registry-table.php:333
+msgid "Volver a Auto"
+msgstr "Torna a Auto"
+
+#: admin/class-registry-table.php:373
+msgid "¿Borrar documento y post asociado? El origen se añadirá a \"IDs a excluir\" en Contenido, para que no se vuelva a generar solo (quítalo de esa lista si quieres que se vuelva a generar)."
+msgstr "Vols esborrar el document i el post associat? L'origen s'afegirà a \"IDs a excloure\" a Contingut, perquè no es torni a generar automàticament (treu-lo d'aquesta llista si vols que es torni a generar)."
+
+#: admin/class-registry-table.php:385
+msgid "Generar"
+msgstr "Genera"
+
+#: admin/class-registry-table.php:386
+msgid "Borrar"
+msgstr "Esborra"
+
+#: admin/views/tab-ajustes.php:14
+msgid "Configuración general del generador de documentos: largo del texto, origen de IA y qué post_types muestran el botón de añadir a la base de conocimiento desde su editor."
+msgstr "Configuració general del generador de documents: llargada del text, origen d'IA i quins post_types mostren el botó d'afegir a la base de coneixement des del seu editor."
+
+#. translators: %s: enlace a la pestaña Generación masiva
+#: admin/views/tab-ajustes.php:25
+msgid "El límite diario, el tamaño de lote y el debounce de la cola se editan en %s."
+msgstr "El límit diari, la mida del lot i el debounce de la cua s'editen a %s."
+
+#: admin/views/tab-ajustes.php:32
+msgid "Largo del texto generado (caracteres)"
+msgstr "Llargada del text generat (caràcters)"
+
+#: admin/views/tab-ajustes.php:35
+msgid "El tamaño real del cuerpo de cada documento generado (sin contar el título). Se puede sobrescribir por documento individual desde el Registro."
+msgstr "La mida real del cos de cada document generat (sense comptar el títol). Es pot sobreescriure per document individual des del Registre."
+
+#: admin/views/tab-ajustes.php:39
+msgid "Tokens de salida por documento"
+msgstr "Tokens de sortida per document"
+
+#: admin/views/tab-ajustes.php:42
+msgid "Techo técnico de la petición a la IA (para que la respuesta no se corte a mitad), no el largo del texto — eso lo controla el campo de arriba."
+msgstr "Sostre tècnic de la petició a la IA (perquè la resposta no es talli a la meitat), no la llargada del text — això ho controla el camp de dalt."
+
+#: admin/views/tab-ajustes.php:46
+msgid "Origen de IA"
+msgstr "Origen d'IA"
+
+#: admin/views/tab-ajustes.php:49
+#: admin/views/tab-ajustes.php:59
+msgid "Conectores de WordPress"
+msgstr "Connectors de WordPress"
+
+#: admin/views/tab-ajustes.php:51
+#: admin/views/tab-ajustes.php:59
+msgid "Support Genix"
+msgstr "Support Genix"
+
+#. translators: %1$s modelo, %2$s origen
+#: admin/views/tab-ajustes.php:57
+msgid "Configuración activa: modelo %1$s, origen %2$s."
+msgstr "Configuració activa: model %1$s, origen %2$s."
+
+#: admin/views/tab-ajustes.php:58
+msgid "Automático"
+msgstr "Automàtic"
+
+#: admin/views/tab-ajustes.php:62
+msgid "El origen seleccionado no está conectado."
+msgstr "L'origen seleccionat no està connectat."
+
+#: admin/views/tab-ajustes.php:70
+msgid "Modelo de WordPress"
+msgstr "Model de WordPress"
+
+#: admin/views/tab-ajustes.php:73
+msgid "Automático (recomendado)"
+msgstr "Automàtic (recomanat)"
+
+#: admin/views/tab-ajustes.php:91
+msgid "No hay modelos compatibles conectados todavía."
+msgstr "Encara no hi ha models compatibles connectats."
+
+#: admin/views/tab-ajustes.php:93
+msgid "Automático elige entre los modelos de texto conectados de Anthropic, OpenAI o Google."
+msgstr "Automàtic tria entre els models de text connectats d'Anthropic, OpenAI o Google."
+
+#: admin/views/tab-ajustes.php:95
+msgid "Gestionar Conectores de WordPress"
+msgstr "Gestiona els Connectors de WordPress"
+
+#: admin/views/tab-ajustes.php:101
+msgid "Botón \"Añadir a la base de conocimiento\" en el editor"
+msgstr "Botó \"Afegeix a la base de coneixement\" a l'editor"
+
+#: admin/views/tab-ajustes.php:117
+msgid "Tipos de contenido públicos donde aparece el meta box \"Base de conocimiento IA\" en su editor. Por defecto, todos."
+msgstr "Tipus de contingut públics on apareix el meta box \"Base de coneixement IA\" al seu editor. Per defecte, tots."
+
+#: admin/views/tab-ajustes.php:121
+msgid "Aviso a buscadores (IndexNow)"
+msgstr "Avís als cercadors (IndexNow)"
+
+#: admin/views/tab-ajustes.php:125
+msgid "Avisar a buscadores compatibles con IndexNow (Bing y otros; Google no lo soporta) al crear, actualizar o borrar contenido del alcance."
+msgstr "Avisa els cercadors compatibles amb IndexNow (Bing i altres; Google no ho admet) en crear, actualitzar o esborrar contingut de l'abast."
+
+#. translators: %s: URL del archivo de clave IndexNow
+#: admin/views/tab-ajustes.php:131
+msgid "Clave del sitio (generada automáticamente): %s"
+msgstr "Clau del lloc (generada automàticament): %s"
+
+#: admin/views/tab-ajustes.php:139
+msgid "Guardar ajustes"
+msgstr "Desa la configuració"
+
+#. translators: %s: enlace a la pestaña Prompt
+#: admin/views/tab-ajustes.php:148
+msgid "El prompt de sistema del chatbot se gestiona en la pestaña %s."
+msgstr "El prompt de sistema del chatbot es gestiona a la pestanya %s."
+
+#: admin/views/tab-ajustes.php:149
+msgid "Prompt"
+msgstr "Prompt"
+
+#. translators: %s: enlace a la pestaña WooCommerce
+#: admin/views/tab-ajustes.php:161
+msgid "Los documentos de información de tienda (cómo comprar, condiciones, envío, pago, impuestos) se generan desde la pestaña %s."
+msgstr "Els documents d'informació de la botiga (com comprar, condicions, enviament, pagament, impostos) es generen des de la pestanya %s."
+
+#: admin/views/tab-carga-inicial.php:16
+msgid "Genera de golpe los documentos de todo el contenido dentro del alcance, y ajusta aquí el límite diario, el tamaño de lote y el debounce de la cola."
+msgstr "Genera de cop els documents de tot el contingut dins de l'abast, i ajusta aquí el límit diari, la mida del lot i el debounce de la cua."
+
+#. translators: 1: nº elementos, 2: nº idiomas, 3: total documentos
+#: admin/views/tab-carga-inicial.php:23
+msgid "Alcance actual: %1$d elementos × %2$d idiomas = %3$d documentos posibles."
+msgstr "Abast actual: %1$d elements × %2$d idiomes = %3$d documents possibles."
+
+#: admin/views/tab-carga-inicial.php:30
+msgid "Documentos ya sincronizados: %d."
+msgstr "Documents ja sincronitzats: %d."
+
+#: admin/views/tab-carga-inicial.php:32
+msgid "El límite diario está desactivado — la generación avanzará sin tope."
+msgstr "El límit diari està desactivat — la generació avançarà sense topall."
+
+#: admin/views/tab-carga-inicial.php:34
+msgid "Límite diario actual: %d generaciones/día."
+msgstr "Límit diari actual: %d generacions/dia."
+
+#: admin/views/tab-carga-inicial.php:38
+msgid "Generación en curso (procesando por lotes vía Action Scheduler)."
+msgstr "Generació en curs (processant per lots mitjançant Action Scheduler)."
+
+#: admin/views/tab-carga-inicial.php:42
+msgid "Cancelar generación"
+msgstr "Cancel·la la generació"
+
+#: admin/views/tab-carga-inicial.php:45
+msgid "\"Generar pendientes\" es seguro repetirlo: no regenera lo que ya está sincronizado y sin cambios, solo lo nuevo o lo que falló."
+msgstr "\"Genera pendents\" es pot repetir amb seguretat: no regenera allò que ja està sincronitzat i sense canvis, només el que és nou o ha fallat."
+
+#: admin/views/tab-carga-inicial.php:50
+msgid "Generar pendientes"
+msgstr "Genera pendents"
+
+#: admin/views/tab-carga-inicial.php:52
+msgid "Esto va a REGENERAR también el contenido que ya está sincronizado, no solo lo pendiente. Gasta IA de más y no se puede deshacer. ¿Seguro que quieres continuar?"
+msgstr "Això REGENERARÀ també el contingut que ja està sincronitzat, no només el pendent. Gastarà IA de més i no es pot desfer. Segur que vols continuar?"
+
+#: admin/views/tab-carga-inicial.php:55
+msgid "Reiniciar todo"
+msgstr "Reinicia-ho tot"
+
+#: admin/views/tab-carga-inicial.php:61
+msgid "Revisa la pestaña Registro para ver el progreso, o Herramientas → Scheduled Actions (grupo woo-kb) para el detalle técnico."
+msgstr "Revisa la pestanya Registre per veure el progrés, o Eines → Scheduled Actions (grup woo-kb) per al detall tècnic."
+
+#: admin/views/tab-carga-inicial.php:66
+msgid "Ajustes de la cola"
+msgstr "Configuració de la cua"
+
+#: admin/views/tab-carga-inicial.php:72
+msgid "Límite diario de generaciones"
+msgstr "Límit diari de generacions"
+
+#: admin/views/tab-carga-inicial.php:77
+msgid "Sin límite (usar solo en cargas manuales supervisadas — recuerda desactivarlo al terminar)"
+msgstr "Sense límit (utilitza-ho només en càrregues manuals supervisades — recorda desactivar-ho en acabar)"
+
+#: admin/views/tab-carga-inicial.php:80
+msgid "Aviso: el límite diario está DESACTIVADO."
+msgstr "Avís: el límit diari està DESACTIVAT."
+
+#: admin/views/tab-carga-inicial.php:85
+msgid "Tamaño de lote"
+msgstr "Mida del lot"
+
+#: admin/views/tab-carga-inicial.php:89
+msgid "Retraso de debounce (segundos)"
+msgstr "Retard de debounce (segons)"
+
+#: admin/views/tab-carga-inicial.php:93
+#: admin/views/tab-contenido.php:145
+#: admin/views/tab-negocio.php:41
+#: admin/views/tab-woocommerce.php:293
+msgid "Guardar"
+msgstr "Desa"
+
+#: admin/views/tab-contenido.php:13
+msgid "Qué contenido de tu web entra en la base de conocimiento: qué tipos de contenido, qué categorías/etiquetas concretas, IDs sueltos adicionales o excluidos, y qué campos personalizados se envían a la IA. Nada se genera para lo que no esté incluido aquí, y un ID excluido nunca genera documento aunque su tipo de contenido o término esté incluido."
+msgstr "Quin contingut del teu web entra a la base de coneixement: quins tipus de contingut, quines categories/etiquetes concretes, IDs solts addicionals o exclosos, i quins camps personalitzats s'envien a la IA. No es genera res per a allò que no estigui inclòs aquí, i un ID exclòs mai no genera document encara que el seu tipus de contingut o terme estigui inclòs."
+
+#: admin/views/tab-contenido.php:20
+msgid "Tipos de contenido a incluir"
+msgstr "Tipus de contingut a incloure"
+
+#: admin/views/tab-contenido.php:23
+msgid "Modo"
+msgstr "Mode"
+
+#: admin/views/tab-contenido.php:27
+msgid "Solo los tipos marcados abajo"
+msgstr "Només els tipus marcats a sota"
+
+#: admin/views/tab-contenido.php:31
+msgid "Todos los tipos públicos"
+msgstr "Tots els tipus públics"
+
+#: admin/views/tab-contenido.php:36
+msgid "CPTs a incluir"
+msgstr "CPT a incloure"
+
+#: admin/views/tab-contenido.php:48
+msgid "Solo se usa si el modo es \"Solo los tipos marcados\"."
+msgstr "Només s'utilitza si el mode és \"Només els tipus marcats\"."
+
+#: admin/views/tab-contenido.php:52
+msgid "CPTs a excluir cuando el modo es \"Todos\""
+msgstr "CPT a excloure quan el mode és \"Tots\""
+
+#: admin/views/tab-contenido.php:64
+msgid "Solo se usa si el modo es \"Todos los tipos públicos\": el resto de tipos, presentes y futuros, entra automáticamente."
+msgstr "Només s'utilitza si el mode és \"Tots els tipus públics\": la resta de tipus, presents i futurs, hi entren automàticament."
+
+#: admin/views/tab-contenido.php:68
+msgid "Taxonomías / términos"
+msgstr "Taxonomies / termes"
+
+#: admin/views/tab-contenido.php:95
+msgid "Nada marcado = todos los términos. Marcado = solo entran posts con ese término."
+msgstr "Res marcat = tots els termes. Marcat = només hi entren posts amb aquest terme."
+
+#: admin/views/tab-contenido.php:101
+msgid "IDs sueltos"
+msgstr "IDs solts"
+
+#: admin/views/tab-contenido.php:103
+msgid "IDs a incluir"
+msgstr "IDs a incloure"
+
+#: admin/views/tab-contenido.php:107
+msgid "IDs separados por comas, independiente de CPT/taxonomía."
+msgstr "IDs separats per comes, independentment del CPT/taxonomia."
+
+#: admin/views/tab-contenido.php:109
+msgid "IDs a excluir"
+msgstr "IDs a excloure"
+
+#: admin/views/tab-contenido.php:113
+msgid "IDs separados por comas: nunca generan documento, aunque su tipo de contenido o término esté incluido."
+msgstr "IDs separats per comes: mai no generen document, encara que el seu tipus de contingut o terme estigui inclòs."
+
+#: admin/views/tab-contenido.php:117
+msgid "Campos custom a incluir por CPT"
+msgstr "Camps personalitzats a incloure per CPT"
+
+#: admin/views/tab-contenido.php:139
+msgid "No se detectaron campos custom en los posts analizados."
+msgstr "No s'han detectat camps personalitzats als posts analitzats."
+
+#: admin/views/tab-faqs.php:22
+msgid "Contenido en Markdown que se publica como documento propio (enlazado desde /llms.txt, igual que el resto de documentos) y aparece en la pestaña Registro. Distinto del prompt del chatbot: esto es contenido público, no instrucciones internas."
+msgstr "Contingut en Markdown que es publica com a document propi (enllaçat des de /llms.txt, igual que la resta de documents) i apareix a la pestanya Registre. És diferent del prompt del chatbot: això és contingut públic, no instruccions internes."
+
+#: admin/views/tab-faqs.php:35
+msgid "Cambiar"
+msgstr "Canvia"
+
+#: admin/views/tab-faqs.php:37
+msgid "Sitio multiidioma: una FAQ (y un documento) por idioma, igual que el resto del contenido."
+msgstr "Lloc multilingüe: una FAQ (i un document) per idioma, igual que la resta del contingut."
+
+#: admin/views/tab-faqs.php:49
+msgid "Instrucciones para generar o ampliar las FAQs (opcional)"
+msgstr "Instruccions per generar o ampliar les FAQs (opcional)"
+
+#: admin/views/tab-faqs.php:50
+msgid "Indica el tono, número de preguntas, formato, orden o estructura que quieres."
+msgstr "Indica el to, el nombre de preguntes, el format, l'ordre o l'estructura que vols."
+
+#: admin/views/tab-faqs.php:51
+msgid "Puedes escribir una indicación breve o pegar un prompt completo. Estas instrucciones prevalecen sobre el formato predeterminado, pero solo pueden usar los datos de Negocio y la FAQ actual. Revisa el borrador antes de guardarlo."
+msgstr "Pots escriure una indicació breu o enganxar un prompt complet. Aquestes instruccions prevalen sobre el format predeterminat, però només poden utilitzar les dades de Negoci i la FAQ actual. Revisa l'esborrany abans de desar-lo."
+
+#: admin/views/tab-faqs.php:53
+msgid "Generar/ampliar con IA"
+msgstr "Genera/amplia amb IA"
+
+#: admin/views/tab-faqs.php:54
+msgid "Usa los datos guardados en la pestaña Negocio. Si ya hay FAQ guardada (en este idioma), la amplía o mejora en vez de partir de cero — puedes repetir esto todas las veces que haga falta: amplía los datos de Negocio (guárdalos primero) o edita la FAQ a mano abajo, guarda, y vuelve a generar para mejorar el resultado."
+msgstr "Utilitza les dades desades a la pestanya Negoci. Si ja hi ha una FAQ desada (en aquest idioma), l'amplia o la millora en lloc de començar de zero — pots repetir-ho tantes vegades com calgui: amplia les dades de Negoci (desa-les primer) o edita la FAQ manualment a sota, desa-la i torna a generar per millorar el resultat."
+
+#: admin/views/tab-faqs.php:62
+msgid "Guardar FAQ"
+msgstr "Desa la FAQ"
+
+#: admin/views/tab-negocio.php:17
+msgid "Datos del negocio en sí: válidos con o sin WooCommerce (lo específico de WooCommerce vive en su propia pestaña). Se usan para el prompt del chatbot (pestaña Chatbot, si Genix está activo) y para llms.txt/llm/info.md."
+msgstr "Dades del negoci en si: vàlides amb o sense WooCommerce (el que és específic de WooCommerce viu a la seva pròpia pestanya). S'utilitzen per al prompt del chatbot (pestanya Chatbot, si Genix està actiu) i per a llms.txt/llm/info.md."
+
+#: admin/views/tab-negocio.php:21
+msgid "1. Datos"
+msgstr "1. Dades"
+
+#: admin/views/tab-negocio.php:46
+msgid "2. Resumen para llms.txt (con IA)"
+msgstr "2. Resum per a llms.txt (amb IA)"
+
+#: admin/views/tab-negocio.php:48
+msgid "Genera o pule un resumen independiente usando todos los datos guardados arriba, incluido \"Enfoque del negocio\". Se usa como cita de apertura pública en /llms.txt, el archivo que leen los buscadores de IA. Guardar o borrar este resumen no modifica los datos fuente. Si el resultado se queda corto, amplía los datos de arriba, guárdalos primero y vuelve a generar."
+msgstr "Genera o poleix un resum independent utilitzant totes les dades desades a dalt, inclòs \"Enfocament del negoci\". S'utilitza com a cita d'obertura pública a /llms.txt, el fitxer que llegeixen els cercadors d'IA. Desar o esborrar aquest resum no modifica les dades font. Si el resultat queda curt, amplia les dades de dalt, desa-les primer i torna a generar."
+
+#: admin/views/tab-negocio.php:59
+msgid "Instrucciones para generar o pulir el texto (opcional)"
+msgstr "Instruccions per generar o polir el text (opcional)"
+
+#: admin/views/tab-negocio.php:60
+msgid "Indica el tono, formato, orden o estructura que quieres para el resumen."
+msgstr "Indica el to, el format, l'ordre o l'estructura que vols per al resum."
+
+#: admin/views/tab-negocio.php:61
+msgid "Puedes escribir una indicación breve o pegar un prompt completo. Estas instrucciones prevalecen sobre el formato predeterminado, pero solo pueden usar los datos guardados arriba. Revisa el borrador antes de guardarlo."
+msgstr "Pots escriure una indicació breu o enganxar un prompt complet. Aquestes instruccions prevalen sobre el format predeterminat, però només poden utilitzar les dades desades a dalt. Revisa l'esborrany abans de desar-lo."
+
+#: admin/views/tab-negocio.php:63
+msgid "Generar/pulir con IA"
+msgstr "Genera/poleix amb IA"
+
+#: admin/views/tab-negocio.php:70
+msgid "Guardar resumen"
+msgstr "Desa el resum"
+
+#: admin/views/tab-prompt.php:15
+msgid "Esta pestaña requiere Support Genix activo."
+msgstr "Aquesta pestanya requereix que Support Genix estigui actiu."
+
+#: admin/views/tab-prompt.php:29
+msgid "Cómo debe comportarse el chatbot de Support Genix: tono, qué hacer cuando no sabe algo, qué no debe hacer nunca. Los datos del negocio en sí (dirección, contacto, horario...) se rellenan en la pestaña Negocio — este cuestionario los combina automáticamente con estos al generar el borrador. Responde lo que sepas, opcionalmente añade páginas del sitio como referencia, y genera un primer borrador con IA. Puedes editarlo a mano antes de guardar, pulirlo con IA después de tus cambios, o añadir más respuestas al cuestionario y volver a generar para mejorar el resultado — no hace falta acertar a la primera."
+msgstr "Com s'ha de comportar el chatbot de Support Genix: to, què ha de fer quan no sap alguna cosa, què no ha de fer mai. Les dades del negoci en si (adreça, contacte, horari...) s'emplenen a la pestanya Negoci — aquest qüestionari les combina automàticament amb aquestes en generar l'esborrany. Respon el que sàpigues, opcionalment afegeix pàgines del lloc com a referència, i genera un primer esborrany amb IA. Pots editar-lo manualment abans de desar, polir-lo amb IA després dels teus canvis, o afegir més respostes al qüestionari i tornar a generar per millorar el resultat — no cal encertar-la a la primera."
+
+#: admin/views/tab-prompt.php:37
+msgid "1. Ajustes del chat"
+msgstr "1. Configuració del xat"
+
+#: admin/views/tab-prompt.php:43
+msgid "Límite de \"Documentos relacionados\""
+msgstr "Límit de \"Documents relacionats\""
+
+#: admin/views/tab-prompt.php:46
+msgid "Máximo de enlaces mostrados bajo la respuesta del chatbot. 0 = sin límite."
+msgstr "Màxim d'enllaços mostrats sota la resposta del chatbot. 0 = sense límit."
+
+#: admin/views/tab-prompt.php:50
+msgid "Guardar ajustes del chat"
+msgstr "Desa la configuració del xat"
+
+#: admin/views/tab-prompt.php:55
+msgid "2. Cuestionario"
+msgstr "2. Qüestionari"
+
+#: admin/views/tab-prompt.php:75
+msgid "Páginas de referencia (opcional)"
+msgstr "Pàgines de referència (opcional)"
+
+#: admin/views/tab-prompt.php:77
+msgid "IDs o URLs separados por coma, ej: 12, https://.../sobre-nosotros/"
+msgstr "IDs o URLs separats per comes, ex.: 12, https://.../sobre-nosotros/"
+
+#: admin/views/tab-prompt.php:78
+msgid "Hasta 3. Se lee el contenido real de esas páginas/posts para dar más contexto a la IA (tono, datos concretos)."
+msgstr "Fins a 3. Es llegeix el contingut real d'aquestes pàgines/posts per donar més context a la IA (to, dades concretes)."
+
+#: admin/views/tab-prompt.php:82
+msgid "Información extra (opcional)"
+msgstr "Informació extra (opcional)"
+
+#: admin/views/tab-prompt.php:84
+msgid "Pega aquí cualquier instrucción o dato adicional para esta generación."
+msgstr "Enganxa aquí qualsevol instrucció o dada addicional per a aquesta generació."
+
+#: admin/views/tab-prompt.php:88
+msgid "Generar borrador con IA"
+msgstr "Genera un esborrany amb IA"
+
+#: admin/views/tab-prompt.php:93
+msgid "3. Borrador editable"
+msgstr "3. Esborrany editable"
+
+#: admin/views/tab-prompt.php:94
+msgid "Edita libremente. Cuando termines, puedes pulir la redacción con IA (sin cambiar el fondo) o guardar directamente."
+msgstr "Edita lliurement. Quan acabis, pots polir la redacció amb IA (sense canviar el fons) o desar directament."
+
+#: admin/views/tab-prompt.php:101
+#: admin/views/tab-woocommerce.php:333
+#: admin/views/tab-woocommerce.php:352
+msgid "Pulir redacción con IA"
+msgstr "Poleix la redacció amb IA"
+
+#: admin/views/tab-prompt.php:104
+msgid "Guardar y sincronizar con Genix"
+msgstr "Desa i sincronitza amb Genix"
+
+#: admin/views/tab-prompt.php:109
+msgid "Support Genix detectado. Listo para sincronizar."
+msgstr "Support Genix detectat. A punt per sincronitzar."
+
+#: admin/views/tab-registro.php:14
+msgid "Todos los documentos generados: su estado, cuándo se actualizaron, y acceso a su contenido. Desde aquí puedes regenerar, borrar, fijar texto manual o filtrar por estado/idioma."
+msgstr "Tots els documents generats: el seu estat, quan es van actualitzar i accés al seu contingut. Des d'aquí pots regenerar, esborrar, fixar text manual o filtrar per estat/idioma."
+
+#. translators: %d: numero de documentos en modo manual que se saltaron
+#: admin/views/tab-registro.php:26
+msgid "%d documento en modo manual se saltó (no se regenera)."
+msgid_plural "%d documentos en modo manual se saltaron (no se regeneran)."
+msgstr[0] "%d document en mode manual s'ha omès (no es regenera)."
+msgstr[1] "%d documents en mode manual s'han omès (no es regeneren)."
+
+#. translators: %d: numero de documentos que quedan por procesar en la cola
+#: admin/views/tab-registro.php:39
+msgid "Lote de %1$d procesado. Quedan %2$d documentos en cola: continuando automáticamente…"
+msgstr "Lot de %1$d processat. Queden %2$d documents a la cua: continuant automàticament…"
+
+#: admin/views/tab-registro.php:62
+msgid "Generar por ID o URL"
+msgstr "Genera per ID o URL"
+
+#: admin/views/tab-registro.php:64
+msgid "Para un producto/página que ya no tiene fila en el Registro (por ejemplo, tras borrarlo aquí): genera de nuevo, en todos los idiomas activos, de forma inmediata y sin esperar al cron."
+msgstr "Per a un producte/pàgina que ja no té fila al Registre (per exemple, després d'esborrar-lo aquí): genera de nou, en tots els idiomes actius, de manera immediata i sense esperar el cron."
+
+#: admin/views/tab-registro.php:69
+msgid "ID del producto/página, o su URL"
+msgstr "ID del producte/pàgina, o la seva URL"
+
+#: admin/views/tab-registro.php:70
+msgid "Generar ahora"
+msgstr "Genera ara"
+
+#: admin/views/tab-registro.php:79
+#: admin/views/tab-visibilidad-ia.php:292
+msgid "Todos los estados"
+msgstr "Tots els estats"
+
+#: admin/views/tab-registro.php:86
+msgid "Todos los idiomas"
+msgstr "Tots els idiomes"
+
+#: admin/views/tab-registro.php:92
+msgid "Buscar por título…"
+msgstr "Cerca per títol…"
+
+#. translators: %d: numero de filas por pagina
+#: admin/views/tab-registro.php:95
+msgid "%d por página"
+msgstr "%d per pàgina"
+
+#: admin/views/tab-registro.php:98
+msgid "Filtrar"
+msgstr "Filtra"
+
+#: admin/views/tab-registro.php:101
+msgid "¿Borrar todos los documentos que cumplen el filtro actual (o TODOS si no hay filtro puesto) y sus posts asociados? Sus orígenes se añadirán a \"IDs a excluir\" en Contenido, para que no se vuelvan a generar solos (quítalos de esa lista si quieres que se vuelvan a generar)."
+msgstr "Vols esborrar tots els documents que compleixen el filtre actual (o TOTS si no hi ha cap filtre aplicat) i els seus posts associats? Els seus orígens s'afegiran a \"IDs a excloure\" a Contingut, perquè no es tornin a generar automàticament (treu-los d'aquesta llista si vols que es tornin a generar)."
+
+#: admin/views/tab-registro.php:107
+msgid "Borrar todos"
+msgstr "Esborra-ho tot"
+
+#: admin/views/tab-registro.php:113
+msgid "Reiniciar cola"
+msgstr "Reinicia la cua"
+
+#: admin/views/tab-registro.php:147
+msgid "¿Borrar los documentos seleccionados y sus posts asociados? Sus orígenes se añadirán a \"IDs a excluir\" en Contenido, para que no se vuelvan a generar solos (quítalos de esa lista si quieres que se vuelvan a generar)."
+msgstr "Vols esborrar els documents seleccionats i els seus posts associats? Els seus orígens s'afegiran a \"IDs a excloure\" a Contingut, perquè no es tornin a generar automàticament (treu-los d'aquesta llista si vols que es tornin a generar)."
+
+#: admin/views/tab-visibilidad-ia.php:99
+msgid "Comprueba cómo se publica el contenido para buscadores y agentes de IA, revisa si las páginas sincronizadas pueden rastrearse y decide qué crawlers de IA pueden acceder a la web. El estado de exposición y la comprobación de accesibilidad son de solo lectura. Las acciones sobre robots.txt y .htaccess modifican archivos reales y siempre requieren confirmación."
+msgstr "Comprova com es publica el contingut per a cercadors i agents d'IA, revisa si les pàgines sincronitzades es poden rastrejar i decideix quins crawlers d'IA poden accedir al web. L'estat d'exposició i la comprovació d'accessibilitat són només de lectura. Les accions sobre robots.txt i .htaccess modifiquen fitxers reals i sempre requereixen confirmació."
+
+#: admin/views/tab-visibilidad-ia.php:103
+msgid "Estado de exposición"
+msgstr "Estat d'exposició"
+
+#: admin/views/tab-visibilidad-ia.php:106
+msgid "llms.txt"
+msgstr "llms.txt"
+
+#: admin/views/tab-visibilidad-ia.php:108
+msgid "Este archivo ayuda a los asistentes de IA a entender qué contiene tu web y dónde encontrar la información más importante."
+msgstr "Aquest fitxer ajuda els assistents d'IA a entendre què conté el teu web i on trobar la informació més important."
+
+#: admin/views/tab-visibilidad-ia.php:110
+msgid "Archivo físico gestionado por AI Knowledge."
+msgstr "Fitxer físic gestionat per AI Knowledge."
+
+#. translators: %s: fecha de última modificación del archivo físico
+#: admin/views/tab-visibilidad-ia.php:116
+msgid "Modificado por última vez: %s."
+msgstr "Modificat per última vegada: %s."
+
+#: admin/views/tab-visibilidad-ia.php:125
+msgid "Ver el archivo actual"
+msgstr "Mostra el fitxer actual"
+
+#: admin/views/tab-visibilidad-ia.php:127
+#: includes/class-editor-metabox.php:70
+msgid "Estado:"
+msgstr "Estat:"
+
+#: admin/views/tab-visibilidad-ia.php:127
+msgid "Todavía no existe el archivo físico."
+msgstr "Encara no existeix el fitxer físic."
+
+#: admin/views/tab-visibilidad-ia.php:128
+msgid "Ver llms.txt"
+msgstr "Mostra llms.txt"
+
+#: admin/views/tab-visibilidad-ia.php:130
+msgid "Guardar una copia física"
+msgstr "Desa una còpia física"
+
+#: admin/views/tab-visibilidad-ia.php:131
+msgid "AI Knowledge puede guardar llms.txt como archivo real en la raíz de tu web."
+msgstr "AI Knowledge pot desar llms.txt com a fitxer real a l'arrel del teu web."
+
+#: admin/views/tab-visibilidad-ia.php:133
+msgid "Ya existe un llms.txt. Descarga una copia antes de sustituirlo."
+msgstr "Ja existeix un llms.txt. Descarrega'n una còpia abans de substituir-lo."
+
+#: admin/views/tab-visibilidad-ia.php:137
+msgid "Descargar copia actual de llms.txt"
+msgstr "Descarrega la còpia actual de llms.txt"
+
+#: admin/views/tab-visibilidad-ia.php:140
+msgid "Todavía no existe un archivo físico. Puedes crearlo con el contenido generado por AI Knowledge."
+msgstr "Encara no existeix cap fitxer físic. Pots crear-lo amb el contingut generat per AI Knowledge."
+
+#: admin/views/tab-visibilidad-ia.php:142
+msgid "Descarga la copia actual primero; el botón se habilitará automáticamente al terminar."
+msgstr "Descarrega primer la còpia actual; el botó s'habilitarà automàticament en acabar."
+
+#: admin/views/tab-visibilidad-ia.php:143
+msgid "Vas a sustituir el llms.txt físico de la raíz por el generado por AI Knowledge. ¿Confirmas que ya descargaste la copia?"
+msgstr "Substituiràs el llms.txt físic de l'arrel pel generat per AI Knowledge. Confirmes que ja n'has descarregat la còpia?"
+
+#: admin/views/tab-visibilidad-ia.php:143
+msgid "Vas a crear un llms.txt físico en la raíz con el contenido generado por AI Knowledge. ¿Quieres continuar?"
+msgstr "Crearàs un llms.txt físic a l'arrel amb el contingut generat per AI Knowledge. Vols continuar?"
+
+#: admin/views/tab-visibilidad-ia.php:146
+msgid "Sustituir por el generado"
+msgstr "Substitueix pel generat"
+
+#: admin/views/tab-visibilidad-ia.php:146
+msgid "Crear archivo físico"
+msgstr "Crea el fitxer físic"
+
+#: admin/views/tab-visibilidad-ia.php:151
+msgid "Markdown público"
+msgstr "Markdown públic"
+
+#: admin/views/tab-visibilidad-ia.php:153
+msgid "El mismo contenido que usa el chatbot, publicado como archivo Markdown para que crawlers y agentes de IA puedan leerlo sin procesar el HTML de la página."
+msgstr "El mateix contingut que utilitza el chatbot, publicat com a fitxer Markdown perquè crawlers i agents d'IA el puguin llegir sense processar l'HTML de la pàgina."
+
+#: admin/views/tab-visibilidad-ia.php:155
+#: admin/views/tab-visibilidad-ia.php:164
+msgid "Ver un ejemplo real"
+msgstr "Mostra un exemple real"
+
+#: admin/views/tab-visibilidad-ia.php:160
+msgid "JSON estructurado"
+msgstr "JSON estructurat"
+
+#: admin/views/tab-visibilidad-ia.php:162
+msgid "Los datos originales de WordPress y WooCommerce en formato JSON, sin pasar por una IA. Permite consultar la información exacta mediante la API del sitio."
+msgstr "Les dades originals de WordPress i WooCommerce en format JSON, sense passar per una IA. Permet consultar la informació exacta mitjançant l'API del lloc."
+
+#: admin/views/tab-visibilidad-ia.php:169
+msgid "JSON-LD (Schema.org)"
+msgstr "JSON-LD (Schema.org)"
+
+#: admin/views/tab-visibilidad-ia.php:171
+msgid "Datos estructurados de Schema.org, como Product o Article, incluidos en el código de cada página para ayudar a los buscadores a identificar el tipo de contenido."
+msgstr "Dades estructurades de Schema.org, com Product o Article, incloses al codi de cada pàgina per ajudar els cercadors a identificar el tipus de contingut."
+
+#. translators: %s: enlace a una página de ejemplo
+#: admin/views/tab-visibilidad-ia.php:180
+msgid "Se incluye dentro de cada página: %s y revisa en el código fuente el bloque <script type=\"application/ld+json\">."
+msgstr "S'inclou dins de cada pàgina: %s i revisa al codi font el bloc <script type=\"application/ld+json\">."
+
+#: admin/views/tab-visibilidad-ia.php:181
+msgid "abre un ejemplo real"
+msgstr "obre un exemple real"
+
+#: admin/views/tab-visibilidad-ia.php:189
+msgid "Contenido pendiente de sincronizar"
+msgstr "Contingut pendent de sincronitzar"
+
+#. translators: %d: numero de elementos del alcance sin sincronizar todavia
+#: admin/views/tab-visibilidad-ia.php:196
+msgid "Queda %d elemento sin sincronizar."
+msgid_plural "Quedan %d elementos sin sincronizar."
+msgstr[0] "Queda %d element sense sincronitzar."
+msgstr[1] "Queden %d elements sense sincronitzar."
+
+#: admin/views/tab-visibilidad-ia.php:202
+msgid "Todo el contenido del alcance está sincronizado."
+msgstr "Tot el contingut de l'abast està sincronitzat."
+
+#: admin/views/tab-visibilidad-ia.php:210
+#: admin/views/tab-visibilidad-ia.php:254
+msgid "Comprobar accesibilidad"
+msgstr "Comprova l'accessibilitat"
+
+#: admin/views/tab-visibilidad-ia.php:211
+msgid "Elige una URL ya sincronizada y comprueba en vivo si robots.txt permite rastrearla y si lleva noindex — avisa si ambas señales se contradicen entre sí."
+msgstr "Tria una URL ja sincronitzada i comprova en directe si robots.txt permet rastrejar-la i si porta noindex — avisa si tots dos senyals es contradiuen."
+
+#: admin/views/tab-visibilidad-ia.php:224
+msgid "robots.txt: permitida."
+msgstr "robots.txt: permesa."
+
+#: admin/views/tab-visibilidad-ia.php:225
+msgid "robots.txt: bloqueada."
+msgstr "robots.txt: bloquejada."
+
+#: admin/views/tab-visibilidad-ia.php:232
+msgid "Señal noindex: sí (meta robots o cabecera X-Robots-Tag)."
+msgstr "Senyal noindex: sí (meta robots o capçalera X-Robots-Tag)."
+
+#: admin/views/tab-visibilidad-ia.php:233
+msgid "Señal noindex: no."
+msgstr "Senyal noindex: no."
+
+#: admin/views/tab-visibilidad-ia.php:237
+msgid "⚠ Conflicto de señales: robots.txt y noindex no coinciden — revisa la configuración."
+msgstr "⚠ Conflicte de senyals: robots.txt i noindex no coincideixen — revisa la configuració."
+
+#: admin/views/tab-visibilidad-ia.php:244
+msgid "Todavía no hay contenido sincronizado que comprobar."
+msgstr "Encara no hi ha contingut sincronitzat per comprovar."
+
+#: admin/views/tab-visibilidad-ia.php:262
+msgid "Gestión de crawlers de IA"
+msgstr "Gestió de crawlers d'IA"
+
+#: admin/views/tab-visibilidad-ia.php:264
+msgid "Configuración por bot"
+msgstr "Configuració per bot"
+
+#: admin/views/tab-visibilidad-ia.php:266
+msgid "Lista de crawlers de IA conocidos, su finalidad y la acción asignada a cada uno. Esta configuración se aplica tanto a robots.txt como a las reglas de .htaccess que aparecen más abajo."
+msgstr "Llista de crawlers d'IA coneguts, la seva finalitat i l'acció assignada a cadascun. Aquesta configuració s'aplica tant a robots.txt com a les regles de .htaccess que apareixen més avall."
+
+#: admin/views/tab-visibilidad-ia.php:270
+msgid "Búsqueda/citas IA"
+msgstr "Cerca/cites IA"
+
+#: admin/views/tab-visibilidad-ia.php:271
+msgid "Uso bajo demanda"
+msgstr "Ús sota demanda"
+
+#: admin/views/tab-visibilidad-ia.php:272
+msgid "Entrenamiento de modelos"
+msgstr "Entrenament de models"
+
+#: admin/views/tab-visibilidad-ia.php:273
+msgid "SEO y scraping"
+msgstr "SEO i scraping"
+
+#: admin/views/tab-visibilidad-ia.php:274
+msgid "Scanners de seguridad"
+msgstr "Escàners de seguretat"
+
+#: admin/views/tab-visibilidad-ia.php:275
+msgid "Buscadores tradicionales"
+msgstr "Cercadors tradicionals"
+
+#: admin/views/tab-visibilidad-ia.php:276
+msgid "Archivado y datasets"
+msgstr "Arxivat i datasets"
+
+#: admin/views/tab-visibilidad-ia.php:281
+msgid "Filtrar por tipo"
+msgstr "Filtra per tipus"
+
+#: admin/views/tab-visibilidad-ia.php:283
+msgid "Todos los tipos"
+msgstr "Tots els tipus"
+
+#: admin/views/tab-visibilidad-ia.php:290
+msgid "Filtrar por estado"
+msgstr "Filtra per estat"
+
+#: admin/views/tab-visibilidad-ia.php:293
+msgid "Permitidos"
+msgstr "Permesos"
+
+#: admin/views/tab-visibilidad-ia.php:294
+msgid "Bloqueados"
+msgstr "Bloquejats"
+
+#: admin/views/tab-visibilidad-ia.php:306
+#: admin/views/tab-visibilidad-ia.php:439
+msgid "Bot"
+msgstr "Bot"
+
+#: admin/views/tab-visibilidad-ia.php:307
+msgid "Operador"
+msgstr "Operador"
+
+#: admin/views/tab-visibilidad-ia.php:308
+#: admin/views/tab-visibilidad-ia.php:440
+msgid "Categoría"
+msgstr "Categoria"
+
+#: admin/views/tab-visibilidad-ia.php:309
+msgid "Descripción"
+msgstr "Descripció"
+
+#: admin/views/tab-visibilidad-ia.php:310
+msgid "Acción"
+msgstr "Acció"
+
+#: admin/views/tab-visibilidad-ia.php:325
+msgid "Permitir"
+msgstr "Permet"
+
+#: admin/views/tab-visibilidad-ia.php:326
+msgid "Bloquear"
+msgstr "Bloqueja"
+
+#: admin/views/tab-visibilidad-ia.php:335
+msgid "Guardar configuración de crawlers"
+msgstr "Desa la configuració de crawlers"
+
+#: admin/views/tab-visibilidad-ia.php:336
+#: assets/admin.js:83
+msgid "Ver todos los crawlers"
+msgstr "Mostra tots els crawlers"
+
+#: admin/views/tab-visibilidad-ia.php:340
+msgid "Visibilidad para los bots bloqueados"
+msgstr "Visibilitat per als bots bloquejats"
+
+#: admin/views/tab-visibilidad-ia.php:341
+msgid "Puedes bloquear el resto del sitio y mantener visible únicamente /llms.txt para los bots configurados como Bloquear."
+msgstr "Pots bloquejar la resta del lloc i mantenir visible únicament /llms.txt per als bots configurats com a Bloqueja."
+
+#: admin/views/tab-visibilidad-ia.php:346
+msgid "Bloquear el sitio completo"
+msgstr "Bloqueja el lloc complet"
+
+#: admin/views/tab-visibilidad-ia.php:347
+msgid "Solo permitir visibilidad de llms.txt"
+msgstr "Permet només la visibilitat de llms.txt"
+
+#: admin/views/tab-visibilidad-ia.php:349
+msgid "Guardar modo de visibilidad"
+msgstr "Desa el mode de visibilitat"
+
+#: admin/views/tab-visibilidad-ia.php:352
+msgid "robots.txt"
+msgstr "robots.txt"
+
+#: admin/views/tab-visibilidad-ia.php:353
+msgid "Se han detectado reglas originales que contradicen el bloque propuesto. Al aplicar, se conservarán y se comentarán para dejar constancia del conflicto:"
+msgstr "S'han detectat regles originals que contradiuen el bloc proposat. En aplicar-lo, es conservaran i es comentaran per deixar constància del conflicte:"
+
+#: admin/views/tab-visibilidad-ia.php:356
+msgid "Actual (lo que vería un crawler ahora mismo)"
+msgstr "Actual (el que veuria un crawler ara mateix)"
+
+#: admin/views/tab-visibilidad-ia.php:364
+#: admin/views/tab-visibilidad-ia.php:402
+msgid "Archivo completo después del cambio"
+msgstr "Fitxer complet després del canvi"
+
+#: admin/views/tab-visibilidad-ia.php:369
+msgid "⚠ Esta acción modifica el archivo robots.txt del sitio. Descarga una copia antes de continuar."
+msgstr "⚠ Aquesta acció modifica el fitxer robots.txt del lloc. Descarrega'n una còpia abans de continuar."
+
+#: admin/views/tab-visibilidad-ia.php:376
+msgid "Descarga la copia actual primero (botón de la izquierda); se habilitará automáticamente al terminar."
+msgstr "Descarrega primer la còpia actual (botó de l'esquerra); s'habilitarà automàticament en acabar."
+
+#: admin/views/tab-visibilidad-ia.php:380
+msgid "Descargar copia actual de robots.txt"
+msgstr "Descarrega la còpia actual de robots.txt"
+
+#: admin/views/tab-visibilidad-ia.php:383
+msgid "Vas a modificar el robots.txt real del sitio con los bots marcados como Bloquear en la tabla de arriba. ¿Confirmas que ya descargaste la copia y quieres continuar?"
+msgstr "Modificaràs el robots.txt real del lloc amb els bots marcats com a Bloqueja a la taula de dalt. Confirmes que ja n'has descarregat la còpia i vols continuar?"
+
+#: admin/views/tab-visibilidad-ia.php:386
+msgid "Aplicar bloqueo a robots.txt"
+msgstr "Aplica el bloqueig a robots.txt"
+
+#: admin/views/tab-visibilidad-ia.php:392
+msgid "Bloqueo en el servidor mediante .htaccess"
+msgstr "Bloqueig al servidor mitjançant .htaccess"
+
+#: admin/views/tab-visibilidad-ia.php:393
+msgid "Se han detectado reglas originales de .htaccess que contradicen el bloque propuesto. Al aplicar, se conservarán y se comentarán."
+msgstr "S'han detectat regles originals de .htaccess que contradiuen el bloc proposat. En aplicar-lo, es conservaran i es comentaran."
+
+#: admin/views/tab-visibilidad-ia.php:395
+msgid "robots.txt comunica preferencias de rastreo, pero un bot puede ignorarlas. Estas reglas rechazan en el servidor las solicitudes que se identifican como alguno de los bots marcados como Bloquear."
+msgstr "robots.txt comunica preferències de rastreig, però un bot pot ignorar-les. Aquestes regles rebutgen al servidor les sol·licituds que s'identifiquen com algun dels bots marcats com a Bloqueja."
+
+#: admin/views/tab-visibilidad-ia.php:397
+msgid "⚠ Modifica un archivo fuera de este plugin que puede afectar a todo el sitio si algo sale mal. Descarga la copia actual antes de continuar."
+msgstr "⚠ Modifica un fitxer extern a aquest plugin que pot afectar tot el lloc si alguna cosa surt malament. Descarrega la còpia actual abans de continuar."
+
+#: admin/views/tab-visibilidad-ia.php:399
+msgid "Archivo completo preparado. Puedes copiarlo y pegarlo manualmente en tu servidor o descargarlo. AI Knowledge no sobrescribe el .htaccess real."
+msgstr "Fitxer complet preparat. Pots copiar-lo i enganxar-lo manualment al servidor o descarregar-lo. AI Knowledge no sobreescriu el .htaccess real."
+
+#: admin/views/tab-visibilidad-ia.php:400
+msgid "Archivo actual"
+msgstr "Fitxer actual"
+
+#: admin/views/tab-visibilidad-ia.php:404
+msgid "Copiar código"
+msgstr "Copia el codi"
+
+#: admin/views/tab-visibilidad-ia.php:408
+msgid "Descargar .htaccess preparado"
+msgstr "Descarrega el .htaccess preparat"
+
+#: admin/views/tab-visibilidad-ia.php:413
+msgid "No se encontró un .htaccess editable en este servidor (por ejemplo, nginx no lo usa, o los permisos no permiten escribirlo). Añade el bloque de arriba a mano en la configuración de tu servidor."
+msgstr "No s'ha trobat cap .htaccess editable en aquest servidor (per exemple, nginx no l'utilitza, o els permisos no permeten escriure-hi). Afegeix manualment el bloc de dalt a la configuració del servidor."
+
+#: admin/views/tab-visibilidad-ia.php:416
+msgid "El archivo real no se modifica desde aquí. Copia el contenido generado o descarga el archivo preparado y sustitúyelo manualmente después de conservar tu copia original."
+msgstr "El fitxer real no es modifica des d'aquí. Copia el contingut generat o descarrega el fitxer preparat i substitueix-lo manualment després de conservar la còpia original."
+
+#: admin/views/tab-visibilidad-ia.php:421
+msgid "Registro de accesos de crawlers de IA"
+msgstr "Registre d'accessos de crawlers d'IA"
+
+#. translators: %d: numero maximo de filas guardadas
+#: admin/views/tab-visibilidad-ia.php:426
+msgid "Solo se registra tráfico que coincide con el catálogo de arriba (nunca tráfico humano ni bots desconocidos). Límite duro de %d filas: al superarlo se borran las más antiguas."
+msgstr "Només es registra trànsit que coincideix amb el catàleg de dalt (mai trànsit humà ni bots desconeguts). Límit estricte de %d files: en superar-lo s'esborren les més antigues."
+
+#: admin/views/tab-visibilidad-ia.php:431
+msgid "Total registrado:"
+msgstr "Total registrat:"
+
+#: admin/views/tab-visibilidad-ia.php:433
+msgid "Todavía no se ha registrado ningún acceso de un crawler conocido."
+msgstr "Encara no s'ha registrat cap accés d'un crawler conegut."
+
+#: admin/views/tab-visibilidad-ia.php:441
+msgid "URL"
+msgstr "URL"
+
+#: admin/views/tab-visibilidad-ia.php:442
+msgid "Fecha"
+msgstr "Data"
+
+#: admin/views/tab-woocommerce.php:14
+msgid "Esta pestaña requiere WooCommerce activo."
+msgstr "Aquesta pestanya requereix que WooCommerce estigui actiu."
+
+#: admin/views/tab-woocommerce.php:66
+msgid "Información de tu tienda que se genera como documentos propios (envíos, impuestos, pagos, condiciones, catálogo) para que el chatbot y los buscadores de IA la conozcan. WooCommerce te lo detecta solo, pero todos los campos se guardan y son editables: lo que se guarda una vez ya no desaparece aunque cambies o borres algo en WooCommerce."
+msgstr "Informació de la teva botiga que es genera com a documents propis (enviaments, impostos, pagaments, condicions, catàleg) perquè el chatbot i els cercadors d'IA la coneguin. WooCommerce ho detecta automàticament, però tots els camps es desen i es poden editar: allò que es desa una vegada ja no desapareix encara que canviïs o esborris alguna cosa a WooCommerce."
+
+#: admin/views/tab-woocommerce.php:76
+msgid "Datos generales"
+msgstr "Dades generals"
+
+#: admin/views/tab-woocommerce.php:77
+msgid "Precargados con el valor real de WooCommerce; edítalos si hace falta. Una vez guardados, no se pierden aunque cambies o borres algo en WooCommerce."
+msgstr "Precarregades amb el valor real de WooCommerce; edita-les si cal. Un cop desades, no es perden encara que canviïs o esborris alguna cosa a WooCommerce."
+
+#: admin/views/tab-woocommerce.php:80
+msgid "Nombre de la tienda"
+msgstr "Nom de la botiga"
+
+#: admin/views/tab-woocommerce.php:84
+msgid "Moneda"
+msgstr "Moneda"
+
+#: admin/views/tab-woocommerce.php:88
+msgid "País base"
+msgstr "País base"
+
+#: admin/views/tab-woocommerce.php:92
+msgid "Condiciones de venta"
+msgstr "Condicions de venda"
+
+#: admin/views/tab-woocommerce.php:96
+#: admin/views/tab-woocommerce.php:107
+msgid "Editar la página real en WordPress"
+msgstr "Edita la pàgina real a WordPress"
+
+#: admin/views/tab-woocommerce.php:98
+msgid "[pendiente] No hay página de condiciones de venta configurada en WooCommerce (Ajustes > Cuentas y privacidad) — precarga vacía, escríbelo a mano si hace falta."
+msgstr "[pendent] No hi ha cap pàgina de condicions de venda configurada a WooCommerce (Configuració > Comptes i privadesa) — precàrrega buida, escriu-ho manualment si cal."
+
+#: admin/views/tab-woocommerce.php:103
+msgid "Política de devoluciones"
+msgstr "Política de devolucions"
+
+#: admin/views/tab-woocommerce.php:109
+msgid "[pendiente] No hay página de devoluciones/reembolsos configurada en WooCommerce (Ajustes > Cuentas y privacidad) — precarga vacía, escríbelo a mano si hace falta."
+msgstr "[pendent] No hi ha cap pàgina de devolucions/reemborsaments configurada a WooCommerce (Configuració > Comptes i privadesa) — precàrrega buida, escriu-ho manualment si cal."
+
+#: admin/views/tab-woocommerce.php:114
+msgid "Métodos de pago"
+msgstr "Mètodes de pagament"
+
+#: admin/views/tab-woocommerce.php:121
+msgid "[pendiente] No hay pasarelas de pago instaladas todavía."
+msgstr "[pendent] Encara no hi ha passarel·les de pagament instal·lades."
+
+#: admin/views/tab-woocommerce.php:132
+#: admin/views/tab-woocommerce.php:160
+msgid "(desactivado)"
+msgstr "(desactivat)"
+
+#: admin/views/tab-woocommerce.php:137
+#: admin/views/tab-woocommerce.php:234
+msgid "Si nunca has guardado esta pestaña, salen todas marcadas por defecto; si guardas sin marcar ninguna, no entra ninguna."
+msgstr "Si mai no has desat aquesta pestanya, surten totes marcades per defecte; si deses sense marcar-ne cap, no n'entra cap."
+
+#: admin/views/tab-woocommerce.php:141
+msgid "Envíos"
+msgstr "Enviaments"
+
+#: admin/views/tab-woocommerce.php:148
+msgid "[pendiente] No hay zonas de envío configuradas todavía."
+msgstr "[pendent] Encara no hi ha zones d'enviament configurades."
+
+#: admin/views/tab-woocommerce.php:166
+#: admin/views/tab-woocommerce.php:210
+msgid "Si nunca has guardado esta pestaña, salen todos marcados por defecto; si guardas sin marcar ninguno, no entra ninguno."
+msgstr "Si mai no has desat aquesta pestanya, surten tots marcats per defecte; si deses sense marcar-ne cap, no n'entra cap."
+
+#: admin/views/tab-woocommerce.php:170
+msgid "Impuestos / IVA"
+msgstr "Impostos / IVA"
+
+#: admin/views/tab-woocommerce.php:175
+msgid "[pendiente] Los impuestos están desactivados en WooCommerce (Ajustes > Impuestos)."
+msgstr "[pendent] Els impostos estan desactivats a WooCommerce (Configuració > Impostos)."
+
+#: admin/views/tab-woocommerce.php:193
+msgid "Todos los países"
+msgstr "Tots els països"
+
+#: admin/views/tab-woocommerce.php:203
+msgid "[pendiente] No hay ningún tipo de impuesto dado de alta todavía."
+msgstr "[pendent] Encara no hi ha cap tipus d'impost donat d'alta."
+
+#: admin/views/tab-woocommerce.php:207
+msgid "Los precios mostrados ya incluyen impuestos."
+msgstr "Els preus mostrats ja inclouen impostos."
+
+#: admin/views/tab-woocommerce.php:208
+msgid "Los precios mostrados NO incluyen impuestos."
+msgstr "Els preus mostrats NO inclouen impostos."
+
+#: admin/views/tab-woocommerce.php:215
+msgid "Catálogo: categorías a incluir"
+msgstr "Catàleg: categories a incloure"
+
+#: admin/views/tab-woocommerce.php:222
+msgid "[pendiente] No hay categorías de producto con productos publicados todavía."
+msgstr "[pendent] Encara no hi ha categories de producte amb productes publicats."
+
+#: admin/views/tab-woocommerce.php:238
+msgid "Pedido mínimo / envío gratis"
+msgstr "Comanda mínima / enviament gratuït"
+
+#: admin/views/tab-woocommerce.php:241
+msgid "Solo se usa si ningún método de envío marcado arriba es de tipo \"Envío gratis\" con importe mínimo configurado en WooCommerce (si lo es, se detecta solo). Ej: \"Envío gratis a partir de 50€\"."
+msgstr "Només s'utilitza si cap mètode d'enviament marcat a dalt és del tipus \"Enviament gratuït\" amb import mínim configurat a WooCommerce (si ho és, es detecta automàticament). Ex.: \"Enviament gratuït a partir de 50 €\"."
+
+#: admin/views/tab-woocommerce.php:245
+msgid "Recogida en tienda"
+msgstr "Recollida a la botiga"
+
+#: admin/views/tab-woocommerce.php:249
+msgid "Disponible"
+msgstr "Disponible"
+
+#: admin/views/tab-woocommerce.php:251
+msgid "Solo se usa si ningún método de envío marcado arriba es de tipo \"Recogida local\" de WooCommerce (si lo es, se detecta solo)."
+msgstr "Només s'utilitza si cap mètode d'enviament marcat a dalt és del tipus \"Recollida local\" de WooCommerce (si ho és, es detecta automàticament)."
+
+#: admin/views/tab-woocommerce.php:255
+msgid "Plazo de entrega"
+msgstr "Termini de lliurament"
+
+#: admin/views/tab-woocommerce.php:258
+msgid "WooCommerce no expone un plazo de entrega real; escríbelo en texto libre (ej. \"2-4 días laborables en Península\")."
+msgstr "WooCommerce no exposa un termini de lliurament real; escriu-lo en text lliure (ex.: \"2-4 dies laborables a la Península\")."
+
+#: admin/views/tab-woocommerce.php:262
+msgid "Contacto y horario de la tienda online"
+msgstr "Contacte i horari de la botiga online"
+
+#. translators: %s: enlace a la pestaña Negocio
+#: admin/views/tab-woocommerce.php:269
+msgid "Solo si el contacto/horario de la tienda online es distinto del general del negocio (pestaña %s). Vacío = se usa el de Negocio."
+msgstr "Només si el contacte/horari de la botiga online és diferent del general del negoci (pestanya %s). Buit = s'utilitza el de Negoci."
+
+#: admin/views/tab-woocommerce.php:277
+msgid "Actualmente se usa (de Negocio):"
+msgstr "Actualment s'utilitza (de Negoci):"
+
+#: admin/views/tab-woocommerce.php:279
+msgid "[pendiente] Tampoco hay contacto general en Negocio todavía."
+msgstr "[pendent] Tampoc no hi ha contacte general a Negoci encara."
+
+#: admin/views/tab-woocommerce.php:286
+msgid "Notas legales adicionales"
+msgstr "Notes legals addicionals"
+
+#: admin/views/tab-woocommerce.php:289
+msgid "Opcional. Cualquier aviso legal adicional que quieras incluir en el documento de información de tienda."
+msgstr "Opcional. Qualsevol avís legal addicional que vulguis incloure al document d'informació de la botiga."
+
+#: admin/views/tab-woocommerce.php:298
+msgid "Generar documentos de tienda"
+msgstr "Genera documents de botiga"
+
+#: admin/views/tab-woocommerce.php:300
+msgid "Genera (o regenera) los documentos compuestos de \"cómo comprar / condiciones de venta / envío y pago\" y \"catálogo de tienda\", uno por idioma activo, a partir de la configuración real de WooCommerce (incluida esta pestaña). No dependen de ningún post concreto, así que se generan a mano con este botón — no se disparan solos al cambiar los ajustes de WooCommerce."
+msgstr "Genera (o regenera) els documents compostos de \"com comprar / condicions de venda / enviament i pagament\" i \"catàleg de botiga\", un per idioma actiu, a partir de la configuració real de WooCommerce (inclosa aquesta pestanya). No depenen de cap post concret, així que es generen manualment amb aquest botó — no s'activen automàticament en canviar la configuració de WooCommerce."
+
+#: admin/views/tab-woocommerce.php:308
+msgid "Generar/actualizar ahora"
+msgstr "Genera/actualitza ara"
+
+#: admin/views/tab-woocommerce.php:313
+msgid "Cada bloque muestra el Markdown publicado. Puedes pulir su formato con IA usando solo los datos que ya contiene; para sustituirlo por un texto completo externo, usa el modo manual de la pestaña Registro."
+msgstr "Cada bloc mostra el Markdown publicat. Pots polir-ne el format amb IA utilitzant només les dades que ja conté; per substituir-lo per un text complet extern, utilitza el mode manual de la pestanya Registre."
+
+#: admin/views/tab-woocommerce.php:321
+msgid "Información de tienda"
+msgstr "Informació de la botiga"
+
+#: admin/views/tab-woocommerce.php:322
+msgid "Pule la estructura y la redacción del documento de compra, condiciones, envío y pago. Las instrucciones prevalecen sobre el formato predeterminado, pero no pueden añadir ni cambiar datos."
+msgstr "Poleix l'estructura i la redacció del document de compra, condicions, enviament i pagament. Les instruccions prevalen sobre el format predeterminat, però no poden afegir ni canviar dades."
+
+#: admin/views/tab-woocommerce.php:329
+#: admin/views/tab-woocommerce.php:348
+msgid "Instrucciones para pulir el texto (opcional)"
+msgstr "Instruccions per polir el text (opcional)"
+
+#: admin/views/tab-woocommerce.php:330
+#: admin/views/tab-woocommerce.php:349
+msgid "Indica solo el tono, la estructura o el estilo. La IA no consulta ni añade datos de WooCommerce desde este campo."
+msgstr "Indica només el to, l'estructura o l'estil. La IA no consulta ni afegeix dades de WooCommerce des d'aquest camp."
+
+#: admin/views/tab-woocommerce.php:331
+#: admin/views/tab-woocommerce.php:350
+msgid "Puedes escribir una indicación breve o pegar un prompt completo. Estas instrucciones prevalecen sobre el formato predeterminado, pero solo pueden usar los datos presentes en el documento. Si ya tienes un texto final generado con otra IA, pégalo manualmente desde la pestaña Registro."
+msgstr "Pots escriure una indicació breu o enganxar un prompt complet. Aquestes instruccions prevalen sobre el format predeterminat, però només poden utilitzar les dades presents al document. Si ja tens un text final generat amb una altra IA, enganxa'l manualment des de la pestanya Registre."
+
+#: admin/views/tab-woocommerce.php:337
+#: admin/views/tab-woocommerce.php:356
+msgid "Todavía no se ha generado."
+msgstr "Encara no s'ha generat."
+
+#: admin/views/tab-woocommerce.php:340
+msgid "Catálogo de tienda"
+msgstr "Catàleg de la botiga"
+
+#: admin/views/tab-woocommerce.php:341
+msgid "Pule la estructura y la redacción del catálogo publicado. Las instrucciones prevalecen sobre el formato predeterminado, pero no pueden añadir productos ni datos que no aparezcan en el documento."
+msgstr "Poleix l'estructura i la redacció del catàleg publicat. Les instruccions prevalen sobre el format predeterminat, però no poden afegir productes ni dades que no apareguin al document."
+
+#: includes/class-ai-client.php:111
+msgid "El origen de IA seleccionado no está conectado o el modelo ya no está disponible."
+msgstr "L'origen d'IA seleccionat no està connectat o el model ja no està disponible."
+
+#: includes/class-ai-client.php:124
+msgid "No hay modelos de texto conectados en WordPress para Anthropic, OpenAI o Google."
+msgstr "No hi ha models de text connectats a WordPress per a Anthropic, OpenAI o Google."
+
+#: includes/class-ai-client.php:153
+#: includes/class-ai-client.php:193
+msgid "Respuesta vacía de la IA."
+msgstr "Resposta buida de la IA."
+
+#: includes/class-chatbot-prompt-builder.php:52
+msgid "Nombre del negocio / marca"
+msgstr "Nom del negoci / marca"
+
+#: includes/class-chatbot-prompt-builder.php:53
+msgid "Ej: el nombre con el que el chatbot debe referirse al negocio."
+msgstr "Ex.: el nom amb què el chatbot s'ha de referir al negoci."
+
+#: includes/class-chatbot-prompt-builder.php:58
+msgid "Dirección"
+msgstr "Adreça"
+
+#: includes/class-chatbot-prompt-builder.php:59
+msgid "Dirección postal del negocio, si es relevante para el cliente (local físico, recogida, visitas...)."
+msgstr "Adreça postal del negoci, si és rellevant per al client (local físic, recollida, visites...)."
+
+#: includes/class-chatbot-prompt-builder.php:64
+msgid "Enfoque del negocio"
+msgstr "Enfocament del negoci"
+
+#: includes/class-chatbot-prompt-builder.php:65
+msgid "Ej: negocio familiar, qué vende o qué servicios ofrece (productos propios, experiencias, citas...)."
+msgstr "Ex.: negoci familiar, què ven o quins serveis ofereix (productes propis, experiències, cites...)."
+
+#: includes/class-chatbot-prompt-builder.php:70
+msgid "Público objetivo"
+msgstr "Públic objectiu"
+
+#: includes/class-chatbot-prompt-builder.php:71
+msgid "Ej: tipo de cliente habitual — ayuda al chatbot a calibrar tono y nivel de detalle."
+msgstr "Ex.: tipus de client habitual — ajuda el chatbot a calibrar el to i el nivell de detall."
+
+#: includes/class-chatbot-prompt-builder.php:76
+msgid "Idioma principal del negocio"
+msgstr "Idioma principal del negoci"
+
+#: includes/class-chatbot-prompt-builder.php:77
+msgid "Ej: español, aunque la web está también en inglés y alemán."
+msgstr "Ex.: espanyol, encara que el web també és en anglès i alemany."
+
+#: includes/class-chatbot-prompt-builder.php:82
+msgid "Horario de atención humana"
+msgstr "Horari d'atenció humana"
+
+#: includes/class-chatbot-prompt-builder.php:83
+msgid "Cuándo hay alguien real disponible, aparte del chatbot (que suele estar activo 24/7)."
+msgstr "Quan hi ha algú real disponible, a banda del chatbot (que sol estar actiu 24/7)."
+
+#: includes/class-chatbot-prompt-builder.php:88
+msgid "Datos de contacto directo"
+msgstr "Dades de contacte directe"
+
+#: includes/class-chatbot-prompt-builder.php:89
+msgid "Teléfono, WhatsApp, email... deja vacío para mantener los que ya haya en el prompt actual."
+msgstr "Telèfon, WhatsApp, correu electrònic... deixa-ho buit per mantenir els que ja hi hagi al prompt actual."
+
+#: includes/class-chatbot-prompt-builder.php:95
+msgid "Tono de la marca"
+msgstr "To de la marca"
+
+#: includes/class-chatbot-prompt-builder.php:96
+msgid "Ej: cercano, profesional, cálido, sin lenguaje robótico."
+msgstr "Ex.: proper, professional, càlid, sense llenguatge robòtic."
+
+#: includes/class-chatbot-prompt-builder.php:101
+msgid "Qué hacer cuando no hay información"
+msgstr "Què fer quan no hi ha informació"
+
+#: includes/class-chatbot-prompt-builder.php:102
+msgid "Ej: no inventar ni dar largas, decir que no se tiene esa información y dar el contacto directo."
+msgstr "Ex.: no inventar ni donar llargues, dir que no es disposa d'aquesta informació i donar el contacte directe."
+
+#: includes/class-chatbot-prompt-builder.php:107
+msgid "Qué NO debe hacer nunca el chatbot"
+msgstr "Què NO ha de fer mai el chatbot"
+
+#: includes/class-chatbot-prompt-builder.php:108
+msgid "Ej: no gestionar pagos ni reclamaciones directamente, no prometer descuentos, no inventar precios ni stock."
+msgstr "Ex.: no gestionar pagaments ni reclamacions directament, no prometre descomptes, no inventar preus ni estoc."
+
+#: includes/class-chatbot-prompt-builder.php:113
+msgid "Cómo cerrar una conversación"
+msgstr "Com tancar una conversa"
+
+#: includes/class-chatbot-prompt-builder.php:114
+msgid "Ej: despedirse con cordialidad e invitar a seguir preguntando si hace falta."
+msgstr "Ex.: acomiadar-se cordialment i convidar a continuar preguntant si cal."
+
+#: includes/class-chatbot-prompt-builder.php:119
+msgid "Longitud de respuesta preferida"
+msgstr "Longitud de resposta preferida"
+
+#: includes/class-chatbot-prompt-builder.php:120
+msgid "Ej: respuestas cortas y directas, o explicadas con más detalle."
+msgstr "Ex.: respostes curtes i directes, o explicades amb més detall."
+
+#: includes/class-chatbot-prompt-builder.php:125
+msgid "Uso de emojis"
+msgstr "Ús d'emojis"
+
+#: includes/class-chatbot-prompt-builder.php:126
+msgid "Ej: sin emojis, o alguno puntual con moderación."
+msgstr "Ex.: sense emojis, o algun de puntual amb moderació."
+
+#: includes/class-chatbot-prompt-builder.php:241
+#: includes/class-chatbot-prompt-builder.php:295
+#: includes/class-chatbot-prompt-builder.php:339
+#: includes/class-chatbot-prompt-builder.php:463
+#: includes/class-chatbot-prompt-builder.php:529
+#: includes/class-generator.php:43
+msgid "El origen de IA seleccionado no está conectado."
+msgstr "L'origen d'IA seleccionat no està connectat."
+
+#: includes/class-chatbot-prompt-builder.php:334
+msgid "No hay texto que pulir."
+msgstr "No hi ha cap text per polir."
+
+#: includes/class-chatbot-prompt-builder.php:409
+msgid "La IA devolvió instrucciones internas dentro del contenido. No se ha publicado el resultado."
+msgstr "La IA ha retornat instruccions internes dins del contingut. El resultat no s'ha publicat."
+
+#: includes/class-chatbot-prompt-builder.php:415
+msgid "La IA copió las instrucciones de redacción dentro del contenido. No se ha publicado el resultado."
+msgstr "La IA ha copiat les instruccions de redacció dins del contingut. El resultat no s'ha publicat."
+
+#: includes/class-chatbot-prompt-builder.php:524
+msgid "No hay texto que normalizar."
+msgstr "No hi ha cap text per normalitzar."
+
+#: includes/class-chatbot-prompt-builder.php:581
+#: includes/class-genix-hooks-guard.php:78
+#: includes/class-genix-hooks-guard.php:86
+#: includes/class-genix-hooks-guard.php:183
+msgid "WOO Knowledge Base Generator:"
+msgstr "WOO Knowledge Base Generator:"
+
+#. translators: 1: longitud actual en caracteres, 2: mínimo recomendado, 3: enlace a la pestaña Negocio
+#: includes/class-chatbot-prompt-builder.php:584
+msgid "El resumen público del negocio tiene %1$d caracteres. Se usa como cita de apertura en /llms.txt: ampliarlo a al menos %2$d caracteres da más contexto útil a los crawlers de IA. %3$s"
+msgstr "El resum públic del negoci té %1$d caràcters. S'utilitza com a cita d'obertura a /llms.txt: ampliar-lo fins a almenys %2$d caràcters aporta més context útil als crawlers d'IA. %3$s"
+
+#: includes/class-chatbot-prompt-builder.php:587
+msgid "Ir a la pestaña Negocio"
+msgstr "Ves a la pestanya Negoci"
+
+#: includes/class-chatbot-prompt.php:90
+msgid "chatbot-system-prompt.md está vacío o no existe."
+msgstr "chatbot-system-prompt.md està buit o no existeix."
+
+#: includes/class-chatbot-prompt.php:94
+msgid "Support Genix no está activo o su módulo de Knowledge Base aún no se ha cargado."
+msgstr "Support Genix no està actiu o el seu mòdul de Knowledge Base encara no s'ha carregat."
+
+#: includes/class-chatbot-prompt.php:106
+msgid "Ya estaba sincronizado."
+msgstr "Ja estava sincronitzat."
+
+#: includes/class-chatbot-prompt.php:112
+msgid "Genix rechazó guardar la opción (AddOption devolvió false)."
+msgstr "Genix ha rebutjat desar l'opció (AddOption ha retornat false)."
+
+#: includes/class-chatbot-prompt.php:117
+msgid "Prompt sincronizado con Support Genix."
+msgstr "Prompt sincronitzat amb Support Genix."
+
+#: includes/class-crawler-catalog.php:31
+msgid "Recopila contenido para entrenar los modelos de OpenAI (GPT)."
+msgstr "Recopila contingut per entrenar els models d'OpenAI (GPT)."
+
+#: includes/class-crawler-catalog.php:38
+msgid "Visita una URL concreta porque un usuario le pidió a ChatGPT que la leyera/resumiera."
+msgstr "Visita un URL concret perquè un usuari ha demanat a ChatGPT que el llegeixi/resumeixi."
+
+#: includes/class-crawler-catalog.php:45
+msgid "Indexa contenido para la función de búsqueda de ChatGPT (citas con enlace)."
+msgstr "Indexa contingut per a la funció de cerca de ChatGPT (cites amb enllaç)."
+
+#: includes/class-crawler-catalog.php:53
+msgid "Recopila contenido para entrenar los modelos de Anthropic (Claude)."
+msgstr "Recopila contingut per entrenar els models d'Anthropic (Claude)."
+
+#: includes/class-crawler-catalog.php:60
+msgid "Visita una URL porque un usuario se lo pidió a Claude en una conversación."
+msgstr "Visita un URL perquè un usuari l'ha demanat a Claude en una conversa."
+
+#: includes/class-crawler-catalog.php:67
+msgid "Indexa contenido para que Claude pueda citarlo/buscarlo."
+msgstr "Indexa contingut perquè Claude el pugui citar/cercar."
+
+#: includes/class-crawler-catalog.php:75
+msgid "Rastreador normal de Google Search. Bloquearlo te saca de Google Search por completo."
+msgstr "Crawler normal de Google Search. Bloquejar-lo et treu completament de Google Search."
+
+#: includes/class-crawler-catalog.php:82
+msgid "Controla si tu contenido se usa para entrenar Gemini/Vertex AI, separado de Googlebot."
+msgstr "Controla si el teu contingut s'utilitza per entrenar Gemini/Vertex AI, separat de Googlebot."
+
+#: includes/class-crawler-catalog.php:90
+msgid "Rastreador de Bing Search, también alimenta Copilot."
+msgstr "Crawler de Bing Search, també alimenta Copilot."
+
+#: includes/class-crawler-catalog.php:98
+msgid "Indexa contenido para que Perplexity AI pueda citarte en sus respuestas."
+msgstr "Indexa contingut perquè Perplexity AI et pugui citar a les seves respostes."
+
+#: includes/class-crawler-catalog.php:105
+msgid "Visita una URL porque un usuario se lo pidió a Perplexity en el momento."
+msgstr "Visita un URL perquè un usuari l'ha demanat a Perplexity en aquell moment."
+
+#: includes/class-crawler-catalog.php:113
+msgid "Genera las vistas previas de enlaces compartidos en Facebook/Instagram."
+msgstr "Genera les previsualitzacions d'enllaços compartits a Facebook/Instagram."
+
+#: includes/class-crawler-catalog.php:120
+msgid "Recopila contenido para entrenar los modelos de Meta AI."
+msgstr "Recopila contingut per entrenar els models de Meta AI."
+
+#: includes/class-crawler-catalog.php:127
+msgid "Visita una URL porque un usuario se lo pidió a Meta AI."
+msgstr "Visita un URL perquè un usuari l'ha demanat a Meta AI."
+
+#: includes/class-crawler-catalog.php:135
+msgid "Controla el uso de tu contenido para entrenar los modelos de IA de Apple, separado de Applebot."
+msgstr "Controla l'ús del teu contingut per entrenar els models d'IA d'Apple, separat d'Applebot."
+
+#: includes/class-crawler-catalog.php:142
+msgid "Alimenta Siri y Spotlight Search."
+msgstr "Alimenta Siri i Spotlight Search."
+
+#: includes/class-crawler-catalog.php:150
+msgid "Alimenta el asistente de IA de DuckDuckGo."
+msgstr "Alimenta l'assistent d'IA de DuckDuckGo."
+
+#: includes/class-crawler-catalog.php:158
+msgid "Indexa contenido para el buscador con IA de You.com."
+msgstr "Indexa contingut per al cercador amb IA de You.com."
+
+#: includes/class-crawler-catalog.php:166
+#: includes/class-crawler-catalog.php:173
+msgid "Recopila contenido para entrenar los modelos de Cohere."
+msgstr "Recopila contingut per entrenar els models de Cohere."
+
+#: includes/class-crawler-catalog.php:181
+msgid "Rastreador agresivo de ByteDance para entrenar sus modelos de IA."
+msgstr "Crawler agressiu de ByteDance per entrenar els seus models d'IA."
+
+#: includes/class-crawler-catalog.php:189
+msgid "Alimenta Alexa y otros productos IA de Amazon (uso mixto: también entrenamiento)."
+msgstr "Alimenta Alexa i altres productes d'IA d'Amazon (ús mixt: també entrenament)."
+
+#: includes/class-crawler-catalog.php:197
+msgid "Recopila contenido para entrenar Grok, uso poco documentado públicamente."
+msgstr "Recopila contingut per entrenar Grok, ús poc documentat públicament."
+
+#: includes/class-crawler-catalog.php:205
+msgid "Dataset usado por muchos laboratorios de IA para entrenar modelos."
+msgstr "Dataset utilitzat per molts laboratoris d'IA per entrenar models."
+
+#: includes/class-crawler-catalog.php:212
+msgid "Extracción de datos comercial, vende acceso estructurado a tu contenido."
+msgstr "Extracció comercial de dades, ven accés estructurat al teu contingut."
+
+#: includes/class-crawler-catalog.php:219
+msgid "Recopila imágenes específicamente para datasets de entrenamiento de IA."
+msgstr "Recopila imatges específicament per a datasets d'entrenament d'IA."
+
+#: includes/class-crawler-catalog.php:226
+#: includes/class-crawler-catalog.php:233
+msgid "Vende los datos recopilados a terceros (incluye entrenamiento de IA)."
+msgstr "Ven les dades recopilades a tercers (inclou entrenament d'IA)."
+
+#: includes/class-crawler-catalog.php:240
+msgid "Recopila contenido para entrenamiento de IA (buscador Timpi)."
+msgstr "Recopila contingut per a entrenament d'IA (cercador Timpi)."
+
+#: includes/class-crawler-catalog.php:247
+msgid "Crawler comercial de SEO, indexación o extracción automatizada de contenido."
+msgstr "Crawler comercial de SEO, indexació o extracció automatitzada de contingut."
+
+#: includes/class-crawler-catalog.php:259
+msgid "Herramienta automatizada de escaneo, reconocimiento o pruebas de seguridad."
+msgstr "Eina automatitzada d'escaneig, reconeixement o proves de seguretat."
+
+#: includes/class-crawler-catalog.php:267
+msgid "Crawler de buscador tradicional o regional configurado aquí para bloqueo explícito."
+msgstr "Crawler de cercador tradicional o regional configurat aquí per al bloqueig explícit."
+
+#: includes/class-crawler-catalog.php:275
+msgid "Crawler de archivado, control de originalidad o creación de datasets."
+msgstr "Crawler d'arxivat, control d'originalitat o creació de datasets."
+
+#: includes/class-document-pipeline.php:47
+msgid "No se pudo extraer el origen."
+msgstr "No s'ha pogut extreure l'origen."
+
+#: includes/class-editor-metabox.php:72
+msgid "Modo: manual"
+msgstr "Mode: manual"
+
+#: includes/class-editor-metabox.php:75
+msgid "Ver en el Registro"
+msgstr "Mostra al Registre"
+
+#: includes/class-editor-metabox.php:79
+msgid "Este contenido todavía no está en la base de conocimiento."
+msgstr "Aquest contingut encara no és a la base de coneixement."
+
+#: includes/class-editor-metabox.php:86
+msgid "Añadir a la base de conocimiento"
+msgstr "Afegeix a la base de coneixement"
+
+#: includes/class-editor-metabox.php:107
+msgid "Contenido no encontrado."
+msgstr "Contingut no trobat."
+
+#: includes/class-genix-bridge.php:41
+msgid "Support Genix no está activo o no expone sgkb-docs."
+msgstr "Support Genix no està actiu o no exposa sgkb-docs."
+
+#: includes/class-genix-hooks-guard.php:87
+msgid "Filtros del chatbot reinstalados correctamente en Support Genix."
+msgstr "Filtres del chatbot reinstal·lats correctament a Support Genix."
+
+#: includes/class-genix-hooks-guard.php:173
+msgid "Support Genix Lite"
+msgstr "Support Genix Lite"
+
+#: includes/class-genix-hooks-guard.php:174
+msgid "Support Genix Pro"
+msgstr "Support Genix Pro"
+
+#. translators: %s: nombres de los plugins afectados (Support Genix Lite y/o Pro)
+#: includes/class-genix-hooks-guard.php:186
+msgid "%s ha perdido los filtros que conectan nuestras mejoras del chatbot (probablemente por una actualización del plugin). El chatbot sigue funcionando, pero sin relevancia mejorada, idiomas no soportados, límite de documentos relacionados, ni el prompt personalizado del sitio."
+msgstr "%s ha perdut els filtres que connecten les nostres millores del chatbot (probablement per una actualització del plugin). El chatbot continua funcionant, però sense rellevància millorada, idiomes no compatibles, límit de documents relacionats ni el prompt personalitzat del lloc."
+
+#: includes/class-genix-hooks-guard.php:190
+msgid "Reinstalar filtros ahora"
+msgstr "Reinstal·la els filtres ara"
+
+#: includes/class-genix-hooks-guard.php:207
+msgid "No se encuentra el archivo de Support Genix (ni Lite ni Pro)."
+msgstr "No s'ha trobat el fitxer de Support Genix (ni Lite ni Pro)."
+
+#: includes/class-genix-hooks-guard.php:224
+msgid "El archivo de Support Genix no tiene permisos de escritura."
+msgstr "El fitxer de Support Genix no té permisos d'escriptura."
+
+#: includes/class-genix-hooks-guard.php:241
+msgid "No se encontró el punto de anclaje para el primer filtro (search-results). Genix pudo cambiar de estructura; revisar manualmente."
+msgstr "No s'ha trobat el punt d'ancoratge per al primer filtre (search-results). Genix pot haver canviat d'estructura; revisa-ho manualment."
+
+#: includes/class-genix-hooks-guard.php:254
+msgid "No se encontró el punto de anclaje para el segundo filtro (docs-list). Genix pudo cambiar de estructura; revisar manualmente."
+msgstr "No s'ha trobat el punt d'ancoratge per al segon filtre (docs-list). Genix pot haver canviat d'estructura; revisa-ho manualment."
+
+#: includes/class-genix-hooks-guard.php:267
+msgid "No se encontró el punto de anclaje para el tercer parche (custom-instructions). Genix pudo cambiar de estructura; revisar manualmente."
+msgstr "No s'ha trobat el punt d'ancoratge per al tercer pedaç (custom-instructions). Genix pot haver canviat d'estructura; revisa-ho manualment."
+
+#: includes/class-genix-hooks-guard.php:298
+msgid "No se pudo escribir el archivo de Support Genix."
+msgstr "No s'ha pogut escriure el fitxer de Support Genix."
+
+#: includes/class-genix-hooks-guard.php:328
+msgid "La comprobación de sintaxis PHP falló tras insertar los filtros. No se ha escrito nada."
+msgstr "La comprovació de sintaxi PHP ha fallat després d'inserir els filtres. No s'ha escrit res."
+
+#: includes/class-genix-hooks-guard.php:336
+msgid "No autorizado."
+msgstr "No autoritzat."
+
+#: includes/class-llms-faq.php:109
+msgid "Preguntas frecuentes"
+msgstr "Preguntes freqüents"
+
+#: includes/class-llms-faq.php:113
+msgid "Preguntas frecuentes públicas del negocio."
+msgstr "Preguntes freqüents públiques del negoci."
+
+#: includes/class-llms-faq.php:118
+msgid "FAQ"
+msgstr "FAQ"
+
+#: includes/class-llms-txt.php:45
+msgid "Última actualización:"
+msgstr "Última actualització:"
+
+#: includes/class-llms-txt.php:73
+msgid "Documentación técnica de la API (OpenAPI)"
+msgstr "Documentació tècnica de l'API (OpenAPI)"
+
+#: includes/class-llms-txt.php:73
+msgid "para desarrolladores e integraciones."
+msgstr "per a desenvolupadors i integracions."
+
+#: includes/class-llms-txt.php:81
+#: includes/class-rest-content.php:49
+msgid "Feed de productos (Google Merchant)"
+msgstr "Feed de productes (Google Merchant)"
+
+#: includes/class-llms-txt.php:81
+msgid "para comparadores y plataformas de shopping."
+msgstr "per a comparadors i plataformes de shopping."
+
+#: includes/class-llms-txt.php:83
+msgid "Feed de contenido (JSON)"
+msgstr "Feed de contingut (JSON)"
+
+#: includes/class-llms-txt.php:83
+msgid "el resto del contenido del alcance, sin paginar."
+msgstr "la resta del contingut de l'abast, sense paginar."
+
+#: includes/class-rest-content.php:55
+msgid "Feed de contenido"
+msgstr "Feed de contingut"
+
+#: includes/class-rest-content.php:246
+msgid "Mapa taxonomía => lista de nombres de término."
+msgstr "Mapa taxonomia => llista de noms de terme."
+
+#: includes/class-rest-content.php:254
+msgid "Solo los campos personalizados seleccionados en Alcance."
+msgstr "Només els camps personalitzats seleccionats a Abast."
+
+#: includes/class-rest-content.php:260
+msgid "Solo poblado si el contenido es un producto WooCommerce."
+msgstr "Només s'emplena si el contingut és un producte WooCommerce."
+
+#: includes/class-rest-content.php:279
+msgid "No encontrado (origen inexistente, no publicado, fuera de alcance, o post_type inexistente/no público)."
+msgstr "No trobat (origen inexistent, no publicat, fora d'abast, o post_type inexistent/no públic)."
+
+#: includes/class-rest-content.php:300
+msgid "AI Knowledge & Visibility — API de contenido"
+msgstr "AI Knowledge & Visibility — API de contingut"
+
+#: includes/class-rest-content.php:301
+msgid "API pública de solo lectura del contenido dentro del alcance configurado del plugin, sin pasar por IA (Fase 3 del roadmap)."
+msgstr "API pública de només lectura del contingut dins de l'abast configurat del plugin, sense passar per IA (Fase 3 del roadmap)."
+
+#: includes/class-rest-content.php:310
+msgid "Un contenido por ID."
+msgstr "Un contingut per ID."
+
+#: includes/class-rest-content.php:321
+msgid "Contenido encontrado."
+msgstr "Contingut trobat."
+
+#: includes/class-rest-content.php:334
+msgid "Listado paginado de un post_type dentro del alcance."
+msgstr "Llistat paginat d'un post_type dins de l'abast."
+
+#: includes/class-rest-content.php:341
+msgid "Ej. \"product\" (WooCommerce) o cualquier otro post_type público dentro del alcance."
+msgstr "Ex. \"product\" (WooCommerce) o qualsevol altre post_type públic dins de l'abast."
+
+#: includes/class-rest-content.php:363
+msgid "Listado paginado (cabeceras X-WP-Total/X-WP-TotalPages)."
+msgstr "Llistat paginat (capçaleres X-WP-Total/X-WP-TotalPages)."
+
+#: includes/class-rest-content.php:409
+msgid "Catálogo de productos"
+msgstr "Catàleg de productes"
+
+#: includes/class-rest-content.php:481
+msgid "No encontrado."
+msgstr "No trobat."
+
+#: includes/class-rest-guard.php:71
+msgid "Invalid post ID."
+msgstr "ID de post no vàlid."
+
+#: includes/class-store-info-doc.php:97
+#: includes/class-store-info-doc.php:123
+#: assets/admin.js
+msgid "Mostrar menos crawlers"
+msgstr "Mostra menys rastrejadors"

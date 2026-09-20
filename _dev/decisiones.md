@@ -189,3 +189,20 @@ contenido) — no se forzó una invalidación especial para este cambio de códi
 - La salida de `llms.txt` incluye en su cabecera la fecha y hora de la última
   generación en formato ISO 8601, tanto en la ruta virtual como en el archivo
   físico regenerado. Así los lectores pueden valorar la frescura del contenido.
+
+## 2026-09-19 — Internacionalización y documentación por idioma
+
+- El español es el idioma base del plugin y la documentación actual de `docs/`
+  se conserva como fuente principal.
+- El catálogo gettext previsto es `languages/ai-knowledge.pot` y el primer
+  catálogo traducible será `languages/ai-knowledge-es_ES.po`.
+- Todos los textos visibles deben quedar preparados para traducción: PHP,
+  JavaScript, botones, errores, avisos y mensajes AJAX.
+- Las traducciones de documentación no se mezclan con gettext: si en el futuro
+  existe `docs/{locale}/archivo.md`, el panel usará ese archivo; si no existe,
+  usará el archivo equivalente de `docs/`.
+- No se crean ahora carpetas ni copias traducidas de Markdown y nunca se borra
+  ni sustituye la documentación base española.
+- Esta decisión está documentada; la implementación y la validación siguen
+  implementadas localmente el 2026-09-19. La prueba visual multiidioma y la
+  revisión lingüística del catálogo siguen pendientes.

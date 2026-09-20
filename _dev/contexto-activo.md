@@ -6,6 +6,16 @@
 `github.com/22MW/ai-knowledge`. Ruta:
 `app/public/wp-content/plugins/ai-knowledge/`.
 
+## Estado de documentación e idiomas — 2026-09-20
+
+- La interfaz dispone de español (`es_ES`), catalán (`ca`), alemán (`de_DE`),
+  inglés (`en_US`) y francés (`fr_FR`).
+- `docs/index.md` y `_dev/docs/index.md` explican los idiomas disponibles e
+  indican que se contacte con el equipo si falta un idioma o hay una traducción
+  incompleta o incorrecta.
+- Los planes y documentos temporales se conservan en `_dev/temp/`; la
+  documentación vigente permanece fuera de esa carpeta.
+
 ## Confirmado (Fases 0-11 completas + reestructuración Negocio/Chatbot/FAQs/WooCommerce)
 
 Fase 10 (plan conjunto de UX del admin, 5 piezas) completa. Además, tras
@@ -78,6 +88,30 @@ limpieza posterior de Ajustes/Chatbot, como `a332da1`.
   borran de la opción existente.
 - Pendiente QA real: conectar proveedor, guardar modelo automático/manual y
   probar documentos, Negocio, FAQs, WooCommerce y traducción del chatbot.
+
+## Próximo cambio documentado — Internacionalización
+
+El diseño quedó acordado en otro hilo, pero todavía no se ha implementado:
+
+- Español como idioma base.
+- `languages/ai-knowledge.pot` como plantilla y
+  `languages/ai-knowledge-es_ES.po` como primer catálogo.
+- Todos los strings visibles del plugin deben pasar por gettext o por la
+  internacionalización JavaScript, incluidos botones, errores, avisos y AJAX.
+- La documentación seguirá en español dentro de `docs/`.
+- Las traducciones futuras podrán vivir en `docs/{locale}/`; el panel deberá
+  usar ese archivo cuando exista y volver a `docs/` cuando no exista.
+- No crear copias traducidas de los `.md` ahora.
+
+Estado actualizado el 2026-09-19: creados `languages/ai-knowledge.pot`,
+`languages/ai-knowledge-es_ES.po`, el `.mo` y el JSON JavaScript generado.
+`assets/admin.js` usa `wp.i18n`, el bootstrap carga el text domain y el panel
+de documentación aplica el fallback por locale. Falta QA visual real con un
+locale alternativo y completar/revisar las traducciones del `.po`.
+
+Actualización posterior: los catálogos inglés y catalán, sus `.mo` y sus JSON
+JavaScript están completos e incluidos en el release `1.1.3`. Falta únicamente
+QA visual real cambiando el locale de WordPress.
 
 ## Ajuste del resumen de Negocio
 

@@ -1,0 +1,1894 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: AI Knowledge & Visibility 1.1.2.2\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/ai-knowledge\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-09-19T12:52:21+00:00\n"
+"PO-Revision-Date: 2026-09-20 12:44+0200\n"
+"Language: de\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.9\n"
+"X-Domain: ai-knowledge\n"
+
+#. Plugin Name of the plugin
+msgid "AI Knowledge & Visibility"
+msgstr "AI Knowledge & Visibility"
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+msgid "https://22mw.online/"
+msgstr "https://22mw.online/"
+
+#. Description of the plugin
+msgid "Genera documentos de base de conocimiento (.md + posts sgkb-docs de Support Genix) a partir de productos WooCommerce u otros CPTs, con cola, límite diario, WPML y publicación pública GEO vía llms.txt."
+msgstr "Erstellt Wissensdatenbank-Dokumente (.md + sgkb-docs-Beiträge von Support Genix) aus WooCommerce-Produkten oder anderen CPTs, mit Warteschlange, Tageslimit, WPML und öffentlicher GEO-Veröffentlichung über llms.txt."
+
+#. Author of the plugin
+msgid "22MW"
+msgstr "22MW"
+
+#: admin/class-admin.php:93
+#: admin/class-admin.php:94
+#: admin/class-admin.php:191
+#: includes/class-editor-metabox.php:50
+msgid "Base de conocimiento IA"
+msgstr "KI-Wissensdatenbank"
+
+#: admin/class-admin.php:134
+msgid "Registro"
+msgstr "Protokoll"
+
+#: admin/class-admin.php:135
+msgid "Contenido"
+msgstr "Inhalt"
+
+#: admin/class-admin.php:136
+#: admin/views/tab-woocommerce.php:270
+msgid "Negocio"
+msgstr "Unternehmen"
+
+#: admin/class-admin.php:137
+msgid "FAQs"
+msgstr "FAQs"
+
+#: admin/class-admin.php:143
+#: admin/views/tab-ajustes.php:162
+msgid "WooCommerce"
+msgstr "WooCommerce"
+
+#: admin/class-admin.php:148
+msgid "Chatbot"
+msgstr "Chatbot"
+
+#: admin/class-admin.php:150
+msgid "Visibilidad IA"
+msgstr "KI-Sichtbarkeit"
+
+#: admin/class-admin.php:151
+#: admin/views/tab-ajustes.php:26
+msgid "Generación masiva"
+msgstr "Massengenerierung"
+
+#: admin/class-admin.php:152
+msgid "Ajustes"
+msgstr "Einstellungen"
+
+#: admin/class-admin.php:175
+#: admin/class-admin.php:407
+#: includes/class-editor-metabox.php:61
+#: includes/class-editor-metabox.php:102
+msgid "No tienes permisos suficientes."
+msgstr "Sie verfügen nicht über ausreichende Berechtigungen."
+
+#: admin/class-admin.php:192
+msgid "Modo oscuro"
+msgstr "Dunkelmodus"
+
+#: admin/class-admin.php:197
+#: admin/class-admin.php:417
+#: assets/admin.js:170
+msgid "Guardado."
+msgstr "Gespeichert."
+
+#: admin/class-admin.php:229
+msgid "Leer documentación"
+msgstr "Dokumentation lesen"
+
+#: admin/class-admin.php:257
+#: assets/admin.js:253
+msgid "Documentación"
+msgstr "Dokumentation"
+
+#: admin/class-admin.php:261
+msgid "Cerrar documentación"
+msgstr "Dokumentation schließen"
+
+#: admin/class-admin.php:398
+msgid "Total de documentos:"
+msgstr "Dokumente insgesamt:"
+
+#: admin/class-admin.php:753
+msgid "No se encontró ningún producto o página con ese ID/URL."
+msgstr "Es wurde kein Produkt bzw. keine Seite mit dieser ID/URL gefunden."
+
+#: admin/class-admin.php:758
+msgid "Ese contenido no está dentro del alcance configurado del plugin (pestaña Alcance/Exclusiones)."
+msgstr "Dieser Inhalt liegt außerhalb des für das Plugin konfigurierten Umfangs (Tab Umfang/Ausschlüsse)."
+
+#: admin/class-admin.php:1009
+#: admin/class-admin.php:1067
+msgid "Borrador generado."
+msgstr "Entwurf erstellt."
+
+#: admin/class-admin.php:1045
+#: admin/class-admin.php:1047
+#: admin/class-admin.php:1112
+msgid "Esta acción requiere Support Genix activo."
+msgstr "Für diese Aktion muss Support Genix aktiv sein."
+
+#: admin/class-admin.php:1095
+#: admin/class-admin.php:1194
+msgid "Texto pulido."
+msgstr "Text überarbeitet."
+
+#: admin/class-admin.php:1280
+msgid "FAQ guardada."
+msgstr "FAQ gespeichert."
+
+#: admin/class-admin.php:1314
+msgid "FAQ generada."
+msgstr "FAQ erstellt."
+
+#: admin/class-admin.php:1541
+msgid "Selección no válida: elige una de las opciones de la lista."
+msgstr "Ungültige Auswahl: Wählen Sie eine der Optionen aus der Liste."
+
+#: admin/class-admin.php:1547
+msgid "No se pudo resolver la URL pública de ese contenido."
+msgstr "Die öffentliche URL dieses Inhalts konnte nicht ermittelt werden."
+
+#: admin/class-admin.php:1600
+msgid "Antes de sustituir llms.txt tienes que descargar la copia actual."
+msgstr "Bevor Sie llms.txt ersetzen, müssen Sie die aktuelle Kopie herunterladen."
+
+#: admin/class-admin.php:1603
+msgid "No se pudo escribir el llms.txt físico en la raíz del sitio."
+msgstr "Die physische llms.txt-Datei konnte nicht im Stammverzeichnis der Website geschrieben werden."
+
+#: admin/class-admin.php:1667
+msgid "No se pudo leer el robots.txt actual (ni físico ni virtual) para generar la copia de seguridad."
+msgstr "Die aktuelle robots.txt-Datei konnte weder physisch noch virtuell gelesen werden, um die Sicherungskopie zu erstellen."
+
+#: admin/class-admin.php:1694
+msgid "Antes de aplicar el bloqueo tienes que descargar la copia actual de robots.txt. Pulsa \"Descargar copia actual\" y vuelve a intentarlo."
+msgstr "Bevor Sie die Sperre anwenden, müssen Sie die aktuelle robots.txt-Kopie herunterladen. Klicken Sie auf \"Aktuelle Kopie herunterladen\" und versuchen Sie es erneut."
+
+#: admin/class-admin.php:1698
+#: admin/views/tab-visibilidad-ia.php:373
+msgid "robots.txt no es escribible en este servidor (permisos de la carpeta raíz)."
+msgstr "robots.txt ist auf diesem Server nicht beschreibbar (Berechtigungen des Stammverzeichnisses)."
+
+#: admin/class-admin.php:1719
+#: admin/class-admin.php:1751
+msgid "No se encontró un .htaccess editable en este servidor (nginx u otra configuración): usa el bloque de código manual en su lugar."
+msgstr "Auf diesem Server wurde keine bearbeitbare .htaccess-Datei gefunden (nginx oder andere Konfiguration): Verwenden Sie stattdessen den manuellen Codeblock."
+
+#: admin/class-admin.php:1747
+msgid "Antes de aplicar el bloqueo tienes que descargar la copia actual de .htaccess. Pulsa \"Descargar copia actual\" y vuelve a intentarlo."
+msgstr "Bevor Sie die Sperre anwenden, müssen Sie die aktuelle .htaccess-Kopie herunterladen. Klicken Sie auf \"Aktuelle Kopie herunterladen\" und versuchen Sie es erneut."
+
+#. translators: %d: numero de documentos con el origen actualizado desde que se fijaron a mano
+#: admin/class-admin.php:1795
+msgid "%d documento en modo manual tiene el origen actualizado desde que se fijó el texto. %s"
+msgid_plural "%d documentos en modo manual tienen el origen actualizado desde que se fijó el texto. %s"
+msgstr[0] "Bei %d Dokument im manuellen Modus wurde die Quelle aktualisiert, seit der Text festgesetzt wurde. %s"
+msgstr[1] "Bei %d Dokumenten im manuellen Modus wurde die Quelle aktualisiert, seit der Text festgesetzt wurde. %s"
+
+#: admin/class-admin.php:1797
+msgid "Revisar en el Registro"
+msgstr "Im Protokoll prüfen"
+
+#. translators: %d: numero de documentos con el origen actualizado desde que se fijaron a mano
+#: admin/class-admin.php:1822
+msgid "KB IA: %d desactualizado(s)"
+msgstr "KI-WB: %d veraltet"
+
+#: admin/class-registry-table.php:16
+msgid "En cola"
+msgstr "In Warteschlange"
+
+#: admin/class-registry-table.php:17
+msgid "Generando"
+msgstr "Wird erstellt"
+
+#: admin/class-registry-table.php:18
+msgid "Listo"
+msgstr "Bereit"
+
+#: admin/class-registry-table.php:19
+msgid "Error"
+msgstr "Fehler"
+
+#: admin/class-registry-table.php:20
+msgid "Sin origen"
+msgstr "Ohne Quelle"
+
+#: admin/class-registry-table.php:38
+msgid "Origen"
+msgstr "Quelle"
+
+#: admin/class-registry-table.php:45
+msgid "Idioma"
+msgstr "Sprache"
+
+#: admin/class-registry-table.php:47
+msgid "Estado"
+msgstr "Status"
+
+#: admin/class-registry-table.php:48
+msgid "Actualizado"
+msgstr "Aktualisiert"
+
+#: admin/class-registry-table.php:49
+msgid "Enlaces"
+msgstr "Links"
+
+#: admin/class-registry-table.php:50
+msgid "Control manual"
+msgstr "Manuelle Steuerung"
+
+#: admin/class-registry-table.php:51
+msgid "Acciones"
+msgstr "Aktionen"
+
+#: admin/class-registry-table.php:112
+msgid "Borrar seleccionados"
+msgstr "Ausgewählte löschen"
+
+#: admin/class-registry-table.php:113
+msgid "Regenerar seleccionados"
+msgstr "Ausgewählte neu generieren"
+
+#: admin/class-registry-table.php:226
+msgid "Manual"
+msgstr "Manuell"
+
+#: admin/class-registry-table.php:228
+msgid "Auto"
+msgstr "Auto"
+
+#: admin/class-registry-table.php:231
+msgid "Origen actualizado"
+msgstr "Quelle aktualisiert"
+
+#: admin/class-registry-table.php:232
+msgid "Marcar revisado"
+msgstr "Als geprüft markieren"
+
+#: admin/class-registry-table.php:290
+msgid "Vuelve a modo automatico y regenera este documento con IA ahora mismo. ¿Continuar?"
+msgstr "Zurück in den Automatikmodus wechseln und dieses Dokument jetzt mit KI neu generieren. Fortfahren?"
+
+#: admin/class-registry-table.php:306
+msgid "Ajustes avanzados"
+msgstr "Erweiterte Einstellungen"
+
+#: admin/class-registry-table.php:308
+msgid "Puente:"
+msgstr "Bridge:"
+
+#: admin/class-registry-table.php:309
+msgid "Sí"
+msgstr "Ja"
+
+#: admin/class-registry-table.php:311
+msgid "Hash:"
+msgstr "Hash:"
+
+#: admin/class-registry-table.php:317
+msgid "Límite de caracteres"
+msgstr "Zeichenlimit"
+
+#: admin/class-registry-table.php:330
+msgid "Guardar límite"
+msgstr "Limit speichern"
+
+#: admin/class-registry-table.php:331
+msgid "Guardar cambios"
+msgstr "Änderungen speichern"
+
+#: admin/class-registry-table.php:333
+msgid "Volver a Auto"
+msgstr "Zurück zu Auto"
+
+#: admin/class-registry-table.php:373
+msgid "¿Borrar documento y post asociado? El origen se añadirá a \"IDs a excluir\" en Contenido, para que no se vuelva a generar solo (quítalo de esa lista si quieres que se vuelva a generar)."
+msgstr "Dokument und zugehörigen Beitrag löschen? Die Quelle wird unter Inhalt zu \"Auszuschließende IDs\" hinzugefügt, damit sie nicht automatisch erneut generiert wird (entfernen Sie sie aus dieser Liste, wenn sie wieder generiert werden soll)."
+
+#: admin/class-registry-table.php:385
+msgid "Generar"
+msgstr "Generieren"
+
+#: admin/class-registry-table.php:386
+msgid "Borrar"
+msgstr "Löschen"
+
+#: admin/views/tab-ajustes.php:14
+msgid "Configuración general del generador de documentos: largo del texto, origen de IA y qué post_types muestran el botón de añadir a la base de conocimiento desde su editor."
+msgstr "Allgemeine Konfiguration des Dokumentgenerators: Textlänge, KI-Quelle und post_types, bei denen der Button zum Hinzufügen zur Wissensdatenbank im Editor angezeigt wird."
+
+#. translators: %s: enlace a la pestaña Generación masiva
+#: admin/views/tab-ajustes.php:25
+msgid "El límite diario, el tamaño de lote y el debounce de la cola se editan en %s."
+msgstr "Tageslimit, Batch-Größe und Debounce-Verzögerung der Warteschlange werden unter %s bearbeitet."
+
+#: admin/views/tab-ajustes.php:32
+msgid "Largo del texto generado (caracteres)"
+msgstr "Länge des generierten Textes (Zeichen)"
+
+#: admin/views/tab-ajustes.php:35
+msgid "El tamaño real del cuerpo de cada documento generado (sin contar el título). Se puede sobrescribir por documento individual desde el Registro."
+msgstr "Tatsächliche Länge des Textkörpers jedes generierten Dokuments (ohne Titel). Sie kann pro Dokument im Protokoll überschrieben werden."
+
+#: admin/views/tab-ajustes.php:39
+msgid "Tokens de salida por documento"
+msgstr "Ausgabe-Tokens pro Dokument"
+
+#: admin/views/tab-ajustes.php:42
+msgid "Techo técnico de la petición a la IA (para que la respuesta no se corte a mitad), no el largo del texto — eso lo controla el campo de arriba."
+msgstr "Technische Obergrenze der KI-Anfrage (damit die Antwort nicht mittendrin abgeschnitten wird), nicht die Textlänge — diese wird durch das Feld oben gesteuert."
+
+#: admin/views/tab-ajustes.php:46
+msgid "Origen de IA"
+msgstr "KI-Quelle"
+
+#: admin/views/tab-ajustes.php:49
+#: admin/views/tab-ajustes.php:59
+msgid "Conectores de WordPress"
+msgstr "WordPress-Konnektoren"
+
+#: admin/views/tab-ajustes.php:51
+#: admin/views/tab-ajustes.php:59
+msgid "Support Genix"
+msgstr "Support Genix"
+
+#. translators: %1$s modelo, %2$s origen
+#: admin/views/tab-ajustes.php:57
+msgid "Configuración activa: modelo %1$s, origen %2$s."
+msgstr "Aktive Konfiguration: Modell %1$s, Quelle %2$s."
+
+#: admin/views/tab-ajustes.php:58
+msgid "Automático"
+msgstr "Automatisch"
+
+#: admin/views/tab-ajustes.php:62
+msgid "El origen seleccionado no está conectado."
+msgstr "Die ausgewählte Quelle ist nicht verbunden."
+
+#: admin/views/tab-ajustes.php:70
+msgid "Modelo de WordPress"
+msgstr "WordPress-Modell"
+
+#: admin/views/tab-ajustes.php:73
+msgid "Automático (recomendado)"
+msgstr "Automatisch (empfohlen)"
+
+#: admin/views/tab-ajustes.php:91
+msgid "No hay modelos compatibles conectados todavía."
+msgstr "Es sind noch keine kompatiblen Modelle verbunden."
+
+#: admin/views/tab-ajustes.php:93
+msgid "Automático elige entre los modelos de texto conectados de Anthropic, OpenAI o Google."
+msgstr "Automatisch wählt zwischen verbundenen Textmodellen von Anthropic, OpenAI oder Google."
+
+#: admin/views/tab-ajustes.php:95
+msgid "Gestionar Conectores de WordPress"
+msgstr "WordPress-Konnektoren verwalten"
+
+#: admin/views/tab-ajustes.php:101
+msgid "Botón \"Añadir a la base de conocimiento\" en el editor"
+msgstr "Button \"Zur Wissensdatenbank hinzufügen\" im Editor"
+
+#: admin/views/tab-ajustes.php:117
+msgid "Tipos de contenido públicos donde aparece el meta box \"Base de conocimiento IA\" en su editor. Por defecto, todos."
+msgstr "Öffentliche Inhaltstypen, bei denen die Meta-Box \"KI-Wissensdatenbank\" im Editor erscheint. Standardmäßig alle."
+
+#: admin/views/tab-ajustes.php:121
+msgid "Aviso a buscadores (IndexNow)"
+msgstr "Suchmaschinen benachrichtigen (IndexNow)"
+
+#: admin/views/tab-ajustes.php:125
+msgid "Avisar a buscadores compatibles con IndexNow (Bing y otros; Google no lo soporta) al crear, actualizar o borrar contenido del alcance."
+msgstr "Mit IndexNow kompatible Suchmaschinen (Bing und andere; Google unterstützt es nicht) benachrichtigen, wenn Inhalte im Umfang erstellt, aktualisiert oder gelöscht werden."
+
+#. translators: %s: URL del archivo de clave IndexNow
+#: admin/views/tab-ajustes.php:131
+msgid "Clave del sitio (generada automáticamente): %s"
+msgstr "Website-Schlüssel (automatisch erstellt): %s"
+
+#: admin/views/tab-ajustes.php:139
+msgid "Guardar ajustes"
+msgstr "Einstellungen speichern"
+
+#. translators: %s: enlace a la pestaña Prompt
+#: admin/views/tab-ajustes.php:148
+msgid "El prompt de sistema del chatbot se gestiona en la pestaña %s."
+msgstr "Der System-Prompt des Chatbots wird im Tab %s verwaltet."
+
+#: admin/views/tab-ajustes.php:149
+msgid "Prompt"
+msgstr "Prompt"
+
+#. translators: %s: enlace a la pestaña WooCommerce
+#: admin/views/tab-ajustes.php:161
+msgid "Los documentos de información de tienda (cómo comprar, condiciones, envío, pago, impuestos) se generan desde la pestaña %s."
+msgstr "Die Shop-Informationsdokumente (Kaufablauf, Bedingungen, Versand, Zahlung, Steuern) werden im Tab %s erstellt."
+
+#: admin/views/tab-carga-inicial.php:16
+msgid "Genera de golpe los documentos de todo el contenido dentro del alcance, y ajusta aquí el límite diario, el tamaño de lote y el debounce de la cola."
+msgstr "Erstellen Sie auf einmal die Dokumente für alle Inhalte im Umfang und stellen Sie hier Tageslimit, Batch-Größe und Debounce der Warteschlange ein."
+
+#. translators: 1: nº elementos, 2: nº idiomas, 3: total documentos
+#: admin/views/tab-carga-inicial.php:23
+msgid "Alcance actual: %1$d elementos × %2$d idiomas = %3$d documentos posibles."
+msgstr "Aktueller Umfang: %1$d Elemente × %2$d Sprachen = %3$d mögliche Dokumente."
+
+#: admin/views/tab-carga-inicial.php:30
+msgid "Documentos ya sincronizados: %d."
+msgstr "Bereits synchronisierte Dokumente: %d."
+
+#: admin/views/tab-carga-inicial.php:32
+msgid "El límite diario está desactivado — la generación avanzará sin tope."
+msgstr "Das Tageslimit ist deaktiviert — die Generierung läuft ohne Begrenzung weiter."
+
+#: admin/views/tab-carga-inicial.php:34
+msgid "Límite diario actual: %d generaciones/día."
+msgstr "Aktuelles Tageslimit: %d Generierungen/Tag."
+
+#: admin/views/tab-carga-inicial.php:38
+msgid "Generación en curso (procesando por lotes vía Action Scheduler)."
+msgstr "Generierung läuft (Batch-Verarbeitung über Action Scheduler)."
+
+#: admin/views/tab-carga-inicial.php:42
+msgid "Cancelar generación"
+msgstr "Generierung abbrechen"
+
+#: admin/views/tab-carga-inicial.php:45
+msgid "\"Generar pendientes\" es seguro repetirlo: no regenera lo que ya está sincronizado y sin cambios, solo lo nuevo o lo que falló."
+msgstr "\"Ausstehende generieren\" kann gefahrlos wiederholt werden: Bereits synchronisierte, unveränderte Inhalte werden nicht neu generiert, sondern nur neue oder fehlgeschlagene."
+
+#: admin/views/tab-carga-inicial.php:50
+msgid "Generar pendientes"
+msgstr "Ausstehende generieren"
+
+#: admin/views/tab-carga-inicial.php:52
+msgid "Esto va a REGENERAR también el contenido que ya está sincronizado, no solo lo pendiente. Gasta IA de más y no se puede deshacer. ¿Seguro que quieres continuar?"
+msgstr "Dadurch werden auch bereits synchronisierte Inhalte NEU GENERIERT, nicht nur ausstehende. Das verbraucht zusätzliche KI-Ressourcen und kann nicht rückgängig gemacht werden. Wirklich fortfahren?"
+
+#: admin/views/tab-carga-inicial.php:55
+msgid "Reiniciar todo"
+msgstr "Alles neu starten"
+
+#: admin/views/tab-carga-inicial.php:61
+msgid "Revisa la pestaña Registro para ver el progreso, o Herramientas → Scheduled Actions (grupo woo-kb) para el detalle técnico."
+msgstr "Prüfen Sie den Tab Protokoll, um den Fortschritt zu sehen, oder Werkzeuge → Scheduled Actions (Gruppe woo-kb) für technische Details."
+
+#: admin/views/tab-carga-inicial.php:66
+msgid "Ajustes de la cola"
+msgstr "Warteschlangen-Einstellungen"
+
+#: admin/views/tab-carga-inicial.php:72
+msgid "Límite diario de generaciones"
+msgstr "Tageslimit für Generierungen"
+
+#: admin/views/tab-carga-inicial.php:77
+msgid "Sin límite (usar solo en cargas manuales supervisadas — recuerda desactivarlo al terminar)"
+msgstr "Ohne Limit (nur für überwachte manuelle Läufe verwenden — anschließend wieder deaktivieren)"
+
+#: admin/views/tab-carga-inicial.php:80
+msgid "Aviso: el límite diario está DESACTIVADO."
+msgstr "Warnung: Das Tageslimit ist DEAKTIVIERT."
+
+#: admin/views/tab-carga-inicial.php:85
+msgid "Tamaño de lote"
+msgstr "Batch-Größe"
+
+#: admin/views/tab-carga-inicial.php:89
+msgid "Retraso de debounce (segundos)"
+msgstr "Debounce-Verzögerung (Sekunden)"
+
+#: admin/views/tab-carga-inicial.php:93
+#: admin/views/tab-contenido.php:145
+#: admin/views/tab-negocio.php:41
+#: admin/views/tab-woocommerce.php:293
+msgid "Guardar"
+msgstr "Speichern"
+
+#: admin/views/tab-contenido.php:13
+msgid "Qué contenido de tu web entra en la base de conocimiento: qué tipos de contenido, qué categorías/etiquetas concretas, IDs sueltos adicionales o excluidos, y qué campos personalizados se envían a la IA. Nada se genera para lo que no esté incluido aquí, y un ID excluido nunca genera documento aunque su tipo de contenido o término esté incluido."
+msgstr "Welche Inhalte Ihrer Website in die Wissensdatenbank aufgenommen werden: Inhaltstypen, konkrete Kategorien/Tags, zusätzliche oder ausgeschlossene einzelne IDs sowie benutzerdefinierte Felder, die an die KI gesendet werden. Für hier nicht enthaltene Inhalte wird nichts generiert, und eine ausgeschlossene ID erzeugt niemals ein Dokument, selbst wenn ihr Inhaltstyp oder Begriff enthalten ist."
+
+#: admin/views/tab-contenido.php:20
+msgid "Tipos de contenido a incluir"
+msgstr "Einzuschließende Inhaltstypen"
+
+#: admin/views/tab-contenido.php:23
+msgid "Modo"
+msgstr "Modus"
+
+#: admin/views/tab-contenido.php:27
+msgid "Solo los tipos marcados abajo"
+msgstr "Nur die unten markierten Typen"
+
+#: admin/views/tab-contenido.php:31
+msgid "Todos los tipos públicos"
+msgstr "Alle öffentlichen Typen"
+
+#: admin/views/tab-contenido.php:36
+msgid "CPTs a incluir"
+msgstr "Einzuschließende CPTs"
+
+#: admin/views/tab-contenido.php:48
+msgid "Solo se usa si el modo es \"Solo los tipos marcados\"."
+msgstr "Wird nur verwendet, wenn der Modus \"Nur die markierten Typen\" ist."
+
+#: admin/views/tab-contenido.php:52
+msgid "CPTs a excluir cuando el modo es \"Todos\""
+msgstr "Auszuschließende CPTs, wenn der Modus \"Alle\" ist"
+
+#: admin/views/tab-contenido.php:64
+msgid "Solo se usa si el modo es \"Todos los tipos públicos\": el resto de tipos, presentes y futuros, entra automáticamente."
+msgstr "Wird nur verwendet, wenn der Modus \"Alle öffentlichen Typen\" ist: Alle übrigen aktuellen und künftigen Typen werden automatisch aufgenommen."
+
+#: admin/views/tab-contenido.php:68
+msgid "Taxonomías / términos"
+msgstr "Taxonomien / Begriffe"
+
+#: admin/views/tab-contenido.php:95
+msgid "Nada marcado = todos los términos. Marcado = solo entran posts con ese término."
+msgstr "Nichts markiert = alle Begriffe. Markiert = nur Beiträge mit diesem Begriff werden aufgenommen."
+
+#: admin/views/tab-contenido.php:101
+msgid "IDs sueltos"
+msgstr "Einzelne IDs"
+
+#: admin/views/tab-contenido.php:103
+msgid "IDs a incluir"
+msgstr "Einzuschließende IDs"
+
+#: admin/views/tab-contenido.php:107
+msgid "IDs separados por comas, independiente de CPT/taxonomía."
+msgstr "Kommagetrennte IDs, unabhängig von CPT/Taxonomie."
+
+#: admin/views/tab-contenido.php:109
+msgid "IDs a excluir"
+msgstr "Auszuschließende IDs"
+
+#: admin/views/tab-contenido.php:113
+msgid "IDs separados por comas: nunca generan documento, aunque su tipo de contenido o término esté incluido."
+msgstr "Kommagetrennte IDs: erzeugen niemals ein Dokument, auch wenn ihr Inhaltstyp oder Begriff enthalten ist."
+
+#: admin/views/tab-contenido.php:117
+msgid "Campos custom a incluir por CPT"
+msgstr "Benutzerdefinierte Felder pro CPT einbeziehen"
+
+#: admin/views/tab-contenido.php:139
+msgid "No se detectaron campos custom en los posts analizados."
+msgstr "In den analysierten Beiträgen wurden keine benutzerdefinierten Felder erkannt."
+
+#: admin/views/tab-faqs.php:22
+msgid "Contenido en Markdown que se publica como documento propio (enlazado desde /llms.txt, igual que el resto de documentos) y aparece en la pestaña Registro. Distinto del prompt del chatbot: esto es contenido público, no instrucciones internas."
+msgstr "Markdown-Inhalt, der als eigenes Dokument veröffentlicht wird (über /llms.txt verlinkt, wie die übrigen Dokumente) und im Tab Protokoll erscheint. Anders als der Chatbot-Prompt: Dies ist öffentlicher Inhalt, keine interne Anweisung."
+
+#: admin/views/tab-faqs.php:35
+msgid "Cambiar"
+msgstr "Ändern"
+
+#: admin/views/tab-faqs.php:37
+msgid "Sitio multiidioma: una FAQ (y un documento) por idioma, igual que el resto del contenido."
+msgstr "Mehrsprachige Website: eine FAQ (und ein Dokument) pro Sprache, wie bei den übrigen Inhalten."
+
+#: admin/views/tab-faqs.php:49
+msgid "Instrucciones para generar o ampliar las FAQs (opcional)"
+msgstr "Anweisungen zum Erstellen oder Erweitern der FAQs (optional)"
+
+#: admin/views/tab-faqs.php:50
+msgid "Indica el tono, número de preguntas, formato, orden o estructura que quieres."
+msgstr "Geben Sie Ton, Anzahl der Fragen, Format, Reihenfolge oder gewünschte Struktur an."
+
+#: admin/views/tab-faqs.php:51
+msgid "Puedes escribir una indicación breve o pegar un prompt completo. Estas instrucciones prevalecen sobre el formato predeterminado, pero solo pueden usar los datos de Negocio y la FAQ actual. Revisa el borrador antes de guardarlo."
+msgstr "Sie können eine kurze Anweisung eingeben oder einen vollständigen Prompt einfügen. Diese Anweisungen haben Vorrang vor dem Standardformat, dürfen aber nur die Unternehmensdaten und die aktuelle FAQ verwenden. Prüfen Sie den Entwurf vor dem Speichern."
+
+#: admin/views/tab-faqs.php:53
+msgid "Generar/ampliar con IA"
+msgstr "Mit KI generieren/erweitern"
+
+#: admin/views/tab-faqs.php:54
+msgid "Usa los datos guardados en la pestaña Negocio. Si ya hay FAQ guardada (en este idioma), la amplía o mejora en vez de partir de cero — puedes repetir esto todas las veces que haga falta: amplía los datos de Negocio (guárdalos primero) o edita la FAQ a mano abajo, guarda, y vuelve a generar para mejorar el resultado."
+msgstr "Verwendet die im Tab Unternehmen gespeicherten Daten. Wenn bereits eine FAQ gespeichert ist (in dieser Sprache), wird sie erweitert oder verbessert, statt bei null zu beginnen — Sie können dies beliebig oft wiederholen: Ergänzen Sie die Unternehmensdaten (zuerst speichern) oder bearbeiten Sie die FAQ unten manuell, speichern Sie und generieren Sie erneut, um das Ergebnis zu verbessern."
+
+#: admin/views/tab-faqs.php:62
+msgid "Guardar FAQ"
+msgstr "FAQ speichern"
+
+#: admin/views/tab-negocio.php:17
+msgid "Datos del negocio en sí: válidos con o sin WooCommerce (lo específico de WooCommerce vive en su propia pestaña). Se usan para el prompt del chatbot (pestaña Chatbot, si Genix está activo) y para llms.txt/llm/info.md."
+msgstr "Eigentliche Unternehmensdaten: gültig mit oder ohne WooCommerce (WooCommerce-spezifische Angaben befinden sich in einem eigenen Tab). Sie werden für den Chatbot-Prompt (Tab Chatbot, wenn Genix aktiv ist) sowie für llms.txt/llm/info.md verwendet."
+
+#: admin/views/tab-negocio.php:21
+msgid "1. Datos"
+msgstr "1. Daten"
+
+#: admin/views/tab-negocio.php:46
+msgid "2. Resumen para llms.txt (con IA)"
+msgstr "2. Zusammenfassung für llms.txt (mit KI)"
+
+#: admin/views/tab-negocio.php:48
+msgid "Genera o pule un resumen independiente usando todos los datos guardados arriba, incluido \"Enfoque del negocio\". Se usa como cita de apertura pública en /llms.txt, el archivo que leen los buscadores de IA. Guardar o borrar este resumen no modifica los datos fuente. Si el resultado se queda corto, amplía los datos de arriba, guárdalos primero y vuelve a generar."
+msgstr "Erstellt oder verbessert eine eigenständige Zusammenfassung mit allen oben gespeicherten Daten, einschließlich \"Unternehmensausrichtung\". Sie wird als öffentliches Eröffnungszitat in /llms.txt verwendet, der Datei, die von KI-Suchmaschinen gelesen wird. Das Speichern oder Löschen dieser Zusammenfassung ändert die Quelldaten nicht. Wenn das Ergebnis zu knapp ist, ergänzen Sie die Daten oben, speichern Sie sie zuerst und generieren Sie erneut."
+
+#: admin/views/tab-negocio.php:59
+msgid "Instrucciones para generar o pulir el texto (opcional)"
+msgstr "Anweisungen zum Erstellen oder Verbessern des Textes (optional)"
+
+#: admin/views/tab-negocio.php:60
+msgid "Indica el tono, formato, orden o estructura que quieres para el resumen."
+msgstr "Geben Sie Ton, Format, Reihenfolge oder gewünschte Struktur der Zusammenfassung an."
+
+#: admin/views/tab-negocio.php:61
+msgid "Puedes escribir una indicación breve o pegar un prompt completo. Estas instrucciones prevalecen sobre el formato predeterminado, pero solo pueden usar los datos guardados arriba. Revisa el borrador antes de guardarlo."
+msgstr "Sie können eine kurze Anweisung eingeben oder einen vollständigen Prompt einfügen. Diese Anweisungen haben Vorrang vor dem Standardformat, dürfen aber nur die oben gespeicherten Daten verwenden. Prüfen Sie den Entwurf vor dem Speichern."
+
+#: admin/views/tab-negocio.php:63
+msgid "Generar/pulir con IA"
+msgstr "Mit KI generieren/verbessern"
+
+#: admin/views/tab-negocio.php:70
+msgid "Guardar resumen"
+msgstr "Zusammenfassung speichern"
+
+#: admin/views/tab-prompt.php:15
+msgid "Esta pestaña requiere Support Genix activo."
+msgstr "Für diesen Tab muss Support Genix aktiv sein."
+
+#: admin/views/tab-prompt.php:29
+msgid "Cómo debe comportarse el chatbot de Support Genix: tono, qué hacer cuando no sabe algo, qué no debe hacer nunca. Los datos del negocio en sí (dirección, contacto, horario...) se rellenan en la pestaña Negocio — este cuestionario los combina automáticamente con estos al generar el borrador. Responde lo que sepas, opcionalmente añade páginas del sitio como referencia, y genera un primer borrador con IA. Puedes editarlo a mano antes de guardar, pulirlo con IA después de tus cambios, o añadir más respuestas al cuestionario y volver a generar para mejorar el resultado — no hace falta acertar a la primera."
+msgstr "Legt fest, wie sich der Support-Genix-Chatbot verhalten soll: Ton, was er tun soll, wenn er etwas nicht weiß, und was er niemals tun darf. Die eigentlichen Unternehmensdaten (Adresse, Kontakt, Öffnungszeiten ...) werden im Tab Unternehmen eingetragen — dieser Fragebogen kombiniert sie beim Erstellen des Entwurfs automatisch mit diesen Antworten. Beantworten Sie, was Sie wissen, fügen Sie optional Seiten der Website als Referenz hinzu und erstellen Sie mit KI einen ersten Entwurf. Sie können ihn vor dem Speichern manuell bearbeiten, nach Ihren Änderungen mit KI sprachlich verbessern oder weitere Antworten zum Fragebogen hinzufügen und erneut generieren — es muss nicht beim ersten Mal perfekt sein."
+
+#: admin/views/tab-prompt.php:37
+msgid "1. Ajustes del chat"
+msgstr "1. Chat-Einstellungen"
+
+#: admin/views/tab-prompt.php:43
+msgid "Límite de \"Documentos relacionados\""
+msgstr "Limit für \"Verwandte Dokumente\""
+
+#: admin/views/tab-prompt.php:46
+msgid "Máximo de enlaces mostrados bajo la respuesta del chatbot. 0 = sin límite."
+msgstr "Maximale Anzahl von Links, die unter der Chatbot-Antwort angezeigt werden. 0 = ohne Limit."
+
+#: admin/views/tab-prompt.php:50
+msgid "Guardar ajustes del chat"
+msgstr "Chat-Einstellungen speichern"
+
+#: admin/views/tab-prompt.php:55
+msgid "2. Cuestionario"
+msgstr "2. Fragebogen"
+
+#: admin/views/tab-prompt.php:75
+msgid "Páginas de referencia (opcional)"
+msgstr "Referenzseiten (optional)"
+
+#: admin/views/tab-prompt.php:77
+msgid "IDs o URLs separados por coma, ej: 12, https://.../sobre-nosotros/"
+msgstr "Kommagetrennte IDs oder URLs, z. B.: 12, https://.../ueber-uns/"
+
+#: admin/views/tab-prompt.php:78
+msgid "Hasta 3. Se lee el contenido real de esas páginas/posts para dar más contexto a la IA (tono, datos concretos)."
+msgstr "Bis zu 3. Der tatsächliche Inhalt dieser Seiten/Beiträge wird gelesen, um der KI mehr Kontext zu geben (Ton, konkrete Daten)."
+
+#: admin/views/tab-prompt.php:82
+msgid "Información extra (opcional)"
+msgstr "Zusätzliche Informationen (optional)"
+
+#: admin/views/tab-prompt.php:84
+msgid "Pega aquí cualquier instrucción o dato adicional para esta generación."
+msgstr "Fügen Sie hier zusätzliche Anweisungen oder Daten für diese Generierung ein."
+
+#: admin/views/tab-prompt.php:88
+msgid "Generar borrador con IA"
+msgstr "Entwurf mit KI erstellen"
+
+#: admin/views/tab-prompt.php:93
+msgid "3. Borrador editable"
+msgstr "3. Bearbeitbarer Entwurf"
+
+#: admin/views/tab-prompt.php:94
+msgid "Edita libremente. Cuando termines, puedes pulir la redacción con IA (sin cambiar el fondo) o guardar directamente."
+msgstr "Bearbeiten Sie frei. Anschließend können Sie den Text mit KI sprachlich überarbeiten (ohne den Inhalt zu verändern) oder direkt speichern."
+
+#: admin/views/tab-prompt.php:101
+#: admin/views/tab-woocommerce.php:333
+#: admin/views/tab-woocommerce.php:352
+msgid "Pulir redacción con IA"
+msgstr "Text mit KI überarbeiten"
+
+#: admin/views/tab-prompt.php:104
+msgid "Guardar y sincronizar con Genix"
+msgstr "Speichern und mit Genix synchronisieren"
+
+#: admin/views/tab-prompt.php:109
+msgid "Support Genix detectado. Listo para sincronizar."
+msgstr "Support Genix erkannt. Bereit zur Synchronisierung."
+
+#: admin/views/tab-registro.php:14
+msgid "Todos los documentos generados: su estado, cuándo se actualizaron, y acceso a su contenido. Desde aquí puedes regenerar, borrar, fijar texto manual o filtrar por estado/idioma."
+msgstr "Alle generierten Dokumente: Status, Zeitpunkt der Aktualisierung und Zugriff auf ihren Inhalt. Von hier aus können Sie neu generieren, löschen, manuellen Text festlegen oder nach Status/Sprache filtern."
+
+#. translators: %d: numero de documentos en modo manual que se saltaron
+#: admin/views/tab-registro.php:26
+msgid "%d documento en modo manual se saltó (no se regenera)."
+msgid_plural "%d documentos en modo manual se saltaron (no se regeneran)."
+msgstr[0] "%d Dokument im manuellen Modus wurde übersprungen (wird nicht neu generiert)."
+msgstr[1] "%d Dokumente im manuellen Modus wurden übersprungen (werden nicht neu generiert)."
+
+#. translators: %d: numero de documentos que quedan por procesar en la cola
+#: admin/views/tab-registro.php:39
+msgid "Lote de %1$d procesado. Quedan %2$d documentos en cola: continuando automáticamente…"
+msgstr "Batch mit %1$d verarbeitet. %2$d Dokumente verbleiben in der Warteschlange: automatische Fortsetzung…"
+
+#: admin/views/tab-registro.php:62
+msgid "Generar por ID o URL"
+msgstr "Nach ID oder URL generieren"
+
+#: admin/views/tab-registro.php:64
+msgid "Para un producto/página que ya no tiene fila en el Registro (por ejemplo, tras borrarlo aquí): genera de nuevo, en todos los idiomas activos, de forma inmediata y sin esperar al cron."
+msgstr "Für ein Produkt/eine Seite, das bzw. die keine Zeile mehr im Protokoll hat (z. B. nach dem Löschen hier): sofort in allen aktiven Sprachen neu generieren, ohne auf den Cron zu warten."
+
+#: admin/views/tab-registro.php:69
+msgid "ID del producto/página, o su URL"
+msgstr "ID des Produkts/der Seite oder dessen/deren URL"
+
+#: admin/views/tab-registro.php:70
+msgid "Generar ahora"
+msgstr "Jetzt generieren"
+
+#: admin/views/tab-registro.php:79
+#: admin/views/tab-visibilidad-ia.php:292
+msgid "Todos los estados"
+msgstr "Alle Status"
+
+#: admin/views/tab-registro.php:86
+msgid "Todos los idiomas"
+msgstr "Alle Sprachen"
+
+#: admin/views/tab-registro.php:92
+msgid "Buscar por título…"
+msgstr "Nach Titel suchen…"
+
+#. translators: %d: numero de filas por pagina
+#: admin/views/tab-registro.php:95
+msgid "%d por página"
+msgstr "%d pro Seite"
+
+#: admin/views/tab-registro.php:98
+msgid "Filtrar"
+msgstr "Filtern"
+
+#: admin/views/tab-registro.php:101
+msgid "¿Borrar todos los documentos que cumplen el filtro actual (o TODOS si no hay filtro puesto) y sus posts asociados? Sus orígenes se añadirán a \"IDs a excluir\" en Contenido, para que no se vuelvan a generar solos (quítalos de esa lista si quieres que se vuelvan a generar)."
+msgstr "Alle Dokumente löschen, die dem aktuellen Filter entsprechen (oder ALLE, wenn kein Filter gesetzt ist), einschließlich ihrer zugehörigen Beiträge? Ihre Quellen werden unter Inhalt zu \"Auszuschließende IDs\" hinzugefügt, damit sie nicht automatisch neu generiert werden (entfernen Sie sie aus dieser Liste, wenn sie wieder generiert werden sollen)."
+
+#: admin/views/tab-registro.php:107
+msgid "Borrar todos"
+msgstr "Alle löschen"
+
+#: admin/views/tab-registro.php:113
+msgid "Reiniciar cola"
+msgstr "Warteschlange zurücksetzen"
+
+#: admin/views/tab-registro.php:147
+msgid "¿Borrar los documentos seleccionados y sus posts asociados? Sus orígenes se añadirán a \"IDs a excluir\" en Contenido, para que no se vuelvan a generar solos (quítalos de esa lista si quieres que se vuelvan a generar)."
+msgstr "Die ausgewählten Dokumente und ihre zugehörigen Beiträge löschen? Ihre Quellen werden unter Inhalt zu \"Auszuschließende IDs\" hinzugefügt, damit sie nicht automatisch neu generiert werden (entfernen Sie sie aus dieser Liste, wenn sie wieder generiert werden sollen)."
+
+#: admin/views/tab-visibilidad-ia.php:99
+msgid "Comprueba cómo se publica el contenido para buscadores y agentes de IA, revisa si las páginas sincronizadas pueden rastrearse y decide qué crawlers de IA pueden acceder a la web. El estado de exposición y la comprobación de accesibilidad son de solo lectura. Las acciones sobre robots.txt y .htaccess modifican archivos reales y siempre requieren confirmación."
+msgstr "Prüfen Sie, wie Inhalte für Suchmaschinen und KI-Agenten veröffentlicht werden, ob synchronisierte Seiten gecrawlt werden können, und entscheiden Sie, welche KI-Crawler auf die Website zugreifen dürfen. Expositionsstatus und Zugänglichkeitsprüfung sind schreibgeschützt. Aktionen an robots.txt und .htaccess ändern echte Dateien und erfordern immer eine Bestätigung."
+
+#: admin/views/tab-visibilidad-ia.php:103
+msgid "Estado de exposición"
+msgstr "Expositionsstatus"
+
+#: admin/views/tab-visibilidad-ia.php:106
+msgid "llms.txt"
+msgstr "llms.txt"
+
+#: admin/views/tab-visibilidad-ia.php:108
+msgid "Este archivo ayuda a los asistentes de IA a entender qué contiene tu web y dónde encontrar la información más importante."
+msgstr "Diese Datei hilft KI-Assistenten zu verstehen, welche Inhalte Ihre Website enthält und wo die wichtigsten Informationen zu finden sind."
+
+#: admin/views/tab-visibilidad-ia.php:110
+msgid "Archivo físico gestionado por AI Knowledge."
+msgstr "Physische Datei, verwaltet von AI Knowledge."
+
+#. translators: %s: fecha de última modificación del archivo físico
+#: admin/views/tab-visibilidad-ia.php:116
+msgid "Modificado por última vez: %s."
+msgstr "Zuletzt geändert: %s."
+
+#: admin/views/tab-visibilidad-ia.php:125
+msgid "Ver el archivo actual"
+msgstr "Aktuelle Datei anzeigen"
+
+#: admin/views/tab-visibilidad-ia.php:127
+#: includes/class-editor-metabox.php:70
+msgid "Estado:"
+msgstr "Status:"
+
+#: admin/views/tab-visibilidad-ia.php:127
+msgid "Todavía no existe el archivo físico."
+msgstr "Die physische Datei existiert noch nicht."
+
+#: admin/views/tab-visibilidad-ia.php:128
+msgid "Ver llms.txt"
+msgstr "Llms.txt anzeigen"
+
+#: admin/views/tab-visibilidad-ia.php:130
+msgid "Guardar una copia física"
+msgstr "Physische Kopie speichern"
+
+#: admin/views/tab-visibilidad-ia.php:131
+msgid "AI Knowledge puede guardar llms.txt como archivo real en la raíz de tu web."
+msgstr "AI Knowledge kann llms.txt als echte Datei im Stammverzeichnis Ihrer Website speichern."
+
+#: admin/views/tab-visibilidad-ia.php:133
+msgid "Ya existe un llms.txt. Descarga una copia antes de sustituirlo."
+msgstr "Eine llms.txt-Datei existiert bereits. Laden Sie eine Kopie herunter, bevor Sie sie ersetzen."
+
+#: admin/views/tab-visibilidad-ia.php:137
+msgid "Descargar copia actual de llms.txt"
+msgstr "Aktuelle Kopie von llms.txt herunterladen"
+
+#: admin/views/tab-visibilidad-ia.php:140
+msgid "Todavía no existe un archivo físico. Puedes crearlo con el contenido generado por AI Knowledge."
+msgstr "Es existiert noch keine physische Datei. Sie können sie mit dem von AI Knowledge generierten Inhalt erstellen."
+
+#: admin/views/tab-visibilidad-ia.php:142
+msgid "Descarga la copia actual primero; el botón se habilitará automáticamente al terminar."
+msgstr "Laden Sie zuerst die aktuelle Kopie herunter; der Button wird nach Abschluss automatisch aktiviert."
+
+#: admin/views/tab-visibilidad-ia.php:143
+msgid "Vas a sustituir el llms.txt físico de la raíz por el generado por AI Knowledge. ¿Confirmas que ya descargaste la copia?"
+msgstr "Sie ersetzen die physische llms.txt-Datei im Stammverzeichnis durch die von AI Knowledge generierte Version. Bestätigen Sie, dass Sie die Kopie bereits heruntergeladen haben?"
+
+#: admin/views/tab-visibilidad-ia.php:143
+msgid "Vas a crear un llms.txt físico en la raíz con el contenido generado por AI Knowledge. ¿Quieres continuar?"
+msgstr "Sie erstellen eine physische llms.txt-Datei im Stammverzeichnis mit dem von AI Knowledge generierten Inhalt. Möchten Sie fortfahren?"
+
+#: admin/views/tab-visibilidad-ia.php:146
+msgid "Sustituir por el generado"
+msgstr "Durch generierte Version ersetzen"
+
+#: admin/views/tab-visibilidad-ia.php:146
+msgid "Crear archivo físico"
+msgstr "Physische Datei erstellen"
+
+#: admin/views/tab-visibilidad-ia.php:151
+msgid "Markdown público"
+msgstr "Öffentliches Markdown"
+
+#: admin/views/tab-visibilidad-ia.php:153
+msgid "El mismo contenido que usa el chatbot, publicado como archivo Markdown para que crawlers y agentes de IA puedan leerlo sin procesar el HTML de la página."
+msgstr "Derselbe Inhalt, den der Chatbot verwendet, als Markdown-Datei veröffentlicht, damit Crawler und KI-Agenten ihn lesen können, ohne das HTML der Seite verarbeiten zu müssen."
+
+#: admin/views/tab-visibilidad-ia.php:155
+#: admin/views/tab-visibilidad-ia.php:164
+msgid "Ver un ejemplo real"
+msgstr "Echtes Beispiel anzeigen"
+
+#: admin/views/tab-visibilidad-ia.php:160
+msgid "JSON estructurado"
+msgstr "Strukturiertes JSON"
+
+#: admin/views/tab-visibilidad-ia.php:162
+msgid "Los datos originales de WordPress y WooCommerce en formato JSON, sin pasar por una IA. Permite consultar la información exacta mediante la API del sitio."
+msgstr "Die ursprünglichen WordPress- und WooCommerce-Daten im JSON-Format, ohne Verarbeitung durch eine KI. Damit lassen sich die exakten Informationen über die API der Website abrufen."
+
+#: admin/views/tab-visibilidad-ia.php:169
+msgid "JSON-LD (Schema.org)"
+msgstr "JSON-LD (Schema.org)"
+
+#: admin/views/tab-visibilidad-ia.php:171
+msgid "Datos estructurados de Schema.org, como Product o Article, incluidos en el código de cada página para ayudar a los buscadores a identificar el tipo de contenido."
+msgstr "Strukturierte Schema.org-Daten wie Product oder Article, die in den Code jeder Seite eingebunden werden, damit Suchmaschinen den Inhaltstyp erkennen können."
+
+#. translators: %s: enlace a una página de ejemplo
+#: admin/views/tab-visibilidad-ia.php:180
+msgid "Se incluye dentro de cada página: %s y revisa en el código fuente el bloque <script type=\"application/ld+json\">."
+msgstr "Wird in jede Seite eingebunden: %s; prüfen Sie im Quellcode den Block <script type=\"application/ld+json\">."
+
+#: admin/views/tab-visibilidad-ia.php:181
+msgid "abre un ejemplo real"
+msgstr "echtes Beispiel öffnen"
+
+#: admin/views/tab-visibilidad-ia.php:189
+msgid "Contenido pendiente de sincronizar"
+msgstr "Ausstehende Synchronisierung"
+
+#. translators: %d: numero de elementos del alcance sin sincronizar todavia
+#: admin/views/tab-visibilidad-ia.php:196
+msgid "Queda %d elemento sin sincronizar."
+msgid_plural "Quedan %d elementos sin sincronizar."
+msgstr[0] "Es verbleibt %d nicht synchronisiertes Element."
+msgstr[1] "Es verbleiben %d nicht synchronisierte Elemente."
+
+#: admin/views/tab-visibilidad-ia.php:202
+msgid "Todo el contenido del alcance está sincronizado."
+msgstr "Alle Inhalte im Umfang sind synchronisiert."
+
+#: admin/views/tab-visibilidad-ia.php:210
+#: admin/views/tab-visibilidad-ia.php:254
+msgid "Comprobar accesibilidad"
+msgstr "Zugänglichkeit prüfen"
+
+#: admin/views/tab-visibilidad-ia.php:211
+msgid "Elige una URL ya sincronizada y comprueba en vivo si robots.txt permite rastrearla y si lleva noindex — avisa si ambas señales se contradicen entre sí."
+msgstr "Wählen Sie eine bereits synchronisierte URL und prüfen Sie live, ob robots.txt das Crawlen erlaubt und ob sie noindex enthält — es wird gewarnt, wenn sich beide Signale widersprechen."
+
+#: admin/views/tab-visibilidad-ia.php:224
+msgid "robots.txt: permitida."
+msgstr "robots.txt: erlaubt."
+
+#: admin/views/tab-visibilidad-ia.php:225
+msgid "robots.txt: bloqueada."
+msgstr "robots.txt: blockiert."
+
+#: admin/views/tab-visibilidad-ia.php:232
+msgid "Señal noindex: sí (meta robots o cabecera X-Robots-Tag)."
+msgstr "noindex-Signal: ja (Meta-Robots oder X-Robots-Tag-Header)."
+
+#: admin/views/tab-visibilidad-ia.php:233
+msgid "Señal noindex: no."
+msgstr "noindex-Signal: nein."
+
+#: admin/views/tab-visibilidad-ia.php:237
+msgid "⚠ Conflicto de señales: robots.txt y noindex no coinciden — revisa la configuración."
+msgstr "⚠ Signalkonflikt: robots.txt und noindex stimmen nicht überein — prüfen Sie die Konfiguration."
+
+#: admin/views/tab-visibilidad-ia.php:244
+msgid "Todavía no hay contenido sincronizado que comprobar."
+msgstr "Es gibt noch keine synchronisierten Inhalte, die geprüft werden können."
+
+#: admin/views/tab-visibilidad-ia.php:262
+msgid "Gestión de crawlers de IA"
+msgstr "Verwaltung von KI-Crawlern"
+
+#: admin/views/tab-visibilidad-ia.php:264
+msgid "Configuración por bot"
+msgstr "Konfiguration pro Bot"
+
+#: admin/views/tab-visibilidad-ia.php:266
+msgid "Lista de crawlers de IA conocidos, su finalidad y la acción asignada a cada uno. Esta configuración se aplica tanto a robots.txt como a las reglas de .htaccess que aparecen más abajo."
+msgstr "Liste bekannter KI-Crawler, ihrer Zwecke und der jeweils zugewiesenen Aktion. Diese Konfiguration gilt sowohl für robots.txt als auch für die weiter unten angezeigten .htaccess-Regeln."
+
+#: admin/views/tab-visibilidad-ia.php:270
+msgid "Búsqueda/citas IA"
+msgstr "KI-Suche/Zitate"
+
+#: admin/views/tab-visibilidad-ia.php:271
+msgid "Uso bajo demanda"
+msgstr "Nutzung auf Anfrage"
+
+#: admin/views/tab-visibilidad-ia.php:272
+msgid "Entrenamiento de modelos"
+msgstr "Modelltraining"
+
+#: admin/views/tab-visibilidad-ia.php:273
+msgid "SEO y scraping"
+msgstr "SEO und Scraping"
+
+#: admin/views/tab-visibilidad-ia.php:274
+msgid "Scanners de seguridad"
+msgstr "Sicherheitsscanner"
+
+#: admin/views/tab-visibilidad-ia.php:275
+msgid "Buscadores tradicionales"
+msgstr "Traditionelle Suchmaschinen"
+
+#: admin/views/tab-visibilidad-ia.php:276
+msgid "Archivado y datasets"
+msgstr "Archivierung und Datensätze"
+
+#: admin/views/tab-visibilidad-ia.php:281
+msgid "Filtrar por tipo"
+msgstr "Nach Typ filtern"
+
+#: admin/views/tab-visibilidad-ia.php:283
+msgid "Todos los tipos"
+msgstr "Alle Typen"
+
+#: admin/views/tab-visibilidad-ia.php:290
+msgid "Filtrar por estado"
+msgstr "Nach Status filtern"
+
+#: admin/views/tab-visibilidad-ia.php:293
+msgid "Permitidos"
+msgstr "Erlaubt"
+
+#: admin/views/tab-visibilidad-ia.php:294
+msgid "Bloqueados"
+msgstr "Blockiert"
+
+#: admin/views/tab-visibilidad-ia.php:306
+#: admin/views/tab-visibilidad-ia.php:439
+msgid "Bot"
+msgstr "Bot"
+
+#: admin/views/tab-visibilidad-ia.php:307
+msgid "Operador"
+msgstr "Betreiber"
+
+#: admin/views/tab-visibilidad-ia.php:308
+#: admin/views/tab-visibilidad-ia.php:440
+msgid "Categoría"
+msgstr "Kategorie"
+
+#: admin/views/tab-visibilidad-ia.php:309
+msgid "Descripción"
+msgstr "Beschreibung"
+
+#: admin/views/tab-visibilidad-ia.php:310
+msgid "Acción"
+msgstr "Aktion"
+
+#: admin/views/tab-visibilidad-ia.php:325
+msgid "Permitir"
+msgstr "Erlauben"
+
+#: admin/views/tab-visibilidad-ia.php:326
+msgid "Bloquear"
+msgstr "Blockieren"
+
+#: admin/views/tab-visibilidad-ia.php:335
+msgid "Guardar configuración de crawlers"
+msgstr "Crawler-Konfiguration speichern"
+
+#: admin/views/tab-visibilidad-ia.php:336
+#: assets/admin.js:83
+msgid "Ver todos los crawlers"
+msgstr "Alle Crawler anzeigen"
+
+#: admin/views/tab-visibilidad-ia.php:340
+msgid "Visibilidad para los bots bloqueados"
+msgstr "Sichtbarkeit für blockierte Bots"
+
+#: admin/views/tab-visibilidad-ia.php:341
+msgid "Puedes bloquear el resto del sitio y mantener visible únicamente /llms.txt para los bots configurados como Bloquear."
+msgstr "Sie können den Rest der Website blockieren und nur /llms.txt für Bots sichtbar lassen, die auf Blockieren gestellt sind."
+
+#: admin/views/tab-visibilidad-ia.php:346
+msgid "Bloquear el sitio completo"
+msgstr "Gesamte Website blockieren"
+
+#: admin/views/tab-visibilidad-ia.php:347
+msgid "Solo permitir visibilidad de llms.txt"
+msgstr "Nur llms.txt sichtbar lassen"
+
+#: admin/views/tab-visibilidad-ia.php:349
+msgid "Guardar modo de visibilidad"
+msgstr "Sichtbarkeitsmodus speichern"
+
+#: admin/views/tab-visibilidad-ia.php:352
+msgid "robots.txt"
+msgstr "robots.txt"
+
+#: admin/views/tab-visibilidad-ia.php:353
+msgid "Se han detectado reglas originales que contradicen el bloque propuesto. Al aplicar, se conservarán y se comentarán para dejar constancia del conflicto:"
+msgstr "Es wurden ursprüngliche Regeln erkannt, die dem vorgeschlagenen Block widersprechen. Beim Anwenden werden sie beibehalten und kommentiert, um den Konflikt zu dokumentieren:"
+
+#: admin/views/tab-visibilidad-ia.php:356
+msgid "Actual (lo que vería un crawler ahora mismo)"
+msgstr "Aktuell (was ein Crawler jetzt sehen würde)"
+
+#: admin/views/tab-visibilidad-ia.php:364
+#: admin/views/tab-visibilidad-ia.php:402
+msgid "Archivo completo después del cambio"
+msgstr "Vollständige Datei nach der Änderung"
+
+#: admin/views/tab-visibilidad-ia.php:369
+msgid "⚠ Esta acción modifica el archivo robots.txt del sitio. Descarga una copia antes de continuar."
+msgstr "⚠ Diese Aktion ändert die robots.txt-Datei der Website. Laden Sie vor dem Fortfahren eine Kopie herunter."
+
+#: admin/views/tab-visibilidad-ia.php:376
+msgid "Descarga la copia actual primero (botón de la izquierda); se habilitará automáticamente al terminar."
+msgstr "Laden Sie zuerst die aktuelle Kopie herunter (linker Button); danach wird die Funktion automatisch aktiviert."
+
+#: admin/views/tab-visibilidad-ia.php:380
+msgid "Descargar copia actual de robots.txt"
+msgstr "Aktuelle robots.txt-Kopie herunterladen"
+
+#: admin/views/tab-visibilidad-ia.php:383
+msgid "Vas a modificar el robots.txt real del sitio con los bots marcados como Bloquear en la tabla de arriba. ¿Confirmas que ya descargaste la copia y quieres continuar?"
+msgstr "Sie ändern die tatsächliche robots.txt der Website mit den oben in der Tabelle als Blockieren markierten Bots. Bestätigen Sie, dass Sie die Kopie bereits heruntergeladen haben und fortfahren möchten?"
+
+#: admin/views/tab-visibilidad-ia.php:386
+msgid "Aplicar bloqueo a robots.txt"
+msgstr "Sperre auf robots.txt anwenden"
+
+#: admin/views/tab-visibilidad-ia.php:392
+msgid "Bloqueo en el servidor mediante .htaccess"
+msgstr "Serverseitige Sperre über .htaccess"
+
+#: admin/views/tab-visibilidad-ia.php:393
+msgid "Se han detectado reglas originales de .htaccess que contradicen el bloque propuesto. Al aplicar, se conservarán y se comentarán."
+msgstr "Es wurden ursprüngliche .htaccess-Regeln erkannt, die dem vorgeschlagenen Block widersprechen. Beim Anwenden werden sie beibehalten und kommentiert."
+
+#: admin/views/tab-visibilidad-ia.php:395
+msgid "robots.txt comunica preferencias de rastreo, pero un bot puede ignorarlas. Estas reglas rechazan en el servidor las solicitudes que se identifican como alguno de los bots marcados como Bloquear."
+msgstr "robots.txt teilt Crawling-Präferenzen mit, ein Bot kann sie jedoch ignorieren. Diese Regeln weisen serverseitig Anfragen zurück, die sich als einer der als Blockieren markierten Bots identifizieren."
+
+#: admin/views/tab-visibilidad-ia.php:397
+msgid "⚠ Modifica un archivo fuera de este plugin que puede afectar a todo el sitio si algo sale mal. Descarga la copia actual antes de continuar."
+msgstr "⚠ Ändert eine Datei außerhalb dieses Plugins, die bei Problemen die gesamte Website beeinträchtigen kann. Laden Sie vor dem Fortfahren die aktuelle Kopie herunter."
+
+#: admin/views/tab-visibilidad-ia.php:399
+msgid "Archivo completo preparado. Puedes copiarlo y pegarlo manualmente en tu servidor o descargarlo. AI Knowledge no sobrescribe el .htaccess real."
+msgstr "Vollständige Datei vorbereitet. Sie können sie manuell auf Ihren Server kopieren/einfügen oder herunterladen. AI Knowledge überschreibt die echte .htaccess nicht."
+
+#: admin/views/tab-visibilidad-ia.php:400
+msgid "Archivo actual"
+msgstr "Aktuelle Datei"
+
+#: admin/views/tab-visibilidad-ia.php:404
+msgid "Copiar código"
+msgstr "Code kopieren"
+
+#: admin/views/tab-visibilidad-ia.php:408
+msgid "Descargar .htaccess preparado"
+msgstr "Vorbereitete .htaccess herunterladen"
+
+#: admin/views/tab-visibilidad-ia.php:413
+msgid "No se encontró un .htaccess editable en este servidor (por ejemplo, nginx no lo usa, o los permisos no permiten escribirlo). Añade el bloque de arriba a mano en la configuración de tu servidor."
+msgstr "Auf diesem Server wurde keine bearbeitbare .htaccess-Datei gefunden (z. B. weil nginx sie nicht verwendet oder die Berechtigungen das Schreiben verhindern). Fügen Sie den obigen Block manuell zur Serverkonfiguration hinzu."
+
+#: admin/views/tab-visibilidad-ia.php:416
+msgid "El archivo real no se modifica desde aquí. Copia el contenido generado o descarga el archivo preparado y sustitúyelo manualmente después de conservar tu copia original."
+msgstr "Die echte Datei wird hier nicht geändert. Kopieren Sie den generierten Inhalt oder laden Sie die vorbereitete Datei herunter und ersetzen Sie sie manuell, nachdem Sie Ihre Originalkopie gesichert haben."
+
+#: admin/views/tab-visibilidad-ia.php:421
+msgid "Registro de accesos de crawlers de IA"
+msgstr "Zugriffsprotokoll der KI-Crawler"
+
+#. translators: %d: numero maximo de filas guardadas
+#: admin/views/tab-visibilidad-ia.php:426
+msgid "Solo se registra tráfico que coincide con el catálogo de arriba (nunca tráfico humano ni bots desconocidos). Límite duro de %d filas: al superarlo se borran las más antiguas."
+msgstr "Es wird nur Datenverkehr protokolliert, der mit dem obigen Katalog übereinstimmt (niemals menschlicher Datenverkehr oder unbekannte Bots). Hartes Limit von %d Zeilen: Bei Überschreitung werden die ältesten gelöscht."
+
+#: admin/views/tab-visibilidad-ia.php:431
+msgid "Total registrado:"
+msgstr "Insgesamt protokolliert:"
+
+#: admin/views/tab-visibilidad-ia.php:433
+msgid "Todavía no se ha registrado ningún acceso de un crawler conocido."
+msgstr "Es wurde noch kein Zugriff eines bekannten Crawlers protokolliert."
+
+#: admin/views/tab-visibilidad-ia.php:441
+msgid "URL"
+msgstr "URL"
+
+#: admin/views/tab-visibilidad-ia.php:442
+msgid "Fecha"
+msgstr "Datum"
+
+#: admin/views/tab-woocommerce.php:14
+msgid "Esta pestaña requiere WooCommerce activo."
+msgstr "Für diesen Tab muss WooCommerce aktiv sein."
+
+#: admin/views/tab-woocommerce.php:66
+msgid "Información de tu tienda que se genera como documentos propios (envíos, impuestos, pagos, condiciones, catálogo) para que el chatbot y los buscadores de IA la conozcan. WooCommerce te lo detecta solo, pero todos los campos se guardan y son editables: lo que se guarda una vez ya no desaparece aunque cambies o borres algo en WooCommerce."
+msgstr "Informationen Ihres Shops, die als eigene Dokumente erzeugt werden (Versand, Steuern, Zahlungen, Bedingungen, Katalog), damit Chatbot und KI-Suchmaschinen sie kennen. WooCommerce erkennt sie automatisch, aber alle Felder werden gespeichert und können bearbeitet werden: Einmal gespeicherte Werte verschwinden nicht, selbst wenn Sie später etwas in WooCommerce ändern oder löschen."
+
+#: admin/views/tab-woocommerce.php:76
+msgid "Datos generales"
+msgstr "Allgemeine Daten"
+
+#: admin/views/tab-woocommerce.php:77
+msgid "Precargados con el valor real de WooCommerce; edítalos si hace falta. Una vez guardados, no se pierden aunque cambies o borres algo en WooCommerce."
+msgstr "Mit dem tatsächlichen WooCommerce-Wert vorausgefüllt; bei Bedarf bearbeiten. Nach dem Speichern gehen sie nicht verloren, auch wenn Sie später etwas in WooCommerce ändern oder löschen."
+
+#: admin/views/tab-woocommerce.php:80
+msgid "Nombre de la tienda"
+msgstr "Shop-Name"
+
+#: admin/views/tab-woocommerce.php:84
+msgid "Moneda"
+msgstr "Währung"
+
+#: admin/views/tab-woocommerce.php:88
+msgid "País base"
+msgstr "Basisland"
+
+#: admin/views/tab-woocommerce.php:92
+msgid "Condiciones de venta"
+msgstr "Verkaufsbedingungen"
+
+#: admin/views/tab-woocommerce.php:96
+#: admin/views/tab-woocommerce.php:107
+msgid "Editar la página real en WordPress"
+msgstr "Echte Seite in WordPress bearbeiten"
+
+#: admin/views/tab-woocommerce.php:98
+msgid "[pendiente] No hay página de condiciones de venta configurada en WooCommerce (Ajustes > Cuentas y privacidad) — precarga vacía, escríbelo a mano si hace falta."
+msgstr "[ausstehend] In WooCommerce ist keine Seite für Verkaufsbedingungen konfiguriert (Einstellungen > Konten und Datenschutz) — leere Vorbelegung; bei Bedarf manuell eintragen."
+
+#: admin/views/tab-woocommerce.php:103
+msgid "Política de devoluciones"
+msgstr "Rückgaberichtlinie"
+
+#: admin/views/tab-woocommerce.php:109
+msgid "[pendiente] No hay página de devoluciones/reembolsos configurada en WooCommerce (Ajustes > Cuentas y privacidad) — precarga vacía, escríbelo a mano si hace falta."
+msgstr "[ausstehend] In WooCommerce ist keine Seite für Rückgaben/Erstattungen konfiguriert (Einstellungen > Konten und Datenschutz) — leere Vorbelegung; bei Bedarf manuell eintragen."
+
+#: admin/views/tab-woocommerce.php:114
+msgid "Métodos de pago"
+msgstr "Zahlungsmethoden"
+
+#: admin/views/tab-woocommerce.php:121
+msgid "[pendiente] No hay pasarelas de pago instaladas todavía."
+msgstr "[ausstehend] Es sind noch keine Zahlungs-Gateways installiert."
+
+#: admin/views/tab-woocommerce.php:132
+#: admin/views/tab-woocommerce.php:160
+msgid "(desactivado)"
+msgstr "(deaktiviert)"
+
+#: admin/views/tab-woocommerce.php:137
+#: admin/views/tab-woocommerce.php:234
+msgid "Si nunca has guardado esta pestaña, salen todas marcadas por defecto; si guardas sin marcar ninguna, no entra ninguna."
+msgstr "Wenn Sie diesen Tab noch nie gespeichert haben, sind standardmäßig alle markiert; wenn Sie speichern, ohne etwas zu markieren, wird nichts aufgenommen."
+
+#: admin/views/tab-woocommerce.php:141
+msgid "Envíos"
+msgstr "Versand"
+
+#: admin/views/tab-woocommerce.php:148
+msgid "[pendiente] No hay zonas de envío configuradas todavía."
+msgstr "[ausstehend] Es sind noch keine Versandzonen konfiguriert."
+
+#: admin/views/tab-woocommerce.php:166
+#: admin/views/tab-woocommerce.php:210
+msgid "Si nunca has guardado esta pestaña, salen todos marcados por defecto; si guardas sin marcar ninguno, no entra ninguno."
+msgstr "Wenn Sie diesen Tab noch nie gespeichert haben, sind standardmäßig alle markiert; wenn Sie speichern, ohne etwas zu markieren, wird nichts aufgenommen."
+
+#: admin/views/tab-woocommerce.php:170
+msgid "Impuestos / IVA"
+msgstr "Steuern / MwSt."
+
+#: admin/views/tab-woocommerce.php:175
+msgid "[pendiente] Los impuestos están desactivados en WooCommerce (Ajustes > Impuestos)."
+msgstr "[ausstehend] Steuern sind in WooCommerce deaktiviert (Einstellungen > Steuern)."
+
+#: admin/views/tab-woocommerce.php:193
+msgid "Todos los países"
+msgstr "Alle Länder"
+
+#: admin/views/tab-woocommerce.php:203
+msgid "[pendiente] No hay ningún tipo de impuesto dado de alta todavía."
+msgstr "[ausstehend] Es ist noch kein Steuersatz eingerichtet."
+
+#: admin/views/tab-woocommerce.php:207
+msgid "Los precios mostrados ya incluyen impuestos."
+msgstr "Die angezeigten Preise enthalten bereits Steuern."
+
+#: admin/views/tab-woocommerce.php:208
+msgid "Los precios mostrados NO incluyen impuestos."
+msgstr "Die angezeigten Preise enthalten KEINE Steuern."
+
+#: admin/views/tab-woocommerce.php:215
+msgid "Catálogo: categorías a incluir"
+msgstr "Katalog: einzuschließende Kategorien"
+
+#: admin/views/tab-woocommerce.php:222
+msgid "[pendiente] No hay categorías de producto con productos publicados todavía."
+msgstr "[ausstehend] Es gibt noch keine Produktkategorien mit veröffentlichten Produkten."
+
+#: admin/views/tab-woocommerce.php:238
+msgid "Pedido mínimo / envío gratis"
+msgstr "Mindestbestellwert / kostenloser Versand"
+
+#: admin/views/tab-woocommerce.php:241
+msgid "Solo se usa si ningún método de envío marcado arriba es de tipo \"Envío gratis\" con importe mínimo configurado en WooCommerce (si lo es, se detecta solo). Ej: \"Envío gratis a partir de 50€\"."
+msgstr "Wird nur verwendet, wenn keine der oben markierten Versandmethoden vom Typ \"Kostenloser Versand\" mit in WooCommerce konfiguriertem Mindestbetrag ist (falls doch, wird dies automatisch erkannt). Beispiel: \"Kostenloser Versand ab 50 €\"."
+
+#: admin/views/tab-woocommerce.php:245
+msgid "Recogida en tienda"
+msgstr "Abholung im Geschäft"
+
+#: admin/views/tab-woocommerce.php:249
+msgid "Disponible"
+msgstr "Verfügbar"
+
+#: admin/views/tab-woocommerce.php:251
+msgid "Solo se usa si ningún método de envío marcado arriba es de tipo \"Recogida local\" de WooCommerce (si lo es, se detecta solo)."
+msgstr "Wird nur verwendet, wenn keine der oben markierten Versandmethoden vom WooCommerce-Typ \"Abholung vor Ort\" ist (falls doch, wird dies automatisch erkannt)."
+
+#: admin/views/tab-woocommerce.php:255
+msgid "Plazo de entrega"
+msgstr "Lieferzeit"
+
+#: admin/views/tab-woocommerce.php:258
+msgid "WooCommerce no expone un plazo de entrega real; escríbelo en texto libre (ej. \"2-4 días laborables en Península\")."
+msgstr "WooCommerce stellt keine tatsächliche Lieferzeit bereit; geben Sie sie als Freitext ein (z. B. \"2–4 Werktage innerhalb Deutschlands\")."
+
+#: admin/views/tab-woocommerce.php:262
+msgid "Contacto y horario de la tienda online"
+msgstr "Kontakt und Öffnungszeiten des Onlineshops"
+
+#. translators: %s: enlace a la pestaña Negocio
+#: admin/views/tab-woocommerce.php:269
+msgid "Solo si el contacto/horario de la tienda online es distinto del general del negocio (pestaña %s). Vacío = se usa el de Negocio."
+msgstr "Nur wenn Kontakt/Öffnungszeiten des Onlineshops von den allgemeinen Unternehmensdaten abweichen (Tab %s). Leer = die Unternehmensdaten werden verwendet."
+
+#: admin/views/tab-woocommerce.php:277
+msgid "Actualmente se usa (de Negocio):"
+msgstr "Aktuell verwendet (aus Unternehmen):"
+
+#: admin/views/tab-woocommerce.php:279
+msgid "[pendiente] Tampoco hay contacto general en Negocio todavía."
+msgstr "[ausstehend] Es gibt auch noch keinen allgemeinen Kontakt unter Unternehmen."
+
+#: admin/views/tab-woocommerce.php:286
+msgid "Notas legales adicionales"
+msgstr "Zusätzliche rechtliche Hinweise"
+
+#: admin/views/tab-woocommerce.php:289
+msgid "Opcional. Cualquier aviso legal adicional que quieras incluir en el documento de información de tienda."
+msgstr "Optional. Jeder zusätzliche rechtliche Hinweis, den Sie in das Shop-Informationsdokument aufnehmen möchten."
+
+#: admin/views/tab-woocommerce.php:298
+msgid "Generar documentos de tienda"
+msgstr "Shop-Dokumente generieren"
+
+#: admin/views/tab-woocommerce.php:300
+msgid "Genera (o regenera) los documentos compuestos de \"cómo comprar / condiciones de venta / envío y pago\" y \"catálogo de tienda\", uno por idioma activo, a partir de la configuración real de WooCommerce (incluida esta pestaña). No dependen de ningún post concreto, así que se generan a mano con este botón — no se disparan solos al cambiar los ajustes de WooCommerce."
+msgstr "Erstellt (oder erstellt neu) die kombinierten Dokumente \"So kaufen Sie / Verkaufsbedingungen / Versand und Zahlung\" und \"Shop-Katalog\", jeweils eines pro aktiver Sprache, auf Basis der tatsächlichen WooCommerce-Konfiguration (einschließlich dieses Tabs). Sie hängen von keinem bestimmten Beitrag ab und werden daher manuell mit diesem Button erzeugt — Änderungen an den WooCommerce-Einstellungen lösen sie nicht automatisch aus."
+
+#: admin/views/tab-woocommerce.php:308
+msgid "Generar/actualizar ahora"
+msgstr "Jetzt generieren/aktualisieren"
+
+#: admin/views/tab-woocommerce.php:313
+msgid "Cada bloque muestra el Markdown publicado. Puedes pulir su formato con IA usando solo los datos que ya contiene; para sustituirlo por un texto completo externo, usa el modo manual de la pestaña Registro."
+msgstr "Jeder Block zeigt das veröffentlichte Markdown. Sie können dessen Format mit KI verbessern, wobei nur bereits enthaltene Daten verwendet werden; um es durch einen vollständigen externen Text zu ersetzen, verwenden Sie den manuellen Modus im Tab Protokoll."
+
+#: admin/views/tab-woocommerce.php:321
+msgid "Información de tienda"
+msgstr "Shop-Informationen"
+
+#: admin/views/tab-woocommerce.php:322
+msgid "Pule la estructura y la redacción del documento de compra, condiciones, envío y pago. Las instrucciones prevalecen sobre el formato predeterminado, pero no pueden añadir ni cambiar datos."
+msgstr "Verbessert Struktur und Formulierung des Dokuments zu Kauf, Bedingungen, Versand und Zahlung. Die Anweisungen haben Vorrang vor dem Standardformat, dürfen jedoch keine Daten hinzufügen oder ändern."
+
+#: admin/views/tab-woocommerce.php:329
+#: admin/views/tab-woocommerce.php:348
+msgid "Instrucciones para pulir el texto (opcional)"
+msgstr "Anweisungen zum Überarbeiten des Textes (optional)"
+
+#: admin/views/tab-woocommerce.php:330
+#: admin/views/tab-woocommerce.php:349
+msgid "Indica solo el tono, la estructura o el estilo. La IA no consulta ni añade datos de WooCommerce desde este campo."
+msgstr "Geben Sie nur Ton, Struktur oder Stil an. Die KI ruft über dieses Feld keine WooCommerce-Daten ab und fügt keine hinzu."
+
+#: admin/views/tab-woocommerce.php:331
+#: admin/views/tab-woocommerce.php:350
+msgid "Puedes escribir una indicación breve o pegar un prompt completo. Estas instrucciones prevalecen sobre el formato predeterminado, pero solo pueden usar los datos presentes en el documento. Si ya tienes un texto final generado con otra IA, pégalo manualmente desde la pestaña Registro."
+msgstr "Sie können eine kurze Anweisung eingeben oder einen vollständigen Prompt einfügen. Diese Anweisungen haben Vorrang vor dem Standardformat, dürfen aber nur die im Dokument vorhandenen Daten verwenden. Wenn Sie bereits einen fertigen Text mit einer anderen KI erstellt haben, fügen Sie ihn manuell über den Tab Protokoll ein."
+
+#: admin/views/tab-woocommerce.php:337
+#: admin/views/tab-woocommerce.php:356
+msgid "Todavía no se ha generado."
+msgstr "Noch nicht generiert."
+
+#: admin/views/tab-woocommerce.php:340
+msgid "Catálogo de tienda"
+msgstr "Shop-Katalog"
+
+#: admin/views/tab-woocommerce.php:341
+msgid "Pule la estructura y la redacción del catálogo publicado. Las instrucciones prevalecen sobre el formato predeterminado, pero no pueden añadir productos ni datos que no aparezcan en el documento."
+msgstr "Verbessert Struktur und Formulierung des veröffentlichten Katalogs. Die Anweisungen haben Vorrang vor dem Standardformat, dürfen jedoch keine Produkte oder Daten hinzufügen, die nicht im Dokument enthalten sind."
+
+#: includes/class-ai-client.php:111
+msgid "El origen de IA seleccionado no está conectado o el modelo ya no está disponible."
+msgstr "Die ausgewählte KI-Quelle ist nicht verbunden oder das Modell ist nicht mehr verfügbar."
+
+#: includes/class-ai-client.php:124
+msgid "No hay modelos de texto conectados en WordPress para Anthropic, OpenAI o Google."
+msgstr "In WordPress sind keine Textmodelle von Anthropic, OpenAI oder Google verbunden."
+
+#: includes/class-ai-client.php:153
+#: includes/class-ai-client.php:193
+msgid "Respuesta vacía de la IA."
+msgstr "Leere Antwort der KI."
+
+#: includes/class-chatbot-prompt-builder.php:52
+msgid "Nombre del negocio / marca"
+msgstr "Unternehmens-/Markenname"
+
+#: includes/class-chatbot-prompt-builder.php:53
+msgid "Ej: el nombre con el que el chatbot debe referirse al negocio."
+msgstr "Beispiel: der Name, mit dem der Chatbot das Unternehmen bezeichnen soll."
+
+#: includes/class-chatbot-prompt-builder.php:58
+msgid "Dirección"
+msgstr "Adresse"
+
+#: includes/class-chatbot-prompt-builder.php:59
+msgid "Dirección postal del negocio, si es relevante para el cliente (local físico, recogida, visitas...)."
+msgstr "Postanschrift des Unternehmens, sofern sie für Kunden relevant ist (Ladengeschäft, Abholung, Besuche ...)."
+
+#: includes/class-chatbot-prompt-builder.php:64
+msgid "Enfoque del negocio"
+msgstr "Unternehmensausrichtung"
+
+#: includes/class-chatbot-prompt-builder.php:65
+msgid "Ej: negocio familiar, qué vende o qué servicios ofrece (productos propios, experiencias, citas...)."
+msgstr "Beispiel: Familienunternehmen, was verkauft wird bzw. welche Leistungen angeboten werden (eigene Produkte, Erlebnisse, Termine ...)."
+
+#: includes/class-chatbot-prompt-builder.php:70
+msgid "Público objetivo"
+msgstr "Zielgruppe"
+
+#: includes/class-chatbot-prompt-builder.php:71
+msgid "Ej: tipo de cliente habitual — ayuda al chatbot a calibrar tono y nivel de detalle."
+msgstr "Beispiel: typischer Kundentyp — hilft dem Chatbot, Ton und Detailgrad anzupassen."
+
+#: includes/class-chatbot-prompt-builder.php:76
+msgid "Idioma principal del negocio"
+msgstr "Hauptsprache des Unternehmens"
+
+#: includes/class-chatbot-prompt-builder.php:77
+msgid "Ej: español, aunque la web está también en inglés y alemán."
+msgstr "Beispiel: Deutsch, auch wenn die Website zusätzlich auf Englisch und Französisch verfügbar ist."
+
+#: includes/class-chatbot-prompt-builder.php:82
+msgid "Horario de atención humana"
+msgstr "Zeiten für persönlichen Support"
+
+#: includes/class-chatbot-prompt-builder.php:83
+msgid "Cuándo hay alguien real disponible, aparte del chatbot (que suele estar activo 24/7)."
+msgstr "Wann eine reale Person erreichbar ist, zusätzlich zum Chatbot (der meist rund um die Uhr aktiv ist)."
+
+#: includes/class-chatbot-prompt-builder.php:88
+msgid "Datos de contacto directo"
+msgstr "Direkte Kontaktdaten"
+
+#: includes/class-chatbot-prompt-builder.php:89
+msgid "Teléfono, WhatsApp, email... deja vacío para mantener los que ya haya en el prompt actual."
+msgstr "Telefon, WhatsApp, E-Mail ... leer lassen, um die bereits im aktuellen Prompt vorhandenen Angaben beizubehalten."
+
+#: includes/class-chatbot-prompt-builder.php:95
+msgid "Tono de la marca"
+msgstr "Markenton"
+
+#: includes/class-chatbot-prompt-builder.php:96
+msgid "Ej: cercano, profesional, cálido, sin lenguaje robótico."
+msgstr "Beispiel: nahbar, professionell, herzlich, ohne robotische Sprache."
+
+#: includes/class-chatbot-prompt-builder.php:101
+msgid "Qué hacer cuando no hay información"
+msgstr "Was tun, wenn Informationen fehlen"
+
+#: includes/class-chatbot-prompt-builder.php:102
+msgid "Ej: no inventar ni dar largas, decir que no se tiene esa información y dar el contacto directo."
+msgstr "Beispiel: nichts erfinden und nicht hinhalten, sagen, dass diese Information nicht vorliegt, und den direkten Kontakt angeben."
+
+#: includes/class-chatbot-prompt-builder.php:107
+msgid "Qué NO debe hacer nunca el chatbot"
+msgstr "Was der Chatbot NIEMALS tun darf"
+
+#: includes/class-chatbot-prompt-builder.php:108
+msgid "Ej: no gestionar pagos ni reclamaciones directamente, no prometer descuentos, no inventar precios ni stock."
+msgstr "Beispiel: Zahlungen oder Reklamationen nicht direkt bearbeiten, keine Rabatte versprechen, keine Preise oder Bestände erfinden."
+
+#: includes/class-chatbot-prompt-builder.php:113
+msgid "Cómo cerrar una conversación"
+msgstr "Wie ein Gespräch beendet werden soll"
+
+#: includes/class-chatbot-prompt-builder.php:114
+msgid "Ej: despedirse con cordialidad e invitar a seguir preguntando si hace falta."
+msgstr "Beispiel: sich freundlich verabschieden und bei Bedarf zu weiteren Fragen einladen."
+
+#: includes/class-chatbot-prompt-builder.php:119
+msgid "Longitud de respuesta preferida"
+msgstr "Bevorzugte Antwortlänge"
+
+#: includes/class-chatbot-prompt-builder.php:120
+msgid "Ej: respuestas cortas y directas, o explicadas con más detalle."
+msgstr "Beispiel: kurze und direkte Antworten oder ausführlicher erklärt."
+
+#: includes/class-chatbot-prompt-builder.php:125
+msgid "Uso de emojis"
+msgstr "Verwendung von Emojis"
+
+#: includes/class-chatbot-prompt-builder.php:126
+msgid "Ej: sin emojis, o alguno puntual con moderación."
+msgstr "Beispiel: keine Emojis oder gelegentlich und sparsam."
+
+#: includes/class-chatbot-prompt-builder.php:241
+#: includes/class-chatbot-prompt-builder.php:295
+#: includes/class-chatbot-prompt-builder.php:339
+#: includes/class-chatbot-prompt-builder.php:463
+#: includes/class-chatbot-prompt-builder.php:529
+#: includes/class-generator.php:43
+msgid "El origen de IA seleccionado no está conectado."
+msgstr "Die ausgewählte KI-Quelle ist nicht verbunden."
+
+#: includes/class-chatbot-prompt-builder.php:334
+msgid "No hay texto que pulir."
+msgstr "Kein Text zum Überarbeiten vorhanden."
+
+#: includes/class-chatbot-prompt-builder.php:409
+msgid "La IA devolvió instrucciones internas dentro del contenido. No se ha publicado el resultado."
+msgstr "Die KI hat interne Anweisungen innerhalb des Inhalts ausgegeben. Das Ergebnis wurde nicht veröffentlicht."
+
+#: includes/class-chatbot-prompt-builder.php:415
+msgid "La IA copió las instrucciones de redacción dentro del contenido. No se ha publicado el resultado."
+msgstr "Die KI hat die Schreibanweisungen in den Inhalt kopiert. Das Ergebnis wurde nicht veröffentlicht."
+
+#: includes/class-chatbot-prompt-builder.php:524
+msgid "No hay texto que normalizar."
+msgstr "Kein Text zum Normalisieren vorhanden."
+
+#: includes/class-chatbot-prompt-builder.php:581
+#: includes/class-genix-hooks-guard.php:78
+#: includes/class-genix-hooks-guard.php:86
+#: includes/class-genix-hooks-guard.php:183
+msgid "WOO Knowledge Base Generator:"
+msgstr "WOO Knowledge Base Generator:"
+
+#. translators: 1: longitud actual en caracteres, 2: mínimo recomendado, 3: enlace a la pestaña Negocio
+#: includes/class-chatbot-prompt-builder.php:584
+msgid "El resumen público del negocio tiene %1$d caracteres. Se usa como cita de apertura en /llms.txt: ampliarlo a al menos %2$d caracteres da más contexto útil a los crawlers de IA. %3$s"
+msgstr "Die öffentliche Unternehmenszusammenfassung hat %1$d Zeichen. Sie wird als Eröffnungszitat in /llms.txt verwendet: Eine Erweiterung auf mindestens %2$d Zeichen liefert KI-Crawlern mehr nützlichen Kontext. %3$s"
+
+#: includes/class-chatbot-prompt-builder.php:587
+msgid "Ir a la pestaña Negocio"
+msgstr "Zum Tab Unternehmen"
+
+#: includes/class-chatbot-prompt.php:90
+msgid "chatbot-system-prompt.md está vacío o no existe."
+msgstr "chatbot-system-prompt.md ist leer oder existiert nicht."
+
+#: includes/class-chatbot-prompt.php:94
+msgid "Support Genix no está activo o su módulo de Knowledge Base aún no se ha cargado."
+msgstr "Support Genix ist nicht aktiv oder sein Knowledge-Base-Modul wurde noch nicht geladen."
+
+#: includes/class-chatbot-prompt.php:106
+msgid "Ya estaba sincronizado."
+msgstr "War bereits synchronisiert."
+
+#: includes/class-chatbot-prompt.php:112
+msgid "Genix rechazó guardar la opción (AddOption devolvió false)."
+msgstr "Genix hat das Speichern der Option abgelehnt (AddOption gab false zurück)."
+
+#: includes/class-chatbot-prompt.php:117
+msgid "Prompt sincronizado con Support Genix."
+msgstr "Prompt mit Support Genix synchronisiert."
+
+#: includes/class-crawler-catalog.php:31
+msgid "Recopila contenido para entrenar los modelos de OpenAI (GPT)."
+msgstr "Sammelt Inhalte zum Trainieren der OpenAI-Modelle (GPT)."
+
+#: includes/class-crawler-catalog.php:38
+msgid "Visita una URL concreta porque un usuario le pidió a ChatGPT que la leyera/resumiera."
+msgstr "Besucht eine bestimmte URL, weil ein Benutzer ChatGPT gebeten hat, sie zu lesen/zusammenzufassen."
+
+#: includes/class-crawler-catalog.php:45
+msgid "Indexa contenido para la función de búsqueda de ChatGPT (citas con enlace)."
+msgstr "Indexiert Inhalte für die ChatGPT-Suchfunktion (Zitate mit Link)."
+
+#: includes/class-crawler-catalog.php:53
+msgid "Recopila contenido para entrenar los modelos de Anthropic (Claude)."
+msgstr "Sammelt Inhalte zum Trainieren der Anthropic-Modelle (Claude)."
+
+#: includes/class-crawler-catalog.php:60
+msgid "Visita una URL porque un usuario se lo pidió a Claude en una conversación."
+msgstr "Besucht eine URL, weil ein Benutzer Claude in einem Gespräch darum gebeten hat."
+
+#: includes/class-crawler-catalog.php:67
+msgid "Indexa contenido para que Claude pueda citarlo/buscarlo."
+msgstr "Indexiert Inhalte, damit Claude sie zitieren/durchsuchen kann."
+
+#: includes/class-crawler-catalog.php:75
+msgid "Rastreador normal de Google Search. Bloquearlo te saca de Google Search por completo."
+msgstr "Normaler Crawler von Google Search. Wenn Sie ihn blockieren, verschwindet Ihre Website vollständig aus Google Search."
+
+#: includes/class-crawler-catalog.php:82
+msgid "Controla si tu contenido se usa para entrenar Gemini/Vertex AI, separado de Googlebot."
+msgstr "Steuert, ob Ihre Inhalte zum Trainieren von Gemini/Vertex AI verwendet werden, getrennt von Googlebot."
+
+#: includes/class-crawler-catalog.php:90
+msgid "Rastreador de Bing Search, también alimenta Copilot."
+msgstr "Crawler von Bing Search, liefert auch Daten für Copilot."
+
+#: includes/class-crawler-catalog.php:98
+msgid "Indexa contenido para que Perplexity AI pueda citarte en sus respuestas."
+msgstr "Indexiert Inhalte, damit Perplexity AI Sie in seinen Antworten zitieren kann."
+
+#: includes/class-crawler-catalog.php:105
+msgid "Visita una URL porque un usuario se lo pidió a Perplexity en el momento."
+msgstr "Besucht eine URL, weil ein Benutzer Perplexity in diesem Moment darum gebeten hat."
+
+#: includes/class-crawler-catalog.php:113
+msgid "Genera las vistas previas de enlaces compartidos en Facebook/Instagram."
+msgstr "Erstellt Vorschauen für auf Facebook/Instagram geteilte Links."
+
+#: includes/class-crawler-catalog.php:120
+msgid "Recopila contenido para entrenar los modelos de Meta AI."
+msgstr "Sammelt Inhalte zum Trainieren der Meta-AI-Modelle."
+
+#: includes/class-crawler-catalog.php:127
+msgid "Visita una URL porque un usuario se lo pidió a Meta AI."
+msgstr "Besucht eine URL, weil ein Benutzer Meta AI darum gebeten hat."
+
+#: includes/class-crawler-catalog.php:135
+msgid "Controla el uso de tu contenido para entrenar los modelos de IA de Apple, separado de Applebot."
+msgstr "Steuert die Nutzung Ihrer Inhalte zum Trainieren von Apples KI-Modellen, getrennt von Applebot."
+
+#: includes/class-crawler-catalog.php:142
+msgid "Alimenta Siri y Spotlight Search."
+msgstr "Liefert Daten für Siri und Spotlight Search."
+
+#: includes/class-crawler-catalog.php:150
+msgid "Alimenta el asistente de IA de DuckDuckGo."
+msgstr "Liefert Daten für den KI-Assistenten von DuckDuckGo."
+
+#: includes/class-crawler-catalog.php:158
+msgid "Indexa contenido para el buscador con IA de You.com."
+msgstr "Indexiert Inhalte für die KI-Suchmaschine von You.com."
+
+#: includes/class-crawler-catalog.php:166
+#: includes/class-crawler-catalog.php:173
+msgid "Recopila contenido para entrenar los modelos de Cohere."
+msgstr "Sammelt Inhalte zum Trainieren der Cohere-Modelle."
+
+#: includes/class-crawler-catalog.php:181
+msgid "Rastreador agresivo de ByteDance para entrenar sus modelos de IA."
+msgstr "Aggressiver ByteDance-Crawler zum Trainieren seiner KI-Modelle."
+
+#: includes/class-crawler-catalog.php:189
+msgid "Alimenta Alexa y otros productos IA de Amazon (uso mixto: también entrenamiento)."
+msgstr "Liefert Daten für Alexa und andere KI-Produkte von Amazon (gemischte Nutzung: auch Training)."
+
+#: includes/class-crawler-catalog.php:197
+msgid "Recopila contenido para entrenar Grok, uso poco documentado públicamente."
+msgstr "Sammelt Inhalte zum Trainieren von Grok; öffentlich nur wenig dokumentierte Nutzung."
+
+#: includes/class-crawler-catalog.php:205
+msgid "Dataset usado por muchos laboratorios de IA para entrenar modelos."
+msgstr "Datensatz, der von vielen KI-Laboren zum Trainieren von Modellen verwendet wird."
+
+#: includes/class-crawler-catalog.php:212
+msgid "Extracción de datos comercial, vende acceso estructurado a tu contenido."
+msgstr "Kommerzielle Datenextraktion, verkauft strukturierten Zugriff auf Ihre Inhalte."
+
+#: includes/class-crawler-catalog.php:219
+msgid "Recopila imágenes específicamente para datasets de entrenamiento de IA."
+msgstr "Sammelt gezielt Bilder für KI-Trainingsdatensätze."
+
+#: includes/class-crawler-catalog.php:226
+#: includes/class-crawler-catalog.php:233
+msgid "Vende los datos recopilados a terceros (incluye entrenamiento de IA)."
+msgstr "Verkauft die gesammelten Daten an Dritte (einschließlich KI-Training)."
+
+#: includes/class-crawler-catalog.php:240
+msgid "Recopila contenido para entrenamiento de IA (buscador Timpi)."
+msgstr "Sammelt Inhalte für KI-Training (Suchmaschine Timpi)."
+
+#: includes/class-crawler-catalog.php:247
+msgid "Crawler comercial de SEO, indexación o extracción automatizada de contenido."
+msgstr "Kommerzieller Crawler für SEO, Indexierung oder automatisierte Inhaltsextraktion."
+
+#: includes/class-crawler-catalog.php:259
+msgid "Herramienta automatizada de escaneo, reconocimiento o pruebas de seguridad."
+msgstr "Automatisiertes Tool für Scans, Aufklärung oder Sicherheitstests."
+
+#: includes/class-crawler-catalog.php:267
+msgid "Crawler de buscador tradicional o regional configurado aquí para bloqueo explícito."
+msgstr "Crawler einer traditionellen oder regionalen Suchmaschine, der hier ausdrücklich zum Blockieren konfiguriert ist."
+
+#: includes/class-crawler-catalog.php:275
+msgid "Crawler de archivado, control de originalidad o creación de datasets."
+msgstr "Crawler für Archivierung, Originalitätsprüfung oder Erstellung von Datensätzen."
+
+#: includes/class-document-pipeline.php:47
+msgid "No se pudo extraer el origen."
+msgstr "Die Quelle konnte nicht extrahiert werden."
+
+#: includes/class-editor-metabox.php:72
+msgid "Modo: manual"
+msgstr "Modus: manuell"
+
+#: includes/class-editor-metabox.php:75
+msgid "Ver en el Registro"
+msgstr "Im Protokoll anzeigen"
+
+#: includes/class-editor-metabox.php:79
+msgid "Este contenido todavía no está en la base de conocimiento."
+msgstr "Dieser Inhalt befindet sich noch nicht in der Wissensdatenbank."
+
+#: includes/class-editor-metabox.php:86
+msgid "Añadir a la base de conocimiento"
+msgstr "Zur Wissensdatenbank hinzufügen"
+
+#: includes/class-editor-metabox.php:107
+msgid "Contenido no encontrado."
+msgstr "Inhalt nicht gefunden."
+
+#: includes/class-genix-bridge.php:41
+msgid "Support Genix no está activo o no expone sgkb-docs."
+msgstr "Support Genix ist nicht aktiv oder stellt sgkb-docs nicht bereit."
+
+#: includes/class-genix-hooks-guard.php:87
+msgid "Filtros del chatbot reinstalados correctamente en Support Genix."
+msgstr "Chatbot-Filter wurden in Support Genix erfolgreich neu installiert."
+
+#: includes/class-genix-hooks-guard.php:173
+msgid "Support Genix Lite"
+msgstr "Support Genix Lite"
+
+#: includes/class-genix-hooks-guard.php:174
+msgid "Support Genix Pro"
+msgstr "Support Genix Pro"
+
+#. translators: %s: nombres de los plugins afectados (Support Genix Lite y/o Pro)
+#: includes/class-genix-hooks-guard.php:186
+msgid "%s ha perdido los filtros que conectan nuestras mejoras del chatbot (probablemente por una actualización del plugin). El chatbot sigue funcionando, pero sin relevancia mejorada, idiomas no soportados, límite de documentos relacionados, ni el prompt personalizado del sitio."
+msgstr "%s hat die Filter verloren, die unsere Chatbot-Verbesserungen verbinden (wahrscheinlich durch ein Plugin-Update). Der Chatbot funktioniert weiterhin, jedoch ohne verbesserte Relevanz, Unterstützung zusätzlicher Sprachen, Limit für verwandte Dokumente oder den benutzerdefinierten Website-Prompt."
+
+#: includes/class-genix-hooks-guard.php:190
+msgid "Reinstalar filtros ahora"
+msgstr "Filter jetzt neu installieren"
+
+#: includes/class-genix-hooks-guard.php:207
+msgid "No se encuentra el archivo de Support Genix (ni Lite ni Pro)."
+msgstr "Die Support-Genix-Datei wurde nicht gefunden (weder Lite noch Pro)."
+
+#: includes/class-genix-hooks-guard.php:224
+msgid "El archivo de Support Genix no tiene permisos de escritura."
+msgstr "Die Support-Genix-Datei ist nicht beschreibbar."
+
+#: includes/class-genix-hooks-guard.php:241
+msgid "No se encontró el punto de anclaje para el primer filtro (search-results). Genix pudo cambiar de estructura; revisar manualmente."
+msgstr "Der Ankerpunkt für den ersten Filter (search-results) wurde nicht gefunden. Genix hat möglicherweise seine Struktur geändert; bitte manuell prüfen."
+
+#: includes/class-genix-hooks-guard.php:254
+msgid "No se encontró el punto de anclaje para el segundo filtro (docs-list). Genix pudo cambiar de estructura; revisar manualmente."
+msgstr "Der Ankerpunkt für den zweiten Filter (docs-list) wurde nicht gefunden. Genix hat möglicherweise seine Struktur geändert; bitte manuell prüfen."
+
+#: includes/class-genix-hooks-guard.php:267
+msgid "No se encontró el punto de anclaje para el tercer parche (custom-instructions). Genix pudo cambiar de estructura; revisar manualmente."
+msgstr "Der Ankerpunkt für den dritten Patch (custom-instructions) wurde nicht gefunden. Genix hat möglicherweise seine Struktur geändert; bitte manuell prüfen."
+
+#: includes/class-genix-hooks-guard.php:298
+msgid "No se pudo escribir el archivo de Support Genix."
+msgstr "Die Support-Genix-Datei konnte nicht geschrieben werden."
+
+#: includes/class-genix-hooks-guard.php:328
+msgid "La comprobación de sintaxis PHP falló tras insertar los filtros. No se ha escrito nada."
+msgstr "Die PHP-Syntaxprüfung ist nach dem Einfügen der Filter fehlgeschlagen. Es wurde nichts geschrieben."
+
+#: includes/class-genix-hooks-guard.php:336
+msgid "No autorizado."
+msgstr "Nicht autorisiert."
+
+#: includes/class-llms-faq.php:109
+msgid "Preguntas frecuentes"
+msgstr "Häufig gestellte Fragen"
+
+#: includes/class-llms-faq.php:113
+msgid "Preguntas frecuentes públicas del negocio."
+msgstr "Öffentliche häufig gestellte Fragen des Unternehmens."
+
+#: includes/class-llms-faq.php:118
+msgid "FAQ"
+msgstr "FAQ"
+
+#: includes/class-llms-txt.php:45
+msgid "Última actualización:"
+msgstr "Letzte Aktualisierung:"
+
+#: includes/class-llms-txt.php:73
+msgid "Documentación técnica de la API (OpenAPI)"
+msgstr "Technische API-Dokumentation (OpenAPI)"
+
+#: includes/class-llms-txt.php:73
+msgid "para desarrolladores e integraciones."
+msgstr "für Entwickler und Integrationen."
+
+#: includes/class-llms-txt.php:81
+#: includes/class-rest-content.php:49
+msgid "Feed de productos (Google Merchant)"
+msgstr "Produkt-Feed (Google Merchant)"
+
+#: includes/class-llms-txt.php:81
+msgid "para comparadores y plataformas de shopping."
+msgstr "für Vergleichsportale und Shopping-Plattformen."
+
+#: includes/class-llms-txt.php:83
+msgid "Feed de contenido (JSON)"
+msgstr "Inhalts-Feed (JSON)"
+
+#: includes/class-llms-txt.php:83
+msgid "el resto del contenido del alcance, sin paginar."
+msgstr "der übrige Inhalt im Umfang, ohne Paginierung."
+
+#: includes/class-rest-content.php:55
+msgid "Feed de contenido"
+msgstr "Inhalts-Feed"
+
+#: includes/class-rest-content.php:246
+msgid "Mapa taxonomía => lista de nombres de término."
+msgstr "Zuordnung Taxonomie => Liste der Begriffsnamen."
+
+#: includes/class-rest-content.php:254
+msgid "Solo los campos personalizados seleccionados en Alcance."
+msgstr "Nur die unter Umfang ausgewählten benutzerdefinierten Felder."
+
+#: includes/class-rest-content.php:260
+msgid "Solo poblado si el contenido es un producto WooCommerce."
+msgstr "Nur befüllt, wenn der Inhalt ein WooCommerce-Produkt ist."
+
+#: includes/class-rest-content.php:279
+msgid "No encontrado (origen inexistente, no publicado, fuera de alcance, o post_type inexistente/no público)."
+msgstr "Nicht gefunden (Quelle existiert nicht, nicht veröffentlicht, außerhalb des Umfangs oder post_type existiert nicht/ist nicht öffentlich)."
+
+#: includes/class-rest-content.php:300
+msgid "AI Knowledge & Visibility — API de contenido"
+msgstr "AI Knowledge & Visibility — Inhalts-API"
+
+#: includes/class-rest-content.php:301
+msgid "API pública de solo lectura del contenido dentro del alcance configurado del plugin, sin pasar por IA (Fase 3 del roadmap)."
+msgstr "Öffentliche schreibgeschützte API für Inhalte innerhalb des konfigurierten Plugin-Umfangs, ohne Verarbeitung durch KI (Phase 3 der Roadmap)."
+
+#: includes/class-rest-content.php:310
+msgid "Un contenido por ID."
+msgstr "Ein Inhalt pro ID."
+
+#: includes/class-rest-content.php:321
+msgid "Contenido encontrado."
+msgstr "Inhalt gefunden."
+
+#: includes/class-rest-content.php:334
+msgid "Listado paginado de un post_type dentro del alcance."
+msgstr "Paginierte Liste eines post_type innerhalb des Umfangs."
+
+#: includes/class-rest-content.php:341
+msgid "Ej. \"product\" (WooCommerce) o cualquier otro post_type público dentro del alcance."
+msgstr "Z. B. \"product\" (WooCommerce) oder ein anderer öffentlicher post_type innerhalb des Umfangs."
+
+#: includes/class-rest-content.php:363
+msgid "Listado paginado (cabeceras X-WP-Total/X-WP-TotalPages)."
+msgstr "Paginierte Liste (Header X-WP-Total/X-WP-TotalPages)."
+
+#: includes/class-rest-content.php:409
+msgid "Catálogo de productos"
+msgstr "Produktkatalog"
+
+#: includes/class-rest-content.php:481
+msgid "No encontrado."
+msgstr "Nicht gefunden."
+
+#: includes/class-rest-guard.php:71
+msgid "Invalid post ID."
+msgstr "Ungültige Beitrags-ID."
+
+#: includes/class-store-info-doc.php:97
+#: includes/class-store-info-doc.php:123
+msgid "WooCommerce no está activo."
+msgstr "WooCommerce ist nicht aktiv."

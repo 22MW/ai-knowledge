@@ -1,6 +1,6 @@
 # Resultados QA — Fases 0 a 5 (primera ronda real)
 
-Fuente: `_dev/tests-qa-fase-0-a-5.md` anotado por el usuario. Aquí se
+Fuente: `_dev/temp/tests-qa-fase-0-a-5.md` anotado por el usuario. Aquí se
 organiza en bugs confirmados, UX pendiente de rediseño, preguntas
 respondidas y decisiones abiertas.
 

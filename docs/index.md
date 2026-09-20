@@ -48,6 +48,20 @@ adicional pensada para que la IA la entienda.
 > No hace falta que sepas nada de IA ni de SEO técnico para usar este
 > plugin. Cada pantalla te explica qué hace y qué pasa si activas algo.
 
+## Idiomas de la interfaz
+
+La interfaz del plugin está preparada para estos idiomas:
+
+- Español
+- Catalán
+- Alemán
+- Inglés
+- Francés
+
+El idioma se toma de la configuración de idioma de WordPress. Si falta un
+idioma, encuentras una cadena sin traducir o detectas una traducción incorrecta,
+ponte en contacto con nosotros para poder corregirla y añadirla al catálogo.
+
 ## Por dónde empezar
 
 Si es la primera vez que lo instalas, sigue este orden:

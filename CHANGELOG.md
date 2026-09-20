@@ -2,7 +2,30 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
-## [1.1.2.2] - Desarrollo
+## [1.1.3.1] - Desarrollo - 2026-09-20
+
+### Internacionalización y documentación
+
+- Añadidos y sincronizados los catálogos de interfaz en español, catalán,
+  alemán, inglés y francés, incluyendo sus archivos `.po`, `.mo` y JSON.
+- Actualizados los índices de documentación pública e interna con los idiomas
+  disponibles y un canal de contacto para solicitar o corregir traducciones.
+- Reorganizada la documentación de desarrollo: los planes y materiales
+  temporales quedan en `_dev/temp/`.
+
+## [1.1.3] - 2026-09-20
+
+### Internacionalización
+
+- Añadida la carga del text domain `ai-knowledge` desde `languages/`.
+- Internacionalizados los textos dinámicos de `assets/admin.js` mediante
+  `wp.i18n` y `wp_set_script_translations()`.
+- Incluidos catálogos PHP y JSON JavaScript en español, catalán, alemán, inglés
+  y francés.
+- La documentación del administrador busca primero `docs/{locale}/` y vuelve
+  a la documentación española de `docs/` cuando no existe traducción.
+
+### Crawlers y reglas del servidor
 
 ### Crawlers y reglas del servidor
 
@@ -293,7 +316,7 @@ Support Genix como núcleo; todo lo de abajo es capa añadida encima.
 - JSON-LD duplicado con el schema nativo de WooCommerce (`WC_Structured_Data`, siempre activo si WooCommerce lo está, independientemente de RankMath): ahora se detecta y se cede el schema, igual que ya se hacía con RankMath/Yoast/AIOSEO.
 - Texto de los `<select>` del admin invisible en hover/foco en modo oscuro: `.wp-core-ui select:hover` de WordPress core forzaba `color:#1e1e1e` con la misma especificidad que la regla del tema — mismo caso ya conocido con los botones, resuelto igual (`!important`, ver `_dev/decisiones.md`).
 
-### Pendiente de esta versión (ver `_dev/qa-resultados-fase-0-a-5.md`)
+### Pendiente de esta versión (ver `_dev/temp/qa-resultados-fase-0-a-5.md`)
 - Confirmar si el botón "Añadir a la base de conocimiento" del editor da feedback suficiente (reportado como "no se ve nada" en la primera ronda de QA).
 - Borde/zona oscura visible tras el fix del tema (reportado, no reproducido aún en código).
 - Rediseño de UX pendiente de acordar: editor de texto del Registro, claridad de "Carga inicial", selección de campos de WooCommerce igual que los posts, notas legales.

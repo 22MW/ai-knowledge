@@ -4,7 +4,7 @@ Tags: woocommerce, chatbot, ia, llms.txt, wpml, support genix
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,6 +30,7 @@ Genera automáticamente una base de conocimiento en Markdown a partir de tu cat�
 * Panel de administración con pestañas especializadas; los ajustes exclusivos del chatbot, como el límite de documentos relacionados, viven en Chatbot y no en los ajustes generales.
 * Funciona igual sin Support Genix instalado: en ese caso, el plugin sigue generando y publicando `/llms.txt` de forma independiente.
 * En WordPress 7.0 o superior puede usar los Conectores nativos de Anthropic, OpenAI o Google, con selección automática o manual del modelo disponible. Support Genix se mantiene como origen alternativo.
+* Interfaz traducida y preparada para español, catalán, alemán, inglés y francés. Si falta un idioma o detectas una cadena sin traducir, ponte en contacto con nosotros.
 * El enfoque detallado del negocio se conserva como dato fuente independiente del resumen público generado para `/llms.txt`.
 * Sin dependencias obligatorias: WooCommerce, WPML y Support Genix se detectan en tiempo real; si no están, esas funciones concretas simplemente no se activan.
 
@@ -87,6 +88,9 @@ El plugin detecta el borrado/despublicación y elimina automáticamente el docum
 == Changelog ==
 
 Ver `CHANGELOG.md` para el historial completo y detallado de cambios.
+
+= 1.1.3 =
+Internacionalización completa del administrador con catálogos español, catalán e inglés para PHP y JavaScript; documentación por locale con fallback al español; mejoras de crawlers y reglas del servidor consolidadas desde la versión de desarrollo 1.1.2.2.
 
 = 1.0.8.6 =
 Limpieza de Ajustes: retirado el prompt global obsoleto y movido el límite de documentos relacionados a la pestaña Chatbot con guardado independiente.

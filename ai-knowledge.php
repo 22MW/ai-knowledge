@@ -3,7 +3,7 @@
  * Plugin Name: AI Knowledge & Visibility
  * Plugin URI: https://22mw.online/
  * Description: Genera documentos de base de conocimiento (.md + posts sgkb-docs de Support Genix) a partir de productos WooCommerce u otros CPTs, con cola, límite diario, WPML y publicación pública GEO vía llms.txt.
- * Version: 1.1.2.2
+ * Version: 1.1.3.1
  * Author: 22MW
  * Author URI: https://22mw.online/
  * Text Domain: ai-knowledge
@@ -18,11 +18,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'AIKB_VERSION', '1.1.2.2' );
+define( 'AIKB_VERSION', '1.1.3.1' );
 define( 'AIKB_FILE', __FILE__ );
 define( 'AIKB_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AIKB_URL', plugin_dir_url( __FILE__ ) );
 define( 'AIKB_TABLE_DOCUMENTS', 'wookb_documents' );
+
+add_action(
+	'init',
+	function () {
+		load_plugin_textdomain( 'ai-knowledge', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+	},
+	1
+);
 
 /**
  * Autoload muy simple por convención de nombre de archivo (class-xxx.php).

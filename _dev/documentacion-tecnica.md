@@ -160,7 +160,7 @@ Escrituras reales en disco (fuera de la carpeta del plugin, en
   `class-crawler-log.php` y `class-chatbot-relevance-guard.php`, siempre
   con `$wpdb->prepare()` para los valores; el nombre de tabla se
   interpola porque `prepare()` no soporta placeholders para identificadores
-  — patrón aceptado, ver `_dev/plugin-check-20260916.md`.
+  — patrón aceptado, ver `_dev/temp/plugin-check-20260916.md`.
 
 ## Generación de documentos — flujo general
 
@@ -196,5 +196,5 @@ Escrituras reales en disco (fuera de la carpeta del plugin, en
 
 - `_dev/decisiones.md` — por qué se tomó cada decisión de diseño.
 - `_dev/roadmap.md` — historial de fases y qué está hecho/pendiente.
-- `_dev/plugin-check-20260916.md` — triage de seguridad/estilo del
+- `_dev/temp/plugin-check-20260916.md` — triage de seguridad/estilo del
   escáner Plugin Check, con verificación real en código.
