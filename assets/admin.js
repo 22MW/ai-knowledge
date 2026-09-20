@@ -364,4 +364,8 @@
 		var step=$(this).closest('li').data('assistant-step');
 		$.post(data.ajaxUrl,{action:'aikb_assistant_navigate',nonce:data.nonce,step:step,assistant_action:'goto'}).done(showPanel);
 	});
+	$(document).on('click', '[data-assistant-category]', function () {
+		var $form=$(this).closest('form'), category=$(this).data('assistant-category'), step=$form.find('[name="assistant_step"]').val();
+		$.post(data.ajaxUrl, $form.serializeArray().concat([{name:'action',value:'aikb_assistant_navigate'},{name:'nonce',value:data.nonce},{name:'step',value:step},{name:'assistant_action',value:'goto'},{name:'assistant_category',value:category}])).done(showPanel);
+	});
 })(jQuery);
