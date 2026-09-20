@@ -215,19 +215,20 @@ class Admin
 		echo '</ol>';
 		echo '<div class="wookb-assistant-breadcrumb"><span>' . esc_html__('Asistente de configuración', 'ai-knowledge') . '</span><span aria-hidden="true">&gt;</span><strong data-assistant-breadcrumb>' . esc_html($steps[$current]['title']) . '</strong></div>';
 		echo '<div class="wookb-card" data-assistant-panel><p data-assistant-description>' . esc_html($steps[$current]['description']) . '</p>';
-		if ('welcome' === $current) {
-			echo '<div class="wookb-assistant-welcome-copy">';
+		echo '<div class="wookb-assistant-welcome-copy"' . ('welcome' === $current ? '' : ' style="display:none"') . '>';
 			echo '<h3>' . esc_html__('Qué revisaremos', 'ai-knowledge') . '</h3><ul>';
 			echo '<li>' . esc_html__('El origen de IA y las conexiones disponibles.', 'ai-knowledge') . '</li>';
 			echo '<li>' . esc_html__('El contenido, los datos del negocio y, si existe, la tienda WooCommerce.', 'ai-knowledge') . '</li>';
 			echo '<li>' . esc_html__('El chatbot, la visibilidad para sistemas de IA y la generación inicial.', 'ai-knowledge') . '</li>';
 			echo '</ul><p>' . esc_html__('El asistente conserva tus valores actuales. Cada paso puede saltarse y completarse después desde la configuración completa.', 'ai-knowledge') . '</p>';
-			echo '</div>';
-		}
+		echo '</div>';
 		echo self::assistant_screen_content($current);
 		echo '<form method="post" data-assistant-form>' . wp_nonce_field('aikb_assistant', 'aikb_assistant_nonce', true, false) . '<input type="hidden" name="assistant_step" value="' . esc_attr($current) . '"><p class="submit">';
 		echo '<button type="submit" class="button wookb-assistant-back" name="assistant_action" value="back"' . ('welcome' === $current ? ' style="display:none"' : '') . '>' . esc_html__('Atrás', 'ai-knowledge') . '</button> ';
-		echo '<button class="button" name="assistant_action" value="skip">' . esc_html__('Saltar este paso', 'ai-knowledge') . '</button> <button class="button button-primary" name="assistant_action" value="' . esc_attr('finish' === $current ? 'finish' : 'continue') . '">' . esc_html('finish' === $current ? __('Terminar', 'ai-knowledge') : __('Continuar', 'ai-knowledge')) . '</button></p></form></div></div>';
+		if ('welcome' !== $current) {
+			echo '<button class="button" name="assistant_action" value="skip">' . esc_html__('Saltar este paso', 'ai-knowledge') . '</button> ';
+		}
+		echo '<button class="button button-primary" name="assistant_action" value="' . esc_attr('finish' === $current ? 'finish' : 'continue') . '">' . esc_html('finish' === $current ? __('Terminar', 'ai-knowledge') : __('Continuar', 'ai-knowledge')) . '</button></p></form></div></div>';
 	}
 
 	protected static function assistant_steps()
