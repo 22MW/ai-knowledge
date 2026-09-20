@@ -340,32 +340,28 @@
 	if (!window.aikbAssistant) return;
 	var data = window.aikbAssistant;
 	var steps = data.steps || {};
-	function render(step, completed) {
-		var item = steps[step];
-		if (!item) return;
-		$('[data-assistant-title]').text(item.title);
-		$('[data-assistant-breadcrumb]').text(item.title);
-		$('[data-assistant-description]').text(item.description);
-		$('.wookb-assistant-welcome-copy').toggle(step === 'welcome');
-		$('.wookb-assistant-screen-section').remove();
-		if (data.screenContent && data.screenContent[step]) $(data.screenContent[step]).insertBefore('[data-assistant-form]');
-		$('[data-assistant-form] input[name="assistant_step"]').val(step);
+	function updateProgress(step, completed) {
 		var keys = Object.keys(steps), currentIndex = keys.indexOf(step);
 		$('.wookb-assistant-progress li').removeClass('is-active is-done is-past is-future').each(function (index) { var $li=$(this), key=$li.data('assistant-step'); if (key === step) $li.addClass('is-active'); if ((completed || []).indexOf(key) !== -1) $li.addClass('is-done'); if (index < currentIndex) $li.addClass('is-past'); if (index > currentIndex) $li.addClass('is-future'); });
-		var currentIndex = Object.keys(steps).indexOf(step);
-		$('[data-assistant-form] .wookb-assistant-back').toggle(currentIndex > 0);
-		$('[data-assistant-form] .wookb-assistant-save').toggle(step !== 'welcome');
-		$('[data-assistant-form] .wookb-assistant-skip').toggle(step !== 'welcome' && step !== 'ai');
-		$('[data-assistant-form] button.button-primary').text(step === 'welcome' ? wp.i18n.__('Continuar', 'ai-knowledge') : (step === 'finish' ? wp.i18n.__('Guardar y terminar', 'ai-knowledge') : wp.i18n.__('Continuar', 'ai-knowledge'))).val(step === 'finish' ? 'finish' : 'continue');
-		window.history.pushState({}, '', 'admin.php?page=ai-knowledge-assistant&step=' + encodeURIComponent(step));
+	}
+	function showPanel(response) {
+		if (!response || !response.success || !response.data.panel) return false;
+		$('[data-assistant-stage]').html(response.data.panel);
+		updateProgress(response.data.step, response.data.completed || []);
+		window.history.pushState({}, '', 'admin.php?page=ai-knowledge-assistant&step=' + encodeURIComponent(response.data.step));
+		return true;
 	}
 	$(document).on('submit', '[data-assistant-form]', function (e) {
 		e.preventDefault();
-		var $form=$(this), action=$form.data('assistant-action') || 'continue', current=$form.find('input[name="assistant_step"]').val();
-		var payload = { action:'aikb_assistant_navigate', nonce:data.nonce, step:current, assistant_action:action };
-	$('.wookb-assistant-screen-section [name], [data-assistant-form] [name]').each(function () { if (this.name !== 'assistant_step' && this.name !== 'aikb_assistant_nonce') payload[this.name] = $(this).val(); });
-		$.post(data.ajaxUrl, payload).done(function (response) { if (response.success) { $('[data-assistant-feedback]').removeClass('is-error').text(response.data.message || wp.i18n.__('Guardado correctamente.', 'ai-knowledge')).show(); if (action !== 'save') render(response.data.step, response.data.completed); } else { $('[data-assistant-feedback]').addClass('is-error').text(wp.i18n.__('No se pudo guardar.', 'ai-knowledge')).show(); } }).fail(function () { $('[data-assistant-feedback]').addClass('is-error').text(wp.i18n.__('No se pudo guardar.', 'ai-knowledge')).show(); });
+		var $form=$(this), submitter=e.originalEvent && e.originalEvent.submitter, action=submitter ? submitter.value : 'continue';
+		var payload=$form.serializeArray();
+		payload.push({name:'action',value:'aikb_assistant_navigate'},{name:'nonce',value:data.nonce},{name:'step',value:$form.find('[name="assistant_step"]').val()},{name:'assistant_action',value:action});
+		$form.find('button').prop('disabled', true);
+		$.post(data.ajaxUrl, payload).done(function (response) { if (!showPanel(response)) { $('[data-assistant-feedback]').addClass('is-error').text(response.data && response.data.message ? response.data.message : wp.i18n.__('No se pudo guardar.', 'ai-knowledge')).addClass('is-visible'); } }).fail(function () { $('[data-assistant-feedback]').addClass('is-error').text(wp.i18n.__('No se pudo guardar.', 'ai-knowledge')).addClass('is-visible'); }).always(function () { $('[data-assistant-form] button').prop('disabled', false); });
 	});
-	$(document).on('click', '[data-assistant-form] button[name="assistant_action"]', function () { $(this).closest('[data-assistant-form]').data('assistant-action', this.value); });
-	$(document).on('click', '[data-assistant-step-link]', function (e) { e.preventDefault(); render($(this).closest('li').data('assistant-step'), []); });
+	$(document).on('click', '[data-assistant-step-link]', function (e) {
+		e.preventDefault();
+		var step=$(this).closest('li').data('assistant-step');
+		$.post(data.ajaxUrl,{action:'aikb_assistant_navigate',nonce:data.nonce,step:step,assistant_action:'goto'}).done(showPanel);
+	});
 })(jQuery);

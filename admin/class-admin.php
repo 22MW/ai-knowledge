@@ -169,12 +169,17 @@ class Admin
 		if (!isset($steps[$current])) {
 			$current = 'welcome';
 		}
+		$notice = '';
 		if ('POST' === $_SERVER['REQUEST_METHOD'] && isset($_POST['aikb_assistant_nonce'])) { // phpcs:ignore
 			check_admin_referer('aikb_assistant', 'aikb_assistant_nonce');
 			$action = isset($_POST['assistant_action']) ? sanitize_key(wp_unslash($_POST['assistant_action'])) : 'continue';
 			$current = isset($_POST['assistant_step']) ? sanitize_key(wp_unslash($_POST['assistant_step'])) : $current;
 			if (!isset($steps[$current])) {
 				$current = 'welcome';
+			}
+			if (in_array($action, array('save', 'continue', 'finish'), true) && 'welcome' !== $current) {
+				self::assistant_save_step($current);
+				$notice = __('Guardado correctamente.', 'ai-knowledge');
 			}
 			$state['initiated'] = true;
 			$state['current'] = $current;
@@ -213,25 +218,32 @@ class Admin
 			$step_position++;
 		}
 		echo '</ol>';
-		echo '<div class="wookb-assistant-breadcrumb"><span>' . esc_html__('Asistente de configuración', 'ai-knowledge') . '</span><span aria-hidden="true">&gt;</span><strong data-assistant-breadcrumb>' . esc_html($steps[$current]['title']) . '</strong></div>';
-		echo '<div class="wookb-card" data-assistant-panel><p data-assistant-description>' . esc_html($steps[$current]['description']) . '</p>';
-		echo '<div class="wookb-assistant-welcome-copy"' . ('welcome' === $current ? '' : ' style="display:none"') . '>';
-			echo '<h3>' . esc_html__('Qué revisaremos', 'ai-knowledge') . '</h3><ul>';
-			echo '<li>' . esc_html__('El origen de IA y las conexiones disponibles.', 'ai-knowledge') . '</li>';
-			echo '<li>' . esc_html__('El contenido, los datos del negocio y, si existe, la tienda WooCommerce.', 'ai-knowledge') . '</li>';
-			echo '<li>' . esc_html__('El chatbot, la visibilidad para sistemas de IA y la generación inicial.', 'ai-knowledge') . '</li>';
-			echo '</ul><p>' . esc_html__('El asistente conserva tus valores actuales. Cada paso puede saltarse y completarse después desde la configuración completa.', 'ai-knowledge') . '</p>';
-		echo '</div>';
-		echo self::assistant_screen_content($current);
-		echo '<form method="post" data-assistant-form>' . wp_nonce_field('aikb_assistant', 'aikb_assistant_nonce', true, false) . '<input type="hidden" name="assistant_step" value="' . esc_attr($current) . '"><p class="submit">';
-		echo '<button type="submit" class="button wookb-assistant-back" name="assistant_action" value="back"' . ('welcome' === $current ? ' style="display:none"' : '') . '>' . esc_html__('Atrás', 'ai-knowledge') . '</button> ';
-		if ('welcome' !== $current && 'ai' !== $current) {
-			echo '<button class="button wookb-assistant-skip" name="assistant_action" value="skip">' . esc_html__('Saltar este paso', 'ai-knowledge') . '</button> ';
-		}
-		echo '<button class="button wookb-assistant-save" name="assistant_action" value="save"' . ('welcome' === $current ? ' style="display:none"' : '') . '>' . esc_html__('Guardar', 'ai-knowledge') . '</button> ';
-		$primary_action = 'finish' === $current ? 'finish' : 'continue';
-		$primary_label = 'welcome' === $current ? __('Continuar', 'ai-knowledge') : ('finish' === $current ? __('Guardar y terminar', 'ai-knowledge') : __('Continuar', 'ai-knowledge'));
-		echo '<button class="button button-primary" name="assistant_action" value="' . esc_attr($primary_action) . '">' . esc_html($primary_label) . '</button></p><div class="wookb-assistant-feedback" data-assistant-feedback role="status" aria-live="polite"></div></form></div></div>';
+		echo '<div data-assistant-stage>' . self::assistant_panel($current, $steps, $notice) . '</div></div>';
+	}
+
+	protected static function assistant_panel($step, $steps, $notice = '')
+	{
+		ob_start();
+		?>
+		<div class="wookb-assistant-breadcrumb"><span><?php esc_html_e('Asistente de configuración', 'ai-knowledge'); ?></span><span aria-hidden="true">&gt;</span><strong><?php echo esc_html($steps[$step]['title']); ?></strong></div>
+		<div class="wookb-card" data-assistant-panel>
+			<form method="post" data-assistant-form>
+				<?php wp_nonce_field('aikb_assistant', 'aikb_assistant_nonce'); ?>
+				<input type="hidden" name="assistant_step" value="<?php echo esc_attr($step); ?>" />
+				<p class="wookb-assistant-description"><?php echo esc_html($steps[$step]['description']); ?></p>
+				<?php echo self::assistant_screen_content($step); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<div class="wookb-assistant-actions">
+					<?php if ('welcome' !== $step) : ?><button type="submit" class="button" name="assistant_action" value="back"><?php esc_html_e('Atrás', 'ai-knowledge'); ?></button><?php endif; ?>
+					<span class="wookb-assistant-actions-main">
+						<?php if ('welcome' !== $step) : ?><button type="submit" class="button" name="assistant_action" value="save"><?php esc_html_e('Guardar', 'ai-knowledge'); ?></button><?php endif; ?>
+						<button type="submit" class="button button-primary" name="assistant_action" value="<?php echo 'finish' === $step ? 'finish' : 'continue'; ?>"><?php echo esc_html('finish' === $step ? __('Guardar y terminar', 'ai-knowledge') : __('Continuar', 'ai-knowledge')); ?></button>
+					</span>
+				</div>
+				<div class="wookb-assistant-feedback<?php echo $notice ? ' is-visible' : ''; ?>" data-assistant-feedback role="status" aria-live="polite"><?php echo esc_html($notice); ?></div>
+			</form>
+		</div>
+		<?php
+		return ob_get_clean();
 	}
 
 	protected static function assistant_steps()
@@ -250,54 +262,22 @@ class Admin
 
 	protected static function assistant_screen_content($step)
 	{
-		if ('ai' === $step) {
-			$settings = Scope::settings();
-			$available = AI_Client::wordpress_available();
-			$models = $available ? AI_Client::available_models() : array();
-			$html = '<section class="wookb-assistant-screen-section"><h3>' . esc_html__('Conexiones de IA', 'ai-knowledge') . '</h3><p>' . esc_html__('Selecciona una conexión existente. Las claves se gestionan en el conector correspondiente y no se guardan en AI Knowledge.', 'ai-knowledge') . '</p><div class="wookb-assistant-fields">';
-			$html .= '<label class="wookb-assistant-field"><span>' . esc_html__('Origen de IA', 'ai-knowledge') . '</span><select name="assistant_ai_key_source" data-assistant-preview-field><option value="genix"' . selected('genix', $settings['ai_key_source'], false) . '>' . esc_html__('Support Genix', 'ai-knowledge') . '</option>';
-			if ($available) $html .= '<option value="wp_connectors"' . selected('wp_connectors', $settings['ai_key_source'], false) . '>' . esc_html__('Conectores de WordPress', 'ai-knowledge') . '</option>';
-			$html .= '</select></label><label class="wookb-assistant-field"><span>' . esc_html__('Modelo', 'ai-knowledge') . '</span><select name="assistant_wp_ai_model" data-assistant-preview-field><option value="' . esc_attr(AI_Client::MODEL_AUTO) . '"' . selected(AI_Client::MODEL_AUTO, $settings['wp_ai_model'], false) . '>' . esc_html__('Automático (recomendado)', 'ai-knowledge') . '</option>';
-			foreach ($models as $key => $model) $html .= '<option value="' . esc_attr($key) . '"' . selected($key, $settings['wp_ai_model'], false) . '>' . esc_html($model['name'] . ' (' . $model['model'] . ')') . '</option>';
-			$html .= '</select></label></div><div class="wookb-assistant-external-links"><p>' . esc_html__('Si falta una conexión, configúrala y vuelve después a este paso:', 'ai-knowledge') . '</p><a class="button" target="_blank" rel="noopener noreferrer" href="' . esc_url(admin_url('options-connectors.php')) . '">' . esc_html__('Configurar Conectores de WordPress', 'ai-knowledge') . '</a> <a class="button" target="_blank" rel="noopener noreferrer" href="' . esc_url(admin_url('plugins.php')) . '">' . esc_html__('Abrir Support Genix', 'ai-knowledge') . '</a></div></section>';
-			return $html;
-		}
-		$content = array(
-			'ai' => array(__('Conexiones detectadas', 'ai-knowledge'), __('Revisa qué origen de IA está disponible. Si no hay ninguno conectado, puedes continuar sin IA y volver a este paso más adelante.', 'ai-knowledge')),
-			'content' => array(__('Alcance inicial', 'ai-knowledge'), __('Selecciona los tipos de contenido públicos que quieres incluir. La configuración avanzada de taxonomías, términos e identificadores se conserva para completarla después.', 'ai-knowledge')),
-			'business' => array(__('Datos principales del negocio', 'ai-knowledge'), __('Completa la identidad, ubicación, público, contacto y horario. Los valores guardados se cargarán aquí sin sustituirlos por valores predeterminados.', 'ai-knowledge')),
-			'woocommerce' => array(__('Datos de la tienda', 'ai-knowledge'), __('Revisa moneda, país, condiciones de compra, entrega, recogida y contacto. Los detalles avanzados de envíos, impuestos y pagos se podrán completar después.', 'ai-knowledge')),
-			'chatbot' => array(__('Configuración del chatbot', 'ai-knowledge'), __('Define cómo Support Genix consultará los documentos, el límite de resultados y la información adicional que debe tener en cuenta.', 'ai-knowledge')),
-			'visibility' => array(__('Publicación y crawlers', 'ai-knowledge'), __('Revisa la publicación de llms.txt, Markdown, JSON y JSON-LD, junto con las familias de crawlers que podrán acceder a cada recurso.', 'ai-knowledge')),
-			'finish' => array(__('Revisión final', 'ai-knowledge'), __('Comprueba los límites de generación, guarda la configuración y decide si quieres iniciar ahora la cola de documentos.', 'ai-knowledge')),
-		);
-		$fields = array(
-			'ai' => array(__('Origen de IA', 'ai-knowledge'), __('Modelo', 'ai-knowledge'), __('Estado de la conexión', 'ai-knowledge')),
-			'content' => array(__('Modo de selección', 'ai-knowledge'), __('Tipos de contenido incluidos', 'ai-knowledge'), __('Tipos de contenido excluidos', 'ai-knowledge')),
-			'business' => array(__('Nombre del negocio', 'ai-knowledge'), __('Dirección y país', 'ai-knowledge'), __('Idioma principal', 'ai-knowledge'), __('Público objetivo', 'ai-knowledge'), __('Contacto', 'ai-knowledge'), __('Horario', 'ai-knowledge'), __('Enfoque del negocio', 'ai-knowledge')),
-			'woocommerce' => array(__('Nombre de la tienda', 'ai-knowledge'), __('Moneda y país base', 'ai-knowledge'), __('Pedido mínimo o envío gratis', 'ai-knowledge'), __('Recogida en tienda', 'ai-knowledge'), __('Plazo de entrega', 'ai-knowledge'), __('Contacto y horario', 'ai-knowledge')),
-			'chatbot' => array(__('Límite de documentos relacionados', 'ai-knowledge'), __('Páginas de referencia', 'ai-knowledge'), __('Información adicional', 'ai-knowledge'), __('Comportamiento del chatbot', 'ai-knowledge'), __('Borrador editable', 'ai-knowledge')),
-			'visibility' => array(__('Formatos públicos', 'ai-knowledge'), __('Búsqueda y citas IA', 'ai-knowledge'), __('Asistentes bajo demanda', 'ai-knowledge'), __('Entrenamiento', 'ai-knowledge'), __('SEO y scraping', 'ai-knowledge'), __('Archivado y datasets', 'ai-knowledge'), __('Scanners de seguridad', 'ai-knowledge'), __('robots.txt', 'ai-knowledge'), __('.htaccess', 'ai-knowledge')),
-			'finish' => array(__('Largo del texto', 'ai-knowledge'), __('Tokens de salida', 'ai-knowledge'), __('IndexNow', 'ai-knowledge'), __('Generación inicial', 'ai-knowledge')),
-		);
-		if (!isset($content[$step])) return '';
-		$html = '<section class="wookb-assistant-screen-section"><h3>' . esc_html($content[$step][0]) . '</h3><p>' . esc_html($content[$step][1]) . '</p><div class="wookb-assistant-fields">';
-		foreach ((array) ($fields[$step] ?? array()) as $index => $label) {
-			$html .= '<label class="wookb-assistant-field"><span>' . esc_html($label) . '</span>';
-			if (in_array($label, array(__('Información adicional', 'ai-knowledge'), __('Comportamiento del chatbot', 'ai-knowledge'), __('Borrador editable', 'ai-knowledge'), __('Enfoque del negocio', 'ai-knowledge')), true)) {
-				$html .= '<textarea rows="3" data-assistant-preview-field></textarea>';
-			} elseif (false !== strpos(strtolower($label), 'estado') || false !== strpos(strtolower($label), 'modo') || false !== strpos(strtolower($label), 'origen') || false !== strpos(strtolower($label), 'generación')) {
-				$html .= '<select data-assistant-preview-field><option>' . esc_html__('Seleccionar', 'ai-knowledge') . '</option></select>';
-			} else {
-				$html .= '<input type="text" data-assistant-preview-field />';
-			}
-			$html .= '</label>';
-		}
-		$html .= '</div>';
-		if ('ai' === $step) {
-			$html .= '<div class="wookb-assistant-external-links"><p>' . esc_html__('Configura la conexión en la pantalla correspondiente y vuelve después a este paso:', 'ai-knowledge') . '</p><a class="button" target="_blank" rel="noopener noreferrer" href="' . esc_url(admin_url('options-connectors.php')) . '">' . esc_html__('Configurar Conectores de WordPress', 'ai-knowledge') . '</a> <a class="button" target="_blank" rel="noopener noreferrer" href="' . esc_url(admin_url('plugins.php')) . '">' . esc_html__('Abrir Support Genix', 'ai-knowledge') . '</a></div>';
-		}
-		return $html . '</section>';
+		$settings = Scope::settings();
+		ob_start();
+		if ('welcome' === $step) : ?>
+			<div class="wookb-assistant-welcome-copy"><h3><?php esc_html_e('Qué revisaremos', 'ai-knowledge'); ?></h3><ul><li><?php esc_html_e('El origen de IA y el contenido que formará la base de conocimiento.', 'ai-knowledge'); ?></li><li><?php esc_html_e('Los datos del negocio y las integraciones disponibles.', 'ai-knowledge'); ?></li><li><?php esc_html_e('La visibilidad para IA y los límites de generación.', 'ai-knowledge'); ?></li></ul></div>
+		<?php elseif ('ai' === $step) : $available = AI_Client::wordpress_available(); $models = $available ? AI_Client::available_models() : array(); ?>
+			<div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Origen de IA', 'ai-knowledge'); ?></span><select name="ai_key_source"><option value="genix" <?php selected('genix', $settings['ai_key_source']); ?>><?php esc_html_e('Support Genix', 'ai-knowledge'); ?></option><?php if ($available) : ?><option value="wp_connectors" <?php selected('wp_connectors', $settings['ai_key_source']); ?>><?php esc_html_e('Conectores de WordPress', 'ai-knowledge'); ?></option><?php endif; ?></select></label><label class="wookb-assistant-field"><span><?php esc_html_e('Modelo', 'ai-knowledge'); ?></span><select name="wp_ai_model"><option value="<?php echo esc_attr(AI_Client::MODEL_AUTO); ?>" <?php selected(AI_Client::MODEL_AUTO, $settings['wp_ai_model']); ?>><?php esc_html_e('Automático (recomendado)', 'ai-knowledge'); ?></option><?php foreach ($models as $key => $model) : ?><option value="<?php echo esc_attr($key); ?>" <?php selected($key, $settings['wp_ai_model']); ?>><?php echo esc_html($model['name'] . ' (' . $model['model'] . ')'); ?></option><?php endforeach; ?></select></label></div><div class="wookb-assistant-external-links"><a class="button" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(admin_url('options-connectors.php')); ?>"><?php esc_html_e('Configurar Conectores de WordPress', 'ai-knowledge'); ?></a> <a class="button" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(admin_url('plugins.php')); ?>"><?php esc_html_e('Abrir Support Genix', 'ai-knowledge'); ?></a></div>
+		<?php elseif ('content' === $step) : $post_types = get_post_types(array('public' => true), 'objects'); ?>
+			<div class="wookb-assistant-field"><span><?php esc_html_e('Modo de selección', 'ai-knowledge'); ?></span><label><input type="radio" name="post_types_mode" value="explicit" <?php checked('explicit', $settings['post_types_mode']); ?> /> <?php esc_html_e('Solo los tipos marcados', 'ai-knowledge'); ?></label><label><input type="radio" name="post_types_mode" value="all_public" <?php checked('all_public', $settings['post_types_mode']); ?> /> <?php esc_html_e('Todos los tipos públicos', 'ai-knowledge'); ?></label></div><div class="wookb-chip-group"><?php foreach ($post_types as $post_type) : if ('attachment' === $post_type->name) continue; ?><label class="wookb-chip"><input type="checkbox" name="post_types[]" value="<?php echo esc_attr($post_type->name); ?>" <?php checked(in_array($post_type->name, (array) $settings['post_types'], true)); ?> /> <?php echo esc_html($post_type->labels->name); ?></label><?php endforeach; ?></div><p><a target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(admin_url('admin.php?page=ai-knowledge&tab=contenido')); ?>"><?php esc_html_e('Abrir configuración avanzada de contenido', 'ai-knowledge'); ?></a></p>
+		<?php elseif ('business' === $step) : $answers = Chatbot_Prompt_Builder::get_saved_answers(); ?><div class="wookb-assistant-fields"><?php foreach (Chatbot_Prompt_Builder::questions_by_group('negocio') as $key => $question) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($question['label']); ?></span><?php if ('textarea' === $question['type']) : ?><textarea name="answers[<?php echo esc_attr($key); ?>]" rows="3"><?php echo esc_textarea($answers[$key]); ?></textarea><?php else : ?><input type="text" name="answers[<?php echo esc_attr($key); ?>]" value="<?php echo esc_attr($answers[$key]); ?>" /><?php endif; ?><small><?php echo esc_html($question['placeholder']); ?></small></label><?php endforeach; ?></div>
+		<?php elseif ('woocommerce' === $step) : ?>
+			<div class="wookb-assistant-fields"><?php foreach (array('wc_store_name' => __('Nombre de la tienda', 'ai-knowledge'), 'wc_currency' => __('Moneda', 'ai-knowledge'), 'wc_base_country' => __('País base', 'ai-knowledge')) as $key => $label) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($label); ?></span><input type="text" name="<?php echo esc_attr($key); ?>" value="<?php echo esc_attr($settings[$key]); ?>" /></label><?php endforeach; ?><label class="wookb-assistant-field"><span><?php esc_html_e('Condiciones de venta', 'ai-knowledge'); ?></span><textarea name="wc_terms_text" rows="3"><?php echo esc_textarea($settings['wc_terms_text']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Política de devoluciones', 'ai-knowledge'); ?></span><textarea name="wc_returns_text" rows="3"><?php echo esc_textarea($settings['wc_returns_text']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Plazo de entrega', 'ai-knowledge'); ?></span><textarea name="delivery_time_note" rows="3"><?php echo esc_textarea($settings['delivery_time_note']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Contacto y horario de la tienda', 'ai-knowledge'); ?></span><textarea name="wc_contact_hours" rows="3"><?php echo esc_textarea($settings['wc_contact_hours']); ?></textarea></label><label class="wookb-chip"><input type="checkbox" name="wc_pickup_available" value="1" <?php checked(!empty($settings['wc_pickup_available'])); ?> /> <?php esc_html_e('Recogida en tienda disponible', 'ai-knowledge'); ?></label></div><p><a target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(admin_url('admin.php?page=ai-knowledge&tab=woocommerce')); ?>"><?php esc_html_e('Abrir configuración avanzada de WooCommerce', 'ai-knowledge'); ?></a></p>
+		<?php elseif ('chatbot' === $step) : $answers = Chatbot_Prompt_Builder::get_saved_answers(); ?><div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Límite de documentos relacionados', 'ai-knowledge'); ?></span><input type="number" min="0" name="chatbot_docs_list_limit" value="<?php echo esc_attr($settings['chatbot_docs_list_limit']); ?>" /></label><?php foreach (Chatbot_Prompt_Builder::questions_by_group('chatbot') as $key => $question) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($question['label']); ?></span><?php if ('textarea' === $question['type']) : ?><textarea name="answers[<?php echo esc_attr($key); ?>]" rows="3"><?php echo esc_textarea($answers[$key]); ?></textarea><?php else : ?><input type="text" name="answers[<?php echo esc_attr($key); ?>]" value="<?php echo esc_attr($answers[$key]); ?>" /><?php endif; ?></label><?php endforeach; ?></div>
+		<?php elseif ('visibility' === $step) : ?><div class="wookb-assistant-field"><span><?php esc_html_e('Acceso de crawlers bloqueados a llms.txt', 'ai-knowledge'); ?></span><label><input type="radio" name="crawler_visibility_mode" value="site" <?php checked('site', $settings['crawler_visibility_mode']); ?> /> <?php esc_html_e('Aplicar la misma política a todo el sitio', 'ai-knowledge'); ?></label><label><input type="radio" name="crawler_visibility_mode" value="llms_only" <?php checked('llms_only', $settings['crawler_visibility_mode']); ?> /> <?php esc_html_e('Permitir solo llms.txt', 'ai-knowledge'); ?></label></div><p><a target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(admin_url('admin.php?page=ai-knowledge&tab=visibilidad-ia')); ?>"><?php esc_html_e('Abrir configuración avanzada de crawlers, robots.txt y .htaccess', 'ai-knowledge'); ?></a></p>
+		<?php elseif ('finish' === $step) : ?><div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Largo máximo del texto', 'ai-knowledge'); ?></span><input type="number" min="100" max="10000" name="body_char_limit" value="<?php echo esc_attr($settings['body_char_limit']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Tokens de salida', 'ai-knowledge'); ?></span><input type="number" min="200" name="output_tokens" value="<?php echo esc_attr($settings['output_tokens']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Límite diario', 'ai-knowledge'); ?></span><input type="number" min="1" name="daily_limit" value="<?php echo esc_attr($settings['daily_limit']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Tamaño de lote', 'ai-knowledge'); ?></span><input type="number" min="1" name="batch_size" value="<?php echo esc_attr($settings['batch_size']); ?>" /></label><label class="wookb-chip"><input type="checkbox" name="no_limit" value="1" <?php checked(!empty($settings['no_limit'])); ?> /> <?php esc_html_e('Sin límite diario', 'ai-knowledge'); ?></label><label class="wookb-chip"><input type="checkbox" name="indexnow_enabled" value="1" <?php checked(!empty($settings['indexnow_enabled'])); ?> /> <?php esc_html_e('Avisar a IndexNow', 'ai-knowledge'); ?></label></div>
+		<?php endif;
+		return ob_get_clean();
 	}
 
 	protected static function assistant_available_steps()
@@ -314,27 +294,68 @@ class Admin
 		check_ajax_referer('aikb_assistant_ajax', 'nonce');
 		$steps = self::assistant_available_steps();
 		$current = isset($_POST['step']) ? sanitize_key(wp_unslash($_POST['step'])) : 'welcome';
-		$action = isset($_POST['assistant_action']) ? sanitize_key(wp_unslash($_POST['assistant_action'])) : 'continue';
+		$action = isset($_POST['assistant_action']) ? sanitize_key(wp_unslash($_POST['assistant_action'])) : 'goto';
 		if (!isset($steps[$current])) wp_send_json_error(array('message' => __('Paso no válido.', 'ai-knowledge')), 400);
 		$state = get_option('aikb_setup_assistant', array());
-		if ('ai' === $current && in_array($action, array('save', 'continue', 'finish'), true)) {
-			$source = isset($_POST['assistant_ai_key_source']) ? sanitize_key(wp_unslash($_POST['assistant_ai_key_source'])) : 'genix';
-			$model = isset($_POST['assistant_wp_ai_model']) ? sanitize_text_field(wp_unslash($_POST['assistant_wp_ai_model'])) : AI_Client::MODEL_AUTO;
-			if (!in_array($source, array('genix', 'wp_connectors'), true) || ('wp_connectors' === $source && !AI_Client::wordpress_available())) $source = 'genix';
-			if (AI_Client::MODEL_AUTO !== $model && !isset(AI_Client::available_models()[$model])) $model = AI_Client::MODEL_AUTO;
-			Scope::update_settings(array('ai_key_source' => $source, 'wp_ai_model' => $model));
+		if (in_array($action, array('save', 'continue', 'finish'), true) && 'welcome' !== $current) {
+			self::assistant_save_step($current);
 		}
 		$state['initiated'] = true;
 		$state['last_opened'] = current_time('mysql');
-		if ('save' === $action) {
+		if (in_array($action, array('save', 'goto'), true)) {
 			$state['current'] = $current;
 		} elseif ('skip' === $action) $state['skipped'] = array_values(array_unique(array_merge((array) ($state['skipped'] ?? array()), array($current))));
 		elseif ('finish' === $action) $state['finished'] = true;
 		elseif ('back' !== $action) $state['completed'] = array_values(array_unique(array_merge((array) ($state['completed'] ?? array()), array($current))));
-		$next = 'save' === $action ? $current : self::assistant_next_step($current, $steps, $action);
+		$next = in_array($action, array('save', 'goto'), true) ? $current : self::assistant_next_step($current, $steps, $action);
 		$state['current'] = $next;
 		update_option('aikb_setup_assistant', $state, false);
-		wp_send_json_success(array('step' => $next, 'completed' => (array) ($state['completed'] ?? array()), 'finished' => !empty($state['finished']), 'message' => __('Guardado correctamente.', 'ai-knowledge')));
+		$message = in_array($action, array('save', 'continue', 'finish'), true) && 'welcome' !== $current ? __('Guardado correctamente.', 'ai-knowledge') : '';
+		wp_send_json_success(array('step' => $next, 'completed' => (array) ($state['completed'] ?? array()), 'finished' => !empty($state['finished']), 'panel' => self::assistant_panel($next, $steps, $message)));
+	}
+
+	protected static function assistant_save_step($step)
+	{
+		$settings = Scope::settings();
+		if ('ai' === $step) {
+			$source = isset($_POST['ai_key_source']) ? sanitize_key(wp_unslash($_POST['ai_key_source'])) : 'genix'; // phpcs:ignore
+			$model = isset($_POST['wp_ai_model']) ? sanitize_text_field(wp_unslash($_POST['wp_ai_model'])) : AI_Client::MODEL_AUTO; // phpcs:ignore
+			if (!in_array($source, array('genix', 'wp_connectors'), true) || ('wp_connectors' === $source && !AI_Client::wordpress_available())) $source = 'genix';
+			if (AI_Client::MODEL_AUTO !== $model && !isset(AI_Client::available_models()[$model])) $model = AI_Client::MODEL_AUTO;
+			Scope::update_settings(array('ai_key_source' => $source, 'wp_ai_model' => $model));
+		} elseif ('content' === $step) {
+			$mode = isset($_POST['post_types_mode']) ? sanitize_key(wp_unslash($_POST['post_types_mode'])) : 'explicit'; // phpcs:ignore
+			Scope::update_settings(array('post_types_mode' => in_array($mode, array('explicit', 'all_public'), true) ? $mode : 'explicit', 'post_types' => isset($_POST['post_types']) ? array_map('sanitize_key', (array) wp_unslash($_POST['post_types'])) : array())); // phpcs:ignore
+		} elseif ('business' === $step || 'chatbot' === $step) {
+			$allowed = array_keys(Chatbot_Prompt_Builder::questions_by_group('business' === $step ? 'negocio' : 'chatbot'));
+			$raw = isset($_POST['answers']) && is_array($_POST['answers']) ? wp_unslash($_POST['answers']) : array(); // phpcs:ignore
+			Chatbot_Prompt_Builder::save_answers(array_intersect_key($raw, array_flip($allowed)));
+			if ('business' === $step) Chatbot_Prompt_Builder::write_info_doc();
+			if ('chatbot' === $step) Scope::update_settings(array('chatbot_docs_list_limit' => max(0, (int) ($_POST['chatbot_docs_list_limit'] ?? Chatbot_Relevance_Guard::DOCS_LIST_LIMIT_DEFAULT)))); // phpcs:ignore
+		} elseif ('woocommerce' === $step) {
+			Scope::update_settings(array(
+				'wc_store_name' => isset($_POST['wc_store_name']) ? sanitize_text_field(wp_unslash($_POST['wc_store_name'])) : '', // phpcs:ignore
+				'wc_currency' => isset($_POST['wc_currency']) ? sanitize_text_field(wp_unslash($_POST['wc_currency'])) : '', // phpcs:ignore
+				'wc_base_country' => isset($_POST['wc_base_country']) ? sanitize_text_field(wp_unslash($_POST['wc_base_country'])) : '', // phpcs:ignore
+				'wc_terms_text' => isset($_POST['wc_terms_text']) ? sanitize_textarea_field(wp_unslash($_POST['wc_terms_text'])) : '', // phpcs:ignore
+				'wc_returns_text' => isset($_POST['wc_returns_text']) ? sanitize_textarea_field(wp_unslash($_POST['wc_returns_text'])) : '', // phpcs:ignore
+				'delivery_time_note' => isset($_POST['delivery_time_note']) ? sanitize_textarea_field(wp_unslash($_POST['delivery_time_note'])) : '', // phpcs:ignore
+				'wc_contact_hours' => isset($_POST['wc_contact_hours']) ? sanitize_textarea_field(wp_unslash($_POST['wc_contact_hours'])) : '', // phpcs:ignore
+				'wc_pickup_available' => !empty($_POST['wc_pickup_available']), // phpcs:ignore
+			));
+		} elseif ('visibility' === $step) {
+			$mode = isset($_POST['crawler_visibility_mode']) ? sanitize_key(wp_unslash($_POST['crawler_visibility_mode'])) : 'site'; // phpcs:ignore
+			Scope::update_settings(array('crawler_visibility_mode' => in_array($mode, array('site', 'llms_only'), true) ? $mode : 'site'));
+		} elseif ('finish' === $step) {
+			Scope::update_settings(array(
+				'body_char_limit' => max(100, min(10000, (int) ($_POST['body_char_limit'] ?? $settings['body_char_limit']))), // phpcs:ignore
+				'output_tokens' => max(200, (int) ($_POST['output_tokens'] ?? $settings['output_tokens'])), // phpcs:ignore
+				'daily_limit' => max(1, (int) ($_POST['daily_limit'] ?? $settings['daily_limit'])), // phpcs:ignore
+				'batch_size' => max(1, (int) ($_POST['batch_size'] ?? $settings['batch_size'])), // phpcs:ignore
+				'no_limit' => !empty($_POST['no_limit']), // phpcs:ignore
+				'indexnow_enabled' => !empty($_POST['indexnow_enabled']), // phpcs:ignore
+			));
+		}
 	}
 
 	protected static function assistant_next_step($current, $steps, $action)
