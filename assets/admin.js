@@ -347,12 +347,12 @@
 		$('[data-assistant-description]').text(item.description);
 		$('.wookb-assistant-welcome-copy').toggle(step === 'welcome');
 		var $link = $('[data-assistant-link-wrap]');
-		if (item.link) { if (!$link.length) $link = $('<p data-assistant-link-wrap><a class="button" data-assistant-link target="_blank" rel="noopener noreferrer">' + wp.i18n.__('Abrir configuración completa', 'ai-knowledge') + '</a></p>').insertBefore('[data-assistant-form]'); $link.find('[data-assistant-link]').attr('href', item.link); } else { $link.remove(); }
+		if (item.link) { if (!$link.length) $link = $('<p class="wookb-assistant-config-link" data-assistant-link-wrap><a class="button" data-assistant-link target="_blank" rel="noopener noreferrer">' + wp.i18n.__('Abrir configuración completa', 'ai-knowledge') + '</a></p>').insertBefore('[data-assistant-form]'); $link.find('[data-assistant-link]').attr('href', item.link); $link.show(); } else { $link.hide(); }
 		$('[data-assistant-form] input[name="assistant_step"]').val(step);
 		var keys = Object.keys(steps), currentIndex = keys.indexOf(step);
 		$('.wookb-assistant-progress li').removeClass('is-active is-done is-past is-future').each(function (index) { var $li=$(this), key=$li.data('assistant-step'); if (key === step) $li.addClass('is-active'); if ((completed || []).indexOf(key) !== -1) $li.addClass('is-done'); if (index < currentIndex) $li.addClass('is-past'); if (index > currentIndex) $li.addClass('is-future'); });
 		var currentIndex = Object.keys(steps).indexOf(step);
-		$('[data-assistant-form] button[value="back"]').toggle(currentIndex > 0);
+		$('[data-assistant-form] .wookb-assistant-back').toggle(currentIndex > 0);
 		$('[data-assistant-form] button.button-primary').text(step === 'finish' ? wp.i18n.__('Terminar', 'ai-knowledge') : wp.i18n.__('Continuar', 'ai-knowledge')).val(step === 'finish' ? 'finish' : 'continue');
 		window.history.pushState({}, '', 'admin.php?page=ai-knowledge-assistant&step=' + encodeURIComponent(step));
 	}
@@ -361,4 +361,5 @@
 		var $form=$(this), action=$form.find(':focus').val() || 'continue', current=$form.find('input[name="assistant_step"]').val();
 		$.post(data.ajaxUrl, { action:'aikb_assistant_navigate', nonce:data.nonce, step:current, assistant_action:action }).done(function (response) { if (response.success) render(response.data.step, response.data.completed); });
 	});
+	$(document).on('click', '[data-assistant-step-link]', function (e) { e.preventDefault(); render($(this).closest('li').data('assistant-step'), []); });
 })(jQuery);

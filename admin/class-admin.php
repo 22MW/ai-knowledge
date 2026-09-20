@@ -209,7 +209,7 @@ class Admin
 			$done = in_array($key, (array) ($state['completed'] ?? array()), true) ? ' is-done' : '';
 			$past = ($step_position < $current_position) ? ' is-past' : '';
 			$future = ($step_position > $current_position) ? ' is-future' : '';
-			echo '<li class="' . esc_attr($active . $done . $past . $future) . '" data-assistant-step="' . esc_attr($key) . '" aria-label="' . esc_attr($step['title']) . '" title="' . esc_attr($step['title']) . '"><span>' . esc_html($step['number']) . '</span></li>';
+			echo '<li class="' . esc_attr($active . $done . $past . $future) . '" data-assistant-step="' . esc_attr($key) . '" aria-label="' . esc_attr($step['title']) . '" title="' . esc_attr($step['title']) . '"><a href="' . esc_url(admin_url('admin.php?page=ai-knowledge-assistant&step=' . $key)) . '" data-assistant-step-link>' . esc_html($step['number']) . '</a></li>';
 			$step_position++;
 		}
 		echo '</ol>';
@@ -224,11 +224,11 @@ class Admin
 			echo '</div>';
 		}
 		if (!empty($steps[$current]['link'])) {
-			echo '<p data-assistant-link-wrap><a class="button" data-assistant-link target="_blank" rel="noopener noreferrer" href="' . esc_url($steps[$current]['link']) . '">' . esc_html__('Abrir configuración completa', 'ai-knowledge') . '</a></p>';
+			echo '<p class="wookb-assistant-config-link" data-assistant-link-wrap><a class="button" data-assistant-link target="_blank" rel="noopener noreferrer" href="' . esc_url($steps[$current]['link']) . '">' . esc_html__('Abrir configuración completa', 'ai-knowledge') . '</a></p>';
 		}
 		echo '<form method="post" data-assistant-form>' . wp_nonce_field('aikb_assistant', 'aikb_assistant_nonce', true, false) . '<input type="hidden" name="assistant_step" value="' . esc_attr($current) . '"><p class="submit">';
 		if ('welcome' !== $current) {
-			echo '<button class="button" name="assistant_action" value="back">' . esc_html__('Atrás', 'ai-knowledge') . '</button> ';
+			echo '<button type="submit" class="button wookb-assistant-back" name="assistant_action" value="back">' . esc_html__('Atrás', 'ai-knowledge') . '</button> ';
 		}
 		echo '<button class="button" name="assistant_action" value="skip">' . esc_html__('Saltar este paso', 'ai-knowledge') . '</button> <button class="button button-primary" name="assistant_action" value="' . esc_attr('finish' === $current ? 'finish' : 'continue') . '">' . esc_html('finish' === $current ? __('Terminar', 'ai-knowledge') : __('Continuar', 'ai-knowledge')) . '</button></p></form></div></div>';
 	}
