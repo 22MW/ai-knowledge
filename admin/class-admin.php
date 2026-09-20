@@ -278,7 +278,11 @@ class Admin
 			}
 			$html .= '</label>';
 		}
-		return $html . '</div></section>';
+		$html .= '</div>';
+		if ('ai' === $step) {
+			$html .= '<div class="wookb-assistant-external-links"><p>' . esc_html__('Configura la conexión en la pantalla correspondiente y vuelve después a este paso:', 'ai-knowledge') . '</p><a class="button" target="_blank" rel="noopener noreferrer" href="' . esc_url(admin_url('options-connectors.php')) . '">' . esc_html__('Configurar Conectores de WordPress', 'ai-knowledge') . '</a> <a class="button" target="_blank" rel="noopener noreferrer" href="' . esc_url(admin_url('plugins.php')) . '">' . esc_html__('Abrir Support Genix', 'ai-knowledge') . '</a></div>';
+		}
+		return $html . '</section>';
 	}
 
 	protected static function assistant_available_steps()
