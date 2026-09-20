@@ -345,6 +345,7 @@
 		if (!item) return;
 		$('[data-assistant-title]').text(item.title);
 		$('[data-assistant-description]').text(item.description);
+		$('.wookb-assistant-welcome-copy').toggle(step === 'welcome');
 		var $link = $('[data-assistant-link-wrap]');
 		if (item.link) { if (!$link.length) $link = $('<p data-assistant-link-wrap><a class="button" data-assistant-link target="_blank" rel="noopener noreferrer">' + wp.i18n.__('Abrir configuración completa', 'ai-knowledge') + '</a></p>').insertBefore('[data-assistant-form]'); $link.find('[data-assistant-link]').attr('href', item.link); } else { $link.remove(); }
 		$('[data-assistant-form] input[name="assistant_step"]').val(step);

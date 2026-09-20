@@ -214,6 +214,15 @@ class Admin
 		}
 		echo '</ol>';
 		echo '<div class="wookb-card" data-assistant-panel><h2 data-assistant-title>' . esc_html($steps[$current]['title']) . '</h2><p data-assistant-description>' . esc_html($steps[$current]['description']) . '</p>';
+		if ('welcome' === $current) {
+			echo '<div class="wookb-assistant-welcome-copy">';
+			echo '<h3>' . esc_html__('Qué revisaremos', 'ai-knowledge') . '</h3><ul>';
+			echo '<li>' . esc_html__('El origen de IA y las conexiones disponibles.', 'ai-knowledge') . '</li>';
+			echo '<li>' . esc_html__('El contenido, los datos del negocio y, si existe, la tienda WooCommerce.', 'ai-knowledge') . '</li>';
+			echo '<li>' . esc_html__('El chatbot, la visibilidad para sistemas de IA y la generación inicial.', 'ai-knowledge') . '</li>';
+			echo '</ul><p>' . esc_html__('El asistente conserva tus valores actuales. Cada paso puede saltarse y completarse después desde la configuración completa.', 'ai-knowledge') . '</p>';
+			echo '</div>';
+		}
 		if (!empty($steps[$current]['link'])) {
 			echo '<p data-assistant-link-wrap><a class="button" data-assistant-link target="_blank" rel="noopener noreferrer" href="' . esc_url($steps[$current]['link']) . '">' . esc_html__('Abrir configuración completa', 'ai-knowledge') . '</a></p>';
 		}
