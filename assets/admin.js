@@ -360,10 +360,11 @@
 	}
 	$(document).on('submit', '[data-assistant-form]', function (e) {
 		e.preventDefault();
-		var $form=$(this), action=$form.find(':focus').val() || 'continue', current=$form.find('input[name="assistant_step"]').val();
+		var $form=$(this), action=$form.data('assistant-action') || 'continue', current=$form.find('input[name="assistant_step"]').val();
 		var payload = { action:'aikb_assistant_navigate', nonce:data.nonce, step:current, assistant_action:action };
 	$('.wookb-assistant-screen-section [name], [data-assistant-form] [name]').each(function () { if (this.name !== 'assistant_step' && this.name !== 'aikb_assistant_nonce') payload[this.name] = $(this).val(); });
 		$.post(data.ajaxUrl, payload).done(function (response) { if (response.success) { $('[data-assistant-feedback]').removeClass('is-error').text(response.data.message || wp.i18n.__('Guardado correctamente.', 'ai-knowledge')).show(); if (action !== 'save') render(response.data.step, response.data.completed); } else { $('[data-assistant-feedback]').addClass('is-error').text(wp.i18n.__('No se pudo guardar.', 'ai-knowledge')).show(); } }).fail(function () { $('[data-assistant-feedback]').addClass('is-error').text(wp.i18n.__('No se pudo guardar.', 'ai-knowledge')).show(); });
 	});
+	$(document).on('click', '[data-assistant-form] button[name="assistant_action"]', function () { $(this).closest('[data-assistant-form]').data('assistant-action', this.value); });
 	$(document).on('click', '[data-assistant-step-link]', function (e) { e.preventDefault(); render($(this).closest('li').data('assistant-step'), []); });
 })(jQuery);
