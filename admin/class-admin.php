@@ -200,7 +200,8 @@ class Admin
 		$state['last_opened'] = current_time('mysql');
 		update_option('aikb_setup_assistant', $state, false);
 		echo '<div class="wookb-wrap wookb-assistant">';
-		echo '<div class="wookb-header-row"><h1>' . esc_html__('Asistente de configuración', 'ai-knowledge') . '</h1><a class="button" href="' . esc_url(admin_url('admin.php?page=ai-knowledge')) . '">' . esc_html__('Salir', 'ai-knowledge') . '</a></div>';
+		echo '<div class="wookb-assistant-header"><div class="wookb-assistant-brand"><strong>' . esc_html__('AI Knowledge & Visibility', 'ai-knowledge') . '</strong><span>' . esc_html(sprintf(__('Versión %s', 'ai-knowledge'), AIKB_VERSION)) . '</span></div><a class="button" href="' . esc_url(admin_url('admin.php?page=ai-knowledge')) . '">' . esc_html__('Salir', 'ai-knowledge') . '</a></div>';
+		echo '<div class="wookb-assistant-heading"><h1>' . esc_html__('Asistente de configuración', 'ai-knowledge') . '</h1><div class="wookb-assistant-breadcrumb"><span>' . esc_html__('Asistente de configuración', 'ai-knowledge') . '</span><span aria-hidden="true">&gt;</span><strong data-assistant-breadcrumb>' . esc_html($steps[$current]['title']) . '</strong></div></div>';
 		echo '<ol class="wookb-assistant-progress" aria-label="' . esc_attr__('Progreso del asistente', 'ai-knowledge') . '">';
 		$step_position = 0;
 		$current_position = array_search($current, array_keys($steps), true);

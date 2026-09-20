@@ -344,6 +344,7 @@
 		var item = steps[step];
 		if (!item) return;
 		$('[data-assistant-title]').text(item.title);
+		$('[data-assistant-breadcrumb]').text(item.title);
 		$('[data-assistant-description]').text(item.description);
 		$('.wookb-assistant-welcome-copy').toggle(step === 'welcome');
 		var $link = $('[data-assistant-link-wrap]');
