@@ -225,8 +225,8 @@ class Admin
 		echo self::assistant_screen_content($current);
 		echo '<form method="post" data-assistant-form>' . wp_nonce_field('aikb_assistant', 'aikb_assistant_nonce', true, false) . '<input type="hidden" name="assistant_step" value="' . esc_attr($current) . '"><p class="submit">';
 		echo '<button type="submit" class="button wookb-assistant-back" name="assistant_action" value="back"' . ('welcome' === $current ? ' style="display:none"' : '') . '>' . esc_html__('Atrás', 'ai-knowledge') . '</button> ';
-		if ('welcome' !== $current) {
-			echo '<button class="button" name="assistant_action" value="skip">' . esc_html__('Saltar este paso', 'ai-knowledge') . '</button> ';
+		if ('welcome' !== $current && 'ai' !== $current) {
+			echo '<button class="button wookb-assistant-skip" name="assistant_action" value="skip">' . esc_html__('Saltar este paso', 'ai-knowledge') . '</button> ';
 		}
 		if ('welcome' !== $current) {
 			echo '<button class="button" name="assistant_action" value="save">' . esc_html__('Guardar', 'ai-knowledge') . '</button> ';
