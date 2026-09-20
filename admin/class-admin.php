@@ -228,9 +228,7 @@ class Admin
 		if ('welcome' !== $current && 'ai' !== $current) {
 			echo '<button class="button wookb-assistant-skip" name="assistant_action" value="skip">' . esc_html__('Saltar este paso', 'ai-knowledge') . '</button> ';
 		}
-		if ('welcome' !== $current) {
-			echo '<button class="button" name="assistant_action" value="save">' . esc_html__('Guardar', 'ai-knowledge') . '</button> ';
-		}
+		echo '<button class="button wookb-assistant-save" name="assistant_action" value="save"' . ('welcome' === $current ? ' style="display:none"' : '') . '>' . esc_html__('Guardar', 'ai-knowledge') . '</button> ';
 		$primary_action = 'finish' === $current ? 'finish' : 'continue';
 		$primary_label = 'welcome' === $current ? __('Continuar', 'ai-knowledge') : ('finish' === $current ? __('Guardar y terminar', 'ai-knowledge') : __('Continuar', 'ai-knowledge'));
 		echo '<button class="button button-primary" name="assistant_action" value="' . esc_attr($primary_action) . '">' . esc_html($primary_label) . '</button></p><div class="wookb-assistant-feedback" data-assistant-feedback role="status" aria-live="polite"></div></form></div></div>';
