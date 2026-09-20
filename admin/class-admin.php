@@ -228,7 +228,8 @@ class Admin
 		if ('welcome' !== $current) {
 			echo '<button class="button" name="assistant_action" value="skip">' . esc_html__('Saltar este paso', 'ai-knowledge') . '</button> ';
 		}
-		echo '<button class="button button-primary" name="assistant_action" value="' . esc_attr('finish' === $current ? 'finish' : 'continue') . '">' . esc_html('finish' === $current ? __('Terminar', 'ai-knowledge') : __('Continuar', 'ai-knowledge')) . '</button></p></form></div></div>';
+		$primary_label = 'welcome' === $current ? __('Continuar', 'ai-knowledge') : ('finish' === $current ? __('Guardar y terminar', 'ai-knowledge') : __('Guardar y continuar', 'ai-knowledge'));
+		echo '<button class="button button-primary" name="assistant_action" value="' . esc_attr('finish' === $current ? 'finish' : 'continue') . '">' . esc_html($primary_label) . '</button></p></form></div></div>';
 	}
 
 	protected static function assistant_steps()

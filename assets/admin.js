@@ -354,7 +354,7 @@
 		$('.wookb-assistant-progress li').removeClass('is-active is-done is-past is-future').each(function (index) { var $li=$(this), key=$li.data('assistant-step'); if (key === step) $li.addClass('is-active'); if ((completed || []).indexOf(key) !== -1) $li.addClass('is-done'); if (index < currentIndex) $li.addClass('is-past'); if (index > currentIndex) $li.addClass('is-future'); });
 		var currentIndex = Object.keys(steps).indexOf(step);
 		$('[data-assistant-form] .wookb-assistant-back').toggle(currentIndex > 0);
-		$('[data-assistant-form] button.button-primary').text(step === 'finish' ? wp.i18n.__('Terminar', 'ai-knowledge') : wp.i18n.__('Continuar', 'ai-knowledge')).val(step === 'finish' ? 'finish' : 'continue');
+		$('[data-assistant-form] button.button-primary').text(step === 'welcome' ? wp.i18n.__('Continuar', 'ai-knowledge') : (step === 'finish' ? wp.i18n.__('Guardar y terminar', 'ai-knowledge') : wp.i18n.__('Guardar y continuar', 'ai-knowledge'))).val(step === 'finish' ? 'finish' : 'continue');
 		window.history.pushState({}, '', 'admin.php?page=ai-knowledge-assistant&step=' + encodeURIComponent(step));
 	}
 	$(document).on('submit', '[data-assistant-form]', function (e) {
