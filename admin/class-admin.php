@@ -224,9 +224,7 @@ class Admin
 			echo '</ul><p>' . esc_html__('El asistente conserva tus valores actuales. Cada paso puede saltarse y completarse después desde la configuración completa.', 'ai-knowledge') . '</p>';
 			echo '</div>';
 		}
-		if (!empty($steps[$current]['link'])) {
-			echo '<p class="wookb-assistant-config-link" data-assistant-link-wrap><a class="button" data-assistant-link target="_blank" rel="noopener noreferrer" href="' . esc_url($steps[$current]['link']) . '">' . esc_html__('Abrir configuración completa', 'ai-knowledge') . '</a></p>';
-		}
+		echo self::assistant_screen_content($current);
 		echo '<form method="post" data-assistant-form>' . wp_nonce_field('aikb_assistant', 'aikb_assistant_nonce', true, false) . '<input type="hidden" name="assistant_step" value="' . esc_attr($current) . '"><p class="submit">';
 		if ('welcome' !== $current) {
 			echo '<button type="submit" class="button wookb-assistant-back" name="assistant_action" value="back">' . esc_html__('Atrás', 'ai-knowledge') . '</button> ';
@@ -246,6 +244,21 @@ class Admin
 			'visibility' => array('number' => 7, 'title' => __('Visibilidad IA', 'ai-knowledge'), 'description' => __('Controla cómo se publican llms.txt, Markdown, JSON y JSON-LD, y decide qué familias de crawlers pueden acceder al sitio. Antes de aplicar cambios en robots.txt o .htaccess podrás revisar la propuesta y conservar una copia de seguridad.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=visibilidad-ia')),
 			'finish' => array('number' => 8, 'title' => __('Ajustes y final', 'ai-knowledge'), 'description' => __('Comprueba los límites de texto y generación antes de terminar. Puedes guardar la configuración sin crear documentos o iniciar la generación utilizando la cola existente y su límite diario. Los pasos omitidos seguirán disponibles cuando vuelvas a abrir el asistente.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=ajustes')),
 		);
+	}
+
+	protected static function assistant_screen_content($step)
+	{
+		$content = array(
+			'ai' => array(__('Conexiones detectadas', 'ai-knowledge'), __('Revisa qué origen de IA está disponible. Si no hay ninguno conectado, puedes continuar sin IA y volver a este paso más adelante.', 'ai-knowledge')),
+			'content' => array(__('Alcance inicial', 'ai-knowledge'), __('Selecciona los tipos de contenido públicos que quieres incluir. La configuración avanzada de taxonomías, términos e identificadores se conserva para completarla después.', 'ai-knowledge')),
+			'business' => array(__('Datos principales del negocio', 'ai-knowledge'), __('Completa la identidad, ubicación, público, contacto y horario. Los valores guardados se cargarán aquí sin sustituirlos por valores predeterminados.', 'ai-knowledge')),
+			'woocommerce' => array(__('Datos de la tienda', 'ai-knowledge'), __('Revisa moneda, país, condiciones de compra, entrega, recogida y contacto. Los detalles avanzados de envíos, impuestos y pagos se podrán completar después.', 'ai-knowledge')),
+			'chatbot' => array(__('Configuración del chatbot', 'ai-knowledge'), __('Define cómo Support Genix consultará los documentos, el límite de resultados y la información adicional que debe tener en cuenta.', 'ai-knowledge')),
+			'visibility' => array(__('Publicación y crawlers', 'ai-knowledge'), __('Revisa la publicación de llms.txt, Markdown, JSON y JSON-LD, junto con las familias de crawlers que podrán acceder a cada recurso.', 'ai-knowledge')),
+			'finish' => array(__('Revisión final', 'ai-knowledge'), __('Comprueba los límites de generación, guarda la configuración y decide si quieres iniciar ahora la cola de documentos.', 'ai-knowledge')),
+		);
+		if (!isset($content[$step])) return '';
+		return '<section class="wookb-assistant-screen-section"><h3>' . esc_html($content[$step][0]) . '</h3><p>' . esc_html($content[$step][1]) . '</p><div class="wookb-assistant-placeholder">' . esc_html__('Los campos específicos de este paso se cargarán aquí y reutilizarán la configuración existente del plugin.', 'ai-knowledge') . '</div></section>';
 	}
 
 	protected static function assistant_available_steps()

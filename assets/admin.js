@@ -347,8 +347,8 @@
 		$('[data-assistant-breadcrumb]').text(item.title);
 		$('[data-assistant-description]').text(item.description);
 		$('.wookb-assistant-welcome-copy').toggle(step === 'welcome');
-		var $link = $('[data-assistant-link-wrap]');
-		if (item.link) { if (!$link.length) $link = $('<p class="wookb-assistant-config-link" data-assistant-link-wrap><a class="button" data-assistant-link target="_blank" rel="noopener noreferrer">' + wp.i18n.__('Abrir configuración completa', 'ai-knowledge') + '</a></p>').insertBefore('[data-assistant-form]'); $link.find('[data-assistant-link]').attr('href', item.link); $link.show(); } else { $link.hide(); }
+		$('.wookb-assistant-screen-section').remove();
+		if (step !== 'welcome') $('<section class="wookb-assistant-screen-section"><h3>' + item.title + '</h3><p>' + item.description + '</p><div class="wookb-assistant-placeholder">' + wp.i18n.__('Los campos específicos de este paso se cargarán aquí y reutilizarán la configuración existente del plugin.', 'ai-knowledge') + '</div></section>').insertBefore('[data-assistant-form]');
 		$('[data-assistant-form] input[name="assistant_step"]').val(step);
 		var keys = Object.keys(steps), currentIndex = keys.indexOf(step);
 		$('.wookb-assistant-progress li').removeClass('is-active is-done is-past is-future').each(function (index) { var $li=$(this), key=$li.data('assistant-step'); if (key === step) $li.addClass('is-active'); if ((completed || []).indexOf(key) !== -1) $li.addClass('is-done'); if (index < currentIndex) $li.addClass('is-past'); if (index > currentIndex) $li.addClass('is-future'); });
