@@ -352,6 +352,21 @@
 		window.history.pushState({}, '', 'admin.php?page=ai-knowledge-assistant&step=' + encodeURIComponent(response.data.step));
 		return true;
 	}
+	$(document).on('click', '[data-server-action]', function (e) {
+		e.preventDefault();
+		e.stopImmediatePropagation();
+		var button = this, action = button.getAttribute('data-server-action');
+		if ('wookb_apply_robots_block' === action && !window.confirm('Confirma que ya descargaste la copia y quieres actualizar robots.txt.')) return false;
+		if ('wookb_download_robots_backup' === action) $('[data-server-action="wookb_apply_robots_block"]').prop('disabled', false).removeAttr('disabled');
+		var detached = document.createElement('form');
+		detached.method = 'post';
+		detached.action = data.adminPostUrl;
+		detached.style.display = 'none';
+		[['action', action], ['_wpnonce', button.getAttribute('data-server-nonce')]].concat(button.getAttribute('data-return-assistant') ? [['wookb_return_assistant', '1']] : []).forEach(function (pair) { var input = document.createElement('input'); input.type = 'hidden'; input.name = pair[0]; input.value = pair[1]; detached.appendChild(input); });
+		document.body.appendChild(detached);
+		detached.submit();
+		return false;
+	});
 	$(document).on('submit', '[data-assistant-form]', function (e) {
 		e.preventDefault();
 		$('.wookb-assistant').addClass('is-loading');
@@ -374,5 +389,9 @@
 	$(document).on('click', '[data-crawler-bulk]', function () {
 		var value = $(this).data('crawler-bulk');
 		$('[data-assistant-stage] .wookb-assistant-crawlers select[name^="crawler_action["]').val(value);
+	});
+	$(document).on('click', '[data-assistant-check-server]', function () {
+		$('.wookb-assistant').addClass('is-loading');
+		$.post(data.ajaxUrl, {action:'aikb_assistant_navigate', nonce:data.nonce, step:'server', assistant_action:'goto'}).done(showPanel).always(function () { $('.wookb-assistant').removeClass('is-loading'); });
 	});
 })(jQuery);

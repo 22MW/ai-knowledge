@@ -1,5 +1,12 @@
 # Release notes
 
+## 1.1.3.3 — desarrollo — 2026-09-22
+
+- Corregida la actualización y verificación de `robots.txt` desde el plugin y
+  el asistente, comparando únicamente las reglas gestionadas por AI Knowledge.
+- Añadida la pantalla de archivos del servidor con descarga manual de
+  `.htaccess`, actualización protegida de `robots.txt` y comprobación AJAX.
+
 ## 1.1.3.2 — desarrollo — 2026-09-21
 
 - Ajustado el asistente de configuración: navegación AJAX, estados, cargador

@@ -53,7 +53,9 @@ delete_transient( 'wookb_accessibility_error' );
 $robots_txt_content = '';
 $robots_txt_error   = '';
 $robots_response     = wp_remote_get( home_url( '/robots.txt' ) );
-if ( is_wp_error( $robots_response ) ) {
+if ( file_exists( Robots_Txt_Guard::path() ) ) {
+	$robots_txt_content = (string) file_get_contents( Robots_Txt_Guard::path() ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+} elseif ( is_wp_error( $robots_response ) ) {
 	$robots_txt_error = $robots_response->get_error_message();
 } else {
 	$robots_txt_content = wp_remote_retrieve_body( $robots_response );
@@ -91,6 +93,8 @@ $robots_full_preview = Robots_Txt_Guard::generate_full_file( $crawler_actions, $
 $htaccess_block_preview = "RewriteEngine On\n" . implode( "\n", Htaccess_Guard::build_action_rules( $crawler_actions, $crawler_visibility_mode ) );
 $htaccess_full_preview = Htaccess_Guard::generate_full_file( $crawler_actions, $crawler_visibility_mode );
 $htaccess_current_content = Htaccess_Guard::is_available() ? (string) file_get_contents( Htaccess_Guard::path() ) : ''; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+$robots_managed_matches = Robots_Txt_Guard::managed_block_matches( $robots_txt_content, $crawler_actions, $crawler_visibility_mode );
+$htaccess_managed_matches = Htaccess_Guard::managed_block_matches( $htaccess_current_content, $crawler_actions, $crawler_visibility_mode );
 $robots_conflicts = Robots_Txt_Guard::action_conflicts( $crawler_actions );
 $htaccess_conflicts = Htaccess_Guard::conflicts( $crawler_blocked_bots, $crawler_visibility_mode );
 ?>
@@ -350,6 +354,7 @@ $category_labels = array(
 </form>
 
 <h3><?php esc_html_e( 'robots.txt', 'ai-knowledge' ); ?></h3>
+<?php if ( $robots_managed_matches ) : ?><div class="notice notice-success inline"><p><?php esc_html_e( 'Las reglas de AI Knowledge coinciden con la configuración guardada.', 'ai-knowledge' ); ?></p></div><?php else : ?><div class="notice notice-warning inline"><p><?php esc_html_e( 'Las reglas de AI Knowledge son diferentes de la configuración guardada.', 'ai-knowledge' ); ?></p></div><?php endif; ?>
 <?php if ( $robots_conflicts ) : ?><div class="notice notice-warning inline"><p><?php esc_html_e( 'Se han detectado reglas originales que contradicen el bloque propuesto. Al aplicar, se conservarán y se comentarán para dejar constancia del conflicto:', 'ai-knowledge' ); ?></p><ul><?php foreach ( $robots_conflicts as $conflict ) : ?><li><code><?php echo esc_html( $conflict ); ?></code></li><?php endforeach; ?></ul></div><?php endif; ?>
 <div class="wookb-crawler-compare">
 	<div>
@@ -390,6 +395,7 @@ $category_labels = array(
 <hr />
 
 <h3><?php esc_html_e( 'Bloqueo en el servidor mediante .htaccess', 'ai-knowledge' ); ?></h3>
+<?php if ( $htaccess_managed_matches ) : ?><div class="notice notice-success inline"><p><?php esc_html_e( 'Las reglas de AI Knowledge coinciden con la configuración guardada.', 'ai-knowledge' ); ?></p></div><?php else : ?><div class="notice notice-warning inline"><p><?php esc_html_e( 'Las reglas de AI Knowledge son diferentes de la configuración guardada.', 'ai-knowledge' ); ?></p></div><?php endif; ?>
 <?php if ( $htaccess_conflicts ) : ?><div class="notice notice-warning inline"><p><?php esc_html_e( 'Se han detectado reglas originales de .htaccess que contradicen el bloque propuesto. Al aplicar, se conservarán y se comentarán.', 'ai-knowledge' ); ?></p><ul><?php foreach ( $htaccess_conflicts as $conflict ) : ?><li><code><?php echo esc_html( $conflict ); ?></code></li><?php endforeach; ?></ul></div><?php endif; ?>
 <p class="description">
 	<?php esc_html_e( 'robots.txt comunica preferencias de rastreo, pero un bot puede ignorarlas. Estas reglas rechazan en el servidor las solicitudes que se identifican como alguno de los bots marcados como Bloquear.', 'ai-knowledge' ); ?>

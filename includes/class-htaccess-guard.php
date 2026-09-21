@@ -106,6 +106,17 @@ class Htaccess_Guard {
 		return $result ? self::move_block_before_wordpress() : false;
 	}
 
+	public static function managed_block_matches( $content, array $actions, $visibility_mode = 'site' ) {
+		$pattern = '/# BEGIN ' . preg_quote( self::MARKER, '/' ) . '\R(.*?)\R# END ' . preg_quote( self::MARKER, '/' ) . '/s';
+		if ( ! preg_match( $pattern, (string) $content, $match ) ) { return false; }
+		$current_lines = preg_split( '/\R/', trim( $match[1] ) );
+		$current_lines = array_values( array_filter( $current_lines, function ( $line ) { return '' !== trim( $line ) && '#' !== substr( trim( $line ), 0, 1 ); } ) );
+		$current = implode( "\n", $current_lines );
+		$expected_lines = array_values( array_filter( array_merge( array( 'RewriteEngine On' ), self::build_action_rules( $actions, $visibility_mode ) ), function ( $line ) { return '' !== trim( $line ); } ) );
+		$expected = implode( "\n", $expected_lines );
+		return hash_equals( $expected, $current );
+	}
+
 	/** Coloca el bloque propio antes de WordPress para que sus reglas se evalúen primero. */
 	protected static function move_block_before_wordpress() {
 		$path = self::path();
