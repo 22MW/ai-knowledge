@@ -1,5 +1,13 @@
 # Release notes
 
+## 1.1.3.2 — desarrollo — 2026-09-21
+
+- Ajustado el asistente de configuración: navegación AJAX, estados, cargador
+  visual y formularios completos por pantalla.
+- Mejorada la gestión de crawlers por categorías, con acciones masivas y
+  descripciones agrupadas sin repetir contenido.
+- Revisada la explicación de visibilidad, `robots.txt` y `.htaccess`.
+
 ## 1.1.3.1 — desarrollo — 2026-09-20
 
 - Sincronizados los idiomas de interfaz español, catalán, alemán, inglés y
