@@ -241,7 +241,7 @@ class Admin
 				<p class="wookb-assistant-description"><?php echo esc_html($steps[$step]['description']); ?></p>
 				<?php echo self::assistant_screen_content($step); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<div class="wookb-assistant-actions">
-					<?php if ('welcome' !== $step) : ?><button type="submit" class="button" name="assistant_action" value="back"><?php esc_html_e('Atrás', 'ai-knowledge'); ?></button><?php endif; ?>
+					<?php if ('welcome' !== $step) : ?><button type="submit" class="button" name="assistant_action" value="back"><?php esc_html_e('Atrás', 'ai-knowledge'); ?></button> <button type="submit" class="button" name="assistant_action" value="exit"><?php esc_html_e('Salir del asistente', 'ai-knowledge'); ?></button><?php endif; ?>
 					<span class="wookb-assistant-actions-main">
 						<?php if ('welcome' !== $step && 'success' !== $step) : ?><button type="submit" class="button" name="assistant_action" value="save"><?php esc_html_e('Guardar configuración', 'ai-knowledge'); ?></button><?php endif; ?>
 						<?php if ('finish' === $step) : ?><button type="submit" class="button" name="assistant_action" value="finish"><?php esc_html_e('Terminar sin generar', 'ai-knowledge'); ?></button><button type="submit" class="button button-primary" name="assistant_action" value="generate"><?php esc_html_e('Generar documentos iniciales', 'ai-knowledge'); ?></button><?php elseif ('success' !== $step) : ?><button type="submit" class="button button-primary" name="assistant_action" value="continue"><?php esc_html_e('Continuar', 'ai-knowledge'); ?></button><?php endif; ?>
@@ -295,7 +295,8 @@ class Admin
 			<p><button type="button" class="button" data-server-action="wookb_download_htaccess_generated" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_download_htaccess_generated')); ?>"><?php esc_html_e('Descargar .htaccess preparado', 'ai-knowledge'); ?></button></p><p><button type="button" class="button" data-assistant-check-server><?php esc_html_e('Comprobar cambios', 'ai-knowledge'); ?></button></p><?php
 			return ob_get_clean();
 		}
-		if ('welcome' === $step) : ?>
+		if ('welcome' === $step) : $geo_prompt = self::build_geo_prompt(); ?>
+			<p><?php esc_html_e('Comprueba tu sitio en un agente externo antes de configurar el plugin. Después de completar la configuración, repite la comprobación con este mismo prompt para comparar el resultado.', 'ai-knowledge'); ?></p><textarea id="wookb-welcome-geo-prompt" readonly rows="8" style="width:100%;max-width:100%;font-size:13px;"><?php echo esc_textarea($geo_prompt); ?></textarea><p><button type="button" class="button" data-wookb-copy-target="wookb-welcome-geo-prompt"><?php esc_html_e('Copiar Prompt', 'ai-knowledge'); ?></button></p>
 			<div class="wookb-assistant-welcome-copy"><h3><?php esc_html_e('Qué revisaremos', 'ai-knowledge'); ?></h3><ul><li><?php esc_html_e('El origen de IA y el contenido que formará la base de conocimiento.', 'ai-knowledge'); ?></li><li><?php esc_html_e('Los datos del negocio y las integraciones disponibles.', 'ai-knowledge'); ?></li><li><?php esc_html_e('La visibilidad para IA y los límites de generación.', 'ai-knowledge'); ?></li></ul></div>
 		<?php elseif ('ai' === $step) : $available = AI_Client::wordpress_available(); $models = $available ? AI_Client::available_models() : array(); ?>
 			<div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Origen de IA', 'ai-knowledge'); ?></span><select name="ai_key_source"><option value="genix" <?php selected('genix', $settings['ai_key_source']); ?>><?php esc_html_e('Support Genix', 'ai-knowledge'); ?></option><?php if ($available) : ?><option value="wp_connectors" <?php selected('wp_connectors', $settings['ai_key_source']); ?>><?php esc_html_e('Conectores de WordPress', 'ai-knowledge'); ?></option><?php endif; ?></select></label><label class="wookb-assistant-field"><span><?php esc_html_e('Modelo', 'ai-knowledge'); ?></span><select name="wp_ai_model"><option value="<?php echo esc_attr(AI_Client::MODEL_AUTO); ?>" <?php selected(AI_Client::MODEL_AUTO, $settings['wp_ai_model']); ?>><?php esc_html_e('Automático (recomendado)', 'ai-knowledge'); ?></option><?php foreach ($models as $key => $model) : ?><option value="<?php echo esc_attr($key); ?>" <?php selected($key, $settings['wp_ai_model']); ?>><?php echo esc_html($model['name'] . ' (' . $model['model'] . ')'); ?></option><?php endforeach; ?></select></label></div><div class="wookb-assistant-external-links"><a class="button" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(admin_url('options-connectors.php')); ?>"><?php esc_html_e('Configurar Conectores de WordPress', 'ai-knowledge'); ?></a> <a class="button" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(admin_url('plugins.php')); ?>"><?php esc_html_e('Abrir Support Genix', 'ai-knowledge'); ?></a></div>
@@ -316,8 +317,8 @@ class Admin
 			<div class="wookb-assistant-crawlers"><?php foreach (Crawler_Catalog::all() as $crawler) : if ($crawler['category'] !== $category) continue; ?><div class="wookb-assistant-crawler"><div><strong><?php echo esc_html($crawler['user_agent']); ?></strong><span><?php echo esc_html($crawler['operator']); ?></span><?php if ($crawler['description'] !== $categories[$category]['description']) : ?><p><?php echo esc_html($crawler['description']); ?></p><?php endif; ?></div><select name="crawler_action[<?php echo esc_attr($crawler['user_agent']); ?>]"><option value="allow" <?php selected('allow', $actions[$crawler['user_agent']]); ?>><?php esc_html_e('Permitir', 'ai-knowledge'); ?></option><option value="block" <?php selected('block', $actions[$crawler['user_agent']]); ?>><?php esc_html_e('Bloquear', 'ai-knowledge'); ?></option></select></div><?php endforeach; ?></div>
 			<h3><?php esc_html_e('Acceso de crawlers bloqueados a llms.txt', 'ai-knowledge'); ?></h3><p><?php esc_html_e('Decide si un crawler bloqueado puede leer únicamente el archivo llms.txt o si también debe quedar bloqueado en todo el sitio.', 'ai-knowledge'); ?></p><div class="wookb-assistant-field"><label><input type="radio" name="crawler_visibility_mode" value="site" <?php checked('site', $settings['crawler_visibility_mode']); ?> /> <?php esc_html_e('Aplicar la misma política a todo el sitio', 'ai-knowledge'); ?></label><label><input type="radio" name="crawler_visibility_mode" value="llms_only" <?php checked('llms_only', $settings['crawler_visibility_mode']); ?> /> <?php esc_html_e('Permitir solo llms.txt', 'ai-knowledge'); ?></label></div><h3><?php esc_html_e('Robots.txt y .htaccess', 'ai-knowledge'); ?></h3><p><?php esc_html_e('La política que guardes aquí sirve como base para preparar las reglas de robots.txt y .htaccess. Esos archivos se gestionan después desde la pantalla Visibilidad IA, donde puedes revisar el contenido antes de aplicarlo.', 'ai-knowledge'); ?></p>
 		<?php elseif ('finish' === $step) : ?><div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Largo máximo del texto', 'ai-knowledge'); ?></span><input type="number" min="100" max="10000" name="body_char_limit" value="<?php echo esc_attr($settings['body_char_limit']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Tokens de salida', 'ai-knowledge'); ?></span><input type="number" min="200" name="output_tokens" value="<?php echo esc_attr($settings['output_tokens']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Límite diario', 'ai-knowledge'); ?></span><input type="number" min="1" name="daily_limit" value="<?php echo esc_attr($settings['daily_limit']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Tamaño de lote', 'ai-knowledge'); ?></span><input type="number" min="1" name="batch_size" value="<?php echo esc_attr($settings['batch_size']); ?>" /></label><label class="wookb-assistant-toggle"><input type="checkbox" name="no_limit" value="1" <?php checked(!empty($settings['no_limit'])); ?> /><span><?php esc_html_e('Sin límite diario', 'ai-knowledge'); ?></span></label><label class="wookb-assistant-toggle"><input type="checkbox" name="indexnow_enabled" value="1" <?php checked(!empty($settings['indexnow_enabled'])); ?> /><span><?php esc_html_e('Avisar a IndexNow', 'ai-knowledge'); ?></span></label></div>
-		<?php elseif ('success' === $step) : $state = get_option('aikb_setup_assistant', array()); $summary = Registry::summary(); ?>
-			<div class="wookb-assistant-summary"><p><strong><?php esc_html_e('Documentos registrados:', 'ai-knowledge'); ?></strong> <?php echo (int) $summary['total']; ?></p><p><strong><?php esc_html_e('Documentos pendientes:', 'ai-knowledge'); ?></strong> <?php echo (int) Registry::count(array('status' => 'queued')); ?></p><p><strong><?php esc_html_e('Pasos omitidos:', 'ai-knowledge'); ?></strong> <?php echo empty($state['skipped']) ? esc_html__('Ninguno', 'ai-knowledge') : esc_html(implode(', ', (array) $state['skipped'])); ?></p><p><a class="button button-primary" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(home_url('/llms.txt')); ?>"><?php esc_html_e('Ver llms.txt', 'ai-knowledge'); ?></a> <a class="button" href="<?php echo esc_url(wp_nonce_url(admin_url('admin-post.php?action=aikb_download_geo_prompt'), 'aikb_download_geo_prompt')); ?>"><?php esc_html_e('Descargar Prompt GEO', 'ai-knowledge'); ?></a></p><div class="wookb-assistant-links"><?php foreach (array('registro' => __('Registro', 'ai-knowledge'), 'contenido' => __('Contenido', 'ai-knowledge'), 'negocio' => __('Negocio', 'ai-knowledge'), 'woocommerce' => __('WooCommerce', 'ai-knowledge'), 'visibilidad-ia' => __('Visibilidad IA', 'ai-knowledge'), 'ajustes' => __('Ajustes', 'ai-knowledge')) as $tab => $label) : if ('woocommerce' === $tab && !class_exists('WooCommerce')) continue; ?><a href="<?php echo esc_url(admin_url('admin.php?page=ai-knowledge' . ('registro' === $tab ? '' : '&tab=' . $tab))); ?>"><?php echo esc_html($label); ?></a><?php endforeach; ?></div></div>
+		<?php elseif ('success' === $step) : $state = get_option('aikb_setup_assistant', array()); $summary = Registry::summary(); $geo_prompt = self::build_geo_prompt(); ?>
+			<div class="wookb-assistant-summary"><p><strong><?php esc_html_e('Documentos registrados:', 'ai-knowledge'); ?></strong> <?php echo (int) $summary['total']; ?></p><p><strong><?php esc_html_e('Documentos pendientes:', 'ai-knowledge'); ?></strong> <?php echo (int) Registry::count(array('status' => 'queued')); ?></p><p><strong><?php esc_html_e('Pasos omitidos:', 'ai-knowledge'); ?></strong> <?php echo empty($state['skipped']) ? esc_html__('Ninguno', 'ai-knowledge') : esc_html(implode(', ', (array) $state['skipped'])); ?></p><p><a class="button button-primary" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(home_url('/llms.txt')); ?>"><?php esc_html_e('Ver llms.txt', 'ai-knowledge'); ?></a></p><p><?php esc_html_e('Recomendamos comprobar este prompt en un agente externo para verificar el funcionamiento del plugin y la visibilidad de tu web.', 'ai-knowledge'); ?></p><textarea id="wookb-assistant-geo-prompt" readonly rows="12" style="width:100%;max-width:100%;"><?php echo esc_textarea($geo_prompt); ?></textarea><p><button type="button" class="button" data-wookb-copy-target="wookb-assistant-geo-prompt"><?php esc_html_e('Copiar Prompt', 'ai-knowledge'); ?></button></p><div class="wookb-assistant-links"><?php foreach (array('registro' => __('Registro', 'ai-knowledge'), 'contenido' => __('Contenido', 'ai-knowledge'), 'negocio' => __('Negocio', 'ai-knowledge'), 'woocommerce' => __('WooCommerce', 'ai-knowledge'), 'visibilidad-ia' => __('Visibilidad IA', 'ai-knowledge'), 'ajustes' => __('Ajustes', 'ai-knowledge')) as $tab => $label) : if ('woocommerce' === $tab && !class_exists('WooCommerce')) continue; ?><a href="<?php echo esc_url(admin_url('admin.php?page=ai-knowledge' . ('registro' === $tab ? '' : '&tab=' . $tab))); ?>"><?php echo esc_html($label); ?></a><?php endforeach; ?></div></div>
 		<?php endif;
 		return ob_get_clean();
 	}
@@ -433,15 +434,66 @@ class Admin
 	{
 		if (!current_user_can(self::capability())) wp_die(esc_html__('No tienes permisos suficientes.', 'ai-knowledge'));
 		check_admin_referer('aikb_download_geo_prompt');
-		$pending = Registry::count(array('status' => 'queued'));
-		$content = "# Auditoría GEO de " . get_bloginfo('name') . "\n\n";
-		$content .= "Analiza " . home_url('/') . " como consultor GEO. Comprueba la visibilidad para sistemas de IA, /llms.txt, los documentos Markdown enlazados, enlaces internos, endpoints JSON y JSON-LD, esquemas, respuestas HTTP y estructura GEO. Comprueba también si quedan documentos pendientes en la cola. No inventes resultados: cita cada URL y respuesta observada.\n\n";
-		$content .= "Estado al descargar este prompt: " . $pending . " documentos pendientes. El análisis solo puede considerarse completo y fiable cuando todos los documentos estén creados y la cola esté vacía.\n";
+		$content = self::build_geo_prompt();
 		nocache_headers();
 		header('Content-Type: text/markdown; charset=utf-8');
 		header('Content-Disposition: attachment; filename="ai-knowledge-prompt-geo.md"');
 		echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- descarga Markdown plano.
 		exit;
+	}
+
+	protected static function build_geo_prompt()
+	{
+		$content = "# Auditoría GEO de " . get_bloginfo('name') . "\n\n";
+		$content .= "Analiza {URL} como consultor GEO y evalúa cómo de accesible, comprensible y reutilizable es su contenido para buscadores, asistentes y sistemas de inteligencia artificial.\n\nRevisa únicamente lo que puedas comprobar realmente en la web. No inventes datos ni des por hecho que una funcionalidad existe si no puedes verificarla.\n\nEvalúa de forma práctica:\n\n- claridad de la entidad, negocio, servicios o productos;\n- estructura y calidad del contenido;\n- facilidad para que una IA entienda páginas, categorías, productos y relaciones entre contenidos;\n- consistencia de datos entre páginas;\n- información duplicada, contradictoria, antigua, vacía o poco útil;\n- accesibilidad del contenido sin depender excesivamente de JavaScript;\n- titles, metadatos y estructura semántica;\n- datos estructurados y schema cuando sean verificables;\n- robots.txt, sitemap, llms.txt y otros recursos orientados a crawlers o IA cuando puedan comprobarse;\n- versiones por idioma y posibles inconsistencias;\n- contenido estructurado o formatos adicionales como Markdown, JSON o endpoints de conocimiento si existen;\n- cualquier problema que pueda provocar que una IA interprete mal, ignore o mezcle información de la web.\n\nDiferencia siempre entre:\n\nError confirmado: problema observado directamente.\n\nRiesgo: algo que puede afectar al GEO pero no puede confirmarse completamente.\n\nRecomendación: mejora que podría aumentar la comprensión o visibilidad.\n\nEntrega el resultado en este formato:\n\n1. Resumen ejecutivo\n2. Hallazgos ordenados por prioridad\n3. Fortalezas GEO actuales\n4. Problemas confirmados\n5. Riesgos\n6. Acciones recomendadas por prioridad\n7. Conclusión general\n\nPara cada hallazgo importante, cita la URL o el elemento observado que lo justifica.\n\nNo conviertas en error algo que simplemente no puedas verificar. En ese caso indícalo como “no verificado”.\n\nEl objetivo es determinar hasta qué punto una IA puede entender correctamente la web y obtener información fiable de ella.\n";
+		$content = "# Auditoría GEO de " . get_bloginfo('name') . "\n\n";
+		$content .= <<<'GEO'
+Analiza [URL] como consultor GEO, centrándote en la visibilidad, accesibilidad y exposición técnica del contenido para buscadores, asistentes y sistemas de inteligencia artificial.
+
+El objetivo no es valorar si el contenido está bien redactado, sino comprobar qué información de la web puede descubrir, acceder, interpretar y reutilizar una IA.
+
+Revisa especialmente:
+
+- si el contenido principal es accesible para crawlers e IA;
+- qué información está disponible directamente en HTML;
+- dependencia de JavaScript para acceder a contenido relevante;
+- robots.txt y posibles restricciones a bots;
+- llms.txt, si existe, y qué información expone;
+- sitemaps y capacidad de descubrimiento de URLs;
+- datos estructurados / Schema.org;
+- metadatos relevantes;
+- canonicals, indexabilidad y señales que puedan afectar a la visibilidad;
+- disponibilidad de versiones estructuradas del contenido como Markdown, JSON, feeds o endpoints específicos;
+- facilidad para identificar entidades, productos, servicios, categorías y relaciones entre ellos;
+- coherencia entre HTML, schema, Markdown, JSON y otros formatos cuando existan;
+- acceso de bots de IA conocidos cuando pueda verificarse;
+- posibles bloqueos, contenido invisible para crawlers o información que solo sea accesible para usuarios humanos.
+
+No hagas una auditoría SEO tradicional ni centres el análisis en copywriting, keywords, densidad de texto o calidad comercial del contenido, salvo que afecten directamente a la comprensión por parte de sistemas de IA.
+
+Diferencia siempre entre:
+
+Confirmado: observado directamente.
+Riesgo: posible problema que no puede verificarse completamente.
+No verificado: elemento al que no se ha podido acceder o comprobar.
+Recomendación: mejora técnica de visibilidad o exposición del conocimiento.
+
+Entrega:
+
+1. Resumen ejecutivo de visibilidad GEO
+2. Qué puede ver y entender actualmente una IA
+3. Qué información está estructurada o preparada para IA
+4. Bloqueos o limitaciones detectadas
+5. Hallazgos ordenados por prioridad
+6. Acciones recomendadas
+7. Conclusión sobre el nivel de exposición GEO de la web
+
+Cita siempre las URLs, respuestas HTTP, archivos o elementos observados que respalden cada conclusión.
+
+No inventes funcionalidades ni marques como error algo que simplemente no hayas podido verificar.
+GEO;
+		$content = str_replace('[URL]', home_url('/'), $content);
+		return $content;
 	}
 
 	protected static function assistant_next_step($current, $steps, $action)

@@ -1,5 +1,12 @@
 # Release notes
 
+## 1.1.3.4 — desarrollo — 2026-09-23
+
+- Añadido el prompt GEO reutilizable en bienvenida y resumen final, con copia
+  directa y URL dinámica del sitio.
+- Mejorada la pantalla de archivos del servidor y la verificación de reglas.
+- Incluidos los ajustes visuales pendientes del asistente.
+
 ## 1.1.3.3 — desarrollo — 2026-09-22
 
 - Corregida la actualización y verificación de `robots.txt` desde el plugin y

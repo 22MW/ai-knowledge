@@ -371,8 +371,10 @@ body.toplevel_page_ai-knowledge #wpcontent {
 .wookb-wrap .notice-success {
   background: #13b7f6;
 }
-.wookb-wrap .notice-warning {
+.wookb-wrap .notice-warning,
+.wookb-wrap .notice-warning p {
   background: var(--tblr-warning, #f76707);
+  color: #1a1a1a;
 }
 .wookb-wrap .notice-error {
   background: var(--tblr-danger, #d63939);
@@ -527,7 +529,6 @@ body.toplevel_page_ai-knowledge #wpcontent {
 /* ==========================================================================
    7. BLOQUES ESPECIFICOS
    ========================================================================== */
-
 
 /* Badges de la columna "Control manual": envuelven en varias lineas si
    hace falta, para no volver a inflar el ancho de la columna (bug A). */

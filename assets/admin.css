@@ -62,3 +62,5 @@
 .wookb-assistant .wookb-assistant-toggle input{background:var(--tblr-secondary-bg,#e5e7eb)}.wookb-assistant .wookb-assistant-toggle input:checked{background:var(--tblr-primary,#007cab)}
 .wookb-assistant-toggle input:checked::before{height:1.5rem!important;width:1.5rem!important}
 .wookb-assistant-crawler-bulk{display:flex;justify-content:flex-end;gap:8px;margin:14px 0}.wookb-assistant-crawlers{max-height:33vh;overflow-y:auto;padding-right:8px;border:1px solid var(--tblr-border-color,#dce1e7);border-radius:6px}.wookb-assistant-crawler{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px;border-bottom:1px solid var(--tblr-border-color,#dce1e7)}.wookb-assistant-crawler:last-child{border-bottom:0}.wookb-assistant-crawler strong,.wookb-assistant-crawler span{display:block}.wookb-assistant-crawler span{font-size:12px;opacity:.75}.wookb-assistant-crawler p{margin:5px 0 0;font-size:13px}.wookb-assistant-crawler select{flex:0 0 120px}
+/* Enlaces finales del asistente */
+.wookb-assistant-links:before{content:'Salir del asistente y acceder a los ajustes del plugin';display:block;width:100%;font-weight:600;margin-bottom:4px}

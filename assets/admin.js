@@ -348,6 +348,10 @@
 	function showPanel(response) {
 		if (!response || !response.success || !response.data.panel) return false;
 		$('[data-assistant-stage]').html(response.data.panel);
+		if ($('#wookb-assistant-geo-prompt').length && !$('#wookb-geo-prompt-notice').length) {
+			$('#wookb-assistant-geo-prompt').attr('rows', 8).css('font-size', '13px');
+			$('<p id="wookb-geo-prompt-notice" style="color:#ff931e;font-size:13px;margin:10px 0 6px;">' + wp.i18n.__('Si hay documentos pendientes, la auditoría será más completa cuando terminen de generarse.', 'ai-knowledge') + '</p>').insertBefore($('#wookb-assistant-geo-prompt'));
+		}
 		updateProgress(response.data.step, response.data.completed || []);
 		window.history.pushState({}, '', 'admin.php?page=ai-knowledge-assistant&step=' + encodeURIComponent(response.data.step));
 		return true;
@@ -394,4 +398,5 @@
 		$('.wookb-assistant').addClass('is-loading');
 		$.post(data.ajaxUrl, {action:'aikb_assistant_navigate', nonce:data.nonce, step:'server', assistant_action:'goto'}).done(showPanel).always(function () { $('.wookb-assistant').removeClass('is-loading'); });
 	});
+	if ($('#wookb-assistant-geo-prompt').length && !$('#wookb-geo-prompt-notice').length) { $('#wookb-assistant-geo-prompt').attr('rows', 8).css('font-size', '13px'); $('<p id="wookb-geo-prompt-notice" style="color:#ff931e;font-size:13px;margin:10px 0 6px;">' + wp.i18n.__('Si hay documentos pendientes, la auditoría será más completa cuando terminen de generarse.', 'ai-knowledge') + '</p>').insertBefore($('#wookb-assistant-geo-prompt')); }
 })(jQuery);
