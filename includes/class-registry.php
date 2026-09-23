@@ -125,11 +125,31 @@ class Registry {
 		return $rows;
 	}
 
-	/** Filas listas para llms.txt: sincronizadas y marcadas como públicas. */
+	/**
+	 * Filas listas para llms.txt: sincronizadas, no-puente, y públicas.
+	 *
+	 * "Pública" depende del origen: los documentos "compuestos" creados desde
+	 * cero por el propio plugin (Store_Info_Doc, Llms_Faq -- source_type no es
+	 * un post_type real, mismo criterio que find_orphans()) siguen públicos
+	 * por defecto, como siempre. Los documentos de un CPT real de WordPress
+	 * (product, page, etc.) y los de Genix (sgkb-docs) requieren is_public = 1
+	 * marcado explícitamente.
+	 */
 	public static function get_synced_public_urls() {
 		global $wpdb;
 		$table = self::table();
-		return $wpdb->get_results( "SELECT * FROM {$table} WHERE status = 'synced' AND is_bridge = 0 AND is_public = 1 ORDER BY lang, source_type" ); // phpcs:ignore
+		$rows  = $wpdb->get_results( "SELECT * FROM {$table} WHERE status = 'synced' AND is_bridge = 0 ORDER BY lang, source_type" ); // phpcs:ignore
+		$public = array();
+		foreach ( $rows as $row ) {
+			if ( post_type_exists( $row->source_type ) ) {
+				if ( ! empty( $row->is_public ) ) {
+					$public[] = $row;
+				}
+				continue;
+			}
+			$public[] = $row;
+		}
+		return $public;
 	}
 
 	/** Para el WP_List_Table del panel, con filtros básicos. */

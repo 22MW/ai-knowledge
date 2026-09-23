@@ -134,13 +134,45 @@ class Document_Pipeline {
 			)
 		);
 
-		// La generación de AI Knowledge ya no crea ni actualiza posts sgkb-docs.
-		// Se conservan las referencias históricas de filas existentes para no
-		// borrar ni modificar automáticamente documentos antiguos de Genix.
-		$existing_row = Registry::find( $real_source_id, $lang );
-		$doc_post_id  = $existing_row ? $existing_row->doc_post_id : null;
-		$product_trid = $existing_row ? $existing_row->product_trid : null;
-		$doc_trid     = $existing_row ? $existing_row->doc_trid : null;
+		$doc_post_id  = null;
+		$product_trid = null;
+		$doc_trid     = null;
+		if ( Genix_Bridge::is_available() ) {
+			// BUG WPML resuelto: los documentos sgkb-docs NO pueden reutilizar el trid
+			// del producto de origen. Si el idioma del documento coincide con el del
+			// producto, ese trid ya tiene ese idioma "ocupado" por el elemento
+			// 'post_product' y WPML rechaza en silencio el registro del documento
+			// (wpml_set_element_language_details no devuelve error; simplemente el
+			// documento queda sin fila en icl_translations y el chatbot lo excluye
+			// de cualquier busqueda por idioma). Los documentos necesitan su PROPIO
+			// grupo de traduccion, independiente del trid del producto.
+			$product_trid = Wpml::get_trid( $real_source_id );
+			$doc_trid     = Registry::find_doc_trid_by_product_trid( $product_trid );
+
+			$existing_row = Registry::find( $real_source_id, $lang );
+			$result = Genix_Bridge::upsert_document(
+				$existing_row ? $existing_row->doc_post_id : null,
+				$data,
+				$markdown,
+				$lang,
+				$doc_trid // null en el primer documento del grupo: WPML autogenera un trid propio para 'post_sgkb-docs'.
+			);
+			if ( is_wp_error( $result ) ) {
+				Registry::update_status(
+					$existing_row->id,
+					'error',
+					array( 'last_error' => $result->get_error_message() )
+				);
+				return $result;
+			}
+			$doc_post_id = $result;
+
+			if ( ! $doc_trid ) {
+				// Primer documento del grupo: recupera el trid que WPML acaba de asignar
+				// para que los siguientes idiomas del mismo producto lo reutilicen.
+				$doc_trid = Wpml::get_trid( $doc_post_id );
+			}
+		}
 
 		$row_id = Registry::upsert(
 			array(
