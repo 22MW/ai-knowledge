@@ -5,38 +5,6 @@ plugin. Se queda dentro del propio plugin, **no se publica en la web**.
 Documenta lo real, verificado en el código a fecha 2026-09-16 — no
 promesas ni roadmap. Para eso ver `_dev/roadmap.md`.
 
-## Diseño aprobado pendiente de implementación (2026-09-23)
-
-Este bloque describe el cambio aprobado por el usuario; no debe interpretarse
-como funcionalidad ya disponible. El detalle operativo y los criterios de QA
-están en `_dev/roadmap.md`.
-
-- Cada fila del Registro tendrá un estado de publicación pública. Cuando esté
-  activo, su `.md` será accesible y la fila aparecerá en `/llms.txt`.
-- La documentación destinada a Genix se copiará íntegramente desde el
-  contenido original publicado a Markdown, sin resumen, reescritura, IA ni
-  límite de caracteres. Los prompts y límites solo aplican a documentos que
-  realmente se generen con IA.
-- La generación individual se podrá lanzar desde Ajustes avanzados mediante
-  AJAX, con fallback al flujo tradicional si JavaScript está desactivado.
-- Cada documento e idioma podrá guardar un prompt propio. Si está vacío, se
-  usará el prompt genérico del generador. El prompt se enviará junto con los
-  datos reales extraídos del post y no podrá autorizar invenciones.
-- El límite específico de la fila tendrá prioridad sobre el límite general de
-  Ajustes y se aplicará al resultado generado en ambos modos de prompt.
-- El pipeline dejará de crear o actualizar posts `sgkb-docs` de Support Genix.
-  El Markdown propio seguirá siendo la fuente de publicación pública cuando
-  el documento esté marcado como público.
-- `sgkb-docs` no podrá aparecer en la configuración ni entrar por “Todos los
-  tipos públicos”, inclusión manual, cola, generación por ID, editor, REST o
-  feeds.
-- Solo se procesarán posts con `post_status = publish`; se revisarán todos los
-  caminos, incluidos cambios posteriores a borrador y traducciones WPML.
-- Los `sgkb-docs` antiguos no se borrarán automáticamente en esta fase.
-
-La estructura exacta de persistencia (columnas nuevas o alternativa compatible)
-se decidirá durante el diseño técnico antes de modificar el esquema.
-
 ## Identidad y estructura
 
 - Archivo principal: `ai-knowledge.php`.

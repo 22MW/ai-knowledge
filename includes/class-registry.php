@@ -41,8 +41,6 @@ class Registry {
 			override_text LONGTEXT NULL,
 			char_limit INT UNSIGNED NULL,
 			stale TINYINT(1) NOT NULL DEFAULT 0,
-			is_public TINYINT(1) NOT NULL DEFAULT 0,
-			custom_prompt LONGTEXT NULL,
 			UNIQUE KEY source_lang (source_id, lang),
 			KEY status (status),
 			KEY source_type (source_type),
@@ -95,8 +93,6 @@ class Registry {
 			'override_text' => null,
 			'char_limit'    => null,
 			'stale'         => 0,
-			'is_public'     => 0,
-			'custom_prompt' => null,
 		);
 		$data = wp_parse_args( $data, $defaults );
 		$wpdb->insert( $table, $data ); // phpcs:ignore
@@ -125,11 +121,11 @@ class Registry {
 		return $rows;
 	}
 
-	/** Filas listas para llms.txt: sincronizadas y marcadas como públicas. */
+	/** Filas listas para llms.txt: sincronizadas, no-puente. */
 	public static function get_synced_public_urls() {
 		global $wpdb;
 		$table = self::table();
-		return $wpdb->get_results( "SELECT * FROM {$table} WHERE status = 'synced' AND is_bridge = 0 AND is_public = 1 ORDER BY lang, source_type" ); // phpcs:ignore
+		return $wpdb->get_results( "SELECT * FROM {$table} WHERE status = 'synced' AND is_bridge = 0 ORDER BY lang, source_type" ); // phpcs:ignore
 	}
 
 	/** Para el WP_List_Table del panel, con filtros básicos. */
