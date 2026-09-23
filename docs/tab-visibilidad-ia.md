@@ -23,7 +23,11 @@ Un resumen de las distintas formas en que se publica tu contenido:
   plugin lo crea y lo regenera cuando cambian los documentos o los datos que
   lo alimentan. Su encabezado incluye la fecha y hora de la última generación
   en formato ISO 8601, para que los lectores puedan comprobar si la
-  información está actualizada.
+  información está actualizada. Dentro del archivo, los enlaces aparecen
+  agrupados por secciones (por ejemplo "Páginas" para tus páginas y
+  productos, o "Documentación" para los artículos exclusivos de Genix que
+  hayas hecho públicos desde la pestaña [Genix](tab-chatbot.md)), para que
+  sea más fácil de entender qué tipo de contenido es cada enlace.
 - **Markdown público** — el mismo contenido que usa tu chatbot, servido
   como archivo de texto plano, fácil de leer para cualquier IA sin tener
   que procesar HTML.

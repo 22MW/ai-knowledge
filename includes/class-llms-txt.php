@@ -155,6 +155,12 @@ class Llms_Txt {
 			}
 		}
 
+		// Artículos exclusivos de Genix (Genix_Reader/Genix_Publish): categoría
+		// propia, no se agrupan con las páginas normales.
+		if ( 'sgkb-docs' === $row->source_type ) {
+			return __( 'Documentación', 'ai-knowledge' );
+		}
+
 		if ( 'product' !== $row->source_type || ! function_exists( 'wc_get_product' ) ) {
 			return 'Páginas';
 		}

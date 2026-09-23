@@ -7,6 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $settings           = Scope::settings();
 $public_post_types  = get_post_types( array( 'public' => true ), 'objects' );
+unset( $public_post_types['sgkb-docs'] ); // copias del chatbot de Genix, no contenido fuente documentable.
 $effective_post_types = Scope::effective_post_types();
 ?>
 <p class="description">

@@ -18,6 +18,7 @@ class Admin
 	public static function init()
 	{
 		add_action('admin_menu', array(__CLASS__, 'menu'));
+		add_filter('admin_title', array(__CLASS__, 'fixed_admin_title'), 10, 2);
 		add_filter('plugin_action_links_' . plugin_basename(AIKB_FILE), array(__CLASS__, 'plugin_action_links'));
 		add_action('admin_init', array(__CLASS__, 'maybe_open_assistant'));
 		add_action('wp_ajax_aikb_assistant_navigate', array(__CLASS__, 'assistant_navigate'));
@@ -38,6 +39,23 @@ class Admin
 			'wookb_generate_prompt_draft' => 'generate_prompt_draft',
 			'wookb_normalize_prompt' => 'normalize_prompt',
 			'wookb_polish_store_doc' => 'polish_store_doc',
+			// Pieza 1: boton "Generar" del Registro por AJAX, mismo callback
+			// que admin_post_wookb_regenerate_single (ver regenerate_single(),
+			// que ya distingue wp_doing_ajax() para responder JSON en vez de
+			// redirigir).
+			'wookb_regenerate_single' => 'regenerate_single',
+			// Pedido explícito del usuario: mismo tratamiento AJAX que
+			// "Generar" para los botones "Guardar límite" y "Guardar
+			// cambios" del bloque "Ajustes avanzados" (ya existían antes de
+			// esta tarea, solo se les añade AJAX aquí).
+			'wookb_set_manual' => 'set_manual',
+			'wookb_set_char_limit' => 'set_char_limit',
+			'wookb_back_to_auto' => 'back_to_auto',
+			// Pieza 2: guardar el prompt propio de un documento.
+			'wookb_save_custom_prompt' => 'save_custom_prompt',
+			// Pieza 5: artículos exclusivos de Genix.
+			'wookb_genix_generate' => 'genix_generate',
+			'wookb_genix_remove' => 'genix_remove',
 		);
 		foreach ($ajax_actions as $action => $callback) {
 			add_action('wp_ajax_' . $action, array(__CLASS__, $callback));
@@ -67,6 +85,9 @@ class Admin
 		add_action('admin_post_wookb_reset_queue', array(__CLASS__, 'reset_queue'));
 		add_action('admin_post_wookb_set_manual', array(__CLASS__, 'set_manual'));
 		add_action('admin_post_wookb_set_char_limit', array(__CLASS__, 'set_char_limit'));
+		add_action('admin_post_wookb_save_custom_prompt', array(__CLASS__, 'save_custom_prompt'));
+		add_action('admin_post_wookb_genix_generate', array(__CLASS__, 'genix_generate'));
+		add_action('admin_post_wookb_genix_remove', array(__CLASS__, 'genix_remove'));
 		add_action('admin_post_wookb_resolve_stale', array(__CLASS__, 'resolve_stale'));
 		add_action('admin_post_wookb_back_to_auto', array(__CLASS__, 'back_to_auto'));
 		add_action('admin_post_wookb_save_woocommerce_settings', array(__CLASS__, 'save_woocommerce_settings'));
@@ -89,6 +110,23 @@ class Admin
 	public static function capability()
 	{
 		return class_exists('WooCommerce') ? self::CAPABILITY_WOO : self::CAPABILITY_FALLBACK;
+	}
+
+	/**
+	 * Todas las pestañas comparten el slug 'page=ai-knowledge' (solo cambia
+	 * `tab=` en la URL), asi que WordPress -- que decide el <title> del
+	 * navegador solo por el slug de pagina, sin mirar `tab=` -- siempre
+	 * coincidia con la primera entrada de submenu registrada (Registro),
+	 * cualquiera que fuese la pestaña real abierta. Se fija un titulo unico
+	 * y estable del plugin en vez de intentar seguir la pestaña activa.
+	 */
+	public static function fixed_admin_title($admin_title, $title)
+	{
+		if (isset($_GET['page']) && 'ai-knowledge' === $_GET['page']) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$plugin_title = __('Base de conocimiento IA', 'ai-knowledge');
+			return $plugin_title . ' — ' . get_bloginfo('name');
+		}
+		return $admin_title;
 	}
 
 	public static function menu()
@@ -528,7 +566,16 @@ GEO;
 		// Chatbot va despues de WooCommerce y solo aparece si Support Genix
 		// esta activo: sin el, el prompt no tiene un consumidor real.
 		if (Chatbot_Prompt::is_genix_ready()) {
-			$tabs['prompt'] = __('Chatbot', 'ai-knowledge');
+			// Pedido explicito del usuario: la etiqueta visible pasa a
+			// "Genix" (ahora tambien alberga la seccion de articulos
+			// exclusivos de Genix, ver tab-prompt.php) -- el slug interno
+			// 'prompt' se conserva a proposito por compatibilidad con
+			// enlaces/redirects existentes (self::redirect('prompt'),
+			// documentation_map()['prompt'], el paso 'chatbot' del asistente
+			// que enlaza a '&tab=prompt', etc.): cambiar el slug rompería
+			// todos esos enlaces sin necesidad, la etiqueta es lo unico que
+			// pidio el usuario.
+			$tabs['prompt'] = __('Genix', 'ai-knowledge');
 		}
 		$tabs['visibilidad-ia'] = __('Visibilidad IA', 'ai-knowledge');
 		$tabs['carga-inicial']  = __('Generación masiva', 'ai-knowledge');
@@ -1106,18 +1153,67 @@ GEO;
 
 		$row = Registry::find_by_id($id);
 		if ($row) {
+			// Pieza 4: Document_Pipeline::process() no comprueba por si mismo
+			// el post_status (a diferencia de Queue::run_generate(), que si lo
+			// hace) -- confirmado por lectura de class-document-pipeline.php.
+			// Sin este freno, "Generar" regeneraba un documento aunque su
+			// origen ya no estuviera publicado.
+			$source_post = get_post($row->source_id);
+			if (!$source_post || 'publish' !== $source_post->post_status) {
+				if (wp_doing_ajax()) {
+					wp_send_json_error(array('message' => __('El origen de este documento ya no está publicado.', 'ai-knowledge')));
+				}
+				wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=registro&wookb_regen_error=' . rawurlencode(__('El origen de este documento ya no está publicado.', 'ai-knowledge'))));
+				exit;
+			}
 			// force=true: el usuario pulso "Generar" explicitamente pidiendo una
 			// regeneracion; sin esto, Document_Pipeline::process() se saltaba todo
 			// en silencio si el producto de origen no habia cambiado desde la
 			// ultima vez (bug real: el boton no hacia nada con ningun limite).
 			$result = Document_Pipeline::process($row->source_id, $row->lang, $char_limit > 0 ? $char_limit : null, true);
 			if (is_wp_error($result)) {
+				if (wp_doing_ajax()) {
+					wp_send_json_error(array('message' => $result->get_error_message()));
+				}
 				wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=registro&wookb_regen_error=' . rawurlencode($result->get_error_message())));
 				exit;
 			}
 		}
 
+		if (wp_doing_ajax()) {
+			wp_send_json_success(self::registry_row_ajax_data($id, __('Generado.', 'ai-knowledge')));
+		}
+
 		self::redirect('registro');
+	}
+
+	/**
+	 * Datos de una fila del Registro para actualizar en pantalla sin
+	 * recargar (botones "Generar"/"Guardar límite"/"Guardar cambios", todos
+	 * por AJAX con el mismo whitelist generico de admin.js). Extraido de
+	 * regenerate_single() para no duplicarlo en set_manual()/
+	 * set_char_limit(): las tres acciones dejan la fila en un estado que hay
+	 * que reflejar igual (estado, fecha, enlaces, contenido si no es manual).
+	 */
+	protected static function registry_row_ajax_data($id, $message)
+	{
+		$fresh = Registry::find_by_id($id);
+		$data  = array(
+			'message' => $message,
+			'tab'     => 'registro',
+		);
+		if ($fresh) {
+			require_once AIKB_DIR . 'admin/class-registry-table.php';
+			$is_manual   = 'manual' === $fresh->override_mode;
+			$data['row'] = array(
+				'status'    => Registry_Table::status_label($fresh->status),
+				'updated'   => $fresh->updated_at,
+				'links'     => Registry_Table::links_html($fresh),
+				'is_manual' => $is_manual,
+				'content'   => $is_manual ? null : ($fresh->md_path ? Markdown_Store::body_only(Markdown_Store::read($fresh->md_path)) : ''),
+			);
+		}
+		return $data;
 	}
 
 	/**
@@ -1147,6 +1243,13 @@ GEO;
 
 		if (! $post_id || ! get_post($post_id)) {
 			wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=registro&wookb_regen_error=' . rawurlencode(__('No se encontró ningún producto o página con ese ID/URL.', 'ai-knowledge'))));
+			exit;
+		}
+
+		// Pieza 4: mismo freno que regenerate_single(), Document_Pipeline::
+		// process() no comprueba post_status por si mismo.
+		if ('publish' !== get_post_status($post_id)) {
+			wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=registro&wookb_regen_error=' . rawurlencode(__('Ese contenido no está publicado.', 'ai-knowledge'))));
 			exit;
 		}
 
@@ -1232,6 +1335,10 @@ GEO;
 		foreach ($batch as $row_id) {
 			$row = Registry::find_by_id($row_id);
 			if (! $row) {
+				continue;
+			}
+			// Pieza 4: mismo freno que regenerate_single()/force_generate().
+			if ('publish' !== get_post_status($row->source_id)) {
 				continue;
 			}
 			Document_Pipeline::process($row->source_id, $row->lang, null, true);
@@ -1738,6 +1845,10 @@ GEO;
 			self::publish_manual_text($row, $text);
 		}
 
+		if (wp_doing_ajax()) {
+			wp_send_json_success(self::registry_row_ajax_data($id, __('Guardado.', 'ai-knowledge')));
+		}
+
 		self::redirect('registro');
 	}
 
@@ -1853,7 +1964,91 @@ GEO;
 			);
 		}
 
+		if (wp_doing_ajax()) {
+			wp_send_json_success(self::registry_row_ajax_data($id, __('Guardado.', 'ai-knowledge')));
+		}
+
 		self::redirect('registro');
+	}
+
+	/**
+	 * Pieza 2: guarda el prompt propio de un documento concreto (columna
+	 * custom_prompt). Vacio = usa el prompt generico de siempre (ver
+	 * Generator::build_prompt()). No regenera nada por si solo: el nuevo
+	 * prompt se aplica en la siguiente generacion (boton "Generar" o cola).
+	 * Mismo patron que set_char_limit(): upsert sobre source_id+lang.
+	 */
+	public static function save_custom_prompt()
+	{
+		self::verify('wookb_save_custom_prompt');
+
+		$id            = isset($_POST['row_id']) ? (int) $_POST['row_id'] : 0; // phpcs:ignore
+		$custom_prompt = isset($_POST['custom_prompt']) ? sanitize_textarea_field(wp_unslash($_POST['custom_prompt'])) : ''; // phpcs:ignore
+
+		$row = Registry::find_by_id($id);
+		if ($row) {
+			Registry::upsert(
+				array(
+					'source_id'     => $row->source_id,
+					'lang'          => $row->lang,
+					'custom_prompt' => $custom_prompt,
+				)
+			);
+		}
+
+		self::redirect('registro');
+	}
+
+	/**
+	 * Pieza 5 (corregida): botón "Generar contenido" de un artículo
+	 * exclusivo de Genix -- copia/actualiza el .md a partir del contenido
+	 * actual del artículo en Genix (sin IA, ver Genix_Markdown) y lo publica
+	 * (fila en Registry). Genix_Publish::publish() rechaza por si sola los
+	 * artículos marcados 'only_for_chatbot' (no son públicos ni dentro de
+	 * Genix), aunque Genix_Reader ya los excluye del listado antes de
+	 * llegar aquí -- freno redundante a propósito.
+	 */
+	public static function genix_generate()
+	{
+		self::verify('wookb_genix_generate');
+
+		$post_id = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0; // phpcs:ignore
+
+		$result = Genix_Publish::publish($post_id);
+
+		if (is_wp_error($result)) {
+			if (wp_doing_ajax()) {
+				wp_send_json_error(array('message' => $result->get_error_message()));
+			}
+			wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=ajustes&wookb_regen_error=' . rawurlencode($result->get_error_message())));
+			exit;
+		}
+
+		self::redirect('ajustes');
+	}
+
+	/**
+	 * Pieza 5 (corregida): botón "Quitar" -- despublica un artículo
+	 * exclusivo de Genix ya publicado (borra .md y la fila del Registro,
+	 * ver Genix_Publish::unpublish()).
+	 */
+	public static function genix_remove()
+	{
+		self::verify('wookb_genix_remove');
+
+		$post_id = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0; // phpcs:ignore
+
+		$result = Genix_Publish::unpublish($post_id);
+
+		if (is_wp_error($result)) {
+			if (wp_doing_ajax()) {
+				wp_send_json_error(array('message' => $result->get_error_message()));
+			}
+			wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=ajustes&wookb_regen_error=' . rawurlencode($result->get_error_message())));
+			exit;
+		}
+
+		self::redirect('ajustes');
 	}
 
 	/**
@@ -1906,9 +2101,16 @@ GEO;
 			);
 			$result = Document_Pipeline::process($row->source_id, $row->lang, null, true);
 			if (is_wp_error($result)) {
+				if (wp_doing_ajax()) {
+					wp_send_json_error(array('message' => $result->get_error_message()));
+				}
 				wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=registro&wookb_regen_error=' . rawurlencode($result->get_error_message())));
 				exit;
 			}
+		}
+
+		if (wp_doing_ajax()) {
+			wp_send_json_success(self::registry_row_ajax_data($id, __('Guardado.', 'ai-knowledge')));
 		}
 
 		self::redirect('registro');

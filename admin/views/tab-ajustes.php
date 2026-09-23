@@ -138,30 +138,3 @@ $wp_ai_models    = $wp_ai_available ? AI_Client::available_models() : array();
 	</table>
 	<?php submit_button( __( 'Guardar ajustes', 'ai-knowledge' ) ); ?>
 </form>
-
-<hr />
-
-<p class="description">
-	<?php
-	printf(
-		/* translators: %s: enlace a la pestaña Prompt */
-		esc_html__( 'El prompt de sistema del chatbot se gestiona en la pestaña %s.', 'ai-knowledge' ),
-		'<a href="' . esc_url( admin_url( 'admin.php?page=ai-knowledge&tab=prompt' ) ) . '">' . esc_html__( 'Prompt', 'ai-knowledge' ) . '</a>'
-	);
-	?>
-</p>
-
-<hr />
-
-<?php if ( class_exists( 'WooCommerce' ) ) : ?>
-<p class="description">
-	<?php
-	printf(
-		/* translators: %s: enlace a la pestaña WooCommerce */
-		esc_html__( 'Los documentos de información de tienda (cómo comprar, condiciones, envío, pago, impuestos) se generan desde la pestaña %s.', 'ai-knowledge' ),
-		'<a href="' . esc_url( admin_url( 'admin.php?page=ai-knowledge&tab=woocommerce' ) ) . '">' . esc_html__( 'WooCommerce', 'ai-knowledge' ) . '</a>'
-	);
-	?>
-</p>
-<hr />
-<?php endif; ?>

@@ -82,7 +82,7 @@ Y a partir de ahí, cada pantalla tiene su propia guía:
 | [Negocio](tab-negocio.md) | Los datos de tu negocio que usan el chatbot y `/llms.txt` |
 | [FAQs](tab-faqs.md) | Preguntas frecuentes públicas, generadas con IA |
 | [WooCommerce](tab-woocommerce.md) | Envíos, impuestos, pagos y condiciones de tu tienda *(solo si tienes WooCommerce)* |
-| [Chatbot](tab-chatbot.md) | El comportamiento de tu chatbot de Support Genix *(solo si lo tienes instalado)* |
+| [Genix](tab-chatbot.md) | El comportamiento de tu chatbot de Support Genix y los artículos exclusivos de Genix que quieras publicar *(solo si lo tienes instalado)* |
 | [Visibilidad IA](tab-visibilidad-ia.md) | Comprobar y controlar qué ven de tu web los buscadores de IA |
 | [Generación masiva](tab-generacion-masiva.md) | Generar todos los documentos pendientes de golpe |
 | [Ajustes](tab-ajustes.md) | Configuración general: largo del texto, origen de la IA, etc. |
@@ -97,7 +97,7 @@ cualquier tipo de contenido de tu web.
 **¿Necesito Support Genix?**
 No para generar y publicar tu base de conocimiento. Solo lo necesitas si
 quieres que un chatbot en tu web use esos datos para responder a tus
-visitantes — en ese caso, la pestaña Chatbot se activa sola.
+visitantes — en ese caso, la pestaña Genix se activa sola.
 
 **¿La IA se inventa datos sobre mi negocio?**
 No debería: el plugin está diseñado para que la IA redacte solo con la

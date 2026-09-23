@@ -22,6 +22,26 @@ class Registry_Table extends \WP_List_Table {
 		return isset( $labels[ $status ] ) ? $labels[ $status ] : $status;
 	}
 
+	/**
+	 * Markup de la columna "Enlaces" (.md publico + sgkb-docs), extraido de
+	 * column_default() para poder reutilizarlo tambien desde
+	 * Admin::regenerate_single() (Pieza 1, respuesta AJAX del boton
+	 * "Generar") sin duplicar la logica.
+	 */
+	public static function links_html( $item ) {
+		$out = array();
+		if ( $item->md_path ) {
+			$out[] = '<a href="' . esc_url( Markdown_Store::public_url( $item->md_path ) ) . '" target="_blank">.md</a>';
+		}
+		if ( $item->doc_post_id ) {
+			$edit = get_edit_post_link( $item->doc_post_id );
+			if ( $edit ) {
+				$out[] = '<a href="' . esc_url( $edit ) . '" target="_blank">sgkb-docs</a>';
+			}
+		}
+		return implode( ' · ', $out );
+	}
+
 	public function __construct() {
 		parent::__construct(
 			array(
@@ -143,17 +163,7 @@ class Registry_Table extends \WP_List_Table {
 			case 'updated':
 				return esc_html( $item->updated_at );
 			case 'links':
-				$out = array();
-				if ( $item->md_path ) {
-					$out[] = '<a href="' . esc_url( Markdown_Store::public_url( $item->md_path ) ) . '" target="_blank">.md</a>';
-				}
-				if ( $item->doc_post_id ) {
-					$edit = get_edit_post_link( $item->doc_post_id );
-					if ( $edit ) {
-						$out[] = '<a href="' . esc_url( $edit ) . '" target="_blank">sgkb-docs</a>';
-					}
-				}
-				return implode( ' · ', $out );
+				return self::links_html( $item );
 			case 'manual':
 				return $this->manual_badges_markup( $item );
 			case 'actions':
@@ -257,10 +267,15 @@ class Registry_Table extends \WP_List_Table {
 			$current_text = $raw ? Markdown_Store::body_only( $raw ) : '';
 		}
 
-		$set_manual_form_id = 'wookb-set-manual-' . (int) $item->id;
-		$char_limit_form_id = 'wookb-char-limit-' . (int) $item->id;
-		$back_auto_form_id  = 'wookb-back-auto-' . (int) $item->id;
-		$resolve_form_id    = 'wookb-resolve-stale-' . (int) $item->id;
+		$set_manual_form_id  = 'wookb-set-manual-' . (int) $item->id;
+		$char_limit_form_id  = 'wookb-char-limit-' . (int) $item->id;
+		$back_auto_form_id   = 'wookb-back-auto-' . (int) $item->id;
+		$resolve_form_id     = 'wookb-resolve-stale-' . (int) $item->id;
+		// Pieza 2: isset() porque la columna custom_prompt puede no existir aun
+		// en la tabla si el sitio no ha pasado por la migracion de version
+		// correspondiente (dbDelta via wookb_db_version).
+		$custom_prompt_form_id = 'wookb-custom-prompt-' . (int) $item->id;
+		$custom_prompt_value   = isset( $item->custom_prompt ) ? (string) $item->custom_prompt : '';
 
 		// Bug real (Fase 10, pieza 5, detectado 2026-09-16): estos 4 <form>
 		// se imprimian aqui mismo, DENTRO de la fila expandida -- que a su vez
@@ -297,6 +312,11 @@ class Registry_Table extends \WP_List_Table {
 			<input type="hidden" name="row_id" value="<?php echo esc_attr( $item->id ); ?>" />
 			<?php wp_nonce_field( 'wookb_resolve_stale' ); ?>
 		</form>
+		<form id="<?php echo esc_attr( $custom_prompt_form_id ); ?>" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:none">
+			<input type="hidden" name="action" value="wookb_save_custom_prompt" />
+			<input type="hidden" name="row_id" value="<?php echo esc_attr( $item->id ); ?>" />
+			<?php wp_nonce_field( 'wookb_save_custom_prompt' ); ?>
+		</form>
 		<?php
 		$this->out_of_band_forms[] = ob_get_clean();
 
@@ -311,28 +331,66 @@ class Registry_Table extends \WP_List_Table {
 				<strong><?php esc_html_e( 'Hash:', 'ai-knowledge' ); ?></strong>
 				<?php echo esc_html( substr( $item->source_hash, 0, 8 ) ); ?>
 			</p>
-			<textarea form="<?php echo esc_attr( $set_manual_form_id ); ?>" name="override_text" rows="15" class="wookb-manual-textarea" style="width:100%;"><?php echo esc_textarea( $current_text ); ?></textarea>
-			<p class="wookb-manual-actions">
-				<label>
-					<?php esc_html_e( 'Límite de caracteres', 'ai-knowledge' ); ?>
-					<input
-						type="number"
-						form="<?php echo esc_attr( $char_limit_form_id ); ?>"
-						name="char_limit"
-						min="100"
-						max="10000"
-						step="50"
-						value="<?php echo esc_attr( $item->char_limit ? $item->char_limit : '' ); ?>"
-						placeholder="<?php echo esc_attr( Generator::BODY_CHAR_LIMIT ); ?>"
-						style="width:6em"
-					/>
-				</label>
-				<button type="submit" form="<?php echo esc_attr( $char_limit_form_id ); ?>" class="button"><?php esc_html_e( 'Guardar límite', 'ai-knowledge' ); ?></button>
-				<button type="submit" form="<?php echo esc_attr( $set_manual_form_id ); ?>" class="button"><?php esc_html_e( 'Guardar cambios', 'ai-knowledge' ); ?></button>
+
+			<?php
+			// Pedido explicito del usuario ("un chorro infumable" con todo
+			// apilado en un solo bloque): dos sub-pestañas dentro del mismo
+			// <details> ya abierto, sin AJAX (solo mostrar/ocultar con JS) --
+			// mismas clases nav-tab/nav-tab-active que ya usan las pestañas
+			// grandes del admin (Admin::render(), ya estilizadas en
+			// wookb-theme.css), en vez de inventar un componente nuevo.
+			?>
+			<div class="nav-tab-wrapper wookb-subtabs" data-wookb-subtabs>
+				<button type="button" class="nav-tab nav-tab-active" data-wookb-subtab-link="contenido"><?php esc_html_e( 'Contenido', 'ai-knowledge' ); ?></button>
+				<button type="button" class="nav-tab" data-wookb-subtab-link="prompt"><?php esc_html_e( 'Prompt', 'ai-knowledge' ); ?></button>
+			</div>
+
+			<div data-wookb-subtab-panel="contenido">
+				<textarea form="<?php echo esc_attr( $set_manual_form_id ); ?>" name="override_text" rows="15" class="wookb-manual-textarea" data-wookb-manual-textarea data-wookb-original-value="<?php echo esc_attr( $current_text ); ?>" style="width:100%;"><?php echo esc_textarea( $current_text ); ?></textarea>
+				<p class="wookb-manual-actions">
+					<label>
+						<?php esc_html_e( 'Límite de caracteres', 'ai-knowledge' ); ?>
+						<input
+							type="number"
+							form="<?php echo esc_attr( $char_limit_form_id ); ?>"
+							name="char_limit"
+							min="100"
+							max="10000"
+							step="50"
+							value="<?php echo esc_attr( $item->char_limit ? $item->char_limit : '' ); ?>"
+							placeholder="<?php echo esc_attr( Generator::BODY_CHAR_LIMIT ); ?>"
+							style="width:6em"
+						/>
+					</label>
+					<button type="submit" form="<?php echo esc_attr( $char_limit_form_id ); ?>" class="button"><?php esc_html_e( 'Guardar límite', 'ai-knowledge' ); ?></button>
+					<button type="submit" form="<?php echo esc_attr( $set_manual_form_id ); ?>" class="button" data-wookb-save-changes-btn disabled><?php esc_html_e( 'Guardar cambios', 'ai-knowledge' ); ?></button>
+					<?php if ( $is_manual ) : ?>
+						<button type="submit" form="<?php echo esc_attr( $back_auto_form_id ); ?>" class="button"><?php esc_html_e( 'Volver a Auto', 'ai-knowledge' ); ?></button>
+					<?php endif; ?>
+				</p>
+			</div>
+
+			<div data-wookb-subtab-panel="prompt" hidden>
 				<?php if ( $is_manual ) : ?>
-					<button type="submit" form="<?php echo esc_attr( $back_auto_form_id ); ?>" class="button"><?php esc_html_e( 'Volver a Auto', 'ai-knowledge' ); ?></button>
+					<p class="wookb-manual-meta">
+						<strong><?php esc_html_e( 'Este documento está en modo Manual.', 'ai-knowledge' ); ?></strong><br />
+						<small><?php esc_html_e( 'El texto está fijado a mano y nunca se regenera con IA, así que el prompt no tiene ningún efecto mientras esté en Manual. Pulsa "Volver a Auto" si quieres que vuelva a generarse con IA y usar el prompt.', 'ai-knowledge' ); ?></small>
+					</p>
+					<p class="wookb-manual-actions">
+						<button type="submit" form="<?php echo esc_attr( $back_auto_form_id ); ?>" class="button"><?php esc_html_e( 'Volver a Auto', 'ai-knowledge' ); ?></button>
+					</p>
 				<?php endif; ?>
-			</p>
+				<p class="wookb-manual-meta">
+					<label for="<?php echo esc_attr( $custom_prompt_form_id ); ?>-textarea">
+						<strong><?php esc_html_e( 'Prompt para este documento', 'ai-knowledge' ); ?></strong>
+					</label><br />
+					<small><?php esc_html_e( 'Instrucciones propias de este documento (estilo, enfoque). No sustituyen los datos reales del contenido: si está vacío, se usa el prompt genérico de siempre.', 'ai-knowledge' ); ?></small>
+				</p>
+				<textarea id="<?php echo esc_attr( $custom_prompt_form_id ); ?>-textarea" form="<?php echo esc_attr( $custom_prompt_form_id ); ?>" name="custom_prompt" rows="6" class="wookb-manual-textarea" style="width:100%;" <?php disabled( $is_manual ); ?>><?php echo esc_textarea( $custom_prompt_value ); ?></textarea>
+				<p class="wookb-manual-actions">
+					<button type="submit" form="<?php echo esc_attr( $custom_prompt_form_id ); ?>" class="button" <?php disabled( $is_manual ); ?>><?php esc_html_e( 'Guardar prompt', 'ai-knowledge' ); ?></button>
+				</p>
+			</div>
 		</details>
 		<?php
 		return ob_get_clean();

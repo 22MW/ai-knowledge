@@ -3,6 +3,92 @@
 	var __ = window.wp && window.wp.i18n ? window.wp.i18n.__ : function (text) { return text; };
 
 	/**
+	 * Notificaciones flotantes ("toast") para los guardados AJAX del admin
+	 * (Generar, Guardar límite/cambios/prompt, y cualquier otro guardado
+	 * AJAX existente: Ajustes, Negocio, FAQs, WooCommerce, crawlers...).
+	 * Pedido explícito del usuario: sustituyen al aviso fijo que se
+	 * imprimía junto al formulario (con `$form.after()`, o en el caso de
+	 * las filas del Registro, dentro de "Ajustes avanzados") -- un solo
+	 * punto centralizado, no un aviso por acción. Arriba a la izquierda,
+	 * fuera de `.wookb-wrap` (position: fixed en <body>, mismo patrón de
+	 * z-index alto que ya usa `.wookb-doc-drawer` en admin.css) para que
+	 * flote por encima de todo sin importar dónde esté desplazado el
+	 * usuario en la pantalla. Desaparece sola a los 10 segundos.
+	 */
+	var TOAST_DURATION = 10000;
+
+	function getToastContainer() {
+		var $container = $( '#wookb-toast-container' );
+		if ( $container.length ) {
+			return $container;
+		}
+		// Dentro de .wookb-wrap (no de <body>): así hereda las variables de
+		// color de Tabler en modo oscuro/claro (el atributo data-bs-theme
+		// vive en .wookb-wrap, ver applyTheme() mas abajo). position:fixed
+		// sigue colocándolo respecto a la ventana igual, .wookb-wrap no crea
+		// un contexto de posicionamiento propio (sin transform/filter).
+		$container = $( '<div id="wookb-toast-container" aria-live="polite"></div>' );
+		var $wrap = $( '.wookb-wrap' ).first();
+		if ( $wrap.length ) {
+			$wrap.append( $container );
+		} else {
+			$( 'body' ).append( $container );
+		}
+		return $container;
+	}
+
+	function showToast( message, type ) {
+		var $container = getToastContainer();
+		var $toast = $( '<div class="wookb-toast"><p></p><button type="button" class="wookb-toast-close" aria-label="' + __( 'Cerrar aviso', 'ai-knowledge' ) + '">&times;</button></div>' );
+		$toast.addClass( 'wookb-toast-' + ( 'error' === type ? 'error' : 'success' ) );
+		$toast.find( 'p' ).text( message );
+		$container.append( $toast );
+
+		var timer = window.setTimeout( function () {
+			$toast.remove();
+		}, TOAST_DURATION );
+
+		$toast.on( 'click', '.wookb-toast-close', function () {
+			window.clearTimeout( timer );
+			$toast.remove();
+		} );
+	}
+	// Expuesto para el resto de bloques de este mismo archivo (segunda IIFE
+	// del asistente de configuración, mas abajo, tiene su propio scope).
+	window.wookbShowToast = showToast;
+
+	/**
+	 * "Guardar cambios" del textarea de contenido (fila del Registro,
+	 * pestaña "Contenido" de Ajustes avanzados) empieza deshabilitado
+	 * (atributo `disabled` puesto por PHP, ver
+	 * Registry_Table::manual_expanded_row_markup()) y solo se activa si el
+	 * valor actual del textarea difiere del original guardado en
+	 * `data-wookb-original-value`. Con la clase activa se añade
+	 * `wookb-btn-success` (ya existente, la reutiliza "Marcar revisado" --
+	 * pedido explícito: no inventar un estilo nuevo).
+	 */
+	function updateManualSaveButtonState( $textarea ) {
+		if ( ! $textarea || ! $textarea.length ) {
+			return;
+		}
+		var original = $textarea.attr( 'data-wookb-original-value' ) || '';
+		var dirty = $textarea.val() !== original;
+		var formId = $textarea.attr( 'form' );
+		if ( ! formId ) {
+			return;
+		}
+		$( 'button[form="' + formId + '"][data-wookb-save-changes-btn]' )
+			.prop( 'disabled', ! dirty )
+			.toggleClass( 'wookb-btn-success', dirty );
+	}
+
+	$( function () {
+		$( '.wookb-wrap' ).on( 'input', '[data-wookb-manual-textarea]', function () {
+			updateManualSaveButtonState( $( this ) );
+		} );
+	} );
+
+	/**
 	 * Tema oscuro/claro (Tabler), encapsulado en .wookb-wrap: no se toca
 	 * <html>/<body> para no afectar al resto de wp-admin. Orden de
 	 * preferencia: eleccion guardada por el usuario (localStorage) ->
@@ -114,7 +200,20 @@
 			'wookb_generate_faqs_draft',
 			'wookb_generate_prompt_draft',
 			'wookb_normalize_prompt',
-			'wookb_polish_store_doc'
+			'wookb_polish_store_doc',
+			// Pieza 1: boton "Generar" del Registro sin recargar la pagina.
+			'wookb_regenerate_single',
+			// Botones "Guardar límite"/"Guardar cambios" (ya existían antes
+			// de esta tarea): mismo tratamiento AJAX, pedido explícito.
+			'wookb_set_manual',
+			'wookb_set_char_limit',
+			// "Volver a Auto" (botones de Contenido y Prompt, mismo <form>).
+			'wookb_back_to_auto',
+			// Pieza 2: guardar el prompt propio de un documento.
+			'wookb_save_custom_prompt',
+			// Pieza 5: artículos exclusivos de Genix.
+			'wookb_genix_generate',
+			'wookb_genix_remove'
 		];
 
 		$( '.wookb-wrap' ).on( 'submit', 'form', function ( e ) {
@@ -147,7 +246,15 @@
 			} else {
 				$submit.html( '<span class="wookb-spinner" aria-hidden="true"></span><span>' + __( 'Procesando…', 'ai-knowledge' ) + '</span>' );
 			}
-			$form.next( '.wookb-ajax-notice' ).remove();
+
+			// Fila real de la que cuelga el boton pulsado, para las acciones
+			// del Registro que necesitan actualizar estado/fecha/enlaces/
+			// contenido en pantalla (ver mas abajo). El aviso de guardado ya
+			// NO depende de esta fila: ahora es un toast flotante
+			// (showToast()), independiente de donde este el boton.
+			var $btn = submitter ? $( submitter ) : null;
+			var $anchor = $btn && $btn.length ? $btn : $form;
+			var $expandRow = $anchor.closest( '.wookb-manual-expand-row' );
 
 			var formData = new FormData( form );
 			formData.set( 'action', action );
@@ -180,11 +287,45 @@
 						$form.nextAll( 'textarea[readonly]' ).first().val( value );
 					}
 				}
-				$form.after( '<div class="notice notice-success inline wookb-ajax-notice"><p></p></div>' );
-				$form.next( '.wookb-ajax-notice' ).find( 'p' ).text( message );
+				// Pieza 1 + botones "Guardar límite"/"Guardar cambios": el
+				// boton de "Generar" (fila principal) vive dentro de la fila
+				// normal de la tabla; esos dos botones viven dentro de la
+				// fila expandida ".wookb-manual-expand-row" (el <details> de
+				// "Ajustes avanzados"), justo debajo -- localizamos la fila
+				// PRINCIPAL en ambos casos para actualizar estado/fecha/
+				// enlaces ($expandRow/$anchor ya calculados mas arriba, antes
+				// del fetch, para el aviso de guardado).
+				var wookbRegistryRowActions = [ 'wookb_regenerate_single', 'wookb_set_manual', 'wookb_set_char_limit', 'wookb_back_to_auto' ];
+				if ( -1 !== wookbRegistryRowActions.indexOf( action ) && result.data && result.data.row ) {
+					var row = result.data.row;
+					var $rowExpand = $expandRow;
+					var $mainRow = $rowExpand.length ? $rowExpand.prev( 'tr' ) : $anchor.closest( 'tr' );
+					if ( ! $rowExpand.length && $mainRow.length ) {
+						$rowExpand = $mainRow.next( '.wookb-manual-expand-row' );
+					}
+					if ( $mainRow.length ) {
+						$mainRow.find( '.column-status' ).text( row.status );
+						$mainRow.find( '.column-updated' ).text( row.updated );
+						$mainRow.find( '.column-links' ).html( row.links );
+					}
+					if ( $rowExpand.length ) {
+						var $textarea = $rowExpand.find( 'textarea[name="override_text"]' );
+						if ( $textarea.length ) {
+							if ( ! row.is_manual && null !== row.content ) {
+								$textarea.val( row.content );
+							}
+							// Se acaba de guardar/regenerar/volver a Auto: lo que hay
+							// ahora en el textarea pasa a ser el nuevo valor "sin
+							// cambios" -- "Guardar cambios" vuelve a deshabilitarse.
+							$textarea.attr( 'data-wookb-original-value', $textarea.val() );
+							updateManualSaveButtonState( $textarea );
+						}
+					}
+				}
+				showToast( message, 'success' );
 			} ).catch( function ( error ) {
-				$form.after( '<div class="notice notice-error inline wookb-ajax-notice"><p></p></div>' );
-				$form.next( '.wookb-ajax-notice' ).find( 'p' ).text( __( 'No se pudo guardar sin recargar. Revisa la sesión y vuelve a intentarlo.', 'ai-knowledge' ) + ' (' + error.message + ')' );
+				var errorMessage = __( 'No se pudo guardar sin recargar. Revisa la sesión y vuelve a intentarlo.', 'ai-knowledge' ) + ' (' + error.message + ')';
+				showToast( errorMessage, 'error' );
 			} ).finally( function () {
 				delete form.dataset.wookbAjaxBusy;
 				if ( isInputSubmit ) {
@@ -271,6 +412,33 @@
 		$wrap.on( 'click', '[data-wookb-doc-close]:not(.wookb-doc-backdrop)', closeDocs );
 		$( document ).on( 'keydown.wookbDocs', function ( e ) {
 			if ( 'Escape' === e.key ) { closeDocs(); }
+		} );
+	} );
+
+	/**
+	 * Sub-pestañas "Contenido"/"Prompt" dentro de "Ajustes avanzados" de una
+	 * fila del Registro (pedido explícito del usuario: demasiado apilado en
+	 * un solo bloque). Solo mostrar/ocultar, sin AJAX -- reutiliza las
+	 * mismas clases nav-tab/nav-tab-active que las pestañas grandes del
+	 * admin. Sin JavaScript, los dos paneles quedan simplemente visibles a
+	 * la vez (el atributo hidden inicial solo se aplica en el HTML server-
+	 * side del panel "prompt"): fallback aceptable, nada deja de poder
+	 * guardarse.
+	 */
+	$( function () {
+		$( '.wookb-wrap' ).on( 'click', '[data-wookb-subtab-link]', function () {
+			var $btn  = $( this );
+			var $bar  = $btn.closest( '[data-wookb-subtabs]' );
+			var $wrap = $bar.parent();
+			var target = $btn.data( 'wookb-subtab-link' );
+
+			$bar.find( '[data-wookb-subtab-link]' ).removeClass( 'nav-tab-active' );
+			$btn.addClass( 'nav-tab-active' );
+
+			$wrap.find( '[data-wookb-subtab-panel]' ).each( function () {
+				var $panel = $( this );
+				$panel.prop( 'hidden', $panel.data( 'wookb-subtab-panel' ) !== target );
+			} );
 		} );
 	} );
 

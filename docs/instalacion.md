@@ -73,8 +73,9 @@ editar a mano o borrar cualquier documento individual.
 - Con **WooCommerce** activo, rellena la pestaña
   **[WooCommerce](tab-woocommerce.md)** con tus datos de envío, impuestos
   y pagos (muchos se detectan solos).
-- Con **Support Genix** activo, configura tu **[Chatbot](tab-chatbot.md)**
-  para que responda con los datos reales de tu negocio.
+- Con **Support Genix** activo, configura tu chatbot en la pestaña
+  **[Genix](tab-chatbot.md)** para que responda con los datos reales de tu
+  negocio.
 - Revisa **[Visibilidad IA](tab-visibilidad-ia.md)** para comprobar que
   los buscadores de IA pueden acceder de verdad a lo que acabas de
   publicar.

@@ -297,3 +297,161 @@ siguiente foco (UX3/UX4 u otra tarea).
   cualquier valor histórico `ask` se normaliza a `allow`.
 - Validación técnica ejecutada; queda pendiente comprobar visualmente los
   filtros y aplicar ambos modos sobre un `.htaccess` real con copia previa.
+
+## Implementado por `desarrollador` — plan `_dev/plan-publicacion-ajax-prompts.md` (2026-09-23)
+
+Piezas 1, 2, 3 (solo confirmación), 4 y 5 implementadas sobre `knowBaseDev`.
+`php -l` y `git diff --check` OK en todos los archivos tocados. Sin commit,
+sin push, sin cambio de versión. Detalle completo en el informe del
+subagente; resumen aquí:
+
+- **Pieza 1 (AJAX "Generar")**: `regenerate_single()` responde JSON si
+  `wp_doing_ajax()`; el JS actualiza estado/fecha/enlaces/contenido de la
+  fila sin recargar. Fallback tradicional intacto.
+- **Pieza 2 (prompt por documento)**: columna `custom_prompt` añadida al
+  `CREATE TABLE` de `Registry::create_table()`. **BLOQUEO/pendiente real**:
+  como el sitio ya está instalado, esa columna solo se crea de verdad cuando
+  `wookb_db_version` (comparado con `AIKB_VERSION`) cambie — es decir, con un
+  **bump de versión** en un release. El subagente `desarrollador` tiene
+  prohibido tocar versión/release, así que el código está listo pero el
+  campo `custom_prompt` NO existe todavía en la tabla real hasta ese paso.
+  Sin la columna, el textarea guarda vacío en silencio (upsert sobre una
+  columna inexistente) y `custom_prompt` en generación se lee como null
+  (fallback seguro al prompt genérico, sin romper nada, pero sin efecto
+  real). Acción pendiente del usuario/Jefe de Proyecto: decidir cuándo
+  incluir este bump en un release y ejecutar `preparar-release`.
+- **Pieza 3**: confirmado por lectura, sin cambios: `Generator::
+  resolve_char_limit()` sigue aplicándose igual con las piezas 1-2 encima.
+- **Pieza 4 (auditoría "solo publicado")**: bug real confirmado y corregido
+  en `Sync::on_product_saved()`/`on_generic_post_saved()` (un post que pasa
+  a borrador sin pasar por la papelera no borraba su documento; el `.md`
+  seguía sirviéndose y apareciendo en `llms.txt`). Añadido el mismo freno
+  post_status=publish, ya presente en `Queue::run_generate()`, a
+  `Admin::regenerate_single()`, `force_generate()` y `reset_queue()` (los
+  tres llamaban a `Document_Pipeline::process()` directo, sin ese filtro).
+- **Pieza 5 (Genix exclusivo)**: `Genix_Reader`, `Genix_Markdown`,
+  `Genix_Publish` nuevas, gateadas por `post_type_exists('sgkb-docs')`.
+  Excluye correctamente los `sgkb-docs` que ya son `doc_post_id` de una fila
+  del Registro (el bug de la vez anterior). **Corregido tras revisión del
+  usuario (2026-09-23)**: el criterio de "¿puede publicarse?" es el meta
+  real `only_for_chatbot` que escribe Genix (support-genix-lite) —
+  `Genix_Reader` también excluye del listado cualquier artículo con ese
+  meta activo, y `Genix_Publish::publish()` lo rechaza como freno
+  redundante. Se quitó el checkbox manual "Público" y el status inventado
+  `hidden`: ahora "publicado" = existe fila en Registry (status siempre
+  `synced`), sin tocar `Registry::get_synced_public_urls()`. UI: botones
+  "Generar contenido"/"Actualizar contenido" y "Quitar" (AJAX + fallback
+  tradicional) en la sección "Artículos exclusivos de Genix" al final de
+  Ajustes. `Registry::query()/count()/query_all_ids()` siguen excluyendo
+  `source_type='sgkb-docs'` por defecto (`apply_registry_scope()`) para que
+  no se mezclen en la tabla del Registro.
+
+### Ajuste de UX posterior (2026-09-23), pedido por el usuario tras verlo en pantalla
+
+- "Ajustes avanzados" de una fila del Registro dividido en dos sub-pestañas
+  ("Contenido"/"Prompt") dentro del mismo `<details>`, sin AJAX (solo
+  mostrar/ocultar con JS), mismas clases `nav-tab`/`nav-tab-active` que ya
+  usan las pestañas grandes del admin.
+- Los botones "Guardar límite" y "Guardar cambios" (ya existían antes de
+  esta tarea) pasan a AJAX con el mismo patrón que "Generar" (Pieza 1):
+  extraído `Admin::registry_row_ajax_data()` compartido entre
+  `regenerate_single()`, `set_manual()` y `set_char_limit()`.
+- Pendiente, NO forzado (pedido explícitamente así por el usuario si no era
+  trivial): los botones de Genix (`Generar contenido`/`Actualizar
+  contenido`/`Quitar`) siguen recargando la página tras guardar — llevarlos
+  al mismo tratamiento en caliente exige reconstruir la celda de acciones
+  completa (nonces nuevos incluidos), no es un cambio trivial como el resto.
+
+### Ajuste de UX posterior (2026-09-23, ronda 2): ubicación del aviso de guardado
+
+- El aviso de "guardado"/error de Generar, Guardar límite, Guardar cambios y
+  Guardar prompt (fila del Registro) ahora sale DENTRO del bloque "Ajustes
+  avanzados" de esa fila (slot `[data-wookb-row-notice]`, justo debajo de las
+  sub-pestañas Contenido/Prompt), no en otro punto de la pantalla. Antes
+  usaba `$form.after()`, que colocaba el aviso lejos porque esos `<form>`
+  viven "fuera de banda" (ver `render_out_of_band_forms()`).
+- Los botones de Genix (Generar/Actualizar contenido, Quitar) no se
+  tocaron: sus `<form>` ya están inline en la misma celda de la tabla (no
+  fuera de banda), así que `$form.after()` ya colocaba el aviso justo al
+  lado del botón — verificado por lectura, sin necesidad de cambio.
+
+### Ajuste de UX posterior (2026-09-23, ronda 3): mover Genix exclusivo a su propia pestaña
+
+- Pestaña "Chatbot" renombrada a **"Genix"** (solo la etiqueta visible,
+  `Admin::tabs()`). Slug interno `prompt` sin cambiar a propósito: lo usan
+  `self::redirect('prompt')`, `documentation_map()['prompt']` y el enlace
+  del asistente de configuración (`admin.php?page=ai-knowledge&tab=prompt`)
+  — cambiarlo rompería esos enlaces sin necesidad, el usuario solo pidió la
+  etiqueta.
+- Sección "Artículos exclusivos de Genix" (Pieza 5) movida de
+  `admin/views/tab-ajustes.php` a `admin/views/tab-prompt.php` (al final,
+  debajo del prompt del chatbot), con el mismo gate
+  `Genix_Reader::is_available()` que tenía antes. Quitada por completo de
+  Ajustes.
+
+### Documentación actualizada (2026-09-23) — docs/ (usuario final, sin jerga técnica)
+
+Revisados todos los archivos de `docs/`. Actualizados: `index.md`,
+`instalacion.md`, `tab-ajustes.md`, `tab-chatbot.md`, `tab-contenido.md`,
+`tab-faqs.md`, `tab-negocio.md`, `tab-registro.md`, `tab-visibilidad-ia.md`.
+Resumen: "Chatbot" renombrado a "Genix" en todo el texto (el archivo sigue
+llamándose `tab-chatbot.md` a propósito, para no romper enlaces existentes
+de otros documentos); añadida la sección "Artículos exclusivos de Genix" en
+`tab-chatbot.md`; documentado en `tab-registro.md` el botón "Generar"
+instantáneo, las sub-pestañas Contenido/Prompt de "Ajustes avanzados", el
+prompt propio por documento, "Guardar límite"/"Guardar cambios" también
+instantáneos, y que un post que pasa a borrador desaparece del Registro y
+de `/llms.txt` solo; nota en `tab-contenido.md` sobre por qué los "Docs" de
+Genix no aparecen como tipo de contenido; nota en `tab-visibilidad-ia.md`
+sobre las secciones "Páginas"/"Documentación" dentro de `/llms.txt`.
+`_dev/documentacion-tecnica.md` no se tocó (es aparte, para desarrolladores).
+
+### Ajuste de UX posterior (2026-09-23, ronda 4): avisos de guardado AJAX pasan a "toast"
+
+- Nueva función centralizada `showToast(message, type)` en `assets/admin.js`
+  (al principio del archivo, expuesta también como `window.wookbShowToast`).
+  Usada por el único punto donde ya se centralizaban todos los guardados
+  AJAX del admin (Ajustes, Negocio, FAQs, WooCommerce, crawlers, Generar,
+  Guardar límite/cambios/prompt, Genix) — no hubo que tocar cada acción por
+  separado.
+- CSS nuevo en `assets/wookb-theme.css` (`#wookb-toast-container`,
+  `.wookb-toast*`): arriba a la izquierda, `position: fixed`, 10s y
+  desaparece sola (o clic en la X). Reutiliza `--tblr-success`/
+  `--tblr-danger` (mismas variables que ya usa `.wookb-assistant-feedback`
+  para éxito/error), no las de `.notice-success/.notice-error` (esas son un
+  azul propio del proyecto, no semánticas de éxito/error).
+- Quitado el slot fijo `data-wookb-row-notice` (código muerto de la ronda
+  anterior) de `admin/class-registry-table.php` y toda su lógica de
+  localización en `admin.js`.
+- El fallback sin JavaScript (recarga con `wookb_notice=1`, gestionado en
+  PHP por `Admin::redirect()`/`Admin::render()`) no se tocó: sigue igual.
+
+### Ajuste de UX posterior (2026-09-23, ronda 5): Volver a Auto por AJAX + botón "Guardar cambios" con estado
+
+- "Volver a Auto" añadido también a la pestaña "Prompt" (mismo `<form>`
+  `wookb_back_to_auto` que ya usaba Contenido, solo un botón más apuntando
+  a el).
+- `Admin::back_to_auto()` ahora responde AJAX (`wp_doing_ajax()` +
+  `registry_row_ajax_data()`, mismo patrón que `set_manual`/
+  `set_char_limit`), registrado en `$ajax_actions` y en el whitelist de
+  `admin.js`.
+- "Guardar cambios" empieza deshabilitado (atributo `disabled` puesto por
+  PHP) y se activa/añade `.wookb-btn-success` (reutilizada, no inventada)
+  en cuanto el textarea difiere de su valor original
+  (`data-wookb-original-value`); se desactiva de nuevo al guardar/
+  regenerar/volver a Auto con éxito, o si el usuario deshace los cambios a
+  mano. Botón "Generar" con `.wookb-btn-success` siempre (criterio: no hay
+  "dirty state" que detectar ahí, así que se aplica de forma fija; el
+  estado "procesando" ya existente sigue deshabilitándolo mientras
+  trabaja).
+- Limitación conocida, no abordada (fuera del alcance pedido): tras
+  "Volver a Auto" por AJAX, los elementos que dependen de `override_mode`
+  (aviso "Este documento está en modo Manual" y los propios botones
+  "Volver a Auto") no se ocultan solos sin recargar — solo se actualiza
+  estado/fecha/enlaces/contenido de la fila, no el HTML condicional de
+  "Ajustes avanzados". Una recarga de la pestaña los refleja bien.
+
+### QA pendiente (todo, no se ha probado en real)
+
+Ver lista de pruebas manuales en el informe del subagente. Ninguna de las 5
+piezas ni el ajuste de UX posterior se ha probado en el navegador todavía.

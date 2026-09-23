@@ -30,18 +30,30 @@ class Sync {
 	}
 
 	protected static function should_skip( $post_id ) {
-		if ( wp_is_post_autosave( $post_id ) || wp_is_post_revision( $post_id ) ) {
-			return true;
-		}
-		$post = get_post( $post_id );
-		if ( ! $post || 'publish' !== $post->post_status ) {
-			return true;
-		}
-		return false;
+		return wp_is_post_autosave( $post_id ) || wp_is_post_revision( $post_id );
 	}
 
+	/**
+	 * Pieza 4 (auditoria "solo contenido publicado"): antes, si el post
+	 * despublicado NO pasaba por la papelera (p.ej. cambiar el estado a
+	 * borrador directamente), should_skip() devolvia true y este metodo
+	 * simplemente salia sin borrar nada -- el documento generado antes
+	 * seguia sirviendose por Markdown_Server y apareciendo en llms.txt
+	 * (Registry::get_synced_public_urls() solo mira status/is_bridge, no
+	 * el post_status actual). Bug confirmado por lectura de should_skip() +
+	 * Markdown_Server::maybe_serve() (sirve el .md fisico sin comprobar
+	 * nada en BD) + Registry::get_synced_public_urls(). Mismo patron que ya
+	 * usa Queue::run_generate() para el mismo caso ("sincronia estricta ->
+	 * borrar si habia fila"), aplicado aqui tambien para que no dependa de
+	 * que algo vuelva a encolar ese source_id.
+	 */
 	public static function on_product_saved( $product_id ) {
 		if ( self::should_skip( $product_id ) ) {
+			return;
+		}
+		$post = get_post( $product_id );
+		if ( ! $post || 'publish' !== $post->post_status ) {
+			self::delete_documents_for( $product_id );
 			return;
 		}
 		if ( ! Scope::is_included( $product_id ) ) {
@@ -53,6 +65,10 @@ class Sync {
 
 	public static function on_generic_post_saved( $post_id, $post, $update ) {
 		if ( self::should_skip( $post_id ) ) {
+			return;
+		}
+		if ( ! $post || 'publish' !== $post->post_status ) {
+			self::delete_documents_for( $post_id );
 			return;
 		}
 		if ( ! Scope::is_included( $post_id ) ) {

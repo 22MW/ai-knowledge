@@ -2,6 +2,45 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [1.1.3.5] - Desarrollo - 2026-09-23
+
+### Registro: generación instantánea, prompt propio y auditoría de publicados
+
+- "Generar", "Guardar límite", "Guardar cambios" y "Volver a Auto" ya no
+  recargan la página (AJAX con fallback tradicional si no hay JavaScript).
+- "Ajustes avanzados" de cada documento se divide en dos pestañas:
+  Contenido y Prompt.
+- Nuevo prompt propio por documento e idioma (columna `custom_prompt`):
+  instrucciones de estilo/enfoque que nunca sustituyen los datos reales; si
+  está vacío, se usa el prompt genérico de siempre. Desactivado mientras el
+  documento esté en modo Manual (con aviso explicando por qué).
+- "Guardar cambios" solo se activa cuando hay ediciones reales sin guardar.
+- Corregido: un producto/página que pasaba de "Publicado" a "Borrador" sin
+  usar la papelera se quedaba visible en el Registro y en `/llms.txt`
+  indefinidamente. Ahora se retira de inmediato, igual que ya pasaba al
+  moverlo a la papelera.
+- Todos los avisos de guardado del admin pasan a notificaciones flotantes
+  (arriba a la derecha, desaparecen solas a los 10 segundos).
+
+### Genix
+
+- Nueva sección "Artículos exclusivos de Genix" en la pestaña Genix (antes
+  "Chatbot", renombrada): permite publicar en `/llms.txt` artículos escritos
+  directamente en Support Genix que no tienen ya su propio documento en
+  este plugin, copiando su contenido tal cual (sin IA). Un artículo marcado
+  en Genix como "solo para uso del chatbot" nunca puede hacerse público
+  desde aquí. Salen agrupados en `/llms.txt` bajo su propia sección
+  "Documentación".
+- `sgkb-docs` (los documentos internos de Genix) ya no puede elegirse como
+  tipo de contenido a documentar, ni en la pestaña Contenido, ni en el botón
+  del editor, ni en el modo "todos los tipos públicos".
+- Corregida una regresión previa que había desactivado el puente con Genix
+  para el chatbot en el pipeline general de documentos.
+
+### Documentación
+
+- Actualizada toda la documentación de usuario (`docs/`) con lo anterior.
+
 ## [1.1.3.1] - Desarrollo - 2026-09-20
 
 ### Internacionalización y documentación

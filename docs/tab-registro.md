@@ -33,21 +33,59 @@ ejecución automática.
 
 Desde cada fila puedes:
 
-- **Regenerar** ese documento en concreto.
+- **Generar** (o regenerar) ese documento en concreto. Se hace al instante,
+  sin recargar la página: verás el estado, la fecha y el contenido
+  actualizarse solos en unos segundos. Si por lo que sea tu navegador tiene
+  JavaScript desactivado, el botón sigue funcionando igual, solo que
+  recargando la pantalla.
 - **Borrar** el documento (y su post asociado). Al borrarlo, su origen se
   añade automáticamente a "IDs a excluir" en
   [Contenido](tab-contenido.md), para que no se vuelva a generar solo —
   si quieres que vuelva a generarse, quítalo de esa lista de exclusiones.
-- **Fijar el texto a mano** (modo manual): si editas el contenido de un
-  documento y no quieres que la próxima regeneración automática lo
-  pise, puedes fijarlo. El plugin te avisará si el contenido original
-  cambia después de fijarlo, para que decidas si actualizarlo.
 
 También puedes seleccionar varios documentos a la vez y borrarlos en
 bloque, con el mismo aviso sobre las exclusiones.
 
 > Borrar documentos aquí no borra tus productos ni páginas reales — solo
 > el documento de conocimiento generado a partir de ellos.
+
+> Si pasas un producto o página a "Borrador" desde su editor (sin
+> borrarlo del todo), su documento desaparece de esta tabla y deja de
+> estar disponible en `/llms.txt` automáticamente, sin que tengas que
+> hacer nada más aquí. En cuanto lo vuelvas a publicar, se genera de
+> nuevo solo.
+
+## Ajustes avanzados de cada documento
+
+Al desplegar "Ajustes avanzados" de cualquier fila, encuentras dos
+pestañas:
+
+### Pestaña "Contenido"
+
+- El texto completo del documento, editable a mano.
+- **Fijar el texto a mano** (modo manual, botón "Guardar cambios"): si
+  editas el contenido de un documento y no quieres que la próxima
+  regeneración automática lo pise, puedes fijarlo aquí. El plugin te
+  avisará si el contenido original cambia después de fijarlo, para que
+  decidas si actualizarlo.
+- **Límite de caracteres** propio para este documento (si lo dejas en
+  blanco, se usa el límite general de [Ajustes](tab-ajustes.md)).
+
+Tanto "Guardar límite" como "Guardar cambios" se guardan al instante, sin
+recargar la página (con el mismo fallback si no tienes JavaScript).
+
+### Pestaña "Prompt"
+
+Puedes escribir **instrucciones propias solo para este documento**: por
+ejemplo, "escribe en un tono más cercano" o "destaca especialmente el
+plazo de entrega". Si lo dejas vacío, se usa el prompt genérico de
+siempre, sin ningún cambio.
+
+Importante: estas instrucciones solo pueden pedir estilo o enfoque —
+nunca pueden hacer que la IA invente datos ni sustituya la información
+real de tu producto o página. Los datos reales siempre mandan.
+
+[SCREENSHOT: "Ajustes avanzados" de una fila con las pestañas Contenido y Prompt]
 
 ## Reiniciar cola
 
@@ -74,6 +112,16 @@ cambió, pero la decisión de actualizarlo es tuya.
 
 **¿Puedo buscar por el nombre de un producto?**
 Sí, el buscador de la parte superior busca por título.
+
+**¿Para qué sirve el prompt propio de un documento?**
+Para casos puntuales en los que quieres que un documento concreto suene
+distinto al resto (más formal, más breve, con más énfasis en algo
+concreto) sin cambiar el prompt general de todo el plugin. No sustituye
+los datos reales del producto o página: solo influye en cómo se redactan.
+
+**Si dejo el prompt de un documento en blanco, ¿pasa algo malo?**
+No, es lo normal: se usa el prompt genérico de siempre, exactamente como
+si esa pestaña no existiera.
 
 ---
 [Ver también: [Contenido](tab-contenido.md) · [Generación masiva](tab-generacion-masiva.md)]
