@@ -250,6 +250,34 @@ QA visual real cambiando el locale de WordPress.
   no lo menciona; ese diff toca IDs forzados a incluir, no relacionado con
   este bug de `tax_query`).
 
+## Plan confirmado — publicación pública, AJAX y prompt por documento
+
+Ajuste confirmado posteriormente: la documentación para Genix debe copiar el
+contenido original completo a Markdown, sin resumen, reescritura, IA ni límite
+de caracteres. En la instalación local, `new-genix-slug` es el rewrite
+`docs_single_slug`; el identificador interno del CPT sigue siendo `sgkb-docs`.
+La exclusión debe usar el post type interno y las URLs deben salir del registro
+real de WordPress.
+
+El usuario aprobó el plan funcional para el siguiente cambio, aún sin código:
+
+- Checkbox por documento para publicar `.md` e incluirlo en `/llms.txt`.
+- Botón «Generar contenido» AJAX dentro de Ajustes avanzados, sin recarga.
+- Prompt guardable por documento e idioma; si está vacío se usa el prompt
+  genérico.
+- El prompt personalizado se envía junto con el contenido real de la página;
+  el límite de caracteres de la fila o de Ajustes se mantiene.
+- No crear ni actualizar `sgkb-docs` de Genix; conservar el Markdown propio y
+  publicarlo solo cuando corresponda.
+- Los tipos públicos siguen siendo elegibles, pero `sgkb-docs` queda excluido
+  de configuración, alcance, cola, generación manual, editor, REST y feeds.
+- Solo se procesan posts publicados; falta auditar todos los caminos y hacer
+  QA real.
+- Los `sgkb-docs` antiguos no se borran automáticamente.
+
+El plan completo está en `_dev/roadmap.md`, sección «Plan aprobado pendiente
+de implementación — publicación, AJAX y prompts por documento».
+
 ## Relevo mínimo — siguiente paso
 
 Confirmar commit + push del fix de `tax_query` (v1.1.0.1) y del diff

@@ -97,6 +97,59 @@ Hay estilos inline como `style="width:100%"` en varias vistas. Detectado, no abo
 
 ## Ideas sin planificar
 
+## Plan aprobado pendiente de implementación — publicación, AJAX y prompts por documento
+
+Plan detallado: [`plan-publicacion-ajax-prompts.md`](plan-publicacion-ajax-prompts.md).
+
+Ajuste posterior confirmado: la documentación destinada a Genix se copiará
+íntegra desde el contenido original publicado a Markdown, sin IA, sin resumen,
+sin reescritura y sin límite de caracteres. La instalación de Genix dentro de
+este workspace confirma que `new-genix-slug` es `docs_single_slug` (rewrite de
+URL), mientras que el `post_type` interno sigue siendo `sgkb-docs`. La
+exclusión debe usar el identificador interno y las URLs deben obtenerse del
+registro real de WordPress.
+
+Alcance funcional confirmado por el usuario el 2026-09-23. Todavía no
+implementado ni validado.
+
+### Objetivo
+
+- Permitir marcar cada documento del Registro como público.
+- Un documento público se publica como `.md` y se incluye en `/llms.txt`.
+- Añadir generación individual por AJAX desde Ajustes avanzados, sin recarga.
+- Añadir prompt guardable por documento e idioma.
+- Si el prompt está vacío, usar el prompt genérico actual.
+- Aplicar el límite de caracteres de la fila o, si no existe, el límite general
+  de Ajustes tanto al prompt como a la generación.
+- No crear ni actualizar posts `sgkb-docs` de Support Genix; conservar el
+  Markdown propio y publicarlo solo cuando corresponda.
+- Permitir seleccionar tipos públicos, pero excluir `sgkb-docs` de todas las
+  rutas de alcance, configuración, cola, generación manual, editor, REST y
+  feeds.
+- Generar únicamente para posts publicados; revisar también generación por ID,
+  traducciones, cambios de estado y documentos existentes.
+
+### Fases previstas
+
+1. Separar publicación Markdown/llms de la integración Genix.
+2. Añadir estado público por fila y su persistencia.
+3. Añadir prompt por documento e idioma.
+4. Integrar prompt personalizado/genérico y límite de caracteres en el
+   generador.
+5. Añadir acciones AJAX para guardar y generar desde Registro.
+6. Excluir `sgkb-docs` de todo el alcance, incluido “Todos los tipos públicos”
+   e inclusión manual por ID.
+7. Auditar y corregir todos los caminos para aceptar únicamente
+   `post_status = publish`.
+8. Ejecutar validación estática y QA real con Genix activo/desactivado,
+   JavaScript activo/desactivado y WPML si está disponible.
+
+### Decisión posterior
+
+Los `sgkb-docs` antiguos no se borrarán automáticamente en esta primera
+implementación. Se mantendrán intactos y se podrá preparar una limpieza
+separada si el usuario la solicita.
+
 - Tags dinámicos en prompts y texto manual (`{post.title}`, datos de producto, etc.).
 - Asistente de configuración por pasos: consultar el plan de asistente en _dev.
   MVP pendiente de validación funcional antes de implementar.
