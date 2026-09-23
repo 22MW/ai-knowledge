@@ -1,5 +1,92 @@
 (function ($) {
 	'use strict';
+	var __ = window.wp && window.wp.i18n ? window.wp.i18n.__ : function (text) { return text; };
+
+	/**
+	 * Notificaciones flotantes ("toast") para los guardados AJAX del admin
+	 * (Generar, Guardar límite/cambios/prompt, y cualquier otro guardado
+	 * AJAX existente: Ajustes, Negocio, FAQs, WooCommerce, crawlers...).
+	 * Pedido explícito del usuario: sustituyen al aviso fijo que se
+	 * imprimía junto al formulario (con `$form.after()`, o en el caso de
+	 * las filas del Registro, dentro de "Ajustes avanzados") -- un solo
+	 * punto centralizado, no un aviso por acción. Arriba a la izquierda,
+	 * fuera de `.wookb-wrap` (position: fixed en <body>, mismo patrón de
+	 * z-index alto que ya usa `.wookb-doc-drawer` en admin.css) para que
+	 * flote por encima de todo sin importar dónde esté desplazado el
+	 * usuario en la pantalla. Desaparece sola a los 10 segundos.
+	 */
+	var TOAST_DURATION = 10000;
+
+	function getToastContainer() {
+		var $container = $( '#wookb-toast-container' );
+		if ( $container.length ) {
+			return $container;
+		}
+		// Dentro de .wookb-wrap (no de <body>): así hereda las variables de
+		// color de Tabler en modo oscuro/claro (el atributo data-bs-theme
+		// vive en .wookb-wrap, ver applyTheme() mas abajo). position:fixed
+		// sigue colocándolo respecto a la ventana igual, .wookb-wrap no crea
+		// un contexto de posicionamiento propio (sin transform/filter).
+		$container = $( '<div id="wookb-toast-container" aria-live="polite"></div>' );
+		var $wrap = $( '.wookb-wrap' ).first();
+		if ( $wrap.length ) {
+			$wrap.append( $container );
+		} else {
+			$( 'body' ).append( $container );
+		}
+		return $container;
+	}
+
+	function showToast( message, type ) {
+		var $container = getToastContainer();
+		var $toast = $( '<div class="wookb-toast"><p></p><button type="button" class="wookb-toast-close" aria-label="' + __( 'Cerrar aviso', 'ai-knowledge' ) + '">&times;</button></div>' );
+		$toast.addClass( 'wookb-toast-' + ( 'error' === type ? 'error' : 'success' ) );
+		$toast.find( 'p' ).text( message );
+		$container.append( $toast );
+
+		var timer = window.setTimeout( function () {
+			$toast.remove();
+		}, TOAST_DURATION );
+
+		$toast.on( 'click', '.wookb-toast-close', function () {
+			window.clearTimeout( timer );
+			$toast.remove();
+		} );
+	}
+	// Expuesto para el resto de bloques de este mismo archivo (segunda IIFE
+	// del asistente de configuración, mas abajo, tiene su propio scope).
+	window.wookbShowToast = showToast;
+
+	/**
+	 * "Guardar cambios" del textarea de contenido (fila del Registro,
+	 * pestaña "Contenido" de Ajustes avanzados) empieza deshabilitado
+	 * (atributo `disabled` puesto por PHP, ver
+	 * Registry_Table::manual_expanded_row_markup()) y solo se activa si el
+	 * valor actual del textarea difiere del original guardado en
+	 * `data-wookb-original-value`. Con la clase activa se añade
+	 * `wookb-btn-success` (ya existente, la reutiliza "Marcar revisado" --
+	 * pedido explícito: no inventar un estilo nuevo).
+	 */
+	function updateManualSaveButtonState( $textarea ) {
+		if ( ! $textarea || ! $textarea.length ) {
+			return;
+		}
+		var original = $textarea.attr( 'data-wookb-original-value' ) || '';
+		var dirty = $textarea.val() !== original;
+		var formId = $textarea.attr( 'form' );
+		if ( ! formId ) {
+			return;
+		}
+		$( 'button[form="' + formId + '"][data-wookb-save-changes-btn]' )
+			.prop( 'disabled', ! dirty )
+			.toggleClass( 'wookb-btn-success', dirty );
+	}
+
+	$( function () {
+		$( '.wookb-wrap' ).on( 'input', '[data-wookb-manual-textarea]', function () {
+			updateManualSaveButtonState( $( this ) );
+		} );
+	} );
 
 	/**
 	 * Tema oscuro/claro (Tabler), encapsulado en .wookb-wrap: no se toca
@@ -55,6 +142,44 @@
 		} );
 	} );
 
+	// Filtros locales de crawlers: combinan tipo y estado sin recargar la página.
+	$( function () {
+		var $wrap = $( '.wookb-wrap' );
+		var $filters = $( '[data-wookb-crawler-filters]' );
+		if ( ! $filters.length ) { return; }
+		var $rows = $( '[data-wookb-crawler-row]' );
+		var $count = $filters.find( '[data-wookb-crawler-count]' );
+		var $toggle = $filters.closest( '.wookb-crawler-section' ).find( '[data-wookb-crawler-toggle]' );
+		var expanded = false;
+		function applyCrawlerFilters() {
+			var category = $filters.find( '[data-wookb-crawler-filter="category"]' ).val();
+			var action = $filters.find( '[data-wookb-crawler-filter="action"]' ).val();
+			var filtering = 'all' !== category || 'all' !== action;
+			var visible = 0;
+			$rows.each( function () {
+				var $row = $( this );
+				var matches = ( 'all' === category || category === $row.attr( 'data-crawler-category' ) ) && ( 'all' === action || action === $row.attr( 'data-crawler-action' ) );
+				var inInitialPage = parseInt( $row.attr( 'data-crawler-index' ), 10 ) < 10;
+				var show = matches && ( expanded || filtering || inInitialPage );
+				$row.toggle( show );
+				if ( matches ) { visible++; }
+			} );
+			$count.text( visible + ' de ' + $rows.length );
+			$toggle.toggle( ! filtering && $rows.length > 10 );
+			$toggle.text( expanded ? __( 'Mostrar menos crawlers', 'ai-knowledge' ) : __( 'Ver todos los crawlers', 'ai-knowledge' ) );
+		}
+		$filters.on( 'change', 'select', applyCrawlerFilters );
+		$toggle.on( 'click', function () {
+			expanded = ! expanded;
+			applyCrawlerFilters();
+		} );
+		$wrap.on( 'change', '[data-wookb-crawler-row] select[name^="crawler_action"]', function () {
+			$( this ).closest( '[data-wookb-crawler-row]' ).attr( 'data-crawler-action', $( this ).val() );
+			applyCrawlerFilters();
+		} );
+		applyCrawlerFilters();
+	} );
+
 	/**
 	 * Fase AJAX 1: guardados simples. El action del formulario se conserva
 	 * para que admin-post.php siga funcionando si JavaScript no esta activo.
@@ -75,7 +200,20 @@
 			'wookb_generate_faqs_draft',
 			'wookb_generate_prompt_draft',
 			'wookb_normalize_prompt',
-			'wookb_polish_store_doc'
+			'wookb_polish_store_doc',
+			// Pieza 1: boton "Generar" del Registro sin recargar la pagina.
+			'wookb_regenerate_single',
+			// Botones "Guardar límite"/"Guardar cambios" (ya existían antes
+			// de esta tarea): mismo tratamiento AJAX, pedido explícito.
+			'wookb_set_manual',
+			'wookb_set_char_limit',
+			// "Volver a Auto" (botones de Contenido y Prompt, mismo <form>).
+			'wookb_back_to_auto',
+			// Pieza 2: guardar el prompt propio de un documento.
+			'wookb_save_custom_prompt',
+			// Pieza 5: artículos exclusivos de Genix.
+			'wookb_genix_generate',
+			'wookb_genix_remove'
 		];
 
 		$( '.wookb-wrap' ).on( 'submit', 'form', function ( e ) {
@@ -103,12 +241,20 @@
 			var originalSubmitText = isInputSubmit ? $submit.val() : $submit.html();
 			$submit.data( 'wookb-original-text', originalSubmitText ).prop( 'disabled', true ).attr( 'aria-busy', 'true' );
 			if ( isInputSubmit ) {
-				$submit.val( 'Procesando…' );
+				$submit.val( __( 'Procesando…', 'ai-knowledge' ) );
 				$submit.after( '<span class="wookb-spinner wookb-spinner-sibling" aria-hidden="true"></span>' );
 			} else {
-				$submit.html( '<span class="wookb-spinner" aria-hidden="true"></span><span>Procesando…</span>' );
+				$submit.html( '<span class="wookb-spinner" aria-hidden="true"></span><span>' + __( 'Procesando…', 'ai-knowledge' ) + '</span>' );
 			}
-			$form.next( '.wookb-ajax-notice' ).remove();
+
+			// Fila real de la que cuelga el boton pulsado, para las acciones
+			// del Registro que necesitan actualizar estado/fecha/enlaces/
+			// contenido en pantalla (ver mas abajo). El aviso de guardado ya
+			// NO depende de esta fila: ahora es un toast flotante
+			// (showToast()), independiente de donde este el boton.
+			var $btn = submitter ? $( submitter ) : null;
+			var $anchor = $btn && $btn.length ? $btn : $form;
+			var $expandRow = $anchor.closest( '.wookb-manual-expand-row' );
 
 			var formData = new FormData( form );
 			formData.set( 'action', action );
@@ -126,9 +272,9 @@
 				return response.json();
 			} ).then( function ( result ) {
 				if ( ! result.success ) {
-					throw new Error( result.data && result.data.message ? result.data.message : 'No se pudo guardar.' );
+					throw new Error( result.data && result.data.message ? result.data.message : __( 'No se pudo guardar.', 'ai-knowledge' ) );
 				}
-				var message = result.data && result.data.message ? result.data.message : 'Guardado.';
+				var message = result.data && result.data.message ? result.data.message : __( 'Guardado.', 'ai-knowledge' );
 				var value = result.data && (result.data.draft || result.data.polished);
 				if ( value ) {
 					if ( 'wookb_generate_business_summary_draft' === action ) {
@@ -141,11 +287,45 @@
 						$form.nextAll( 'textarea[readonly]' ).first().val( value );
 					}
 				}
-				$form.after( '<div class="notice notice-success inline wookb-ajax-notice"><p></p></div>' );
-				$form.next( '.wookb-ajax-notice' ).find( 'p' ).text( message );
+				// Pieza 1 + botones "Guardar límite"/"Guardar cambios": el
+				// boton de "Generar" (fila principal) vive dentro de la fila
+				// normal de la tabla; esos dos botones viven dentro de la
+				// fila expandida ".wookb-manual-expand-row" (el <details> de
+				// "Ajustes avanzados"), justo debajo -- localizamos la fila
+				// PRINCIPAL en ambos casos para actualizar estado/fecha/
+				// enlaces ($expandRow/$anchor ya calculados mas arriba, antes
+				// del fetch, para el aviso de guardado).
+				var wookbRegistryRowActions = [ 'wookb_regenerate_single', 'wookb_set_manual', 'wookb_set_char_limit', 'wookb_back_to_auto' ];
+				if ( -1 !== wookbRegistryRowActions.indexOf( action ) && result.data && result.data.row ) {
+					var row = result.data.row;
+					var $rowExpand = $expandRow;
+					var $mainRow = $rowExpand.length ? $rowExpand.prev( 'tr' ) : $anchor.closest( 'tr' );
+					if ( ! $rowExpand.length && $mainRow.length ) {
+						$rowExpand = $mainRow.next( '.wookb-manual-expand-row' );
+					}
+					if ( $mainRow.length ) {
+						$mainRow.find( '.column-status' ).text( row.status );
+						$mainRow.find( '.column-updated' ).text( row.updated );
+						$mainRow.find( '.column-links' ).html( row.links );
+					}
+					if ( $rowExpand.length ) {
+						var $textarea = $rowExpand.find( 'textarea[name="override_text"]' );
+						if ( $textarea.length ) {
+							if ( ! row.is_manual && null !== row.content ) {
+								$textarea.val( row.content );
+							}
+							// Se acaba de guardar/regenerar/volver a Auto: lo que hay
+							// ahora en el textarea pasa a ser el nuevo valor "sin
+							// cambios" -- "Guardar cambios" vuelve a deshabilitarse.
+							$textarea.attr( 'data-wookb-original-value', $textarea.val() );
+							updateManualSaveButtonState( $textarea );
+						}
+					}
+				}
+				showToast( message, 'success' );
 			} ).catch( function ( error ) {
-				$form.after( '<div class="notice notice-error inline wookb-ajax-notice"><p></p></div>' );
-				$form.next( '.wookb-ajax-notice' ).find( 'p' ).text( 'No se pudo guardar sin recargar. Revisa la sesión y vuelve a intentarlo. (' + error.message + ')' );
+				var errorMessage = __( 'No se pudo guardar sin recargar. Revisa la sesión y vuelve a intentarlo.', 'ai-knowledge' ) + ' (' + error.message + ')';
+				showToast( errorMessage, 'error' );
 			} ).finally( function () {
 				delete form.dataset.wookbAjaxBusy;
 				if ( isInputSubmit ) {
@@ -180,7 +360,7 @@
 				return $( template.innerHTML ).filter( '#' + anchor ).length > 0;
 			} );
 			if ( validInCurrent || validInTemplate ) {
-				$heading.append( ' <button type="button" class="button-link wookb-doc-heading-link" data-wookb-doc-open="' + $wrap.data( 'wookb-doc-tab' ) + '" data-wookb-doc-anchor="' + anchor + '" aria-label="Abrir esta sección de documentación">?</button>' );
+			$heading.append( ' <button type="button" class="button-link wookb-doc-heading-link" data-wookb-doc-open="' + $wrap.data( 'wookb-doc-tab' ) + '" data-wookb-doc-anchor="' + anchor + '" aria-label="' + __( 'Abrir esta sección de documentación', 'ai-knowledge' ) + '">?</button>' );
 			}
 		} );
 		function closeDocs() {
@@ -211,7 +391,7 @@
 			var template = $drawer.find( '[data-wookb-doc-template="' + file + '"]' )[ 0 ];
 			if ( ! template ) { return; }
 			$content.html( template.innerHTML );
-			$title.text( 'Documentación' );
+			$title.text( __( 'Documentación', 'ai-knowledge' ) );
 			$back.prop( 'hidden', false ).trigger( 'focus' );
 			var anchor = String( $( this ).data( 'wookb-doc-anchor' ) || '' );
 			if ( anchor ) {
@@ -236,6 +416,33 @@
 	} );
 
 	/**
+	 * Sub-pestañas "Contenido"/"Prompt" dentro de "Ajustes avanzados" de una
+	 * fila del Registro (pedido explícito del usuario: demasiado apilado en
+	 * un solo bloque). Solo mostrar/ocultar, sin AJAX -- reutiliza las
+	 * mismas clases nav-tab/nav-tab-active que las pestañas grandes del
+	 * admin. Sin JavaScript, los dos paneles quedan simplemente visibles a
+	 * la vez (el atributo hidden inicial solo se aplica en el HTML server-
+	 * side del panel "prompt"): fallback aceptable, nada deja de poder
+	 * guardarse.
+	 */
+	$( function () {
+		$( '.wookb-wrap' ).on( 'click', '[data-wookb-subtab-link]', function () {
+			var $btn  = $( this );
+			var $bar  = $btn.closest( '[data-wookb-subtabs]' );
+			var $wrap = $bar.parent();
+			var target = $btn.data( 'wookb-subtab-link' );
+
+			$bar.find( '[data-wookb-subtab-link]' ).removeClass( 'nav-tab-active' );
+			$btn.addClass( 'nav-tab-active' );
+
+			$wrap.find( '[data-wookb-subtab-panel]' ).each( function () {
+				var $panel = $( this );
+				$panel.prop( 'hidden', $panel.data( 'wookb-subtab-panel' ) !== target );
+			} );
+		} );
+	} );
+
+	/**
 	 * Fase 11 (revision UX): descarga de robots.txt/.htaccess por fetch() en
 	 * vez de un submit normal, para poder habilitar el boton "Aplicar"
 	 * hermano en cuanto termina, sin recargar la pestaña. La proteccion real
@@ -250,7 +457,7 @@
 				return;
 			}
 			navigator.clipboard.writeText( target.value ).then( function () {
-				window.alert( 'Código copiado.' );
+				window.alert( __( 'Código copiado.', 'ai-knowledge' ) );
 			} );
 		} );
 
@@ -294,4 +501,70 @@
 			} );
 		} );
 	} );
+})(jQuery);
+
+(function ($) {
+	'use strict';
+	if (!window.aikbAssistant) return;
+	var data = window.aikbAssistant;
+	var steps = data.steps || {};
+	window.setTimeout(function () { $('.wookb-assistant').removeClass('is-loading'); }, 350);
+	function updateProgress(step, completed) {
+		var keys = Object.keys(steps), currentIndex = keys.indexOf(step);
+		$('.wookb-assistant-progress li').removeClass('is-active is-done is-past is-future').each(function (index) { var $li=$(this), key=$li.data('assistant-step'); if (key === step) $li.addClass('is-active'); if ((completed || []).indexOf(key) !== -1) $li.addClass('is-done'); if (index < currentIndex) $li.addClass('is-past'); if (index > currentIndex) $li.addClass('is-future'); });
+	}
+	function showPanel(response) {
+		if (!response || !response.success || !response.data.panel) return false;
+		$('[data-assistant-stage]').html(response.data.panel);
+		if ($('#wookb-assistant-geo-prompt').length && !$('#wookb-geo-prompt-notice').length) {
+			$('#wookb-assistant-geo-prompt').attr('rows', 8).css('font-size', '13px');
+			$('<p id="wookb-geo-prompt-notice" style="color:#ff931e;font-size:13px;margin:10px 0 6px;">' + wp.i18n.__('Si hay documentos pendientes, la auditoría será más completa cuando terminen de generarse.', 'ai-knowledge') + '</p>').insertBefore($('#wookb-assistant-geo-prompt'));
+		}
+		updateProgress(response.data.step, response.data.completed || []);
+		window.history.pushState({}, '', 'admin.php?page=ai-knowledge-assistant&step=' + encodeURIComponent(response.data.step));
+		return true;
+	}
+	$(document).on('click', '[data-server-action]', function (e) {
+		e.preventDefault();
+		e.stopImmediatePropagation();
+		var button = this, action = button.getAttribute('data-server-action');
+		if ('wookb_apply_robots_block' === action && !window.confirm('Confirma que ya descargaste la copia y quieres actualizar robots.txt.')) return false;
+		if ('wookb_download_robots_backup' === action) $('[data-server-action="wookb_apply_robots_block"]').prop('disabled', false).removeAttr('disabled');
+		var detached = document.createElement('form');
+		detached.method = 'post';
+		detached.action = data.adminPostUrl;
+		detached.style.display = 'none';
+		[['action', action], ['_wpnonce', button.getAttribute('data-server-nonce')]].concat(button.getAttribute('data-return-assistant') ? [['wookb_return_assistant', '1']] : []).forEach(function (pair) { var input = document.createElement('input'); input.type = 'hidden'; input.name = pair[0]; input.value = pair[1]; detached.appendChild(input); });
+		document.body.appendChild(detached);
+		detached.submit();
+		return false;
+	});
+	$(document).on('submit', '[data-assistant-form]', function (e) {
+		e.preventDefault();
+		$('.wookb-assistant').addClass('is-loading');
+		var $form=$(this), submitter=e.originalEvent && e.originalEvent.submitter, action=submitter ? submitter.value : 'continue';
+		var payload=$form.serializeArray();
+		payload.push({name:'action',value:'aikb_assistant_navigate'},{name:'nonce',value:data.nonce},{name:'step',value:$form.find('[name="assistant_step"]').val()},{name:'assistant_action',value:action});
+		$form.find('button').prop('disabled', true);
+		$.post(data.ajaxUrl, payload).done(function (response) { if (!showPanel(response)) { $('[data-assistant-feedback]').addClass('is-error').text(response.data && response.data.message ? response.data.message : wp.i18n.__('No se pudo guardar.', 'ai-knowledge')).addClass('is-visible'); } }).fail(function () { $('[data-assistant-feedback]').addClass('is-error').text(wp.i18n.__('No se pudo guardar.', 'ai-knowledge')).addClass('is-visible'); }).always(function () { $('[data-assistant-form] button').prop('disabled', false); $('.wookb-assistant').removeClass('is-loading'); });
+	});
+	$(document).on('click', '[data-assistant-step-link]', function (e) {
+		e.preventDefault();
+		$('.wookb-assistant').addClass('is-loading');
+		var step=$(this).closest('li').data('assistant-step');
+		$.post(data.ajaxUrl,{action:'aikb_assistant_navigate',nonce:data.nonce,step:step,assistant_action:'goto'}).done(showPanel).always(function () { $('.wookb-assistant').removeClass('is-loading'); });
+	});
+	$(document).on('click', '[data-assistant-category]', function () {
+		var $form=$(this).closest('form'), category=$(this).data('assistant-category'), step=$form.find('[name="assistant_step"]').val();
+		$.post(data.ajaxUrl, $form.serializeArray().concat([{name:'action',value:'aikb_assistant_navigate'},{name:'nonce',value:data.nonce},{name:'step',value:step},{name:'assistant_action',value:'goto'},{name:'assistant_category',value:category}])).done(showPanel);
+	});
+	$(document).on('click', '[data-crawler-bulk]', function () {
+		var value = $(this).data('crawler-bulk');
+		$('[data-assistant-stage] .wookb-assistant-crawlers select[name^="crawler_action["]').val(value);
+	});
+	$(document).on('click', '[data-assistant-check-server]', function () {
+		$('.wookb-assistant').addClass('is-loading');
+		$.post(data.ajaxUrl, {action:'aikb_assistant_navigate', nonce:data.nonce, step:'server', assistant_action:'goto'}).done(showPanel).always(function () { $('.wookb-assistant').removeClass('is-loading'); });
+	});
+	if ($('#wookb-assistant-geo-prompt').length && !$('#wookb-geo-prompt-notice').length) { $('#wookb-assistant-geo-prompt').attr('rows', 8).css('font-size', '13px'); $('<p id="wookb-geo-prompt-notice" style="color:#ff931e;font-size:13px;margin:10px 0 6px;">' + wp.i18n.__('Si hay documentos pendientes, la auditoría será más completa cuando terminen de generarse.', 'ai-knowledge') + '</p>').insertBefore($('#wookb-assistant-geo-prompt')); }
 })(jQuery);

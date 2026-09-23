@@ -165,11 +165,15 @@ class Scope {
 
 		if ( 'all_public' === $settings['post_types_mode'] ) {
 			$all = array_keys( get_post_types( array( 'public' => true ), 'names' ) );
-			$all = array_diff( $all, array( 'attachment' ), (array) $settings['post_types_excluded_when_all'] );
+			$all = array_diff( $all, array( 'attachment', 'sgkb-docs' ), (array) $settings['post_types_excluded_when_all'] );
 			return array_values( $all );
 		}
 
-		return (array) $settings['post_types'];
+		// 'sgkb-docs' nunca es un tipo de contenido documentable, aunque quede
+		// guardado en la seleccion manual de una configuracion antigua: son
+		// copias del propio chatbot de Genix, no contenido fuente (ver Genix_Reader,
+		// camino totalmente aparte para artículos exclusivos de Genix).
+		return array_values( array_diff( (array) $settings['post_types'], array( 'sgkb-docs' ) ) );
 	}
 
 	public static function resolve_ids() {

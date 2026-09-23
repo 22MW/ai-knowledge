@@ -53,7 +53,9 @@ delete_transient( 'wookb_accessibility_error' );
 $robots_txt_content = '';
 $robots_txt_error   = '';
 $robots_response     = wp_remote_get( home_url( '/robots.txt' ) );
-if ( is_wp_error( $robots_response ) ) {
+if ( file_exists( Robots_Txt_Guard::path() ) ) {
+	$robots_txt_content = (string) file_get_contents( Robots_Txt_Guard::path() ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+} elseif ( is_wp_error( $robots_response ) ) {
 	$robots_txt_error = $robots_response->get_error_message();
 } else {
 	$robots_txt_content = wp_remote_retrieve_body( $robots_response );
@@ -68,7 +70,7 @@ $llms_backup_confirmed = (bool) get_transient( 'wookb_llms_backup_confirmed_' . 
 $htaccess_available = Htaccess_Guard::is_available();
 $htaccess_confirmed = Htaccess_Guard::backup_confirmed();
 
-$crawler_saved_actions = Scope::settings()['crawler_actions'];
+$crawler_saved_actions = Crawler_Catalog::effective_actions();
 $crawler_visibility_mode = Scope::settings()['crawler_visibility_mode'];
 
 // Fase 11, pieza 3: ultimos accesos registrados del catalogo de crawlers.
@@ -91,6 +93,8 @@ $robots_full_preview = Robots_Txt_Guard::generate_full_file( $crawler_actions, $
 $htaccess_block_preview = "RewriteEngine On\n" . implode( "\n", Htaccess_Guard::build_action_rules( $crawler_actions, $crawler_visibility_mode ) );
 $htaccess_full_preview = Htaccess_Guard::generate_full_file( $crawler_actions, $crawler_visibility_mode );
 $htaccess_current_content = Htaccess_Guard::is_available() ? (string) file_get_contents( Htaccess_Guard::path() ) : ''; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+$robots_managed_matches = Robots_Txt_Guard::managed_block_matches( $robots_txt_content, $crawler_actions, $crawler_visibility_mode );
+$htaccess_managed_matches = Htaccess_Guard::managed_block_matches( $htaccess_current_content, $crawler_actions, $crawler_visibility_mode );
 $robots_conflicts = Robots_Txt_Guard::action_conflicts( $crawler_actions );
 $htaccess_conflicts = Htaccess_Guard::conflicts( $crawler_blocked_bots, $crawler_visibility_mode );
 ?>
@@ -270,8 +274,32 @@ $category_labels = array(
 	'ai_search'                => __( 'Búsqueda/citas IA', 'ai-knowledge' ),
 	'user_requested_assistant' => __( 'Uso bajo demanda', 'ai-knowledge' ),
 	'model_training'           => __( 'Entrenamiento de modelos', 'ai-knowledge' ),
+	'seo_scraper'              => __( 'SEO y scraping', 'ai-knowledge' ),
+	'security_scanner'         => __( 'Scanners de seguridad', 'ai-knowledge' ),
+	'traditional_search'       => __( 'Buscadores tradicionales', 'ai-knowledge' ),
+	'archive_dataset'          => __( 'Archivado y datasets', 'ai-knowledge' ),
 );
 ?>
+<div class="wookb-crawler-filters" data-wookb-crawler-filters>
+	<label>
+		<span class="screen-reader-text"><?php esc_html_e( 'Filtrar por tipo', 'ai-knowledge' ); ?></span>
+		<select data-wookb-crawler-filter="category">
+			<option value="all"><?php esc_html_e( 'Todos los tipos', 'ai-knowledge' ); ?></option>
+			<?php foreach ( $category_labels as $category => $label ) : ?>
+				<option value="<?php echo esc_attr( $category ); ?>"><?php echo esc_html( $label ); ?></option>
+			<?php endforeach; ?>
+		</select>
+	</label>
+	<label>
+		<span class="screen-reader-text"><?php esc_html_e( 'Filtrar por estado', 'ai-knowledge' ); ?></span>
+		<select data-wookb-crawler-filter="action">
+			<option value="all"><?php esc_html_e( 'Todos los estados', 'ai-knowledge' ); ?></option>
+			<option value="allow"><?php esc_html_e( 'Permitidos', 'ai-knowledge' ); ?></option>
+			<option value="block"><?php esc_html_e( 'Bloqueados', 'ai-knowledge' ); ?></option>
+		</select>
+	</label>
+	<span class="description" data-wookb-crawler-count aria-live="polite"></span>
+</div>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 	<input type="hidden" name="action" value="wookb_save_crawler_actions" />
 	<?php wp_nonce_field( 'wookb_save_crawler_actions' ); ?>
@@ -287,11 +315,11 @@ $category_labels = array(
 			</tr>
 		</thead>
 		<tbody>
-			<?php foreach ( Crawler_Catalog::all() as $entry ) :
+			<?php foreach ( Crawler_Catalog::all() as $index => $entry ) :
 				$ua       = $entry['user_agent'];
 				$current  = isset( $crawler_saved_actions[ $ua ] ) ? $crawler_saved_actions[ $ua ] : $entry['default_action'];
 				?>
-				<tr>
+				<tr data-wookb-crawler-row data-crawler-index="<?php echo (int) $index; ?>" data-crawler-category="<?php echo esc_attr( $entry['category'] ); ?>" data-crawler-action="<?php echo esc_attr( $current ); ?>">
 					<td><?php echo esc_html( $ua ); ?></td>
 					<td><?php echo esc_html( $entry['operator'] ); ?></td>
 					<td><?php echo esc_html( isset( $category_labels[ $entry['category'] ] ) ? $category_labels[ $entry['category'] ] : $entry['category'] ); ?></td>
@@ -300,9 +328,6 @@ $category_labels = array(
 						<select name="crawler_action[<?php echo esc_attr( $ua ); ?>]">
 							<option value="allow" <?php selected( 'allow', $current ); ?>><?php esc_html_e( 'Permitir', 'ai-knowledge' ); ?></option>
 							<option value="block" <?php selected( 'block', $current ); ?>><?php esc_html_e( 'Bloquear', 'ai-knowledge' ); ?></option>
-							<?php if ( 'ask' === $current ) : ?>
-								<option value="ask" selected="selected" disabled="disabled"><?php esc_html_e( 'Sin decidir (uso mixto)', 'ai-knowledge' ); ?></option>
-							<?php endif; ?>
 						</select>
 					</td>
 				</tr>
@@ -310,7 +335,10 @@ $category_labels = array(
 		</tbody>
 	</table>
 	</div>
-	<div class="submit-row"><?php submit_button( __( 'Guardar configuración de crawlers', 'ai-knowledge' ), 'primary', 'submit', false ); ?></div>
+	<div class="submit-row wookb-crawler-actions">
+		<?php submit_button( __( 'Guardar configuración de crawlers', 'ai-knowledge' ), 'primary', 'submit', false ); ?>
+		<button type="button" class="button" data-wookb-crawler-toggle><?php esc_html_e( 'Ver todos los crawlers', 'ai-knowledge' ); ?></button>
+	</div>
 </form>
 
 <h3><?php esc_html_e( 'Visibilidad para los bots bloqueados', 'ai-knowledge' ); ?></h3>
@@ -326,6 +354,7 @@ $category_labels = array(
 </form>
 
 <h3><?php esc_html_e( 'robots.txt', 'ai-knowledge' ); ?></h3>
+<?php if ( $robots_managed_matches ) : ?><div class="notice notice-success inline"><p><?php esc_html_e( 'Las reglas de AI Knowledge coinciden con la configuración guardada.', 'ai-knowledge' ); ?></p></div><?php else : ?><div class="notice notice-warning inline"><p><?php esc_html_e( 'Las reglas de AI Knowledge son diferentes de la configuración guardada.', 'ai-knowledge' ); ?></p></div><?php endif; ?>
 <?php if ( $robots_conflicts ) : ?><div class="notice notice-warning inline"><p><?php esc_html_e( 'Se han detectado reglas originales que contradicen el bloque propuesto. Al aplicar, se conservarán y se comentarán para dejar constancia del conflicto:', 'ai-knowledge' ); ?></p><ul><?php foreach ( $robots_conflicts as $conflict ) : ?><li><code><?php echo esc_html( $conflict ); ?></code></li><?php endforeach; ?></ul></div><?php endif; ?>
 <div class="wookb-crawler-compare">
 	<div>
@@ -366,6 +395,7 @@ $category_labels = array(
 <hr />
 
 <h3><?php esc_html_e( 'Bloqueo en el servidor mediante .htaccess', 'ai-knowledge' ); ?></h3>
+<?php if ( $htaccess_managed_matches ) : ?><div class="notice notice-success inline"><p><?php esc_html_e( 'Las reglas de AI Knowledge coinciden con la configuración guardada.', 'ai-knowledge' ); ?></p></div><?php else : ?><div class="notice notice-warning inline"><p><?php esc_html_e( 'Las reglas de AI Knowledge son diferentes de la configuración guardada.', 'ai-knowledge' ); ?></p></div><?php endif; ?>
 <?php if ( $htaccess_conflicts ) : ?><div class="notice notice-warning inline"><p><?php esc_html_e( 'Se han detectado reglas originales de .htaccess que contradicen el bloque propuesto. Al aplicar, se conservarán y se comentarán.', 'ai-knowledge' ); ?></p><ul><?php foreach ( $htaccess_conflicts as $conflict ) : ?><li><code><?php echo esc_html( $conflict ); ?></code></li><?php endforeach; ?></ul></div><?php endif; ?>
 <p class="description">
 	<?php esc_html_e( 'robots.txt comunica preferencias de rastreo, pero un bot puede ignorarlas. Estas reglas rechazan en el servidor las solicitudes que se identifican como alguno de los bots marcados como Bloquear.', 'ai-knowledge' ); ?>

@@ -18,6 +18,11 @@ class Admin
 	public static function init()
 	{
 		add_action('admin_menu', array(__CLASS__, 'menu'));
+		add_filter('admin_title', array(__CLASS__, 'fixed_admin_title'), 10, 2);
+		add_filter('plugin_action_links_' . plugin_basename(AIKB_FILE), array(__CLASS__, 'plugin_action_links'));
+		add_action('admin_init', array(__CLASS__, 'maybe_open_assistant'));
+		add_action('wp_ajax_aikb_assistant_navigate', array(__CLASS__, 'assistant_navigate'));
+		add_action('admin_post_aikb_download_geo_prompt', array(__CLASS__, 'download_geo_prompt'));
 		$ajax_actions = array(
 			'wookb_save_content' => 'save_content',
 			'wookb_save_settings' => 'save_settings',
@@ -34,6 +39,23 @@ class Admin
 			'wookb_generate_prompt_draft' => 'generate_prompt_draft',
 			'wookb_normalize_prompt' => 'normalize_prompt',
 			'wookb_polish_store_doc' => 'polish_store_doc',
+			// Pieza 1: boton "Generar" del Registro por AJAX, mismo callback
+			// que admin_post_wookb_regenerate_single (ver regenerate_single(),
+			// que ya distingue wp_doing_ajax() para responder JSON en vez de
+			// redirigir).
+			'wookb_regenerate_single' => 'regenerate_single',
+			// Pedido explícito del usuario: mismo tratamiento AJAX que
+			// "Generar" para los botones "Guardar límite" y "Guardar
+			// cambios" del bloque "Ajustes avanzados" (ya existían antes de
+			// esta tarea, solo se les añade AJAX aquí).
+			'wookb_set_manual' => 'set_manual',
+			'wookb_set_char_limit' => 'set_char_limit',
+			'wookb_back_to_auto' => 'back_to_auto',
+			// Pieza 2: guardar el prompt propio de un documento.
+			'wookb_save_custom_prompt' => 'save_custom_prompt',
+			// Pieza 5: artículos exclusivos de Genix.
+			'wookb_genix_generate' => 'genix_generate',
+			'wookb_genix_remove' => 'genix_remove',
 		);
 		foreach ($ajax_actions as $action => $callback) {
 			add_action('wp_ajax_' . $action, array(__CLASS__, $callback));
@@ -63,6 +85,9 @@ class Admin
 		add_action('admin_post_wookb_reset_queue', array(__CLASS__, 'reset_queue'));
 		add_action('admin_post_wookb_set_manual', array(__CLASS__, 'set_manual'));
 		add_action('admin_post_wookb_set_char_limit', array(__CLASS__, 'set_char_limit'));
+		add_action('admin_post_wookb_save_custom_prompt', array(__CLASS__, 'save_custom_prompt'));
+		add_action('admin_post_wookb_genix_generate', array(__CLASS__, 'genix_generate'));
+		add_action('admin_post_wookb_genix_remove', array(__CLASS__, 'genix_remove'));
 		add_action('admin_post_wookb_resolve_stale', array(__CLASS__, 'resolve_stale'));
 		add_action('admin_post_wookb_back_to_auto', array(__CLASS__, 'back_to_auto'));
 		add_action('admin_post_wookb_save_woocommerce_settings', array(__CLASS__, 'save_woocommerce_settings'));
@@ -85,6 +110,23 @@ class Admin
 	public static function capability()
 	{
 		return class_exists('WooCommerce') ? self::CAPABILITY_WOO : self::CAPABILITY_FALLBACK;
+	}
+
+	/**
+	 * Todas las pestañas comparten el slug 'page=ai-knowledge' (solo cambia
+	 * `tab=` en la URL), asi que WordPress -- que decide el <title> del
+	 * navegador solo por el slug de pagina, sin mirar `tab=` -- siempre
+	 * coincidia con la primera entrada de submenu registrada (Registro),
+	 * cualquiera que fuese la pestaña real abierta. Se fija un titulo unico
+	 * y estable del plugin en vez de intentar seguir la pestaña activa.
+	 */
+	public static function fixed_admin_title($admin_title, $title)
+	{
+		if (isset($_GET['page']) && 'ai-knowledge' === $_GET['page']) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$plugin_title = __('Base de conocimiento IA', 'ai-knowledge');
+			return $plugin_title . ' — ' . get_bloginfo('name');
+		}
+		return $admin_title;
 	}
 
 	public static function menu()
@@ -121,6 +163,385 @@ class Admin
 				array(__CLASS__, 'render')
 			);
 		}
+		add_submenu_page(
+			'ai-knowledge',
+			__('Asistente de configuración', 'ai-knowledge'),
+			__('Asistente', 'ai-knowledge'),
+			self::capability(),
+			'ai-knowledge-assistant',
+			array(__CLASS__, 'render_assistant')
+		);
+	}
+
+	public static function plugin_action_links($links)
+	{
+		if (current_user_can(self::capability())) {
+			array_unshift($links, '<a href="' . esc_url(admin_url('admin.php?page=ai-knowledge-assistant')) . '">' . esc_html__('Abrir asistente', 'ai-knowledge') . '</a>');
+		}
+		return $links;
+	}
+
+	public static function maybe_open_assistant()
+	{
+		if (!is_admin() || !current_user_can(self::capability()) || wp_doing_ajax() || (empty($_GET['activate']) && empty($_GET['activate-multi']))) { // phpcs:ignore
+			return;
+		}
+		$state = get_option('aikb_setup_assistant', array());
+		if (!empty($state['initiated']) || !empty($state['finished'])) {
+			return;
+		}
+		$state['initiated'] = true;
+		$state['last_opened'] = current_time('mysql');
+		update_option('aikb_setup_assistant', $state, false);
+		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge-assistant'));
+		exit;
+	}
+
+	public static function render_assistant()
+	{
+		if (!current_user_can(self::capability())) {
+			wp_die(esc_html__('No tienes permisos suficientes.', 'ai-knowledge'));
+		}
+		$steps = self::assistant_available_steps();
+		$state = get_option('aikb_setup_assistant', array('current' => 'welcome', 'completed' => array(), 'skipped' => array()));
+		$current = isset($_GET['step']) ? sanitize_key(wp_unslash($_GET['step'])) : (isset($state['current']) ? $state['current'] : 'welcome'); // phpcs:ignore
+		if (!isset($steps[$current])) {
+			$current = 'welcome';
+		}
+		$notice = '';
+		if ('POST' === $_SERVER['REQUEST_METHOD'] && isset($_POST['aikb_assistant_nonce'])) { // phpcs:ignore
+			check_admin_referer('aikb_assistant', 'aikb_assistant_nonce');
+			$action = isset($_POST['assistant_action']) ? sanitize_key(wp_unslash($_POST['assistant_action'])) : 'continue';
+			$current = isset($_POST['assistant_step']) ? sanitize_key(wp_unslash($_POST['assistant_step'])) : $current;
+			if (!isset($steps[$current])) {
+				$current = 'welcome';
+			}
+			if (in_array($action, array('save', 'continue', 'finish', 'generate'), true) && 'welcome' !== $current) {
+				self::assistant_save_step($current);
+				if ('generate' === $action) {
+					foreach (Wpml::active_languages() ?: array('es') as $faq_lang) {
+						Llms_Faq::persist_doc($faq_lang);
+					}
+					Queue::start_seed();
+				}
+				if ('save' === $action) $notice = __('Guardado correctamente.', 'ai-knowledge');
+			}
+			$state['initiated'] = true;
+			$state['current'] = $current;
+			$state['last_opened'] = current_time('mysql');
+			if ('skip' === $action) {
+				$state['skipped'] = array_values(array_unique(array_merge((array) ($state['skipped'] ?? array()), array($current))));
+			} elseif (in_array($action, array('finish', 'generate'), true)) {
+				$state['finished'] = true;
+				$state['completed'] = array_values(array_unique(array_merge((array) ($state['completed'] ?? array()), array($current))));
+			} elseif ('exit' !== $action) {
+				$state['completed'] = array_values(array_unique(array_merge((array) ($state['completed'] ?? array()), array($current))));
+			}
+			$next = self::assistant_next_step($current, $steps, $action);
+			if ('exit' === $action) {
+				update_option('aikb_setup_assistant', $state, false);
+				wp_safe_redirect(admin_url('admin.php?page=ai-knowledge'));
+				exit;
+			}
+			$state['current'] = $next;
+			update_option('aikb_setup_assistant', $state, false);
+			$current = $next;
+		}
+		$state['last_opened'] = current_time('mysql');
+		update_option('aikb_setup_assistant', $state, false);
+		echo '<div class="wookb-wrap wookb-assistant is-loading">';
+		echo '<div class="wookb-assistant-header"><div class="wookb-assistant-brand"><strong>' . esc_html__('AI Knowledge & Visibility', 'ai-knowledge') . '</strong><span>' . esc_html(sprintf(__('Versión %s', 'ai-knowledge'), AIKB_VERSION)) . '</span></div><a class="button" href="' . esc_url(admin_url('admin.php?page=ai-knowledge')) . '">' . esc_html__('Salir', 'ai-knowledge') . '</a></div>';
+		echo '<ol class="wookb-assistant-progress" aria-label="' . esc_attr__('Progreso del asistente', 'ai-knowledge') . '">';
+		$step_position = 0;
+		$current_position = array_search($current, array_keys($steps), true);
+		foreach ($steps as $key => $step) {
+			$active = $key === $current ? ' is-active' : '';
+			$done = in_array($key, (array) ($state['completed'] ?? array()), true) ? ' is-done' : '';
+			$past = ($step_position < $current_position) ? ' is-past' : '';
+			$future = ($step_position > $current_position) ? ' is-future' : '';
+			echo '<li class="' . esc_attr($active . $done . $past . $future) . '" data-assistant-step="' . esc_attr($key) . '" aria-label="' . esc_attr($step['title']) . '" title="' . esc_attr($step['title']) . '"><a href="' . esc_url(admin_url('admin.php?page=ai-knowledge-assistant&step=' . $key)) . '" data-assistant-step-link>' . esc_html($step['number']) . '</a></li>';
+			$step_position++;
+		}
+		echo '</ol>';
+		echo '<div data-assistant-stage>' . self::assistant_panel($current, $steps, $notice) . '</div></div>';
+	}
+
+	protected static function assistant_panel($step, $steps, $notice = '')
+	{
+		ob_start();
+		?>
+		<div class="wookb-assistant-breadcrumb"><span><?php esc_html_e('Asistente de configuración', 'ai-knowledge'); ?></span><span aria-hidden="true">&gt;</span><strong><?php echo esc_html($steps[$step]['title']); ?></strong></div>
+		<div class="wookb-card" data-assistant-panel>
+			<div class="wookb-assistant-loader" aria-live="polite"><span class="wookb-assistant-loader-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+			<form method="post" data-assistant-form>
+				<?php wp_nonce_field('aikb_assistant', 'aikb_assistant_nonce'); ?>
+				<input type="hidden" name="assistant_step" value="<?php echo esc_attr($step); ?>" />
+				<p class="wookb-assistant-description"><?php echo esc_html($steps[$step]['description']); ?></p>
+				<?php echo self::assistant_screen_content($step); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<div class="wookb-assistant-actions">
+					<?php if ('welcome' !== $step) : ?><button type="submit" class="button" name="assistant_action" value="back"><?php esc_html_e('Atrás', 'ai-knowledge'); ?></button> <button type="submit" class="button" name="assistant_action" value="exit"><?php esc_html_e('Salir del asistente', 'ai-knowledge'); ?></button><?php endif; ?>
+					<span class="wookb-assistant-actions-main">
+						<?php if ('welcome' !== $step && 'success' !== $step) : ?><button type="submit" class="button" name="assistant_action" value="save"><?php esc_html_e('Guardar configuración', 'ai-knowledge'); ?></button><?php endif; ?>
+						<?php if ('finish' === $step) : ?><button type="submit" class="button" name="assistant_action" value="finish"><?php esc_html_e('Terminar sin generar', 'ai-knowledge'); ?></button><button type="submit" class="button button-primary" name="assistant_action" value="generate"><?php esc_html_e('Generar documentos iniciales', 'ai-knowledge'); ?></button><?php elseif ('success' !== $step) : ?><button type="submit" class="button button-primary" name="assistant_action" value="continue"><?php esc_html_e('Continuar', 'ai-knowledge'); ?></button><?php endif; ?>
+					</span>
+				</div>
+				<div class="wookb-assistant-feedback<?php echo $notice ? ' is-visible' : ''; ?>" data-assistant-feedback role="status" aria-live="polite"><?php echo esc_html($notice); ?></div>
+			</form>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
+	protected static function assistant_steps()
+	{
+		return array(
+			'welcome' => array('number' => 1, 'title' => __('Bienvenida', 'ai-knowledge'), 'description' => __('AI Knowledge convierte el contenido de tu sitio en documentos preparados para buscadores, asistentes y sistemas de inteligencia artificial. Este recorrido revisará contigo las decisiones principales sin borrar una configuración existente. Puedes saltar cualquier paso, salir cuando quieras y continuar más adelante desde el mismo punto.', 'ai-knowledge')),
+			'ai' => array('number' => 2, 'title' => __('Origen de IA', 'ai-knowledge'), 'description' => __('Elige el servicio que ayudará a redactar y mejorar los documentos. AI Knowledge utiliza las conexiones ya configuradas mediante los Conectores de WordPress o Support Genix y nunca guarda aquí sus claves. Si todavía no existe una conexión, puedes continuar sin IA y configurarla después.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=ajustes')),
+			'content' => array('number' => 3, 'title' => __('Contenido y alcance', 'ai-knowledge'), 'description' => __('Selecciona los tipos de contenido público que deben formar parte de la base de conocimiento. La selección determina qué entradas, páginas, productos u otros contenidos podrán generar documentos. Las taxonomías, términos, identificadores y campos personalizados pueden configurarse después desde la pantalla Contenido del plugin.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=contenido')),
+			'business' => array('number' => 4, 'title' => __('Negocio', 'ai-knowledge'), 'description' => __('Añade la información estable que una IA necesita para comprender correctamente tu negocio: identidad, ubicación, público, contacto, horario y enfoque. Estos datos complementan el contenido del sitio y ayudan a producir respuestas coherentes sin inventar información.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=negocio')),
+			'woocommerce' => array('number' => 5, 'title' => __('WooCommerce', 'ai-knowledge'), 'description' => __('Revisa los datos generales de la tienda, el país, la moneda, las condiciones de compra, la recogida, los plazos y el contacto. Los envíos, impuestos, pagos, categorías y otras opciones avanzadas pueden completarse después en una ventana nueva sin perder el progreso.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=woocommerce')),
+			'chatbot' => array('number' => 6, 'title' => __('Chatbot', 'ai-knowledge'), 'description' => __('Configura cómo Support Genix utilizará la base de conocimiento, cuántos documentos relacionados podrá consultar y qué información adicional debe tener en cuenta. Este paso solo aparece cuando la integración está disponible.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=prompt')),
+			'visibility' => array('number' => 7, 'title' => __('Visibilidad IA', 'ai-knowledge'), 'description' => __('Decide qué familias de crawlers pueden acceder al sitio y cómo se gestiona su acceso a llms.txt. Al guardar, esta selección queda conservada para utilizarla en las reglas de visibilidad del plugin.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=visibilidad-ia')),
+			'server' => array('number' => 8, 'title' => __('Archivos del servidor', 'ai-knowledge'), 'description' => __('Comprueba si robots.txt y .htaccess difieren de la configuración guardada. Descarga las copias y las versiones preparadas; el asistente no muestra el código completo ni modifica .htaccess automáticamente.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=visibilidad-ia')),
+			'finish' => array('number' => 9, 'title' => __('Ajustes y final', 'ai-knowledge'), 'description' => __('Comprueba los límites de texto y generación antes de terminar. Puedes guardar la configuración sin crear documentos o iniciar la generación utilizando la cola existente y su límite diario. Los pasos omitidos seguirán disponibles cuando vuelvas a abrir el asistente.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=ajustes')),
+			'success' => array('number' => 10, 'title' => __('Resumen final', 'ai-knowledge'), 'description' => __('La configuración del asistente ha terminado. Revisa el estado real de los documentos y accede directamente a las áreas principales del plugin.', 'ai-knowledge')),
+		);
+	}
+
+	protected static function assistant_screen_content($step)
+	{
+		$settings = Scope::settings();
+		ob_start();
+		if ('server' === $step) {
+			$crawler_actions = Crawler_Catalog::effective_actions();
+			$mode = $settings['crawler_visibility_mode'];
+			if (file_exists(Robots_Txt_Guard::path())) {
+				$robots_current = (string) file_get_contents(Robots_Txt_Guard::path()); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			} else {
+				$robots_response = wp_remote_get(home_url('/robots.txt'));
+				$robots_current = is_wp_error($robots_response) ? '' : wp_remote_retrieve_body($robots_response);
+			}
+			$robots_generated = Robots_Txt_Guard::generate_full_file($crawler_actions, $mode);
+			$htaccess_current = Htaccess_Guard::is_available() ? (string) file_get_contents(Htaccess_Guard::path()) : '';
+			$htaccess_generated = Htaccess_Guard::generate_full_file($crawler_actions, $mode);
+			$robots_backup_ready = Robots_Txt_Guard::backup_confirmed();
+			if (!Robots_Txt_Guard::managed_block_matches($robots_current, $crawler_actions, $mode)) : ?><p class="notice notice-warning inline"><strong><?php esc_html_e('Las reglas de AI Knowledge en robots.txt son diferentes de la configuración guardada.', 'ai-knowledge'); ?></strong></p><?php else : ?><p class="notice notice-success inline"><?php esc_html_e('Las reglas de AI Knowledge en robots.txt coinciden con la configuración guardada.', 'ai-knowledge'); ?></p><?php endif; ?>
+			<p><?php esc_html_e('Descarga una copia actual antes de actualizar robots.txt con la versión preparada.', 'ai-knowledge'); ?></p>
+			<p><button type="button" class="button" data-server-action="wookb_download_robots_backup" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_download_robots_backup')); ?>"><?php esc_html_e('Descargar copia actual de robots.txt', 'ai-knowledge'); ?></button> <button type="button" class="button button-primary" data-server-action="wookb_apply_robots_block" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_apply_robots_block')); ?>" data-return-assistant="1" <?php disabled(!$robots_backup_ready); ?>><?php esc_html_e('Actualizar robots.txt', 'ai-knowledge'); ?></button></p>
+			<?php if (!Htaccess_Guard::managed_block_matches($htaccess_current, $crawler_actions, $mode)) : ?><p class="notice notice-warning inline"><strong><?php esc_html_e('Las reglas de AI Knowledge en .htaccess son diferentes de la configuración guardada.', 'ai-knowledge'); ?></strong></p><?php else : ?><p class="notice notice-success inline"><?php esc_html_e('Las reglas de AI Knowledge en .htaccess coinciden con la configuración guardada.', 'ai-knowledge'); ?></p><?php endif; ?>
+			<p><?php esc_html_e('El plugin no modifica .htaccess desde el asistente. Descarga la versión preparada y sustitúyela manualmente; conserva siempre una copia por seguridad.', 'ai-knowledge'); ?></p>
+			<p><button type="button" class="button" data-server-action="wookb_download_htaccess_generated" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_download_htaccess_generated')); ?>"><?php esc_html_e('Descargar .htaccess preparado', 'ai-knowledge'); ?></button></p><p><button type="button" class="button" data-assistant-check-server><?php esc_html_e('Comprobar cambios', 'ai-knowledge'); ?></button></p><?php
+			return ob_get_clean();
+		}
+		if ('welcome' === $step) : $geo_prompt = self::build_geo_prompt(); ?>
+			<p><?php esc_html_e('Comprueba tu sitio en un agente externo antes de configurar el plugin. Después de completar la configuración, repite la comprobación con este mismo prompt para comparar el resultado.', 'ai-knowledge'); ?></p><textarea id="wookb-welcome-geo-prompt" readonly rows="8" style="width:100%;max-width:100%;font-size:13px;"><?php echo esc_textarea($geo_prompt); ?></textarea><p><button type="button" class="button" data-wookb-copy-target="wookb-welcome-geo-prompt"><?php esc_html_e('Copiar Prompt', 'ai-knowledge'); ?></button></p>
+			<div class="wookb-assistant-welcome-copy"><h3><?php esc_html_e('Qué revisaremos', 'ai-knowledge'); ?></h3><ul><li><?php esc_html_e('El origen de IA y el contenido que formará la base de conocimiento.', 'ai-knowledge'); ?></li><li><?php esc_html_e('Los datos del negocio y las integraciones disponibles.', 'ai-knowledge'); ?></li><li><?php esc_html_e('La visibilidad para IA y los límites de generación.', 'ai-knowledge'); ?></li></ul></div>
+		<?php elseif ('ai' === $step) : $available = AI_Client::wordpress_available(); $models = $available ? AI_Client::available_models() : array(); ?>
+			<div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Origen de IA', 'ai-knowledge'); ?></span><select name="ai_key_source"><option value="genix" <?php selected('genix', $settings['ai_key_source']); ?>><?php esc_html_e('Support Genix', 'ai-knowledge'); ?></option><?php if ($available) : ?><option value="wp_connectors" <?php selected('wp_connectors', $settings['ai_key_source']); ?>><?php esc_html_e('Conectores de WordPress', 'ai-knowledge'); ?></option><?php endif; ?></select></label><label class="wookb-assistant-field"><span><?php esc_html_e('Modelo', 'ai-knowledge'); ?></span><select name="wp_ai_model"><option value="<?php echo esc_attr(AI_Client::MODEL_AUTO); ?>" <?php selected(AI_Client::MODEL_AUTO, $settings['wp_ai_model']); ?>><?php esc_html_e('Automático (recomendado)', 'ai-knowledge'); ?></option><?php foreach ($models as $key => $model) : ?><option value="<?php echo esc_attr($key); ?>" <?php selected($key, $settings['wp_ai_model']); ?>><?php echo esc_html($model['name'] . ' (' . $model['model'] . ')'); ?></option><?php endforeach; ?></select></label></div><div class="wookb-assistant-external-links"><a class="button" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(admin_url('options-connectors.php')); ?>"><?php esc_html_e('Configurar Conectores de WordPress', 'ai-knowledge'); ?></a> <a class="button" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(admin_url('plugins.php')); ?>"><?php esc_html_e('Abrir Support Genix', 'ai-knowledge'); ?></a></div>
+		<?php elseif ('content' === $step) : $post_types = get_post_types(array('public' => true), 'objects'); ?>
+			<input type="hidden" name="post_types_mode" value="explicit" /><div class="wookb-assistant-field"><span><?php esc_html_e('Tipos de contenido que quieres incluir', 'ai-knowledge'); ?></span><div class="wookb-chip-group"><?php foreach ($post_types as $post_type) : if ('attachment' === $post_type->name) continue; ?><label class="wookb-chip"><input type="checkbox" name="post_types[]" value="<?php echo esc_attr($post_type->name); ?>" <?php checked(in_array($post_type->name, (array) $settings['post_types'], true)); ?> /> <?php echo esc_html($post_type->labels->name); ?></label><?php endforeach; ?></div></div>
+		<?php elseif ('business' === $step) : $answers = Chatbot_Prompt_Builder::get_saved_answers(); ?><div class="wookb-assistant-fields"><?php foreach (Chatbot_Prompt_Builder::questions_by_group('negocio') as $key => $question) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($question['label']); ?></span><?php if ('textarea' === $question['type']) : ?><textarea name="answers[<?php echo esc_attr($key); ?>]" rows="3"><?php echo esc_textarea($answers[$key]); ?></textarea><?php else : ?><input type="text" name="answers[<?php echo esc_attr($key); ?>]" value="<?php echo esc_attr($answers[$key]); ?>" /><?php endif; ?><small><?php echo esc_html($question['placeholder']); ?></small></label><?php endforeach; ?></div>
+		<?php elseif ('woocommerce' === $step) : ?>
+			<div class="wookb-assistant-fields"><?php foreach (array('wc_store_name' => __('Nombre de la tienda', 'ai-knowledge'), 'wc_currency' => __('Moneda', 'ai-knowledge'), 'wc_base_country' => __('País base', 'ai-knowledge')) as $key => $label) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($label); ?></span><input type="text" name="<?php echo esc_attr($key); ?>" value="<?php echo esc_attr($settings[$key]); ?>" /></label><?php endforeach; ?><label class="wookb-assistant-field"><span><?php esc_html_e('Condiciones de venta', 'ai-knowledge'); ?></span><textarea name="wc_terms_text" rows="3"><?php echo esc_textarea($settings['wc_terms_text']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Política de devoluciones', 'ai-knowledge'); ?></span><textarea name="wc_returns_text" rows="3"><?php echo esc_textarea($settings['wc_returns_text']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Plazo de entrega', 'ai-knowledge'); ?></span><textarea name="delivery_time_note" rows="3"><?php echo esc_textarea($settings['delivery_time_note']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Contacto y horario de la tienda', 'ai-knowledge'); ?></span><textarea name="wc_contact_hours" rows="3"><?php echo esc_textarea($settings['wc_contact_hours']); ?></textarea></label><label class="wookb-assistant-toggle"><input type="checkbox" name="wc_pickup_available" value="1" <?php checked(!empty($settings['wc_pickup_available'])); ?> /><span><?php esc_html_e('Recogida en tienda disponible', 'ai-knowledge'); ?></span></label></div>
+		<?php elseif ('chatbot' === $step) : $answers = Chatbot_Prompt_Builder::get_saved_answers(); ?><div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Límite de documentos relacionados', 'ai-knowledge'); ?></span><input type="number" min="0" name="chatbot_docs_list_limit" value="<?php echo esc_attr($settings['chatbot_docs_list_limit']); ?>" /></label><?php foreach (Chatbot_Prompt_Builder::questions_by_group('chatbot') as $key => $question) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($question['label']); ?></span><?php if ('textarea' === $question['type']) : ?><textarea name="answers[<?php echo esc_attr($key); ?>]" rows="3"><?php echo esc_textarea($answers[$key]); ?></textarea><?php else : ?><input type="text" name="answers[<?php echo esc_attr($key); ?>]" value="<?php echo esc_attr($answers[$key]); ?>" /><?php endif; ?></label><?php endforeach; ?></div>
+		<?php elseif ('visibility' === $step) :
+			$categories = self::assistant_crawler_categories();
+			$category = isset($_POST['assistant_category']) ? sanitize_key(wp_unslash($_POST['assistant_category'])) : 'ai_search'; // phpcs:ignore
+			if (!isset($categories[$category])) $category = 'ai_search';
+			$actions = Crawler_Catalog::effective_actions(); ?>
+			<input type="hidden" name="assistant_category" value="<?php echo esc_attr($category); ?>" />
+			<nav class="wookb-assistant-subnav" aria-label="<?php esc_attr_e('Categorías de crawlers', 'ai-knowledge'); ?>"><?php foreach ($categories as $key => $item) : ?><button type="button" class="button<?php echo $key === $category ? ' button-primary' : ''; ?>" data-assistant-category="<?php echo esc_attr($key); ?>"><?php echo esc_html($item['title']); ?></button><?php endforeach; ?></nav>
+			<h3><?php echo esc_html($categories[$category]['title']); ?></h3><?php if (!empty($categories[$category]['description'])) : ?><p><?php echo esc_html($categories[$category]['description']); ?></p><?php endif; ?><div class="wookb-assistant-crawler-bulk"><button type="button" class="button" data-crawler-bulk="allow"><?php esc_html_e('Permitir todos', 'ai-knowledge'); ?></button> <button type="button" class="button" data-crawler-bulk="block"><?php esc_html_e('Bloquear todos', 'ai-knowledge'); ?></button></div>
+			<div class="wookb-assistant-crawlers"><?php foreach (Crawler_Catalog::all() as $crawler) : if ($crawler['category'] !== $category) continue; ?><div class="wookb-assistant-crawler"><div><strong><?php echo esc_html($crawler['user_agent']); ?></strong><span><?php echo esc_html($crawler['operator']); ?></span><?php if ($crawler['description'] !== $categories[$category]['description']) : ?><p><?php echo esc_html($crawler['description']); ?></p><?php endif; ?></div><select name="crawler_action[<?php echo esc_attr($crawler['user_agent']); ?>]"><option value="allow" <?php selected('allow', $actions[$crawler['user_agent']]); ?>><?php esc_html_e('Permitir', 'ai-knowledge'); ?></option><option value="block" <?php selected('block', $actions[$crawler['user_agent']]); ?>><?php esc_html_e('Bloquear', 'ai-knowledge'); ?></option></select></div><?php endforeach; ?></div>
+			<h3><?php esc_html_e('Acceso de crawlers bloqueados a llms.txt', 'ai-knowledge'); ?></h3><p><?php esc_html_e('Decide si un crawler bloqueado puede leer únicamente el archivo llms.txt o si también debe quedar bloqueado en todo el sitio.', 'ai-knowledge'); ?></p><div class="wookb-assistant-field"><label><input type="radio" name="crawler_visibility_mode" value="site" <?php checked('site', $settings['crawler_visibility_mode']); ?> /> <?php esc_html_e('Aplicar la misma política a todo el sitio', 'ai-knowledge'); ?></label><label><input type="radio" name="crawler_visibility_mode" value="llms_only" <?php checked('llms_only', $settings['crawler_visibility_mode']); ?> /> <?php esc_html_e('Permitir solo llms.txt', 'ai-knowledge'); ?></label></div><h3><?php esc_html_e('Robots.txt y .htaccess', 'ai-knowledge'); ?></h3><p><?php esc_html_e('La política que guardes aquí sirve como base para preparar las reglas de robots.txt y .htaccess. Esos archivos se gestionan después desde la pantalla Visibilidad IA, donde puedes revisar el contenido antes de aplicarlo.', 'ai-knowledge'); ?></p>
+		<?php elseif ('finish' === $step) : ?><div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Largo máximo del texto', 'ai-knowledge'); ?></span><input type="number" min="100" max="10000" name="body_char_limit" value="<?php echo esc_attr($settings['body_char_limit']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Tokens de salida', 'ai-knowledge'); ?></span><input type="number" min="200" name="output_tokens" value="<?php echo esc_attr($settings['output_tokens']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Límite diario', 'ai-knowledge'); ?></span><input type="number" min="1" name="daily_limit" value="<?php echo esc_attr($settings['daily_limit']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Tamaño de lote', 'ai-knowledge'); ?></span><input type="number" min="1" name="batch_size" value="<?php echo esc_attr($settings['batch_size']); ?>" /></label><label class="wookb-assistant-toggle"><input type="checkbox" name="no_limit" value="1" <?php checked(!empty($settings['no_limit'])); ?> /><span><?php esc_html_e('Sin límite diario', 'ai-knowledge'); ?></span></label><label class="wookb-assistant-toggle"><input type="checkbox" name="indexnow_enabled" value="1" <?php checked(!empty($settings['indexnow_enabled'])); ?> /><span><?php esc_html_e('Avisar a IndexNow', 'ai-knowledge'); ?></span></label></div>
+		<?php elseif ('success' === $step) : $state = get_option('aikb_setup_assistant', array()); $summary = Registry::summary(); $geo_prompt = self::build_geo_prompt(); ?>
+			<div class="wookb-assistant-summary"><p><strong><?php esc_html_e('Documentos registrados:', 'ai-knowledge'); ?></strong> <?php echo (int) $summary['total']; ?></p><p><strong><?php esc_html_e('Documentos pendientes:', 'ai-knowledge'); ?></strong> <?php echo (int) Registry::count(array('status' => 'queued')); ?></p><p><strong><?php esc_html_e('Pasos omitidos:', 'ai-knowledge'); ?></strong> <?php echo empty($state['skipped']) ? esc_html__('Ninguno', 'ai-knowledge') : esc_html(implode(', ', (array) $state['skipped'])); ?></p><p><a class="button button-primary" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(home_url('/llms.txt')); ?>"><?php esc_html_e('Ver llms.txt', 'ai-knowledge'); ?></a></p><p><?php esc_html_e('Recomendamos comprobar este prompt en un agente externo para verificar el funcionamiento del plugin y la visibilidad de tu web.', 'ai-knowledge'); ?></p><textarea id="wookb-assistant-geo-prompt" readonly rows="12" style="width:100%;max-width:100%;"><?php echo esc_textarea($geo_prompt); ?></textarea><p><button type="button" class="button" data-wookb-copy-target="wookb-assistant-geo-prompt"><?php esc_html_e('Copiar Prompt', 'ai-knowledge'); ?></button></p><div class="wookb-assistant-links"><?php foreach (array('registro' => __('Registro', 'ai-knowledge'), 'contenido' => __('Contenido', 'ai-knowledge'), 'negocio' => __('Negocio', 'ai-knowledge'), 'woocommerce' => __('WooCommerce', 'ai-knowledge'), 'visibilidad-ia' => __('Visibilidad IA', 'ai-knowledge'), 'ajustes' => __('Ajustes', 'ai-knowledge')) as $tab => $label) : if ('woocommerce' === $tab && !class_exists('WooCommerce')) continue; ?><a href="<?php echo esc_url(admin_url('admin.php?page=ai-knowledge' . ('registro' === $tab ? '' : '&tab=' . $tab))); ?>"><?php echo esc_html($label); ?></a><?php endforeach; ?></div></div>
+		<?php endif;
+		return ob_get_clean();
+	}
+
+	protected static function assistant_crawler_categories()
+	{
+		$labels = array(
+			'ai_search' => __('Búsqueda/citas IA', 'ai-knowledge'), 'user_requested_assistant' => __('Uso bajo demanda', 'ai-knowledge'),
+			'model_training' => __('Entrenamiento de modelos', 'ai-knowledge'), 'seo_scraper' => __('SEO y scraping', 'ai-knowledge'),
+			'archive_dataset' => __('Archivado y datasets', 'ai-knowledge'), 'security_scanner' => __('Scanners de seguridad', 'ai-knowledge'),
+			'traditional_search' => __('Buscadores tradicionales', 'ai-knowledge'),
+		);
+		$categories = array();
+		foreach ($labels as $category => $title) {
+			$descriptions = array();
+			foreach (Crawler_Catalog::all() as $crawler) {
+				if ($crawler['category'] === $category && '' !== trim((string) $crawler['description'])) $descriptions[] = $crawler['description'];
+			}
+			$unique = array_values(array_unique($descriptions));
+			$categories[$category] = array('title' => $title, 'description' => 1 === count($unique) ? $unique[0] : '');
+		}
+		return $categories;
+	}
+
+	protected static function assistant_available_steps()
+	{
+		$steps = self::assistant_steps();
+		if (!class_exists('WooCommerce')) unset($steps['woocommerce']);
+		if (!Chatbot_Prompt::is_genix_ready()) unset($steps['chatbot']);
+		return $steps;
+	}
+
+	public static function assistant_navigate()
+	{
+		if (!current_user_can(self::capability())) wp_send_json_error(array('message' => __('No tienes permisos suficientes.', 'ai-knowledge')), 403);
+		check_ajax_referer('aikb_assistant_ajax', 'nonce');
+		$steps = self::assistant_available_steps();
+		$current = isset($_POST['step']) ? sanitize_key(wp_unslash($_POST['step'])) : 'welcome';
+		$action = isset($_POST['assistant_action']) ? sanitize_key(wp_unslash($_POST['assistant_action'])) : 'goto';
+		if (!isset($steps[$current])) wp_send_json_error(array('message' => __('Paso no válido.', 'ai-knowledge')), 400);
+		$state = get_option('aikb_setup_assistant', array());
+		if (in_array($action, array('save', 'continue', 'finish', 'generate'), true) && 'welcome' !== $current) {
+			self::assistant_save_step($current);
+			if ('generate' === $action) Queue::start_seed();
+		}
+		$state['initiated'] = true;
+		$state['last_opened'] = current_time('mysql');
+		if (in_array($action, array('save', 'goto'), true)) {
+			$state['current'] = $current;
+		} elseif ('skip' === $action) $state['skipped'] = array_values(array_unique(array_merge((array) ($state['skipped'] ?? array()), array($current))));
+		elseif (in_array($action, array('finish', 'generate'), true)) $state['finished'] = true;
+		elseif ('back' !== $action) $state['completed'] = array_values(array_unique(array_merge((array) ($state['completed'] ?? array()), array($current))));
+		$next = in_array($action, array('save', 'goto'), true) ? $current : self::assistant_next_step($current, $steps, $action);
+		$state['current'] = $next;
+		update_option('aikb_setup_assistant', $state, false);
+		$message = 'save' === $action ? __('Guardado correctamente.', 'ai-knowledge') : '';
+		wp_send_json_success(array('step' => $next, 'completed' => (array) ($state['completed'] ?? array()), 'finished' => !empty($state['finished']), 'panel' => self::assistant_panel($next, $steps, $message)));
+	}
+
+	protected static function assistant_save_step($step)
+	{
+		$settings = Scope::settings();
+		if ('ai' === $step) {
+			$source = isset($_POST['ai_key_source']) ? sanitize_key(wp_unslash($_POST['ai_key_source'])) : 'genix'; // phpcs:ignore
+			$model = isset($_POST['wp_ai_model']) ? sanitize_text_field(wp_unslash($_POST['wp_ai_model'])) : AI_Client::MODEL_AUTO; // phpcs:ignore
+			if (!in_array($source, array('genix', 'wp_connectors'), true) || ('wp_connectors' === $source && !AI_Client::wordpress_available())) $source = 'genix';
+			if (AI_Client::MODEL_AUTO !== $model && !isset(AI_Client::available_models()[$model])) $model = AI_Client::MODEL_AUTO;
+			Scope::update_settings(array('ai_key_source' => $source, 'wp_ai_model' => $model));
+		} elseif ('content' === $step) {
+			$mode = isset($_POST['post_types_mode']) ? sanitize_key(wp_unslash($_POST['post_types_mode'])) : 'explicit'; // phpcs:ignore
+			Scope::update_settings(array('post_types_mode' => in_array($mode, array('explicit', 'all_public'), true) ? $mode : 'explicit', 'post_types' => isset($_POST['post_types']) ? array_map('sanitize_key', (array) wp_unslash($_POST['post_types'])) : array())); // phpcs:ignore
+		} elseif ('business' === $step || 'chatbot' === $step) {
+			$allowed = array_keys(Chatbot_Prompt_Builder::questions_by_group('business' === $step ? 'negocio' : 'chatbot'));
+			$raw = isset($_POST['answers']) && is_array($_POST['answers']) ? wp_unslash($_POST['answers']) : array(); // phpcs:ignore
+			Chatbot_Prompt_Builder::save_answers(array_intersect_key($raw, array_flip($allowed)));
+			if ('business' === $step) Chatbot_Prompt_Builder::write_info_doc();
+			if ('chatbot' === $step) Scope::update_settings(array('chatbot_docs_list_limit' => max(0, (int) ($_POST['chatbot_docs_list_limit'] ?? Chatbot_Relevance_Guard::DOCS_LIST_LIMIT_DEFAULT)))); // phpcs:ignore
+		} elseif ('woocommerce' === $step) {
+			Scope::update_settings(array(
+				'wc_store_name' => isset($_POST['wc_store_name']) ? sanitize_text_field(wp_unslash($_POST['wc_store_name'])) : '', // phpcs:ignore
+				'wc_currency' => isset($_POST['wc_currency']) ? sanitize_text_field(wp_unslash($_POST['wc_currency'])) : '', // phpcs:ignore
+				'wc_base_country' => isset($_POST['wc_base_country']) ? sanitize_text_field(wp_unslash($_POST['wc_base_country'])) : '', // phpcs:ignore
+				'wc_terms_text' => isset($_POST['wc_terms_text']) ? sanitize_textarea_field(wp_unslash($_POST['wc_terms_text'])) : '', // phpcs:ignore
+				'wc_returns_text' => isset($_POST['wc_returns_text']) ? sanitize_textarea_field(wp_unslash($_POST['wc_returns_text'])) : '', // phpcs:ignore
+				'delivery_time_note' => isset($_POST['delivery_time_note']) ? sanitize_textarea_field(wp_unslash($_POST['delivery_time_note'])) : '', // phpcs:ignore
+				'wc_contact_hours' => isset($_POST['wc_contact_hours']) ? sanitize_textarea_field(wp_unslash($_POST['wc_contact_hours'])) : '', // phpcs:ignore
+				'wc_pickup_available' => !empty($_POST['wc_pickup_available']), // phpcs:ignore
+			));
+		} elseif ('visibility' === $step) {
+			$mode = isset($_POST['crawler_visibility_mode']) ? sanitize_key(wp_unslash($_POST['crawler_visibility_mode'])) : 'site'; // phpcs:ignore
+			$actions = Crawler_Catalog::effective_actions();
+			if (isset($_POST['crawler_action']) && is_array($_POST['crawler_action'])) { // phpcs:ignore
+				foreach (wp_unslash($_POST['crawler_action']) as $user_agent => $action) { // phpcs:ignore
+					$user_agent = sanitize_text_field($user_agent);
+					$action = sanitize_key($action);
+					if (isset($actions[$user_agent]) && in_array($action, array('allow', 'block'), true)) $actions[$user_agent] = $action;
+				}
+			}
+			Scope::update_settings(array('crawler_visibility_mode' => in_array($mode, array('site', 'llms_only'), true) ? $mode : 'site', 'crawler_actions' => $actions));
+		} elseif ('finish' === $step) {
+			Scope::update_settings(array(
+				'body_char_limit' => max(100, min(10000, (int) ($_POST['body_char_limit'] ?? $settings['body_char_limit']))), // phpcs:ignore
+				'output_tokens' => max(200, (int) ($_POST['output_tokens'] ?? $settings['output_tokens'])), // phpcs:ignore
+				'daily_limit' => max(1, (int) ($_POST['daily_limit'] ?? $settings['daily_limit'])), // phpcs:ignore
+				'batch_size' => max(1, (int) ($_POST['batch_size'] ?? $settings['batch_size'])), // phpcs:ignore
+				'no_limit' => !empty($_POST['no_limit']), // phpcs:ignore
+				'indexnow_enabled' => !empty($_POST['indexnow_enabled']), // phpcs:ignore
+			));
+		}
+	}
+
+	public static function download_geo_prompt()
+	{
+		if (!current_user_can(self::capability())) wp_die(esc_html__('No tienes permisos suficientes.', 'ai-knowledge'));
+		check_admin_referer('aikb_download_geo_prompt');
+		$content = self::build_geo_prompt();
+		nocache_headers();
+		header('Content-Type: text/markdown; charset=utf-8');
+		header('Content-Disposition: attachment; filename="ai-knowledge-prompt-geo.md"');
+		echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- descarga Markdown plano.
+		exit;
+	}
+
+	protected static function build_geo_prompt()
+	{
+		$content = "# Auditoría GEO de " . get_bloginfo('name') . "\n\n";
+		$content .= "Analiza {URL} como consultor GEO y evalúa cómo de accesible, comprensible y reutilizable es su contenido para buscadores, asistentes y sistemas de inteligencia artificial.\n\nRevisa únicamente lo que puedas comprobar realmente en la web. No inventes datos ni des por hecho que una funcionalidad existe si no puedes verificarla.\n\nEvalúa de forma práctica:\n\n- claridad de la entidad, negocio, servicios o productos;\n- estructura y calidad del contenido;\n- facilidad para que una IA entienda páginas, categorías, productos y relaciones entre contenidos;\n- consistencia de datos entre páginas;\n- información duplicada, contradictoria, antigua, vacía o poco útil;\n- accesibilidad del contenido sin depender excesivamente de JavaScript;\n- titles, metadatos y estructura semántica;\n- datos estructurados y schema cuando sean verificables;\n- robots.txt, sitemap, llms.txt y otros recursos orientados a crawlers o IA cuando puedan comprobarse;\n- versiones por idioma y posibles inconsistencias;\n- contenido estructurado o formatos adicionales como Markdown, JSON o endpoints de conocimiento si existen;\n- cualquier problema que pueda provocar que una IA interprete mal, ignore o mezcle información de la web.\n\nDiferencia siempre entre:\n\nError confirmado: problema observado directamente.\n\nRiesgo: algo que puede afectar al GEO pero no puede confirmarse completamente.\n\nRecomendación: mejora que podría aumentar la comprensión o visibilidad.\n\nEntrega el resultado en este formato:\n\n1. Resumen ejecutivo\n2. Hallazgos ordenados por prioridad\n3. Fortalezas GEO actuales\n4. Problemas confirmados\n5. Riesgos\n6. Acciones recomendadas por prioridad\n7. Conclusión general\n\nPara cada hallazgo importante, cita la URL o el elemento observado que lo justifica.\n\nNo conviertas en error algo que simplemente no puedas verificar. En ese caso indícalo como “no verificado”.\n\nEl objetivo es determinar hasta qué punto una IA puede entender correctamente la web y obtener información fiable de ella.\n";
+		$content = "# Auditoría GEO de " . get_bloginfo('name') . "\n\n";
+		$content .= <<<'GEO'
+Analiza [URL] como consultor GEO, centrándote en la visibilidad, accesibilidad y exposición técnica del contenido para buscadores, asistentes y sistemas de inteligencia artificial.
+
+El objetivo no es valorar si el contenido está bien redactado, sino comprobar qué información de la web puede descubrir, acceder, interpretar y reutilizar una IA.
+
+Revisa especialmente:
+
+- si el contenido principal es accesible para crawlers e IA;
+- qué información está disponible directamente en HTML;
+- dependencia de JavaScript para acceder a contenido relevante;
+- robots.txt y posibles restricciones a bots;
+- llms.txt, si existe, y qué información expone;
+- sitemaps y capacidad de descubrimiento de URLs;
+- datos estructurados / Schema.org;
+- metadatos relevantes;
+- canonicals, indexabilidad y señales que puedan afectar a la visibilidad;
+- disponibilidad de versiones estructuradas del contenido como Markdown, JSON, feeds o endpoints específicos;
+- facilidad para identificar entidades, productos, servicios, categorías y relaciones entre ellos;
+- coherencia entre HTML, schema, Markdown, JSON y otros formatos cuando existan;
+- acceso de bots de IA conocidos cuando pueda verificarse;
+- posibles bloqueos, contenido invisible para crawlers o información que solo sea accesible para usuarios humanos.
+
+No hagas una auditoría SEO tradicional ni centres el análisis en copywriting, keywords, densidad de texto o calidad comercial del contenido, salvo que afecten directamente a la comprensión por parte de sistemas de IA.
+
+Diferencia siempre entre:
+
+Confirmado: observado directamente.
+Riesgo: posible problema que no puede verificarse completamente.
+No verificado: elemento al que no se ha podido acceder o comprobar.
+Recomendación: mejora técnica de visibilidad o exposición del conocimiento.
+
+Entrega:
+
+1. Resumen ejecutivo de visibilidad GEO
+2. Qué puede ver y entender actualmente una IA
+3. Qué información está estructurada o preparada para IA
+4. Bloqueos o limitaciones detectadas
+5. Hallazgos ordenados por prioridad
+6. Acciones recomendadas
+7. Conclusión sobre el nivel de exposición GEO de la web
+
+Cita siempre las URLs, respuestas HTTP, archivos o elementos observados que respalden cada conclusión.
+
+No inventes funcionalidades ni marques como error algo que simplemente no hayas podido verificar.
+GEO;
+		$content = str_replace('[URL]', home_url('/'), $content);
+		return $content;
+	}
+
+	protected static function assistant_next_step($current, $steps, $action)
+	{
+		$keys = array_keys($steps);
+		$index = array_search($current, $keys, true);
+		if ('back' === $action) {
+			return $keys[max(0, $index - 1)];
+		}
+		return $keys[min(count($keys) - 1, $index + 1)];
 	}
 
 	/**
@@ -145,7 +566,16 @@ class Admin
 		// Chatbot va despues de WooCommerce y solo aparece si Support Genix
 		// esta activo: sin el, el prompt no tiene un consumidor real.
 		if (Chatbot_Prompt::is_genix_ready()) {
-			$tabs['prompt'] = __('Chatbot', 'ai-knowledge');
+			// Pedido explicito del usuario: la etiqueta visible pasa a
+			// "Genix" (ahora tambien alberga la seccion de articulos
+			// exclusivos de Genix, ver tab-prompt.php) -- el slug interno
+			// 'prompt' se conserva a proposito por compatibilidad con
+			// enlaces/redirects existentes (self::redirect('prompt'),
+			// documentation_map()['prompt'], el paso 'chatbot' del asistente
+			// que enlaza a '&tab=prompt', etc.): cambiar el slug rompería
+			// todos esos enlaces sin necesidad, la etiqueta es lo unico que
+			// pidio el usuario.
+			$tabs['prompt'] = __('Genix', 'ai-knowledge');
 		}
 		$tabs['visibilidad-ia'] = __('Visibilidad IA', 'ai-knowledge');
 		$tabs['carga-inicial']  = __('Generación masiva', 'ai-knowledge');
@@ -165,7 +595,21 @@ class Admin
 		wp_enqueue_style('wookb-tabler', AIKB_URL . 'assets/tabler.min.css', array(), AIKB_VERSION);
 		wp_enqueue_style('wookb-theme', AIKB_URL . 'assets/wookb-theme.css', array('wookb-tabler'), AIKB_VERSION);
 		wp_enqueue_style('wookb-admin', AIKB_URL . 'assets/admin.css', array('wookb-theme'), AIKB_VERSION);
-		wp_enqueue_script('wookb-admin', AIKB_URL . 'assets/admin.js', array('jquery'), AIKB_VERSION, true);
+		wp_enqueue_script('wookb-admin', AIKB_URL . 'assets/admin.js', array('jquery', 'wp-i18n'), AIKB_VERSION, true);
+		wp_set_script_translations('wookb-admin', 'ai-knowledge', AIKB_DIR . 'languages');
+		if (false !== strpos($hook, 'ai-knowledge-assistant')) {
+			$screen_content = array();
+			foreach (array_keys(self::assistant_available_steps()) as $step_key) {
+				$screen_content[$step_key] = self::assistant_screen_content($step_key);
+			}
+			wp_localize_script('wookb-admin', 'aikbAssistant', array(
+				'ajaxUrl' => admin_url('admin-ajax.php'),
+				'adminPostUrl' => admin_url('admin-post.php'),
+				'nonce' => wp_create_nonce('aikb_assistant_ajax'),
+				'steps' => self::assistant_available_steps(),
+				'screenContent' => $screen_content,
+			));
+		}
 	}
 
 	public static function render()
@@ -249,7 +693,7 @@ class Admin
 		if (empty($docs[$tab])) {
 			return;
 		}
-		$file = AIKB_DIR . 'docs/' . $docs[$tab];
+		$file = self::documentation_file($docs[$tab]);
 		if (!is_readable($file)) {
 			return;
 		}
@@ -260,12 +704,27 @@ class Admin
 		echo '<div class="wookb-doc-drawer-header"><button type="button" class="button-link wookb-doc-back" data-wookb-doc-back hidden>←</button><h2>' . esc_html($title) . '</h2><button type="button" class="button-link" data-wookb-doc-close aria-label="' . esc_attr__('Cerrar documentación', 'ai-knowledge') . '">×</button></div>';
 		echo '<div class="wookb-doc-drawer-content">' . $content . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitizado por markdown_to_html
 		foreach ($docs as $doc_file) {
-			if ($doc_file === $docs[$tab] || ! is_readable(AIKB_DIR . 'docs/' . $doc_file)) {
+			$doc_path = self::documentation_file($doc_file);
+			if ($doc_file === $docs[$tab] || ! is_readable($doc_path)) {
 				continue;
 			}
-			echo '<template data-wookb-doc-template="' . esc_attr($doc_file) . '">' . self::markdown_to_html((string) file_get_contents(AIKB_DIR . 'docs/' . $doc_file)) . '</template>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<template data-wookb-doc-template="' . esc_attr($doc_file) . '">' . self::markdown_to_html((string) file_get_contents($doc_path)) . '</template>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 		echo '</aside>';
+	}
+
+	/**
+	 * Returns a locale-specific documentation file, falling back to Spanish.
+	 */
+	protected static function documentation_file($filename)
+	{
+		$filename = basename((string) $filename);
+		$locale   = function_exists('determine_locale') ? determine_locale() : get_locale();
+		$localized = AIKB_DIR . 'docs/' . sanitize_file_name($locale) . '/' . $filename;
+		if (is_readable($localized)) {
+			return $localized;
+		}
+		return AIKB_DIR . 'docs/' . $filename;
 	}
 
 	protected static function markdown_to_html($markdown)
@@ -694,18 +1153,67 @@ class Admin
 
 		$row = Registry::find_by_id($id);
 		if ($row) {
+			// Pieza 4: Document_Pipeline::process() no comprueba por si mismo
+			// el post_status (a diferencia de Queue::run_generate(), que si lo
+			// hace) -- confirmado por lectura de class-document-pipeline.php.
+			// Sin este freno, "Generar" regeneraba un documento aunque su
+			// origen ya no estuviera publicado.
+			$source_post = get_post($row->source_id);
+			if (!$source_post || 'publish' !== $source_post->post_status) {
+				if (wp_doing_ajax()) {
+					wp_send_json_error(array('message' => __('El origen de este documento ya no está publicado.', 'ai-knowledge')));
+				}
+				wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=registro&wookb_regen_error=' . rawurlencode(__('El origen de este documento ya no está publicado.', 'ai-knowledge'))));
+				exit;
+			}
 			// force=true: el usuario pulso "Generar" explicitamente pidiendo una
 			// regeneracion; sin esto, Document_Pipeline::process() se saltaba todo
 			// en silencio si el producto de origen no habia cambiado desde la
 			// ultima vez (bug real: el boton no hacia nada con ningun limite).
 			$result = Document_Pipeline::process($row->source_id, $row->lang, $char_limit > 0 ? $char_limit : null, true);
 			if (is_wp_error($result)) {
+				if (wp_doing_ajax()) {
+					wp_send_json_error(array('message' => $result->get_error_message()));
+				}
 				wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=registro&wookb_regen_error=' . rawurlencode($result->get_error_message())));
 				exit;
 			}
 		}
 
+		if (wp_doing_ajax()) {
+			wp_send_json_success(self::registry_row_ajax_data($id, __('Generado.', 'ai-knowledge')));
+		}
+
 		self::redirect('registro');
+	}
+
+	/**
+	 * Datos de una fila del Registro para actualizar en pantalla sin
+	 * recargar (botones "Generar"/"Guardar límite"/"Guardar cambios", todos
+	 * por AJAX con el mismo whitelist generico de admin.js). Extraido de
+	 * regenerate_single() para no duplicarlo en set_manual()/
+	 * set_char_limit(): las tres acciones dejan la fila en un estado que hay
+	 * que reflejar igual (estado, fecha, enlaces, contenido si no es manual).
+	 */
+	protected static function registry_row_ajax_data($id, $message)
+	{
+		$fresh = Registry::find_by_id($id);
+		$data  = array(
+			'message' => $message,
+			'tab'     => 'registro',
+		);
+		if ($fresh) {
+			require_once AIKB_DIR . 'admin/class-registry-table.php';
+			$is_manual   = 'manual' === $fresh->override_mode;
+			$data['row'] = array(
+				'status'    => Registry_Table::status_label($fresh->status),
+				'updated'   => $fresh->updated_at,
+				'links'     => Registry_Table::links_html($fresh),
+				'is_manual' => $is_manual,
+				'content'   => $is_manual ? null : ($fresh->md_path ? Markdown_Store::body_only(Markdown_Store::read($fresh->md_path)) : ''),
+			);
+		}
+		return $data;
 	}
 
 	/**
@@ -735,6 +1243,13 @@ class Admin
 
 		if (! $post_id || ! get_post($post_id)) {
 			wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=registro&wookb_regen_error=' . rawurlencode(__('No se encontró ningún producto o página con ese ID/URL.', 'ai-knowledge'))));
+			exit;
+		}
+
+		// Pieza 4: mismo freno que regenerate_single(), Document_Pipeline::
+		// process() no comprueba post_status por si mismo.
+		if ('publish' !== get_post_status($post_id)) {
+			wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=registro&wookb_regen_error=' . rawurlencode(__('Ese contenido no está publicado.', 'ai-knowledge'))));
 			exit;
 		}
 
@@ -820,6 +1335,10 @@ class Admin
 		foreach ($batch as $row_id) {
 			$row = Registry::find_by_id($row_id);
 			if (! $row) {
+				continue;
+			}
+			// Pieza 4: mismo freno que regenerate_single()/force_generate().
+			if ('publish' !== get_post_status($row->source_id)) {
 				continue;
 			}
 			Document_Pipeline::process($row->source_id, $row->lang, null, true);
@@ -1326,6 +1845,10 @@ class Admin
 			self::publish_manual_text($row, $text);
 		}
 
+		if (wp_doing_ajax()) {
+			wp_send_json_success(self::registry_row_ajax_data($id, __('Guardado.', 'ai-knowledge')));
+		}
+
 		self::redirect('registro');
 	}
 
@@ -1441,7 +1964,91 @@ class Admin
 			);
 		}
 
+		if (wp_doing_ajax()) {
+			wp_send_json_success(self::registry_row_ajax_data($id, __('Guardado.', 'ai-knowledge')));
+		}
+
 		self::redirect('registro');
+	}
+
+	/**
+	 * Pieza 2: guarda el prompt propio de un documento concreto (columna
+	 * custom_prompt). Vacio = usa el prompt generico de siempre (ver
+	 * Generator::build_prompt()). No regenera nada por si solo: el nuevo
+	 * prompt se aplica en la siguiente generacion (boton "Generar" o cola).
+	 * Mismo patron que set_char_limit(): upsert sobre source_id+lang.
+	 */
+	public static function save_custom_prompt()
+	{
+		self::verify('wookb_save_custom_prompt');
+
+		$id            = isset($_POST['row_id']) ? (int) $_POST['row_id'] : 0; // phpcs:ignore
+		$custom_prompt = isset($_POST['custom_prompt']) ? sanitize_textarea_field(wp_unslash($_POST['custom_prompt'])) : ''; // phpcs:ignore
+
+		$row = Registry::find_by_id($id);
+		if ($row) {
+			Registry::upsert(
+				array(
+					'source_id'     => $row->source_id,
+					'lang'          => $row->lang,
+					'custom_prompt' => $custom_prompt,
+				)
+			);
+		}
+
+		self::redirect('registro');
+	}
+
+	/**
+	 * Pieza 5 (corregida): botón "Generar contenido" de un artículo
+	 * exclusivo de Genix -- copia/actualiza el .md a partir del contenido
+	 * actual del artículo en Genix (sin IA, ver Genix_Markdown) y lo publica
+	 * (fila en Registry). Genix_Publish::publish() rechaza por si sola los
+	 * artículos marcados 'only_for_chatbot' (no son públicos ni dentro de
+	 * Genix), aunque Genix_Reader ya los excluye del listado antes de
+	 * llegar aquí -- freno redundante a propósito.
+	 */
+	public static function genix_generate()
+	{
+		self::verify('wookb_genix_generate');
+
+		$post_id = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0; // phpcs:ignore
+
+		$result = Genix_Publish::publish($post_id);
+
+		if (is_wp_error($result)) {
+			if (wp_doing_ajax()) {
+				wp_send_json_error(array('message' => $result->get_error_message()));
+			}
+			wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=ajustes&wookb_regen_error=' . rawurlencode($result->get_error_message())));
+			exit;
+		}
+
+		self::redirect('ajustes');
+	}
+
+	/**
+	 * Pieza 5 (corregida): botón "Quitar" -- despublica un artículo
+	 * exclusivo de Genix ya publicado (borra .md y la fila del Registro,
+	 * ver Genix_Publish::unpublish()).
+	 */
+	public static function genix_remove()
+	{
+		self::verify('wookb_genix_remove');
+
+		$post_id = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0; // phpcs:ignore
+
+		$result = Genix_Publish::unpublish($post_id);
+
+		if (is_wp_error($result)) {
+			if (wp_doing_ajax()) {
+				wp_send_json_error(array('message' => $result->get_error_message()));
+			}
+			wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=ajustes&wookb_regen_error=' . rawurlencode($result->get_error_message())));
+			exit;
+		}
+
+		self::redirect('ajustes');
 	}
 
 	/**
@@ -1494,9 +2101,16 @@ class Admin
 			);
 			$result = Document_Pipeline::process($row->source_id, $row->lang, null, true);
 			if (is_wp_error($result)) {
+				if (wp_doing_ajax()) {
+					wp_send_json_error(array('message' => $result->get_error_message()));
+				}
 				wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=registro&wookb_regen_error=' . rawurlencode($result->get_error_message())));
 				exit;
 			}
+		}
+
+		if (wp_doing_ajax()) {
+			wp_send_json_success(self::registry_row_ajax_data($id, __('Guardado.', 'ai-knowledge')));
 		}
 
 		self::redirect('registro');
@@ -1682,10 +2296,21 @@ class Admin
 			wp_die(esc_html__('robots.txt no es escribible en este servidor (permisos de la carpeta raíz).', 'ai-knowledge'));
 		}
 
-		Robots_Txt_Guard::apply_actions(Crawler_Catalog::effective_actions(), Scope::settings()['crawler_visibility_mode']);
+		$actions = Crawler_Catalog::effective_actions();
+		$mode = Scope::settings()['crawler_visibility_mode'];
+		$written = Robots_Txt_Guard::apply_actions($actions, $mode);
+		$path = Robots_Txt_Guard::path();
+		$verified = $written && file_exists($path) && Robots_Txt_Guard::managed_block_matches((string) file_get_contents($path), $actions, $mode); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		if (!$verified) {
+			wp_die(esc_html__('No se pudo verificar la actualización de robots.txt. Comprueba los permisos de escritura de la raíz del sitio y vuelve a intentarlo.', 'ai-knowledge'));
+		}
 		// Uso unico: la confirmacion de descarga solo vale para esta aplicacion.
 		Robots_Txt_Guard::clear_backup_confirmation();
 
+		if ( ! empty( $_POST['wookb_return_assistant'] ) ) {
+			wp_safe_redirect( admin_url( 'admin.php?page=ai-knowledge-assistant&step=server&wookb_notice=1' ) );
+			exit;
+		}
 		self::redirect('visibilidad-ia');
 	}
 
@@ -1745,7 +2370,7 @@ class Admin
 	public static function download_htaccess_generated()
 	{
 		self::verify('wookb_download_htaccess_generated');
-		$content = Htaccess_Guard::generate_full_file(Crawler_Catalog::blocked_user_agents(), Scope::settings()['crawler_visibility_mode']);
+		$content = Htaccess_Guard::generate_full_file(Crawler_Catalog::effective_actions(), Scope::settings()['crawler_visibility_mode']);
 		nocache_headers();
 		header('Content-Type: application/octet-stream');
 		header('Content-Disposition: attachment; filename="htaccess-ai-knowledge-' . gmdate('Ymd-His') . '.txt"');

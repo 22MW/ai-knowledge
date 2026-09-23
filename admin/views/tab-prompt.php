@@ -107,3 +107,64 @@ if ( false === $draft ) {
 </form>
 
 <p style="color:#008a20;"><?php esc_html_e( 'Support Genix detectado. Listo para sincronizar.', 'ai-knowledge' ); ?></p>
+
+<?php
+// Pedido explicito del usuario: la seccion "Artículos exclusivos de Genix"
+// (Pieza 5) se movió aquí desde Ajustes -- esta pestaña ya solo aparece si
+// Genix está activo (Admin::tabs()), así que es su sitio natural. Mismo
+// gate que tenía en Ajustes (Genix_Reader::is_available()).
+?>
+<?php if ( class_exists( '\AIKB\Genix_Reader' ) && Genix_Reader::is_available() ) : $genix_articles = Genix_Reader::find_exclusive_articles(); ?>
+<hr />
+<h2><?php esc_html_e( 'Artículos exclusivos de Genix', 'ai-knowledge' ); ?></h2>
+<p class="description">
+	<?php esc_html_e( 'Artículos escritos directamente en Support Genix, sin producto ni página de este sitio detrás. Puedes copiarlos tal cual (sin IA) a un documento propio y hacerlos públicos, para que entren en llms.txt.', 'ai-knowledge' ); ?>
+</p>
+<?php if ( empty( $genix_articles ) ) : ?>
+	<p><?php esc_html_e( 'No hay artículos exclusivos de Genix (o todos los que existen ya tienen su propio documento generado por este plugin).', 'ai-knowledge' ); ?></p>
+<?php else : ?>
+	<table class="wp-list-table widefat fixed striped">
+		<thead>
+			<tr>
+				<th><?php esc_html_e( 'Artículo', 'ai-knowledge' ); ?></th>
+				<th><?php esc_html_e( 'Idioma', 'ai-knowledge' ); ?></th>
+				<th><?php esc_html_e( 'Estado', 'ai-knowledge' ); ?></th>
+				<th><?php esc_html_e( 'Acciones', 'ai-knowledge' ); ?></th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php foreach ( $genix_articles as $article ) :
+				$is_public        = Genix_Publish::is_public( $article['id'], $article['lang'] );
+				$generate_form_id = 'wookb-genix-generate-' . (int) $article['id'];
+				$remove_form_id   = 'wookb-genix-remove-' . (int) $article['id'];
+				?>
+				<tr data-wookb-genix-row="<?php echo esc_attr( $article['id'] ); ?>">
+					<td>
+						<a href="<?php echo esc_url( $article['permalink'] ); ?>" target="_blank"><?php echo esc_html( $article['title'] ? $article['title'] : ( '#' . $article['id'] ) ); ?></a>
+					</td>
+					<td><?php echo esc_html( strtoupper( $article['lang'] ) ); ?></td>
+					<td>
+						<?php echo $is_public ? esc_html__( 'Publicado', 'ai-knowledge' ) : esc_html__( 'No publicado', 'ai-knowledge' ); ?>
+					</td>
+					<td>
+						<form id="<?php echo esc_attr( $generate_form_id ); ?>" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
+							<input type="hidden" name="action" value="wookb_genix_generate" />
+							<input type="hidden" name="post_id" value="<?php echo esc_attr( $article['id'] ); ?>" />
+							<?php wp_nonce_field( 'wookb_genix_generate' ); ?>
+							<button type="submit" class="button button-small"><?php echo $is_public ? esc_html__( 'Actualizar contenido', 'ai-knowledge' ) : esc_html__( 'Generar contenido', 'ai-knowledge' ); ?></button>
+						</form>
+						<?php if ( $is_public ) : ?>
+							<form id="<?php echo esc_attr( $remove_form_id ); ?>" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
+								<input type="hidden" name="action" value="wookb_genix_remove" />
+								<input type="hidden" name="post_id" value="<?php echo esc_attr( $article['id'] ); ?>" />
+								<?php wp_nonce_field( 'wookb_genix_remove' ); ?>
+								<button type="submit" class="button button-small button-link-delete"><?php esc_html_e( 'Quitar', 'ai-knowledge' ); ?></button>
+							</form>
+						<?php endif; ?>
+					</td>
+				</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+<?php endif; ?>
+<?php endif; ?>

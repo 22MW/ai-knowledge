@@ -97,6 +97,17 @@ class Robots_Txt_Guard {
 		return insert_with_markers( self::path(), self::MARKER, self::build_action_rules( $actions, $visibility_mode ) );
 	}
 
+	public static function managed_block_matches( $content, array $actions, $visibility_mode = 'site' ) {
+		$pattern = '/# BEGIN ' . preg_quote( self::MARKER, '/' ) . '\R(.*?)\R# END ' . preg_quote( self::MARKER, '/' ) . '/s';
+		if ( ! preg_match( $pattern, (string) $content, $match ) ) { return false; }
+		$current_lines = preg_split( '/\R/', trim( $match[1] ) );
+		$current_lines = array_values( array_filter( $current_lines, function ( $line ) { return '' !== trim( $line ) && '#' !== substr( trim( $line ), 0, 1 ); } ) );
+		$current = implode( "\n", $current_lines );
+		$expected_lines = array_values( array_filter( self::build_action_rules( $actions, $visibility_mode ), function ( $line ) { return '' !== trim( $line ); } ) );
+		$expected = implode( "\n", $expected_lines );
+		return hash_equals( $expected, $current );
+	}
+
 	public static function action_conflicts( array $actions ) {
 		$path = self::path();
 		if ( ! file_exists( $path ) ) { return array(); }

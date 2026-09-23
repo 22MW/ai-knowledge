@@ -21,7 +21,13 @@ Un resumen de las distintas formas en que se publica tu contenido:
   dónde encontrar la información más importante. Es una convención
   emergente (todavía no un estándar oficial), pero cada vez más usada. El
   plugin lo crea y lo regenera cuando cambian los documentos o los datos que
-  lo alimentan.
+  lo alimentan. Su encabezado incluye la fecha y hora de la última generación
+  en formato ISO 8601, para que los lectores puedan comprobar si la
+  información está actualizada. Dentro del archivo, los enlaces aparecen
+  agrupados por secciones (por ejemplo "Páginas" para tus páginas y
+  productos, o "Documentación" para los artículos exclusivos de Genix que
+  hayas hecho públicos desde la pestaña [Genix](tab-chatbot.md)), para que
+  sea más fácil de entender qué tipo de contenido es cada enlace.
 - **Markdown público** — el mismo contenido que usa tu chatbot, servido
   como archivo de texto plano, fácil de leer para cualquier IA sin tener
   que procesar HTML.
@@ -48,6 +54,10 @@ pero `noindex` lo bloquea), te avisa del conflicto para que lo revises.
 
 ## Gestión de crawlers de IA
 
+La tabla incluye crawlers de IA, herramientas SEO y scraping, buscadores
+tradicionales, servicios de archivado y scanners automatizados. Puedes filtrar
+la lista por tipo y por estado sin recargar la página, y combinar ambos filtros.
+
 Un catálogo de crawlers de IA conocidos, agrupados por su propósito, con
 una acción por cada uno: **permitir** o **bloquear**. Esta configuración
 es la que alimenta tanto el bloqueo por `robots.txt` como el bloqueo real
@@ -71,6 +81,10 @@ como "Bloquear" en la tabla intenta acceder, el servidor rechaza la
 petición directamente, la respete o no. En modo «Solo permitir visibilidad
 de `llms.txt`», esos bots pueden leer `/llms.txt` y reciben `404` en el resto
 del sitio.
+
+Las reglas de `.htaccess` se agrupan por comportamiento para evitar bloques
+repetidos y se colocan antes de las reglas de WordPress, de modo que el bloqueo
+se evalúe antes de enviar la petición a `index.php`.
 
 El plugin muestra el `.htaccess` actual y el archivo completo propuesto. El
 archivo real no se sobrescribe automáticamente: puedes copiar el código o

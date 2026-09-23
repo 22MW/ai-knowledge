@@ -59,42 +59,79 @@ class Htaccess_Guard {
 	 * @param string[] $bot_user_agents Tokens de user_agent del catalogo.
 	 */
 	public static function build_rules( array $bot_user_agents, $visibility_mode = 'site' ) {
-		$lines = array();
+		$blocked = array();
 		foreach ( $bot_user_agents as $ua ) {
 			$ua = trim( (string) $ua );
-			if ( '' === $ua ) {
-				continue;
-			}
-			if ( 'llms_only' === $visibility_mode ) {
-				$lines[] = 'RewriteCond %{HTTP_USER_AGENT} "' . $ua . '" [NC]';
-				$lines[] = 'RewriteRule ^llms\\.txt$ - [L]';
-				$lines[] = 'RewriteCond %{HTTP_USER_AGENT} "' . $ua . '" [NC]';
-				$lines[] = 'RewriteRule ^ - [R=404,L]';
-			} else {
-				$lines[] = 'RewriteCond %{HTTP_USER_AGENT} "' . $ua . '" [NC]';
-				$lines[] = 'RewriteRule .* - [F,L]';
-			}
+			if ( '' !== $ua ) { $blocked[] = $ua; }
 		}
-		return $lines;
+		return self::build_grouped_rules( $blocked, $visibility_mode );
 	}
 
 	public static function build_action_rules( array $actions, $visibility_mode = 'site' ) {
-		$lines = array();
+		$blocked = array();
 		foreach ( $actions as $ua => $action ) {
 			if ( 'allow' === $action ) { continue; }
 			$ua = trim( (string) $ua );
-			if ( 'llms_only' === $visibility_mode ) { $lines[] = 'RewriteCond %{HTTP_USER_AGENT} "' . $ua . '" [NC]'; $lines[] = 'RewriteRule ^llms\\.txt$ - [L]'; }
-			$lines[] = 'RewriteCond %{HTTP_USER_AGENT} "' . $ua . '" [NC]';
-			$lines[] = 'RewriteRule ^ - [R=404,L]';
+			if ( '' !== $ua ) { $blocked[] = $ua; }
 		}
+		$lines = self::build_grouped_rules( $blocked, $visibility_mode );
 		return $lines;
+	}
+
+	/** Agrupa bots con el mismo comportamiento en una cadena OR compacta. */
+	protected static function build_grouped_rules( array $bot_user_agents, $visibility_mode ) {
+		$conditions = array();
+		$last = count( $bot_user_agents ) - 1;
+		foreach ( array_values( $bot_user_agents ) as $index => $ua ) {
+			$flags = $index < $last ? '[NC,OR]' : '[NC]';
+			$conditions[] = 'RewriteCond %{HTTP_USER_AGENT} "' . preg_quote( $ua, '/' ) . '" ' . $flags;
+		}
+		if ( empty( $conditions ) ) { return array(); }
+		if ( 'llms_only' === $visibility_mode ) {
+			return array_merge(
+				$conditions,
+				array( 'RewriteRule ^llms\\.txt$ - [L]' ),
+				$conditions,
+				array( 'RewriteRule ^ - [R=404,L]' )
+			);
+		}
+		return array_merge( $conditions, array( 'RewriteRule ^ - [R=404,L]' ) );
 	}
 
 	public static function apply_actions( array $actions, $visibility_mode = 'site' ) {
 		self::comment_action_conflicts( $actions );
 		$rules = self::build_action_rules( $actions, $visibility_mode );
 		array_unshift( $rules, 'RewriteEngine On' );
-		return insert_with_markers( self::path(), self::MARKER, $rules );
+		$result = insert_with_markers( self::path(), self::MARKER, $rules );
+		return $result ? self::move_block_before_wordpress() : false;
+	}
+
+	public static function managed_block_matches( $content, array $actions, $visibility_mode = 'site' ) {
+		$pattern = '/# BEGIN ' . preg_quote( self::MARKER, '/' ) . '\R(.*?)\R# END ' . preg_quote( self::MARKER, '/' ) . '/s';
+		if ( ! preg_match( $pattern, (string) $content, $match ) ) { return false; }
+		$current_lines = preg_split( '/\R/', trim( $match[1] ) );
+		$current_lines = array_values( array_filter( $current_lines, function ( $line ) { return '' !== trim( $line ) && '#' !== substr( trim( $line ), 0, 1 ); } ) );
+		$current = implode( "\n", $current_lines );
+		$expected_lines = array_values( array_filter( array_merge( array( 'RewriteEngine On' ), self::build_action_rules( $actions, $visibility_mode ) ), function ( $line ) { return '' !== trim( $line ); } ) );
+		$expected = implode( "\n", $expected_lines );
+		return hash_equals( $expected, $current );
+	}
+
+	/** Coloca el bloque propio antes de WordPress para que sus reglas se evalúen primero. */
+	protected static function move_block_before_wordpress() {
+		$path = self::path();
+		$raw = (string) file_get_contents( $path ); // phpcs:ignore
+		$pattern = '/\R?# BEGIN ' . preg_quote( self::MARKER, '/' ) . '.*?# END ' . preg_quote( self::MARKER, '/' ) . '\R?/s';
+		if ( ! preg_match( $pattern, $raw, $match ) ) { return false; }
+		$without = preg_replace( $pattern, "\n", $raw, 1 );
+		$block = trim( $match[0] );
+		if ( preg_match( '/^# BEGIN WordPress$/mi', $without, $wp_match, PREG_OFFSET_CAPTURE ) ) {
+			$offset = $wp_match[0][1];
+			$raw = rtrim( substr( $without, 0, $offset ) ) . "\n\n" . $block . "\n\n" . ltrim( substr( $without, $offset ) );
+		} else {
+			$raw = rtrim( $without ) . "\n\n" . $block . "\n";
+		}
+		return false !== file_put_contents( $path, $raw, LOCK_EX ); // phpcs:ignore
 	}
 
 	protected static function comment_action_conflicts( array $actions ) {
@@ -153,6 +190,10 @@ class Htaccess_Guard {
 			return rtrim( $original ) . "\n";
 		}
 		$block = "# BEGIN " . self::MARKER . "\n" . implode( "\n", array_merge( array( 'RewriteEngine On' ), $rules ) ) . "\n# END " . self::MARKER;
+		if ( preg_match( '/^# BEGIN WordPress$/mi', $original, $match, PREG_OFFSET_CAPTURE ) ) {
+			$offset = $match[0][1];
+			return rtrim( substr( $original, 0, $offset ) ) . "\n\n" . $block . "\n\n" . ltrim( substr( $original, $offset ) );
+		}
 		return rtrim( $original ) . "\n\n" . $block . "\n";
 	}
 

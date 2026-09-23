@@ -42,6 +42,7 @@ class Llms_Txt {
 		$lines[] = '# ' . get_bloginfo( 'name' );
 		$lines[] = '';
 		$lines[] = '> ' . self::summary();
+		$lines[] = '> ' . __( 'Última actualización:', 'ai-knowledge' ) . ' ' . wp_date( 'c' );
 		$lines[] = '';
 
 		// info.md: mismo resumen+contacto que ya lleva la cita de arriba,
@@ -152,6 +153,12 @@ class Llms_Txt {
 			if ( $faq_label ) {
 				return $faq_label;
 			}
+		}
+
+		// Artículos exclusivos de Genix (Genix_Reader/Genix_Publish): categoría
+		// propia, no se agrupan con las páginas normales.
+		if ( 'sgkb-docs' === $row->source_type ) {
+			return __( 'Documentación', 'ai-knowledge' );
 		}
 
 		if ( 'product' !== $row->source_type || ! function_exists( 'wc_get_product' ) ) {

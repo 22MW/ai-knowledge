@@ -25,6 +25,13 @@ Eliges entre dos modos:
 
 [SCREENSHOT: selector de modo "Solo los tipos marcados" vs "Todos los tipos públicos"]
 
+> Si usas Support Genix, no verás los artículos internos de Genix
+> ("Docs") en esta lista: son copias que el propio chatbot usa para
+> responder, no contenido tuyo que la IA tenga que redactar. Si quieres
+> publicar alguno de esos artículos hacia fuera (en `/llms.txt`), se hace
+> desde la pestaña [Genix](tab-chatbot.md), sección "Artículos exclusivos
+> de Genix".
+
 ## Categorías y etiquetas
 
 Para cada tipo de contenido incluido, puedes afinar por sus categorías o

@@ -1,10 +1,14 @@
-# Pestaña Chatbot
+# Pestaña Genix
 
 [← Volver al índice](index.md)
 
 > Esta pestaña solo aparece si tienes **Support Genix activo**. Sin él, no
 > hay ningún chatbot al que enviar este prompt, así que la pestaña
 > permanece oculta.
+
+> Esta pestaña se llamaba antes "Chatbot". Se ha renombrado a "Genix"
+> porque ahora también incluye la sección de artículos exclusivos de Genix
+> (más abajo), no solo el comportamiento del chatbot.
 
 Aquí defines **cómo debe comportarse** el chatbot de tu web: su tono, qué
 debe hacer cuando no sabe algo, y qué no debe hacer nunca. Los datos de tu
@@ -47,6 +51,41 @@ termines de ajustarlo puedes:
 - **Guardar y sincronizar con Genix**, para que el chatbot empiece a
   usarlo de inmediato.
 
+## 4. Artículos exclusivos de Genix
+
+Si usas Support Genix, es normal que además de los productos y páginas de
+tu web tengas otros artículos de ayuda escritos **directamente dentro de
+Genix** (por ejemplo, guías de uso o respuestas largas que solo querías
+tener a mano para el chatbot, sin crear una página nueva en tu web). Esta
+sección te deja decidir cuáles de esos artículos también se hacen
+**públicos** en `/llms.txt`, para que los buscadores y asistentes de IA
+externos puedan leerlos también, no solo tu propio chatbot.
+
+Verás una tabla con esos artículos y, para cada uno:
+
+- **Estado**: si ya está "Publicado" (visible en `/llms.txt`) o "No
+  publicado" (solo lo usa tu chatbot, hacia fuera no existe).
+- **Generar contenido** (o **Actualizar contenido** si ya está publicado):
+  copia el texto del artículo tal cual está en Genix en ese momento y lo
+  publica. No usa IA ni resume nada: es una copia fiel. Si editas el
+  artículo en Genix más adelante, vuelve a pulsar este botón para
+  refrescar la copia publicada.
+- **Quitar**: deja de publicarlo. El artículo sigue existiendo en Genix
+  igual que antes (esto no lo borra ni lo toca), simplemente deja de
+  aparecer en `/llms.txt`.
+
+Dos artículos que **no aparecen nunca** en esta lista, a propósito:
+
+- Los que en Genix están marcados como **"solo para uso del chatbot"**:
+  si ni siquiera son visibles dentro de Genix para un visitante normal, no
+  tiene sentido hacerlos públicos hacia fuera desde aquí.
+- Los que **ya tienen su propia ficha generada por este plugin** (porque
+  son la copia automática que se crea para un producto o página normal de
+  tu web): esos ya se gestionan desde el [Registro](tab-registro.md), no
+  hace falta duplicarlos aquí.
+
+[SCREENSHOT: tabla de artículos exclusivos de Genix con los botones Generar/Actualizar y Quitar]
+
 ## Preguntas frecuentes
 
 **¿Esto es lo mismo que las FAQs?**
@@ -67,6 +106,18 @@ tu propio texto y guardarlo, sin generar nada con IA primero.
 No, "Generar borrador con IA" reemplaza el borrador en pantalla, pero
 hasta que no pulses "Guardar y sincronizar con Genix" no se sobrescribe
 lo que el chatbot está usando en producción.
+
+**No veo un artículo de Genix en la lista de "Artículos exclusivos de
+Genix", ¿por qué?**
+Puede ser por dos motivos: está marcado en Genix como "solo para uso del
+chatbot" (no puede hacerse público desde aquí), o ya tiene su propia
+ficha en el [Registro](tab-registro.md) porque corresponde a un producto
+o página real de tu web.
+
+**Si "Quito" un artículo publicado, ¿se borra en Genix?**
+No. "Quitar" solo deja de publicarlo hacia fuera (deja de aparecer en
+`/llms.txt`). El artículo original sigue existiendo en Genix igual que
+antes.
 
 ---
 [Ver también: [Negocio](tab-negocio.md) · [FAQs](tab-faqs.md)]

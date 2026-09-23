@@ -41,6 +41,7 @@ class Registry {
 			override_text LONGTEXT NULL,
 			char_limit INT UNSIGNED NULL,
 			stale TINYINT(1) NOT NULL DEFAULT 0,
+			custom_prompt LONGTEXT NULL,
 			UNIQUE KEY source_lang (source_id, lang),
 			KEY status (status),
 			KEY source_type (source_type),
@@ -128,6 +129,19 @@ class Registry {
 		return $wpdb->get_results( "SELECT * FROM {$table} WHERE status = 'synced' AND is_bridge = 0 ORDER BY lang, source_type" ); // phpcs:ignore
 	}
 
+	/**
+	 * IDs de post ya usados como doc_post_id (la copia sgkb-docs que
+	 * Document_Pipeline genera para el chatbot de un producto/pagina real).
+	 * Usado por Genix_Reader (Pieza 5) para excluir del listado de
+	 * "artículos exclusivos de Genix" los sgkb-docs que en realidad SI
+	 * tienen un origen real detrás -- ver docblock de esa clase.
+	 */
+	public static function all_doc_post_ids() {
+		global $wpdb;
+		$table = self::table();
+		return array_map( 'intval', $wpdb->get_col( "SELECT doc_post_id FROM {$table} WHERE doc_post_id IS NOT NULL" ) ); // phpcs:ignore
+	}
+
 	/** Para el WP_List_Table del panel, con filtros básicos. */
 	/**
 	 * Busqueda por titulo: JOIN con wp_posts por source_id. Los documentos
@@ -146,10 +160,30 @@ class Registry {
 		return array( $where, $vals );
 	}
 
+	/**
+	 * Fuente de verdad de "esta fila entra en la tabla del Registro (pestaña
+	 * Registro)". Los artículos exclusivos de Genix (Pieza 5, source_type
+	 * 'sgkb-docs', ver Genix_Publish) SI son filas reales de esta tabla --
+	 * necesario para que entren en Registry::get_synced_public_urls() y por
+	 * tanto en llms.txt -- pero deliberadamente NO deben aparecer como filas
+	 * nuevas en la tabla del Registro: tienen su propio listado aparte (ver
+	 * tab-ajustes.php). 'sgkb-docs' nunca es el source_type de una fila del
+	 * flujo normal (ahí source_type siempre es el post_type del origen real:
+	 * product, page...), así que esta exclusión no afecta a nada existente.
+	 * $args['include_genix'] = true la desactiva, para cuando el propio
+	 * listado de Genix necesite consultar esta tabla.
+	 */
+	protected static function apply_registry_scope( $where, $args ) {
+		if ( empty( $args['include_genix'] ) ) {
+			$where[] = "source_type != 'sgkb-docs'";
+		}
+		return $where;
+	}
+
 	public static function query( $args = array() ) {
 		global $wpdb;
 		$table = self::table();
-		$where = array( '1=1' );
+		$where = self::apply_registry_scope( array( '1=1' ), $args );
 		$vals  = array();
 
 		if ( ! empty( $args['status'] ) ) {
@@ -193,7 +227,7 @@ class Registry {
 	public static function query_all_ids( $args = array() ) {
 		global $wpdb;
 		$table = self::table();
-		$where = array( '1=1' );
+		$where = self::apply_registry_scope( array( '1=1' ), $args );
 		$vals  = array();
 
 		if ( ! empty( $args['status'] ) ) {
@@ -218,7 +252,7 @@ class Registry {
 	public static function count( $args = array() ) {
 		global $wpdb;
 		$table = self::table();
-		$where = array( '1=1' );
+		$where = self::apply_registry_scope( array( '1=1' ), $args );
 		$vals  = array();
 
 		if ( ! empty( $args['status'] ) ) {

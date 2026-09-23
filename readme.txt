@@ -1,14 +1,14 @@
 === AI Knowledge & Visibility ===
 Contributors: 22mw
-Tags: woocommerce, chatbot, ia, llms.txt, wpml, support genix
+Tags: woocommerce, chatbot, ia, llms.txt, wpml, crawlers, robots.txt
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.2
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Genera automáticamente una base de conocimiento en Markdown a partir de tu catálogo WooCommerce (y otros CPT), la publica en /llms.txt para buscadores de IA y la conecta con el chatbot de Support Genix.
+Genera una base de conocimiento en Markdown, la publica en `/llms.txt`, controla el acceso de crawlers de IA mediante `robots.txt` y `.htaccess`, y puede conectarla con el chatbot de Support Genix.
 
 == Description ==
 
@@ -16,6 +16,7 @@ Genera automáticamente una base de conocimiento en Markdown a partir de tu cat�
 
 1. **Alimentar el chatbot de Support Genix** con información real y actualizada de tu tienda, en vez de depender de que el chatbot "adivine" o de mantener un prompt manual interminable.
 2. **Publicar `/llms.txt`**, el archivo estándar que los motores de búsqueda de IA (ChatGPT, Perplexity, Claude y similares) usan para entender de qué trata tu web — lo que hoy se conoce como optimización GEO (Generative Engine Optimization), el equivalente a SEO para inteligencias artificiales.
+3. **Gestionar la visibilidad para crawlers**, con un catálogo organizado por finalidad, decisiones Permitir/Bloquear por bot y reglas coordinadas para `robots.txt` y `.htaccess`, incluyendo un modo que deja visible únicamente `/llms.txt`.
 
 = Características principales =
 
@@ -23,6 +24,7 @@ Genera automáticamente una base de conocimiento en Markdown a partir de tu cat�
 * Cola de generación con límite diario configurable (o sin límite, para cargas iniciales supervisadas).
 * Compatible con WPML: genera un documento por cada idioma activo, resolviendo traducciones reales y evitando falsos "documentos puente" cuando no hace falta.
 * Publicación pública de `/llms.txt`, generado dinámicamente desde el propio registro de documentos (no un archivo estático que se queda desactualizado).
+* Gestión avanzada de crawlers de IA por categorías, con acciones individuales Permitir/Bloquear, modo de acceso exclusivo a `/llms.txt`, propuestas para `robots.txt` y `.htaccess`, copias de seguridad y registro de accesos detectados.
 * Sección de FAQ pública editable, incluida en `/llms.txt`.
 * Los generadores de Negocio, FAQs y documentos WooCommerce aceptan instrucciones breves o prompts completos que prevalecen sobre el formato predeterminado sin poder inventar datos; el resultado se revisa antes de guardar en Negocio y FAQs.
 * Conexión directa con Support Genix (Pro y Lite): crea/actualiza los posts `sgkb-docs` que el chatbot usa como fuente, y sincroniza el prompt de sistema del chatbot con un asistente de redacción propio.
@@ -30,6 +32,7 @@ Genera automáticamente una base de conocimiento en Markdown a partir de tu cat�
 * Panel de administración con pestañas especializadas; los ajustes exclusivos del chatbot, como el límite de documentos relacionados, viven en Chatbot y no en los ajustes generales.
 * Funciona igual sin Support Genix instalado: en ese caso, el plugin sigue generando y publicando `/llms.txt` de forma independiente.
 * En WordPress 7.0 o superior puede usar los Conectores nativos de Anthropic, OpenAI o Google, con selección automática o manual del modelo disponible. Support Genix se mantiene como origen alternativo.
+* Interfaz traducida y preparada para español, catalán, alemán, inglés y francés. Si falta un idioma o detectas una cadena sin traducir, ponte en contacto con nosotros.
 * El enfoque detallado del negocio se conserva como dato fuente independiente del resumen público generado para `/llms.txt`.
 * Sin dependencias obligatorias: WooCommerce, WPML y Support Genix se detectan en tiempo real; si no están, esas funciones concretas simplemente no se activan.
 
@@ -53,6 +56,29 @@ Si tienes instalado y activo el plugin Support Genix (Pro o Lite), AI Knowledge 
 * Ofrece, en la pestaña **Prompt**, un asistente para redactar y sincronizar el prompt de sistema del chatbot.
 
 Si no tienes Support Genix, estas dos funciones quedan inactivas sin errores ni avisos molestos — el resto del plugin (generación de documentos y `/llms.txt`) sigue funcionando igual.
+
+= Gestión de crawlers y visibilidad para IA =
+
+La pantalla **Visibilidad IA** permite decidir qué crawlers pueden acceder al sitio. El catálogo está organizado por finalidad para que no sea necesario conocer de memoria cada nombre técnico:
+
+* Búsqueda y citas de IA.
+* Asistentes que visitan una página por petición del usuario.
+* Entrenamiento de modelos.
+* SEO y scraping.
+* Archivado y creación de datasets.
+* Scanners de seguridad.
+* Buscadores tradicionales.
+
+Cada categoría explica para qué se utilizan sus crawlers. También puedes revisar cada bot conocido y asignarle una acción individual: **Permitir** o **Bloquear**.
+
+Para los bots bloqueados existen dos modos de visibilidad:
+
+* Bloquear el acceso al sitio completo.
+* Permitir únicamente el acceso a `/llms.txt`, manteniendo bloqueado el resto de la web.
+
+La configuración se usa para preparar reglas coherentes de `robots.txt` y `.htaccess`. Antes de aplicar cambios sobre archivos reales, el plugin muestra la configuración actual y la propuesta, conserva las reglas externas y exige descargar una copia de seguridad. El bloque de `.htaccess` también puede descargarse o copiarse para aplicarlo manualmente.
+
+El registro de accesos permite consultar las visitas detectadas de crawlers conocidos. Los bloqueos no sustituyen un firewall ni garantizan que un bot malicioso respete `robots.txt`; las reglas de `.htaccess` proporcionan un control adicional a nivel de servidor.
 
 == Frequently Asked Questions ==
 
@@ -84,9 +110,19 @@ Solo se envía el contenido necesario al origen de IA seleccionado (Conectores d
 
 El plugin detecta el borrado/despublicación y elimina automáticamente el documento asociado (el archivo `.md`, el post `sgkb-docs` si existe, y la fila de su registro interno), para que `/llms.txt` y el chatbot no sigan citando contenido que ya no existe.
 
+= ¿Puedo permitir `/llms.txt` y bloquear el resto del sitio a un crawler? =
+
+Sí. En **Visibilidad IA** selecciona el modo que permite únicamente `/llms.txt` para los bots bloqueados. Así esos crawlers pueden consultar el índice preparado para IA sin obtener permiso para rastrear el resto de la web.
+
 == Changelog ==
 
 Ver `CHANGELOG.md` para el historial completo y detallado de cambios.
+
+= 1.2.0 =
+Internacionalización completa (español, catalán, alemán, inglés, francés). En el Registro, generación, guardado y "Volver a Auto" ya no recargan la página, con prompt propio por documento e idioma y avisos flotantes. Nueva sección para publicar en `/llms.txt` artículos escritos directamente en Support Genix, respetando su marca de uso exclusivo para chatbot.
+
+= 1.1.3 =
+Internacionalización completa del administrador con catálogos español, catalán e inglés para PHP y JavaScript; documentación por locale con fallback al español; mejoras de crawlers y reglas del servidor consolidadas desde la versión de desarrollo 1.1.2.2.
 
 = 1.0.8.6 =
 Limpieza de Ajustes: retirado el prompt global obsoleto y movido el límite de documentos relacionados a la pestaña Chatbot con guardado independiente.

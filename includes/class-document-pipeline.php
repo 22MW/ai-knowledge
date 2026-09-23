@@ -104,10 +104,16 @@ class Document_Pipeline {
 		// encontrar las fichas reales de los otros idiomas.
 		$cross_language_links = self::build_cross_language_links( $source_id, $lang );
 
+		// Pieza 2: prompt propio de esta fila, si el admin escribio uno. isset()
+		// por seguridad: la columna custom_prompt puede no existir aun en la
+		// tabla si el sitio no ha pasado por la migracion de version que la
+		// añade (dbDelta via wookb_db_version, ver ai-knowledge.php).
+		$custom_prompt = ( $existing && isset( $existing->custom_prompt ) ) ? $existing->custom_prompt : '';
+
 		if ( $is_bridge ) {
 			$markdown = Generator::build_bridge_markdown( $data, $cross_language_links );
 		} else {
-			$markdown = Generator::generate( $data, $cross_language_links, $char_limit );
+			$markdown = Generator::generate( $data, $cross_language_links, $char_limit, $custom_prompt );
 			if ( is_wp_error( $markdown ) ) {
 				Registry::update_status(
 					Registry::find( $real_source_id, $lang )->id,

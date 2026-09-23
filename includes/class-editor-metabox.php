@@ -33,7 +33,7 @@ class Editor_Metabox {
 		}
 
 		$types = get_post_types( array( 'public' => true ), 'names' );
-		unset( $types['attachment'] );
+		unset( $types['attachment'], $types['sgkb-docs'] );
 		return array_values( $types );
 	}
 

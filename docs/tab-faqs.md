@@ -7,7 +7,7 @@ como un documento más de tu base de conocimiento (aparece enlazado desde
 `/llms.txt`, igual que el resto de documentos, y también en
 [Registro](tab-registro.md)).
 
-> No lo confundas con el prompt del [Chatbot](tab-chatbot.md): esto es
+> No lo confundas con el prompt del chatbot en [Genix](tab-chatbot.md): esto es
 > contenido **público**, pensado para que lo lea cualquiera (persona o
 > IA); el prompt del chatbot son instrucciones internas de comportamiento.
 

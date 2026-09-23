@@ -36,8 +36,14 @@ class Generator {
 	 * Null (por defecto) usa BODY_CHAR_LIMIT. Lo usa la regeneracion individual
 	 * desde el Registro (accion puntual bajo demanda del admin, valor de un
 	 * solo uso que no se persiste en BD, ver Admin::regenerate_single()).
+	 *
+	 * $custom_prompt: instrucciones propias de ESTE documento concreto
+	 * (columna custom_prompt de la fila del Registro, Pieza 2). Vacio/null usa
+	 * el prompt generico de siempre, sin cambios. Nunca sustituye los datos
+	 * reales de $data: ver build_prompt(), que lo añade como instrucciones
+	 * adicionales con el límite explícito de no inventar ni sustituir datos.
 	 */
-	public static function generate( array $data, array $links = array(), $char_limit = null ) {
+	public static function generate( array $data, array $links = array(), $char_limit = null, $custom_prompt = '' ) {
 		$config = self::ai_config();
 		if ( ! $config ) {
 			return new \WP_Error( 'wookb_no_ai_connection', __( 'El origen de IA seleccionado no está conectado.', 'ai-knowledge' ) );
@@ -50,7 +56,7 @@ class Generator {
 		// formato exacto (Tarea 3) sin depender de que el modelo lo reproduzca
 		// bien. El prompt le pide explicitamente que NO genere esa seccion el
 		// mismo, para no duplicarla.
-		$prompt = self::build_prompt( $data, $links, $char_limit );
+		$prompt = self::build_prompt( $data, $links, $char_limit, $custom_prompt );
 
 		$response = AI_Client::generate(
 			'Eres un redactor técnico que genera documentos de base de conocimiento en Markdown para un chatbot de atención al cliente de un negocio o tienda online.',
@@ -121,7 +127,7 @@ class Generator {
 		return $title_line . "\n\n" . implode( "\n", $kept );
 	}
 
-	public static function build_prompt( array $data, array $links = array(), $char_limit = null ) {
+	public static function build_prompt( array $data, array $links = array(), $char_limit = null, $custom_prompt = '' ) {
 		$char_limit = self::resolve_char_limit( $char_limit );
 		$settings = Scope::settings();
 
@@ -171,6 +177,16 @@ class Generator {
 		$prompt .= "- NO incluyas avisos genéricos tipo \"precio orientativo\" o \"confirma la disponibilidad\": esos avisos los añade el propio chatbot en su respuesta cuando corresponde, no deben estar guardados en este documento.\n\n";
 
 		$prompt .= "Datos del producto:\n" . implode( "\n", $datos ) . "\n\n";
+
+		// Pieza 2: instrucciones propias de este documento (columna
+		// custom_prompt de la fila del Registro). Se añaden DESPUES de "Datos
+		// del producto" y con un límite explícito: complementan el estilo o
+		// el enfoque, pero nunca sustituyen ni inventan datos reales -- los
+		// datos de arriba mandan siempre si hay contradicción.
+		if ( ! empty( $custom_prompt ) && is_string( $custom_prompt ) && '' !== trim( $custom_prompt ) ) {
+			$prompt .= "Instrucciones adicionales específicas para este documento (aplícalas solo como estilo o énfasis; NUNCA sustituyen, contradicen ni inventan los datos reales de \"Datos del producto\" de arriba, que siempre tienen prioridad):\n" . trim( $custom_prompt ) . "\n\n";
+		}
+
 		$prompt .= 'Idioma de salida: ' . strtoupper( $data['lang'] ) . ". Responde solo con el documento Markdown, sin explicaciones adicionales.";
 
 		return $prompt;

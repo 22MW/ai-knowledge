@@ -79,4 +79,4 @@ otros no?**
 Sí, marca solo los que quieras en el selector de esta pantalla.
 
 ---
-[Ver también: [Generación masiva](tab-generacion-masiva.md) · [Chatbot](tab-chatbot.md) · [WooCommerce](tab-woocommerce.md)]
+[Ver también: [Generación masiva](tab-generacion-masiva.md) · [Genix](tab-chatbot.md) · [WooCommerce](tab-woocommerce.md)]

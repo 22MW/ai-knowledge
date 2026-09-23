@@ -3,7 +3,7 @@
  * Plugin Name: AI Knowledge & Visibility
  * Plugin URI: https://22mw.online/
  * Description: Genera documentos de base de conocimiento (.md + posts sgkb-docs de Support Genix) a partir de productos WooCommerce u otros CPTs, con cola, límite diario, WPML y publicación pública GEO vía llms.txt.
- * Version: 1.1.2
+ * Version: 1.2.0
  * Author: 22MW
  * Author URI: https://22mw.online/
  * Text Domain: ai-knowledge
@@ -18,11 +18,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'AIKB_VERSION', '1.1.2' );
+define( 'AIKB_VERSION', '1.2.0' );
 define( 'AIKB_FILE', __FILE__ );
 define( 'AIKB_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AIKB_URL', plugin_dir_url( __FILE__ ) );
 define( 'AIKB_TABLE_DOCUMENTS', 'wookb_documents' );
+
+add_action(
+	'init',
+	function () {
+		load_plugin_textdomain( 'ai-knowledge', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+	},
+	1
+);
 
 /**
  * Autoload muy simple por convención de nombre de archivo (class-xxx.php).
@@ -56,6 +64,15 @@ spl_autoload_register(
  * Activación: crea la tabla de registro y la carpeta wp-content/llm/.
  */
 function wookb_activate() {
+	update_option( 'aikb_setup_assistant', array(
+		'version'    => '1',
+		'initiated'  => false,
+		'current'    => 'welcome',
+		'completed'  => array(),
+		'skipped'    => array(),
+		'finished'   => false,
+		'last_opened'=> current_time( 'mysql' ),
+	), false );
 	require_once AIKB_DIR . 'includes/class-registry.php';
 	\AIKB\Registry::create_table();
 

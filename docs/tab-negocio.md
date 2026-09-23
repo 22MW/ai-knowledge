@@ -5,7 +5,7 @@
 Aquí guardas los datos de tu negocio en sí — lo que no depende de
 WooCommerce y por tanto tiene sentido tengas o no tienda online: quién
 eres, a qué te dedicas, cómo contactarte. Estos datos alimentan el
-[Chatbot](tab-chatbot.md) (si tienes Support Genix) y el resumen público
+chatbot de la pestaña [Genix](tab-chatbot.md) (si tienes Support Genix) y el resumen público
 que aparece en `/llms.txt`.
 
 > Lo específico de tu tienda WooCommerce (envíos, impuestos, pagos) vive
@@ -59,4 +59,4 @@ El resumen de negocio actual es uno solo. Si tu sitio es multiidioma, la
 sección de [FAQs](tab-faqs.md) sí gestiona un documento por idioma.
 
 ---
-[Ver también: [Chatbot](tab-chatbot.md) · [FAQs](tab-faqs.md) · [Visibilidad IA](tab-visibilidad-ia.md)]
+[Ver también: [Genix](tab-chatbot.md) · [FAQs](tab-faqs.md) · [Visibilidad IA](tab-visibilidad-ia.md)]

@@ -369,16 +369,95 @@ body.toplevel_page_ai-knowledge #wpcontent {
   color: #fff;
 }
 .wookb-wrap .notice-success {
-  background: #13b7f6;
+  background: #3858e9;
+  width: fit-content;
+  display: flex;
+  padding: 5px 22px 0px;
 }
-.wookb-wrap .notice-warning {
+.wookb-wrap .notice-warning,
+.wookb-wrap .notice-warning p {
   background: var(--tblr-warning, #f76707);
+  color: #1a1a1a;
+  width: fit-content;
+  display: flex;
 }
 .wookb-wrap .notice-error {
+  width: fit-content;
+  display: flex;
   background: var(--tblr-danger, #d63939);
 }
 .wookb-wrap .notice-info {
+  width: fit-content;
+  display: flex;
   background: var(--tblr-azure, #4299e1);
+}
+
+/* Toasts flotantes de guardado AJAX (showToast() en admin.js), pedido
+   explicito del usuario para sustituir el aviso fijo junto al formulario:
+   arriba a la izquierda, por encima de todo, independiente de por donde
+   este desplazada la pantalla. Mismo z-index alto que .wookb-doc-drawer
+   (admin.css, 100001) para no quedar por detras de el; +1 para ganarle si
+   ambos coinciden en pantalla. Colores: mismas variables --tblr-success/
+   --tblr-danger que ya usa .wookb-assistant-feedback/.wookb-assistant-toggle
+   para exito/error -- no son las mismas que .notice-success/.notice-error
+   de arriba (esas usan un azul propio del proyecto), pero son las variables
+   REALES de Tabler para "correcto"/"incorrecto" que el admin ya usa en
+   otros sitios, y las que mejor encajan en una notificacion de estado. */
+.wookb-wrap #wookb-toast-container {
+  position: fixed;
+  top: 32px;
+  right: 20px;
+  z-index: 100002;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  max-width: 380px;
+}
+.wookb-wrap .wookb-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  animation: wookb-toast-in 0.15s ease-out;
+}
+.wookb-wrap .wookb-toast p {
+  margin: 0;
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.wookb-wrap .wookb-toast-success {
+  background: var(--tblr-success, #2fb344);
+}
+.wookb-wrap .wookb-toast-error {
+  background: var(--tblr-danger, #d63939);
+}
+.wookb-wrap .wookb-toast-close {
+  background: transparent;
+  border: none;
+  color: #fff;
+  opacity: 0.8;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+}
+.wookb-wrap .wookb-toast-close:hover {
+  opacity: 1;
+}
+@keyframes wookb-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ==========================================================================
@@ -527,7 +606,6 @@ body.toplevel_page_ai-knowledge #wpcontent {
 /* ==========================================================================
    7. BLOQUES ESPECIFICOS
    ========================================================================== */
-
 
 /* Badges de la columna "Control manual": envuelven en varias lineas si
    hace falta, para no volver a inflar el ancho de la columna (bug A). */

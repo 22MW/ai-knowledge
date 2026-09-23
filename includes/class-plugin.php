@@ -50,6 +50,15 @@ class Plugin {
 		require_once AIKB_DIR . 'includes/class-crawler-log.php';
 		require_once AIKB_DIR . 'includes/class-htaccess-guard.php';
 		require_once AIKB_DIR . 'includes/class-robots-txt-guard.php';
+		// Pieza 5: artículos exclusivos de Genix. Clases de solo utilidad
+		// (sin init() propio, sin hooks): se cargan siempre, pero solo hacen
+		// algo si post_type_exists('sgkb-docs') en el momento de usarlas
+		// (comprobado en Admin, no aquí -- los CPTs de terceros se registran
+		// en 'init', que todavía no ha corrido cuando Plugin::init() se
+		// ejecuta en 'plugins_loaded').
+		require_once AIKB_DIR . 'includes/class-genix-reader.php';
+		require_once AIKB_DIR . 'includes/class-genix-markdown.php';
+		require_once AIKB_DIR . 'includes/class-genix-publish.php';
 
 		Queue::init();
 		Sync::init();

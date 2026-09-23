@@ -2,6 +2,75 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [1.2.0] - 2026-09-23
+
+### Internacionalización y documentación
+
+- Añadidos y sincronizados los catálogos de interfaz en español, catalán,
+  alemán, inglés y francés, incluyendo sus archivos `.po`, `.mo` y JSON.
+- Actualizados los índices de documentación pública e interna con los idiomas
+  disponibles y un canal de contacto para solicitar o corregir traducciones.
+- Reorganizada la documentación de desarrollo: los planes y materiales
+  temporales quedan en `_dev/temp/`.
+
+### Registro: generación instantánea, prompt propio y auditoría de publicados
+
+- "Generar", "Guardar límite", "Guardar cambios" y "Volver a Auto" ya no
+  recargan la página (AJAX con fallback tradicional si no hay JavaScript).
+- "Ajustes avanzados" de cada documento se divide en dos pestañas:
+  Contenido y Prompt.
+- Nuevo prompt propio por documento e idioma (columna `custom_prompt`):
+  instrucciones de estilo/enfoque que nunca sustituyen los datos reales; si
+  está vacío, se usa el prompt genérico de siempre. Desactivado mientras el
+  documento esté en modo Manual (con aviso explicando por qué).
+- "Guardar cambios" solo se activa cuando hay ediciones reales sin guardar.
+- Corregido: un producto/página que pasaba de "Publicado" a "Borrador" sin
+  usar la papelera se quedaba visible en el Registro y en `/llms.txt`
+  indefinidamente. Ahora se retira de inmediato, igual que ya pasaba al
+  moverlo a la papelera.
+- Todos los avisos de guardado del admin pasan a notificaciones flotantes
+  (arriba a la derecha, desaparecen solas a los 10 segundos).
+
+### Genix
+
+- Nueva sección "Artículos exclusivos de Genix" en la pestaña Genix (antes
+  "Chatbot", renombrada): permite publicar en `/llms.txt` artículos escritos
+  directamente en Support Genix que no tienen ya su propio documento en
+  este plugin, copiando su contenido tal cual (sin IA). Un artículo marcado
+  en Genix como "solo para uso del chatbot" nunca puede hacerse público
+  desde aquí. Salen agrupados en `/llms.txt` bajo su propia sección
+  "Documentación".
+- `sgkb-docs` (los documentos internos de Genix) ya no puede elegirse como
+  tipo de contenido a documentar, ni en la pestaña Contenido, ni en el botón
+  del editor, ni en el modo "todos los tipos públicos".
+- Corregida una regresión previa que había desactivado el puente con Genix
+  para el chatbot en el pipeline general de documentos.
+
+### Documentación
+
+- Actualizada toda la documentación de usuario (`docs/`) con lo anterior.
+
+## [1.1.3] - 2026-09-20
+
+### Internacionalización
+
+- Añadida la carga del text domain `ai-knowledge` desde `languages/`.
+- Internacionalizados los textos dinámicos de `assets/admin.js` mediante
+  `wp.i18n` y `wp_set_script_translations()`.
+- Incluidos catálogos PHP y JSON JavaScript en español, catalán, alemán, inglés
+  y francés.
+- La documentación del administrador busca primero `docs/{locale}/` y vuelve
+  a la documentación española de `docs/` cuando no existe traducción.
+
+### Crawlers y reglas del servidor
+
+### Crawlers y reglas del servidor
+
+- Ampliado el catálogo de crawlers con filtros por tipo y estado.
+- Reglas `.htaccess` agrupadas y ordenadas antes de WordPress.
+- `Amazonbot` permitido por defecto; eliminado el estado «Sin decidir».
+- `llms.txt` incluye la fecha ISO 8601 de su última generación.
+
 ## [1.1.2] - 2026-09-18
 
 ### Documentación contextual en el admin
@@ -284,7 +353,7 @@ Support Genix como núcleo; todo lo de abajo es capa añadida encima.
 - JSON-LD duplicado con el schema nativo de WooCommerce (`WC_Structured_Data`, siempre activo si WooCommerce lo está, independientemente de RankMath): ahora se detecta y se cede el schema, igual que ya se hacía con RankMath/Yoast/AIOSEO.
 - Texto de los `<select>` del admin invisible en hover/foco en modo oscuro: `.wp-core-ui select:hover` de WordPress core forzaba `color:#1e1e1e` con la misma especificidad que la regla del tema — mismo caso ya conocido con los botones, resuelto igual (`!important`, ver `_dev/decisiones.md`).
 
-### Pendiente de esta versión (ver `_dev/qa-resultados-fase-0-a-5.md`)
+### Pendiente de esta versión (ver `_dev/temp/qa-resultados-fase-0-a-5.md`)
 - Confirmar si el botón "Añadir a la base de conocimiento" del editor da feedback suficiente (reportado como "no se ve nada" en la primera ronda de QA).
 - Borde/zona oscura visible tras el fix del tema (reportado, no reproducido aún en código).
 - Rediseño de UX pendiente de acordar: editor de texto del Registro, claridad de "Carga inicial", selección de campos de WooCommerce igual que los posts, notas legales.
