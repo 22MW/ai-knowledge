@@ -4,7 +4,7 @@ Tags: woocommerce, chatbot, ia, llms.txt, wpml, crawlers, robots.txt
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.3
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -117,6 +117,9 @@ Sí. En **Visibilidad IA** selecciona el modo que permite únicamente `/llms.txt
 == Changelog ==
 
 Ver `CHANGELOG.md` para el historial completo y detallado de cambios.
+
+= 1.2.0 =
+Internacionalización completa (español, catalán, alemán, inglés, francés). En el Registro, generación, guardado y "Volver a Auto" ya no recargan la página, con prompt propio por documento e idioma y avisos flotantes. Nueva sección para publicar en `/llms.txt` artículos escritos directamente en Support Genix, respetando su marca de uso exclusivo para chatbot.
 
 = 1.1.3 =
 Internacionalización completa del administrador con catálogos español, catalán e inglés para PHP y JavaScript; documentación por locale con fallback al español; mejoras de crawlers y reglas del servidor consolidadas desde la versión de desarrollo 1.1.2.2.

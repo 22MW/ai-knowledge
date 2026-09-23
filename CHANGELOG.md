@@ -2,7 +2,16 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
-## [1.1.3.5] - Desarrollo - 2026-09-23
+## [1.2.0] - 2026-09-23
+
+### Internacionalización y documentación
+
+- Añadidos y sincronizados los catálogos de interfaz en español, catalán,
+  alemán, inglés y francés, incluyendo sus archivos `.po`, `.mo` y JSON.
+- Actualizados los índices de documentación pública e interna con los idiomas
+  disponibles y un canal de contacto para solicitar o corregir traducciones.
+- Reorganizada la documentación de desarrollo: los planes y materiales
+  temporales quedan en `_dev/temp/`.
 
 ### Registro: generación instantánea, prompt propio y auditoría de publicados
 
@@ -40,17 +49,6 @@ Todas las modificaciones relevantes de este plugin se documentan en este archivo
 ### Documentación
 
 - Actualizada toda la documentación de usuario (`docs/`) con lo anterior.
-
-## [1.1.3.1] - Desarrollo - 2026-09-20
-
-### Internacionalización y documentación
-
-- Añadidos y sincronizados los catálogos de interfaz en español, catalán,
-  alemán, inglés y francés, incluyendo sus archivos `.po`, `.mo` y JSON.
-- Actualizados los índices de documentación pública e interna con los idiomas
-  disponibles y un canal de contacto para solicitar o corregir traducciones.
-- Reorganizada la documentación de desarrollo: los planes y materiales
-  temporales quedan en `_dev/temp/`.
 
 ## [1.1.3] - 2026-09-20
 
