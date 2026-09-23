@@ -4,7 +4,7 @@ Tags: woocommerce, chatbot, ia, llms.txt, wpml, crawlers, robots.txt
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -117,9 +117,6 @@ Sí. En **Visibilidad IA** selecciona el modo que permite únicamente `/llms.txt
 == Changelog ==
 
 Ver `CHANGELOG.md` para el historial completo y detallado de cambios.
-
-= 1.2.0 =
-Base de datos para publicación selectiva de documentos de Support Genix en Markdown/llms.txt (columnas `is_public`, `custom_prompt`). Los documentos "compuestos" del propio plugin (Negocio, FAQs, catálogo/información de tienda) siguen públicos por defecto; los de un CPT real de WordPress o de Support Genix ahora requieren marcarse como públicos explícitamente.
 
 = 1.1.3 =
 Internacionalización completa del administrador con catálogos español, catalán e inglés para PHP y JavaScript; documentación por locale con fallback al español; mejoras de crawlers y reglas del servidor consolidadas desde la versión de desarrollo 1.1.2.2.

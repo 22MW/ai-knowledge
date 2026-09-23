@@ -278,27 +278,6 @@ El usuario aprobó el plan funcional para el siguiente cambio, aún sin código:
 El plan completo está en `_dev/roadmap.md`, sección «Plan aprobado pendiente
 de implementación — publicación, AJAX y prompts por documento».
 
-## Cambio actual — Publicación Genix, Fases 1-2 (2026-09-23)
-
-- Corregida regresión no intencionada de `2cd3e47`: el puente Genix
-  (creación/actualización de `sgkb-docs` desde el pipeline general de
-  productos/CPTs) estaba desactivado globalmente; restaurado en
-  `class-document-pipeline.php`.
-- `Registry::get_synced_public_urls()` ajustada: los documentos "compuestos"
-  del propio plugin (Negocio, FAQs, tienda) siguen públicos por defecto; los
-  de un CPT real de WordPress o de Genix (`sgkb-docs`) requieren `is_public=1`
-  explícito (todavía nadie lo pone a 1: pendiente de Fase 3).
-- Versión sincronizada a `1.2.0` en `readme.txt` (Stable tag) y `CHANGELOG.md`.
-- Fase 1 (lectura exclusiva de Genix): `includes/class-genix-reader.php`
-  (`Genix_Reader`), solo lee `sgkb-docs` publicados, nunca escribe en Genix.
-- Fase 2 (copia íntegra a Markdown): `includes/class-genix-markdown.php`
-  (`Genix_Markdown`), conversor HTML→Markdown propio sin librerías externas
-  (decisión explícita: sin Composer, sin vendorizar dependencias de terceros),
-  escribe el `.md` vía `Markdown_Store`.
-- Ninguna de las dos clases está cableada todavía en `class-plugin.php` ni en
-  ningún punto de entrada — corresponde a las Fases 3/4 (checkbox UI, AJAX).
-- Sin QA real todavía, solo `php -l` y lectura de código.
-
 ## Relevo mínimo — siguiente paso
 
 Confirmar commit + push del fix de `tax_query` (v1.1.0.1) y del diff

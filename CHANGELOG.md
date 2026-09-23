@@ -2,22 +2,6 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
-## [1.2.0] - 2026-09-23
-
-### Publicación selectiva de documentos (base para Genix → Markdown)
-
-- Nuevas columnas `is_public` y `custom_prompt` en el registro de documentos,
-  vía migración `dbDelta()`.
-- `get_synced_public_urls()` (qué sale en `/llms.txt`) distingue origen: los
-  documentos "compuestos" creados desde cero por el plugin (Negocio, FAQs,
-  información/catálogo de tienda) siguen públicos por defecto; los generados
-  a partir de un CPT real de WordPress o de un documento de Support Genix
-  (`sgkb-docs`) requieren marcarse como públicos explícitamente.
-- Corregido un cambio de alcance no intencionado que había desactivado el
-  puente con Support Genix (creación/actualización de `sgkb-docs`) para todo
-  el flujo general de generación de documentos: restaurado a su
-  comportamiento anterior.
-
 ## [1.1.3.1] - Desarrollo - 2026-09-20
 
 ### Internacionalización y documentación
