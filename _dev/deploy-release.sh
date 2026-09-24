@@ -93,7 +93,7 @@ git checkout -B "$BRANCH_RELEASE" "origin/$BRANCH_DEV" 2>/dev/null || git checko
 
 # Eliminar archivos que no deben ir en el ZIP de producción
 rm -rf _dev .kilo
-rm -f deploy-release.sh .env.local .env
+rm -f deploy-release.sh .env.local .env *.zip
 find . -name '.DS_Store' -delete 2>/dev/null || true
 
 git add -A
