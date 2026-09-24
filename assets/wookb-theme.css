@@ -71,8 +71,18 @@ body.toplevel_page_ai-knowledge #wpcontent {
   gap: 1rem;
   flex-wrap: wrap;
 }
+.wookb-header-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
 
-.wookb-theme-toggle {
+/* Tamaño compartido por los botones de la cabecera (modo oscuro, ver
+   llms.txt...); .wookb-theme-toggle queda SOLO para el boton real de tema
+   (el JS engancha su click y su texto por esa clase especificamente -- otro
+   boton con esa misma clase se veia arrastrado por ese mismo JS, pisandole
+   el texto y bloqueando su propio click con preventDefault(), bug real). */
+.wookb-header-btn {
   background: var(--tblr-secondary-bg, #e5e7eb);
   color: var(--tblr-body-color);
   border: none;
@@ -223,11 +233,11 @@ body.toplevel_page_ai-knowledge #wpcontent {
    real de Tabler, no color inventado): no verde puro (junto al rojo de
    "peligro" quedaba mal) ni azul (se confundia con "info"). */
 .wookb-wrap .button.wookb-btn-success,
-.wookb-wrap .wookb-theme-toggle.wookb-btn-success {
+.wookb-wrap .wookb-header-btn.wookb-btn-success {
   background: var(--tblr-cyan, #17a2b8);
   color: #fff;
 }
-.wookb-wrap a.wookb-theme-toggle.wookb-btn-success {
+.wookb-wrap a.wookb-header-btn.wookb-btn-success {
   text-decoration: none;
   display: inline-block;
 }

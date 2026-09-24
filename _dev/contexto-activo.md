@@ -510,6 +510,53 @@ con `wp i18n make-mo` hacia un directorio temporal (sin tocar los `.mo`
 reales) — los 5 `.po` compilan sin error. No se tocó ningún `.mo`, ningún
 `.json` de JS ni el propio `.pot`.
 
+### FAQ/WooCommerce/Negocio: solo idioma principal + nota de idiomas (2026-09-24)
+
+- `Wpml::default_language()` (nuevo): idioma principal real vía filtro
+  `wpml_default_language`, con fallback a `active_languages()[0]` (que ya
+  cae a 'es' sin WPML).
+- `Wpml::languages_note($doc_lang)` (nuevo): frase "Esta web también está
+  disponible en: ..." redactada en `$doc_lang`, con nombres de idioma en su
+  forma nativa (evita tener que traducir los nombres a cada idioma). Vacía
+  si el sitio es monoidioma.
+- `Store_Info_Doc::generate_all()`: ya no recorre `Wpml::active_languages()`,
+  genera una sola vez en `Wpml::default_language()`. Nota de idiomas añadida
+  al final del cuerpo (después de `enforce_char_limit()`, para que nunca se
+  recorte).
+- `Llms_Faq::persist_doc()`: nota de idiomas añadida al Markdown publicado.
+  El paso `faqs` del asistente (`assistant_save_step()`) ya no recorre
+  idiomas activos, genera solo en el principal; su panel de lectura
+  (`assistant_screen_content('faqs')`) y el resumen (`render_assistant_summary()`)
+  actualizados igual (un bloque, no un `foreach` por idioma).
+- `Chatbot_Prompt_Builder::write_info_doc()` (Negocio): nunca tuvo bucle por
+  idioma (siempre fue un solo documento), solo se le añadió la nota de
+  idiomas.
+- Las páginas/productos reales (traducción real vía WPML) NO se tocaron:
+  siguen generando un documento por idioma como siempre.
+- **Limpieza de filas antiguas en otros idiomas: NO hecha a propósito.** Si
+  el sitio tenía FAQ/WooCommerce ya generados en varios idiomas antes de
+  hoy, esas filas de Registry y sus `.md` siguen existiendo (huérfanas, ya
+  no se regeneran ni actualizan, pero tampoco se borran solas). Es una
+  limpieza de datos con efecto real sobre `/llms.txt` que no me correspondía
+  forzar sin confirmación explícita — se puede hacer a mano desde el
+  Registro (botón "Borrar" de esas filas) o pedir una tarea aparte.
+
+### Enriquecer documentos de productos WooCommerce (2026-09-24)
+
+- IA escribe solo la descripcion; el codigo anexa "## Datos de compra" (precio,
+  precio anterior, % descuento, oferta hasta, disponibilidad, envio, impuestos,
+  TODAS las variaciones publicadas hasta 100, campos personalizados) via
+  `Generator::build_purchase_data_block()` (pura) tras `enforce_body_char_limit`;
+  no cuenta para el limite. Datos en `$data['purchase']` (Extractor_Woo), sin
+  tocar claves existentes ni `compute_hash()`. Titulo decodificado en
+  Extractor_Base (los docs con guiones/comillas cambian de hash y se regeneran).
+- **PENDIENTE i18n**: etiquetas del bloque en espanol fijo, sin `__()`, todas en
+  `Generator::PURCHASE_LABELS` (+ "Estandar"/"cualquiera" en Extractor_Woo).
+- Decision pendiente (no aplicada): campos nuevos sin cubrir por el hash
+  (peso, dimensiones, clase de envio/fiscal, tipos de impuesto, sale_until,
+  stock_quantity, SKU, backorder, variaciones ocultas por get_available_variations).
+  Ver informe.
+
 ### QA pendiente (todo, no se ha probado en real)
 
 Ver lista de pruebas manuales en el informe del subagente. Ninguna de las 5

@@ -23,6 +23,76 @@ class Wpml {
 		return $langs ? array_keys( $langs ) : array( 'es' );
 	}
 
+	/**
+	 * Idioma PRINCIPAL real del sitio (distinto de "idiomas activos"): el que
+	 * WPML tiene configurado como idioma por defecto, vía el filtro estándar
+	 * 'wpml_default_language'. Usado por los documentos "compuestos" del
+	 * propio plugin (FAQ, información de tienda) que no tienen una
+	 * traducción real por idioma como un producto/página -- no tiene sentido
+	 * generarlos en todos los idiomas activos, solo en el principal.
+	 *
+	 * Fallback sin WPML (o si el filtro no devuelve nada, caso no esperado
+	 * pero posible si el modulo de idiomas de WPML no está inicializado
+	 * todavía): primer idioma de active_languages(), que ya cae a 'es' en
+	 * ese caso -- mismo patrón de fallback monolingüe que el resto de la clase.
+	 */
+	public static function default_language() {
+		if ( self::is_active() ) {
+			$default = apply_filters( 'wpml_default_language', null );
+			if ( $default && is_string( $default ) ) {
+				return $default;
+			}
+		}
+		$active = self::active_languages();
+		return $active ? $active[0] : 'es';
+	}
+
+	/** Nombre nativo de un idioma (para listarlo dentro de otro idioma sin tener que traducirlo). */
+	protected static function native_language_name( $code ) {
+		$names = array(
+			'es' => 'español',
+			'ca' => 'català',
+			'en' => 'English',
+			'de' => 'Deutsch',
+			'eu' => 'euskara',
+			'fr' => 'français',
+		);
+		return isset( $names[ $code ] ) ? $names[ $code ] : strtoupper( $code );
+	}
+
+	/**
+	 * Frase "Esta web está disponible también en: ..." (Markdown, una línea),
+	 * redactada en $doc_lang -- el idioma real del documento que la incluye.
+	 * Usada por los documentos "compuestos" del propio plugin (FAQ,
+	 * información de tienda, Negocio) que ahora solo se generan en el idioma
+	 * principal del sitio: sin esta nota, una IA que lea ese documento no
+	 * tendría forma de saber que existen otras versiones del sitio en otros
+	 * idiomas, ya que este documento en concreto no está traducido.
+	 *
+	 * Vacío si el sitio es monoidioma (ruido innecesario) o si $doc_lang es
+	 * el único idioma activo.
+	 */
+	public static function languages_note( $doc_lang ) {
+		$active = self::active_languages();
+		$others = array_values( array_diff( $active, array( $doc_lang ) ) );
+		if ( empty( $others ) ) {
+			return '';
+		}
+
+		$templates = array(
+			'es' => 'Esta web también está disponible en: %s.',
+			'ca' => 'Aquest lloc també està disponible en: %s.',
+			'en' => 'This website is also available in: %s.',
+			'de' => 'Diese Website ist auch verfügbar auf: %s.',
+			'eu' => 'Webgune hau eskuragarri dago ere: %s.',
+			'fr' => 'Ce site est également disponible en : %s.',
+		);
+		$template = isset( $templates[ $doc_lang ] ) ? $templates[ $doc_lang ] : $templates['es'];
+
+		$names = array_map( array( __CLASS__, 'native_language_name' ), $others );
+		return sprintf( $template, implode( ', ', $names ) );
+	}
+
 	public static function element_language( $post_id ) {
 		if ( ! self::is_active() ) {
 			return 'es';

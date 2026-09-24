@@ -43,7 +43,7 @@ class Rest_Content {
 	 * Llms_Txt::build()).
 	 */
 	public static function print_feed_links() {
-		if ( class_exists( 'WooCommerce' ) ) {
+		if ( class_exists( 'WooCommerce' ) && Scope::has_post_type_in_scope( 'product' ) ) {
 			printf(
 				'<link rel="alternate" type="application/rss+xml" title="%s" href="%s" />' . "\n",
 				esc_attr__( 'Feed de productos (Google Merchant)', 'ai-knowledge' ),
@@ -392,6 +392,13 @@ class Rest_Content {
 	 * el servidor REST envuelve en JSON por defecto y este formato no lo es.
 	 */
 	public static function get_feed_products_xml() {
+		// 'product' fuera del alcance: el feed no se publica (404), en vez de
+		// responder 200 con un canal vacio -- misma regla que ya aplica
+		// /content/{id} con Scope::is_included().
+		if ( ! Scope::has_post_type_in_scope( 'product' ) ) {
+			return self::not_found();
+		}
+
 		$currency = get_woocommerce_currency();
 		$ids      = array_values(
 			array_filter(

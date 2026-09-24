@@ -298,7 +298,6 @@ class Admin
 				<?php endif; ?>
 				<div class="wookb-assistant-actions">
 					<?php if ('welcome' !== $step) : ?><button type="submit" class="button" name="assistant_action" value="back"><?php esc_html_e('Atrás', 'ai-knowledge'); ?></button><?php endif; ?>
-					<?php if (!in_array($step, array('welcome', 'finish', 'success'), true)) : ?> <button type="submit" class="button" name="assistant_action" value="exit"><?php esc_html_e('Salir del asistente', 'ai-knowledge'); ?></button><?php endif; ?>
 					<span class="wookb-assistant-actions-main">
 						<?php if (!in_array($step, array('welcome', 'success', 'finish'), true)) : ?><button type="submit" class="button" name="assistant_action" value="save"><?php esc_html_e('Guardar configuración', 'ai-knowledge'); ?></button><?php endif; ?>
 						<?php if ('success' !== $step) : ?><button type="submit" class="button button-primary" name="assistant_action" value="continue"><?php esc_html_e('Continuar', 'ai-knowledge'); ?></button><?php endif; ?>
@@ -382,23 +381,23 @@ class Admin
 			<div class="wookb-assistant-fields"><?php foreach (array('wc_store_name' => __('Nombre de la tienda', 'ai-knowledge'), 'wc_currency' => __('Moneda', 'ai-knowledge'), 'wc_base_country' => __('País base', 'ai-knowledge')) as $key => $label) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($label); ?></span><input type="text" name="<?php echo esc_attr($key); ?>" value="<?php echo esc_attr($settings[$key]); ?>" /></label><?php endforeach; ?><label class="wookb-assistant-field"><span><?php esc_html_e('Condiciones de venta', 'ai-knowledge'); ?></span><textarea name="wc_terms_text" rows="3"><?php echo esc_textarea($settings['wc_terms_text']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Política de devoluciones', 'ai-knowledge'); ?></span><textarea name="wc_returns_text" rows="3"><?php echo esc_textarea($settings['wc_returns_text']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Plazo de entrega', 'ai-knowledge'); ?></span><textarea name="delivery_time_note" rows="3"><?php echo esc_textarea($settings['delivery_time_note']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Contacto y horario de la tienda', 'ai-knowledge'); ?></span><textarea name="wc_contact_hours" rows="3"><?php echo esc_textarea($settings['wc_contact_hours']); ?></textarea></label><label class="wookb-assistant-toggle"><input type="checkbox" name="wc_pickup_available" value="1" <?php checked(!empty($settings['wc_pickup_available'])); ?> /><span><?php esc_html_e('Recogida en tienda disponible', 'ai-knowledge'); ?></span></label></div>
 		<?php elseif ('chatbot' === $step) : $answers = Chatbot_Prompt_Builder::get_saved_answers(); ?><div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Límite de documentos relacionados', 'ai-knowledge'); ?></span><input type="number" min="0" name="chatbot_docs_list_limit" value="<?php echo esc_attr($settings['chatbot_docs_list_limit']); ?>" /></label><?php foreach (Chatbot_Prompt_Builder::questions_by_group('chatbot') as $key => $question) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($question['label']); ?></span><?php if ('textarea' === $question['type']) : ?><textarea name="answers[<?php echo esc_attr($key); ?>]" rows="3"><?php echo esc_textarea($answers[$key]); ?></textarea><?php else : ?><input type="text" name="answers[<?php echo esc_attr($key); ?>]" value="<?php echo esc_attr($answers[$key]); ?>" /><?php endif; ?></label><?php endforeach; ?></div>
 		<?php elseif ('faqs' === $step) :
-			$faq_langs = Wpml::active_languages() ?: array('es');
+			// Cambio de comportamiento (2026-09-24): el FAQ ya solo se genera
+			// en el idioma principal (ver assistant_save_step('faqs')), no en
+			// cada idioma activo -- un solo bloque, no un foreach por idioma.
+			$faq_lang = Wpml::default_language();
+			$faq_error = get_transient('wookb_assistant_faqs_error_' . $faq_lang);
+			$faq_current = Llms_Faq::read($faq_lang);
 			?>
 			<p class="description"><?php esc_html_e('Al guardar este paso, se genera con IA y se publica de inmediato en llms.txt (excepción explícita de este paso del asistente a la norma habitual de revisar antes de publicar).', 'ai-knowledge'); ?></p>
-			<?php foreach ($faq_langs as $faq_lang) :
-				$faq_error = get_transient('wookb_assistant_faqs_error_' . $faq_lang);
-				$faq_current = Llms_Faq::read($faq_lang);
-				?>
-				<h3><?php echo esc_html(count($faq_langs) > 1 ? strtoupper($faq_lang) : __('Preguntas frecuentes', 'ai-knowledge')); ?></h3>
-				<?php if ($faq_error) : ?>
-					<p class="notice notice-warning inline"><?php echo esc_html($faq_error); ?></p>
-				<?php elseif ('' !== $faq_current) : ?>
-					<p class="notice notice-success inline"><?php esc_html_e('Ya hay un FAQ publicado para este idioma. Al guardar de nuevo, se amplía/mejora, no se sustituye desde cero.', 'ai-knowledge'); ?></p>
-					<textarea readonly rows="8" style="width:100%;max-width:100%;font-size:13px;"><?php echo esc_textarea($faq_current); ?></textarea>
-				<?php else : ?>
-					<p class="description"><?php esc_html_e('Todavía no hay FAQ generado para este idioma.', 'ai-knowledge'); ?></p>
-				<?php endif; ?>
-			<?php endforeach; ?>
+			<h3><?php esc_html_e('Preguntas frecuentes', 'ai-knowledge'); ?></h3>
+			<?php if ($faq_error) : ?>
+				<p class="notice notice-warning inline"><?php echo esc_html($faq_error); ?></p>
+			<?php elseif ('' !== $faq_current) : ?>
+				<p class="notice notice-success inline"><?php esc_html_e('Ya hay un FAQ publicado para este idioma. Al guardar de nuevo, se amplía/mejora, no se sustituye desde cero.', 'ai-knowledge'); ?></p>
+				<textarea readonly rows="8" style="width:100%;max-width:100%;font-size:13px;"><?php echo esc_textarea($faq_current); ?></textarea>
+			<?php else : ?>
+				<p class="description"><?php esc_html_e('Todavía no hay FAQ generado para este idioma.', 'ai-knowledge'); ?></p>
+			<?php endif; ?>
 		<?php elseif ('visibility' === $step) :
 			$categories = self::assistant_crawler_categories();
 			$category = isset($_POST['assistant_category']) ? sanitize_key(wp_unslash($_POST['assistant_category'])) : 'ai_search'; // phpcs:ignore
@@ -605,18 +604,24 @@ class Admin
 		} elseif ('faqs' === $step) {
 			// Paso nuevo. Excepcion explicita, ya confirmada por el usuario, a
 			// la norma general de "revisar antes de publicar": aqui se genera
-			// Y se publica de una vez, para cada idioma activo. Solo si hay
-			// conexion -- si no, no hay nada que hacer en este paso (no tiene
-			// campos propios que guardar, es puramente de generacion).
+			// Y se publica de una vez. Solo si hay conexion -- si no, no hay
+			// nada que hacer en este paso (no tiene campos propios que
+			// guardar, es puramente de generacion).
+			//
+			// Cambio de comportamiento confirmado por el usuario (2026-09-24):
+			// antes se generaba un documento por cada idioma ACTIVO de WPML,
+			// igual que un producto/pagina con traduccion real. El FAQ no
+			// tiene traduccion real detras -- lo redacta el propio plugin, no
+			// hay contenido distinto que traducir por idioma. Ahora se genera
+			// SOLO en el idioma PRINCIPAL del sitio (Wpml::default_language()).
 			if (self::assistant_ai_available()) {
 				$answers = Chatbot_Prompt_Builder::get_saved_answers();
-				foreach (Wpml::active_languages() ?: array('es') as $faq_lang) {
-					$current_faq = Llms_Faq::read($faq_lang);
-					$draft = Chatbot_Prompt_Builder::generate_faqs($answers, $current_faq, '');
-					if (is_wp_error($draft)) {
-						set_transient('wookb_assistant_faqs_error_' . $faq_lang, $draft->get_error_message(), MINUTE_IN_SECONDS);
-						continue;
-					}
+				$faq_lang = Wpml::default_language();
+				$current_faq = Llms_Faq::read($faq_lang);
+				$draft = Chatbot_Prompt_Builder::generate_faqs($answers, $current_faq, '');
+				if (is_wp_error($draft)) {
+					set_transient('wookb_assistant_faqs_error_' . $faq_lang, $draft->get_error_message(), MINUTE_IN_SECONDS);
+				} else {
 					delete_transient('wookb_assistant_faqs_error_' . $faq_lang);
 					Llms_Faq::save($draft, $faq_lang);
 					Llms_Faq::persist_doc($faq_lang);
@@ -653,106 +658,173 @@ class Admin
 	protected static function build_geo_prompt()
 	{
 		$content = <<<'GEO'
-# Auditoría GEO - Percepción IA
+# Auditoría GEO - Visibilidad IA de una web
 
-Analiza [URL] simulando cómo un agente de inteligencia artificial interpreta esta web.
+Analiza la web: [URL]
 
-El objetivo es saber qué información puede descubrir, comprender y reutilizar una IA actualmente.
+Objetivo:
+Evaluar cómo una inteligencia artificial, agente autónomo o buscador con IA puede descubrir, interpretar y acceder a esta web actualmente.
 
-No hagas auditoría SEO.
-No analices keywords, posicionamiento, copywriting, diseño o estrategia comercial.
+NO hagas auditoría SEO.
+NO analices keywords.
+NO analices posicionamiento.
+NO analices copywriting.
+NO analices diseño visual.
+NO valores estrategia comercial.
 
-## Recursos GEO
+Analiza únicamente la capa técnica de visibilidad, accesibilidad y comprensión para sistemas IA.
 
-Comprueba directamente:
+---
+
+## Recursos GEO y archivos técnicos
+
+Comprueba directamente todos los recursos disponibles:
 
 - [URL]robots.txt
 - [URL]llms.txt
 - [URL]sitemap.xml
 - [URL]sitemap_index.xml
 - [URL]wp-sitemap.xml
+- feeds XML
+- feeds JSON
+- endpoints públicos
+- APIs relacionadas
+- archivos Markdown
+- documentación para IA
+- cualquier archivo específico GEO encontrado
 
-Para cada recurso indica:
+Para cada recurso:
 
-- URL comprobada.
+- URL exacta comprobada.
 - Código HTTP.
-- Contenido encontrado.
-- Información disponible para una IA.
+- Si existe o no.
+- Si ha podido ser leído completamente.
+- Información que aporta a una IA.
 
-## Comprensión de la entidad
+IMPORTANTE:
+No marques un archivo como "no verificado" sin intentar acceder primero.
+Si no puedes leerlo indica exactamente:
+- motivo del fallo;
+- bloqueo encontrado;
+- error HTTP;
+- limitación técnica.
 
+No dejes recursos sin intentar comprobar.
+
+---
+
+# Analiza exclusivamente:
+
+## 1. Percepción IA actual
+
+Explica brevemente:
+
+- Qué puede entender una IA de la web.
+- Qué nivel de acceso tiene.
+- Si existe una capa preparada para agentes IA.
+- Si la información está organizada para interpretación automática.
+
+Máximo 50 líneas.
+
+---
+
+## 2. Tabla comparativa técnica
+
+Entrega una tabla:
+
+| Elemento | Estado | Resultado observado | Impacto para IA |
+|---|---|---|---|
+| robots.txt | | | |
+| llms.txt | | | |
+| sitemap | | | |
+| Markdown IA | | | |
+| JSON | | | |
+| Feeds | | | |
+| APIs | | | |
+| Schema.org | | | |
+| Product | | | |
+| Organization | | | |
+| FAQ | | | |
+| Otros recursos GEO | | | |
+
+---
+
+## 3. Calidad de archivos GEO
+
+Evalúa únicamente la calidad técnica de cada archivo:
+
+### llms.txt
 Analiza:
 
-- Qué entidad identifica una IA.
-- Qué producto, servicio o información representa.
-- Qué relaciones puede interpretar:
-  - empresa;
-  - producto;
-  - tecnologías;
-  - plataformas;
-  - servicios relacionados.
+- existencia;
+- estructura;
+- claridad para modelos IA;
+- enlaces útiles;
+- organización;
+- actualización;
+- relación con otros recursos.
 
-## Información reutilizable por IA
-
-Indica qué puede responder una IA actualmente sobre:
-
-- qué es;
-- qué hace;
-- cómo funciona;
-- integraciones;
-- requisitos;
-- categorías;
-- relaciones detectadas.
-
-## Estructuras disponibles
-
-Comprueba únicamente elementos existentes:
-
-- Schema.org / JSON-LD.
-- SoftwareApplication.
-- Product.
-- Organization.
-- FAQ.
-- Markdown.
-- JSON.
-- APIs o endpoints estructurados.
-
-## Accesibilidad IA
-
+### robots.txt
 Analiza:
 
-- si la información principal es accesible;
-- si existen bloqueos para bots IA;
-- si existe contenido no accesible para agentes automáticos;
-- si depende de interacción humana o JavaScript.
+- acceso permitido/bloqueado para bots IA;
+- reglas específicas;
+- coherencia con llms.txt.
 
-## Resultado
+### JSON / APIs / Feeds
+Analiza:
 
-Entrega:
+- existencia;
+- accesibilidad;
+- formato;
+- utilidad para agentes IA.
 
-# 1. Cómo ve una IA esta web actualmente
+NO evalúes la calidad del texto comercial.
+Evalúa únicamente si sirve como fuente interpretable por IA.
 
-# 2. Información que puede extraer
+---
 
-# 3. Archivos y estructuras disponibles
+## 4. Problemas detectados
 
-# 4. Limitaciones detectadas
+Lista únicamente problemas confirmados.
 
-# 5. Nivel de comprensión IA:
-Bajo / Medio / Alto
-
-Usa siempre esta clasificación:
+Clasificación:
 
 - Confirmado: comprobado directamente.
 - Riesgo: posible limitación no confirmada.
 - No verificado: no se ha podido comprobar.
 
-Reglas:
+No inventes problemas.
 
-- No inventes datos.
-- No hagas recomendaciones.
-- No marques errores sin evidencia.
-- Cada conclusión debe estar respaldada por una URL, archivo, código HTTP o elemento técnico observado.
+---
+
+## 5. Nivel final de visibilidad IA
+
+Clasifica:
+
+BAJO / MEDIO / ALTO
+
+Basado únicamente en:
+
+- accesibilidad;
+- archivos GEO;
+- estructuras técnicas;
+- facilidad de interpretación automática.
+
+No valores contenido, SEO ni marketing.
+
+---
+
+Formato final obligatorio:
+
+1. Resumen humano (máximo 50 líneas).
+2. Tabla comparativa técnica.
+3. Nivel de visibilidad IA.
+4. Problemas confirmados.
+
+No incluyas recomendaciones generales.
+No expliques qué se podría hacer.
+Entrega únicamente el estado actual de la web.
 GEO;
 		$content = str_replace('[URL]', home_url('/'), $content);
 		return $content;
@@ -856,7 +928,7 @@ GEO;
 		// oscuro en cada carga).
 		echo '<script>(function(){var w=document.currentScript.parentNode;var t=null;try{t=window.localStorage.getItem("wookb_theme");}catch(e){}if("dark"!==t&&"light"!==t){if(window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches){t="light";}else{t="dark";}}w.setAttribute("data-bs-theme",t);})();</script>';
 		echo '<div class="wookb-header-row"><h3>' . esc_html__('Base de conocimiento IA', 'ai-knowledge') . '</h3>';
-		echo '<button type="button" class="wookb-theme-toggle"> ' . esc_html__('Modo oscuro', 'ai-knowledge') . '</button> <a class="wookb-theme-toggle wookb-btn-success" href="' . esc_url(home_url('/llms.txt')) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Ver llms.txt', 'ai-knowledge') . '</a></div>';
+		echo '<div class="wookb-header-btn-group"><a class="wookb-header-btn wookb-btn-success" href="' . esc_url(home_url('/llms.txt')) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Ver llms.txt', 'ai-knowledge') . '</a> <button type="button" class="wookb-header-btn wookb-theme-toggle"> ' . esc_html__('Modo oscuro', 'ai-knowledge') . '</button></div></div>';
 
 		self::render_registry_summary();
 
@@ -1267,25 +1339,25 @@ GEO;
 				break;
 			}
 		}
-		$summary_langs = Wpml::active_languages() ?: array('es');
+		// Cambio de comportamiento (2026-09-24): WooCommerce y FAQ ya solo se
+		// generan en el idioma principal (Store_Info_Doc::generate_all(),
+		// Llms_Faq vía assistant_save_step('faqs')), no por cada idioma
+		// activo -- un solo bloque cada uno, sin foreach por idioma.
+		$default_lang = Wpml::default_language();
 		$chatbot_synced = '' !== Chatbot_Prompt::read() && Chatbot_Prompt::is_genix_ready();
 		$doc_summary = Registry::summary();
 		ob_start();
 		?>
 		<div class="wookb-assistant-summary">
 			<p><strong><?php esc_html_e('Negocio:', 'ai-knowledge'); ?></strong> <?php echo $business_has_data ? esc_html__('Datos guardados.', 'ai-knowledge') : esc_html__('Todavía sin datos.', 'ai-knowledge'); ?></p>
-			<?php if (class_exists('WooCommerce')) : ?>
-				<?php foreach ($summary_langs as $wc_lang) :
-					$store_info_row = Registry::find(Store_Info_Doc::SOURCE_ID_STORE_INFO, $wc_lang);
-					$catalog_row = Registry::find(Store_Info_Doc::SOURCE_ID_SHOP_CATALOG, $wc_lang);
-					$wc_synced = ($store_info_row && $store_info_row->md_path) || ($catalog_row && $catalog_row->md_path);
-					?>
-					<p><strong><?php echo esc_html(sprintf(/* translators: %s: idioma */ __('WooCommerce (%s):', 'ai-knowledge'), count($summary_langs) > 1 ? strtoupper($wc_lang) : __('general', 'ai-knowledge'))); ?></strong> <?php echo $wc_synced ? esc_html__('Documentos generados.', 'ai-knowledge') : esc_html__('Todavía sin generar.', 'ai-knowledge'); ?></p>
-				<?php endforeach; ?>
+			<?php if (class_exists('WooCommerce')) :
+				$store_info_row = Registry::find(Store_Info_Doc::SOURCE_ID_STORE_INFO, $default_lang);
+				$catalog_row = Registry::find(Store_Info_Doc::SOURCE_ID_SHOP_CATALOG, $default_lang);
+				$wc_synced = ($store_info_row && $store_info_row->md_path) || ($catalog_row && $catalog_row->md_path);
+				?>
+				<p><strong><?php esc_html_e('WooCommerce:', 'ai-knowledge'); ?></strong> <?php echo $wc_synced ? esc_html__('Documentos generados.', 'ai-knowledge') : esc_html__('Todavía sin generar.', 'ai-knowledge'); ?></p>
 			<?php endif; ?>
-			<?php foreach ($summary_langs as $faq_summary_lang) : ?>
-				<p><strong><?php echo esc_html(sprintf(/* translators: %s: idioma */ __('FAQ (%s):', 'ai-knowledge'), count($summary_langs) > 1 ? strtoupper($faq_summary_lang) : __('general', 'ai-knowledge'))); ?></strong> <?php echo '' !== Llms_Faq::read($faq_summary_lang) ? esc_html__('Publicado.', 'ai-knowledge') : esc_html__('Todavía sin generar.', 'ai-knowledge'); ?></p>
-			<?php endforeach; ?>
+			<p><strong><?php esc_html_e('FAQ:', 'ai-knowledge'); ?></strong> <?php echo '' !== Llms_Faq::read($default_lang) ? esc_html__('Publicado.', 'ai-knowledge') : esc_html__('Todavía sin generar.', 'ai-knowledge'); ?></p>
 			<?php if (Chatbot_Prompt::is_genix_ready()) : ?>
 				<p><strong><?php esc_html_e('Chatbot:', 'ai-knowledge'); ?></strong> <?php echo $chatbot_synced ? esc_html__('Sincronizado con Genix.', 'ai-knowledge') : esc_html__('Todavía sin sincronizar.', 'ai-knowledge'); ?></p>
 			<?php endif; ?>

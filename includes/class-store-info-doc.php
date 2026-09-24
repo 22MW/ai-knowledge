@@ -56,31 +56,38 @@ class Store_Info_Doc {
 	const CHAR_LIMIT = 20000;
 
 	/**
-	 * Genera (o regenera) los documentos de información de tienda y catálogo
-	 * para todos los idiomas activos. Pensado para lanzarse manualmente desde
-	 * el admin (botón en Ajustes), no desde el ciclo de guardado de posts: su
-	 * origen (ajustes de WooCommerce) no dispara ningún hook de save_post.
+	 * Genera (o regenera) los documentos de información de tienda y catálogo.
+	 * Pensado para lanzarse manualmente desde el admin (botón en Ajustes), no
+	 * desde el ciclo de guardado de posts: su origen (ajustes de WooCommerce)
+	 * no dispara ningún hook de save_post.
+	 *
+	 * Cambio de comportamiento confirmado por el usuario (2026-09-24): antes
+	 * generaba un documento por cada idioma activo de WPML, igual que un
+	 * producto/página con traducción real. Pero este documento no tiene
+	 * traducción real detrás -- lo redacta el propio plugin a partir de los
+	 * ajustes de WooCommerce, no hay contenido distinto por idioma que
+	 * traducir. Ahora se genera SOLO en el idioma principal del sitio
+	 * (Wpml::default_language()), no en todos los activos.
 	 *
 	 * Devuelve un resumen array( 'ok' => int, 'errores' => array ).
 	 */
 	public static function generate_all() {
 		$ok      = 0;
 		$errores = array();
+		$lang    = Wpml::default_language();
 
-		foreach ( Wpml::active_languages() as $lang ) {
-			$result = self::generate_store_info( $lang );
-			if ( is_wp_error( $result ) ) {
-				$errores[] = 'store-info (' . $lang . '): ' . $result->get_error_message();
-			} else {
-				$ok++;
-			}
+		$result = self::generate_store_info( $lang );
+		if ( is_wp_error( $result ) ) {
+			$errores[] = 'store-info (' . $lang . '): ' . $result->get_error_message();
+		} else {
+			$ok++;
+		}
 
-			$result = self::generate_shop_catalog( $lang );
-			if ( is_wp_error( $result ) ) {
-				$errores[] = 'shop-catalog (' . $lang . '): ' . $result->get_error_message();
-			} else {
-				$ok++;
-			}
+		$result = self::generate_shop_catalog( $lang );
+		if ( is_wp_error( $result ) ) {
+			$errores[] = 'shop-catalog (' . $lang . '): ' . $result->get_error_message();
+		} else {
+			$ok++;
 		}
 
 		Llms_Txt::invalidate();
@@ -99,6 +106,7 @@ class Store_Info_Doc {
 
 		$body = self::build_store_info_body( $lang );
 		$body = self::enforce_char_limit( $body );
+		$body = self::append_languages_note( $body, $lang );
 
 		$title = self::title_store_info( $lang );
 		$url   = self::url_store_info( $lang );
@@ -125,6 +133,7 @@ class Store_Info_Doc {
 
 		$body = self::build_shop_catalog_body( $lang );
 		$body = self::enforce_char_limit( $body );
+		$body = self::append_languages_note( $body, $lang );
 
 		$title = self::title_shop_catalog( $lang );
 		$url   = self::url_shop_catalog( $lang );
@@ -885,5 +894,23 @@ class Store_Info_Doc {
 		}
 
 		return implode( "\n", $kept );
+	}
+
+	/**
+	 * Añade la nota "Esta web también está disponible en: ..." (Wpml::
+	 * languages_note()) al final del cuerpo -- DESPUÉS de enforce_char_limit()
+	 * a propósito, para que nunca se recorte junto con el resto del texto.
+	 * Cambio de comportamiento confirmado por el usuario (2026-09-24): estos
+	 * documentos ahora solo se generan en el idioma principal (ver
+	 * generate_all()), así que sin esta nota una IA que los lea no tendría
+	 * forma de saber que el sitio existe en otros idiomas. Vacía (sin
+	 * cambios en el body) si el sitio es monoidioma.
+	 */
+	protected static function append_languages_note( $body, $lang ) {
+		$note = Wpml::languages_note( $lang );
+		if ( '' === $note ) {
+			return $body;
+		}
+		return rtrim( $body ) . "\n\n" . $note;
 	}
 }

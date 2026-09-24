@@ -103,7 +103,7 @@ class Markdown_Discovery {
 	 * imprimir nada, should_skip_schema() comprueba TODAS las fuentes
 	 * conocidas que ya cubren esto: WooCommerce core (Product, siempre
 	 * activo salvo que alguien desenganche su hook explícitamente), RankMath
-	 * (Article y Product, si su módulo 'schema' está activo), Yoast SEO y
+	 * (Article y Product, si su módulo 'rich-snippet' está activo), Yoast SEO y
 	 * AIOSEO (ambos activos por defecto sin módulo desactivable simple). Si
 	 * ninguna de esas fuentes aplica, se imprime el nuestro como red de
 	 * seguridad mínima (mejor Schema.org básico que ninguno).
@@ -166,10 +166,14 @@ class Markdown_Discovery {
 			$skip = true;
 		}
 
-		// RankMath: solo si su módulo 'schema' está activo (es desactivable,
+		// RankMath: solo si su módulo de Schema está activo (es desactivable,
 		// a diferencia de WooCommerce/Yoast/AIOSEO) -- misma comprobación que
-		// usa el propio RankMath para decidir si generar su JSON-LD.
-		if ( ! $skip && class_exists( '\RankMath\Helper' ) && \RankMath\Helper::is_module_active( 'schema' ) ) {
+		// usa el propio RankMath para decidir si generar su JSON-LD. El id
+		// real de ese módulo en RankMath es 'rich-snippet' (no 'schema': con
+		// 'schema' la comprobación devolvía siempre false y nuestro Article
+		// se emitía igualmente junto al grafo de RankMath -- bug real
+		// confirmado en una instalación con RankMath activo).
+		if ( ! $skip && class_exists( '\RankMath\Helper' ) && \RankMath\Helper::is_module_active( 'rich-snippet' ) ) {
 			$skip = true;
 		}
 
