@@ -496,6 +496,20 @@ final:
   perdía. Corregido con un `$state = get_option(...)` de refresco en los dos
   sitios.
 
+### Catálogos de idioma actualizados (2026-09-24)
+
+Comparados los 5 `.po` (`ca`, `de_DE`, `en_US`, `eu`, `fr_FR`) contra
+`languages/ai-knowledge.pot` (ya regenerado por la sesión principal,
+confirmado estable: `wp i18n make-pot` no cambia nada al repetirlo). Añadidas
+125 entradas nuevas por idioma (las del rediseño del asistente + Genix +
+toasts + demás cambios de hoy) más 1 entrada suelta que ya faltaba de antes
+("Mostrar menos crawlers", solo en `de_DE`/`eu`/`fr_FR` — `ca`/`en_US` ya la
+tenían). Solo adiciones, ninguna traducción existente tocada ni borrada
+(`git diff --stat` confirma 0 líneas eliminadas en los 5 archivos). Validado
+con `wp i18n make-mo` hacia un directorio temporal (sin tocar los `.mo`
+reales) — los 5 `.po` compilan sin error. No se tocó ningún `.mo`, ningún
+`.json` de JS ni el propio `.pot`.
+
 ### QA pendiente (todo, no se ha probado en real)
 
 Ver lista de pruebas manuales en el informe del subagente. Ninguna de las 5

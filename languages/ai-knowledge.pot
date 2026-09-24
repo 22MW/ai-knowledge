@@ -9,13 +9,13 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-24T07:03:42+00:00\n"
+"POT-Creation-Date: 2026-09-24T08:54:07+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: ai-knowledge\n"
 
 #. Plugin Name of the plugin
-#: admin/class-admin.php:253
+#: admin/class-admin.php:256
 msgid "AI Knowledge & Visibility"
 msgstr ""
 
@@ -35,13 +35,13 @@ msgstr ""
 #: admin/class-admin.php:126
 #: admin/class-admin.php:135
 #: admin/class-admin.php:136
-#: admin/class-admin.php:688
+#: admin/class-admin.php:858
 #: includes/class-editor-metabox.php:50
 msgid "Base de conocimiento IA"
 msgstr ""
 
 #: admin/class-admin.php:168
-#: admin/class-admin.php:273
+#: admin/class-admin.php:276
 msgid "Asistente de configuración"
 msgstr ""
 
@@ -54,582 +54,699 @@ msgid "Abrir asistente"
 msgstr ""
 
 #: admin/class-admin.php:203
-#: admin/class-admin.php:394
-#: admin/class-admin.php:473
-#: admin/class-admin.php:672
-#: admin/class-admin.php:904
+#: admin/class-admin.php:486
+#: admin/class-admin.php:643
+#: admin/class-admin.php:842
+#: admin/class-admin.php:1074
 #: includes/class-editor-metabox.php:61
 #: includes/class-editor-metabox.php:102
 msgid "No tienes permisos suficientes."
 msgstr ""
 
 #: admin/class-admin.php:227
-#: admin/class-admin.php:415
+#: admin/class-admin.php:512
 msgid "Guardado correctamente."
 msgstr ""
 
-#: admin/class-admin.php:253
+#: admin/class-admin.php:256
 msgid "Versión %s"
 msgstr ""
 
-#: admin/class-admin.php:253
+#: admin/class-admin.php:256
 msgid "Salir"
 msgstr ""
 
-#: admin/class-admin.php:254
+#: admin/class-admin.php:257
 msgid "Progreso del asistente"
 msgstr ""
 
-#: admin/class-admin.php:282
+#: admin/class-admin.php:300
 msgid "Atrás"
 msgstr ""
 
-#: admin/class-admin.php:282
+#: admin/class-admin.php:301
 msgid "Salir del asistente"
 msgstr ""
 
-#: admin/class-admin.php:284
+#: admin/class-admin.php:303
 msgid "Guardar configuración"
 msgstr ""
 
-#: admin/class-admin.php:285
-msgid "Terminar sin generar"
-msgstr ""
-
-#: admin/class-admin.php:285
-msgid "Generar documentos iniciales"
-msgstr ""
-
-#: admin/class-admin.php:285
+#: admin/class-admin.php:304
 msgid "Continuar"
 msgstr ""
 
-#: admin/class-admin.php:298
+#: admin/class-admin.php:327
 msgid "Bienvenida"
 msgstr ""
 
-#: admin/class-admin.php:298
+#: admin/class-admin.php:327
 msgid "AI Knowledge convierte el contenido de tu sitio en documentos preparados para buscadores, asistentes y sistemas de inteligencia artificial. Este recorrido revisará contigo las decisiones principales sin borrar una configuración existente. Puedes saltar cualquier paso, salir cuando quieras y continuar más adelante desde el mismo punto."
 msgstr ""
 
-#: admin/class-admin.php:299
-#: admin/class-admin.php:340
+#: admin/class-admin.php:328
+#: admin/class-admin.php:376
 #: admin/views/tab-ajustes.php:46
 msgid "Origen de IA"
 msgstr ""
 
-#: admin/class-admin.php:299
-msgid "Elige el servicio que ayudará a redactar y mejorar los documentos. AI Knowledge utiliza las conexiones ya configuradas mediante los Conectores de WordPress o Support Genix y nunca guarda aquí sus claves. Si todavía no existe una conexión, puedes continuar sin IA y configurarla después."
+#: admin/class-admin.php:328
+msgid "Elige el servicio que ayudará a redactar y mejorar los documentos. AI Knowledge utiliza las conexiones ya configuradas mediante los Conectores de WordPress o Support Genix y nunca guarda aquí sus claves. Si todavía no existe una conexión, puedes continuar sin IA y configurarla después: cada paso siguiente que genere contenido avisará si no hay conexión, sin bloquearte."
 msgstr ""
 
-#: admin/class-admin.php:300
+#: admin/class-admin.php:329
+msgid "Límites de generación"
+msgstr ""
+
+#: admin/class-admin.php:329
+msgid "Comprueba el largo máximo del texto y los límites de generación antes de continuar: a partir de aquí, cada paso puede generar contenido real con IA en cuanto lo guardes."
+msgstr ""
+
+#: admin/class-admin.php:330
 msgid "Contenido y alcance"
 msgstr ""
 
-#: admin/class-admin.php:300
-msgid "Selecciona los tipos de contenido público que deben formar parte de la base de conocimiento. La selección determina qué entradas, páginas, productos u otros contenidos podrán generar documentos. Las taxonomías, términos, identificadores y campos personalizados pueden configurarse después desde la pantalla Contenido del plugin."
+#: admin/class-admin.php:330
+msgid "Selecciona los tipos de contenido público que deben formar parte de la base de conocimiento. La selección determina qué entradas, páginas, productos u otros contenidos podrán generar documentos. Al guardar, se encola la generación de todo lo que entre en el alcance. Las taxonomías, términos, identificadores y campos personalizados pueden configurarse después desde la pantalla Contenido del plugin."
 msgstr ""
 
-#: admin/class-admin.php:301
-#: admin/class-admin.php:359
-#: admin/class-admin.php:611
+#: admin/class-admin.php:331
+#: admin/class-admin.php:432
+#: admin/class-admin.php:781
 #: admin/views/tab-woocommerce.php:270
 msgid "Negocio"
 msgstr ""
 
-#: admin/class-admin.php:301
+#: admin/class-admin.php:331
 msgid "Añade la información estable que una IA necesita para comprender correctamente tu negocio: identidad, ubicación, público, contacto, horario y enfoque. Estos datos complementan el contenido del sitio y ayudan a producir respuestas coherentes sin inventar información."
 msgstr ""
 
-#: admin/class-admin.php:302
-#: admin/class-admin.php:359
-#: admin/class-admin.php:618
+#: admin/class-admin.php:332
+#: admin/class-admin.php:432
+#: admin/class-admin.php:788
 msgid "WooCommerce"
 msgstr ""
 
-#: admin/class-admin.php:302
-msgid "Revisa los datos generales de la tienda, el país, la moneda, las condiciones de compra, la recogida, los plazos y el contacto. Los envíos, impuestos, pagos, categorías y otras opciones avanzadas pueden completarse después en una ventana nueva sin perder el progreso."
+#: admin/class-admin.php:332
+msgid "Revisa los datos generales de la tienda, el país, la moneda, las condiciones de compra, la recogida, los plazos y el contacto. Al guardar, se generan los documentos de información de tienda si hay conexión de IA disponible. Los envíos, impuestos, pagos, categorías y otras opciones avanzadas pueden completarse después en una ventana nueva sin perder el progreso."
 msgstr ""
 
-#: admin/class-admin.php:303
+#: admin/class-admin.php:333
+#: admin/class-admin.php:782
+msgid "FAQs"
+msgstr ""
+
+#: admin/class-admin.php:333
+msgid "Genera con IA las preguntas frecuentes públicas de tu negocio a partir de los datos ya introducidos, y las publica directamente en llms.txt. Este paso solo aparece si hay una conexión de IA disponible."
+msgstr ""
+
+#: admin/class-admin.php:334
 msgid "Chatbot"
 msgstr ""
 
-#: admin/class-admin.php:303
-msgid "Configura cómo Support Genix utilizará la base de conocimiento, cuántos documentos relacionados podrá consultar y qué información adicional debe tener en cuenta. Este paso solo aparece cuando la integración está disponible."
+#: admin/class-admin.php:334
+msgid "Configura cómo Support Genix utilizará la base de conocimiento, cuántos documentos relacionados podrá consultar y qué información adicional debe tener en cuenta. Al guardar, se sincroniza con Genix si hay conexión disponible. Este paso solo aparece cuando la integración está disponible."
 msgstr ""
 
-#: admin/class-admin.php:304
-#: admin/class-admin.php:359
-#: admin/class-admin.php:634
+#: admin/class-admin.php:335
+#: admin/class-admin.php:432
+#: admin/class-admin.php:804
 msgid "Visibilidad IA"
 msgstr ""
 
-#: admin/class-admin.php:304
+#: admin/class-admin.php:335
 msgid "Decide qué familias de crawlers pueden acceder al sitio y cómo se gestiona su acceso a llms.txt. Al guardar, esta selección queda conservada para utilizarla en las reglas de visibilidad del plugin."
 msgstr ""
 
-#: admin/class-admin.php:305
+#: admin/class-admin.php:336
 msgid "Archivos del servidor"
 msgstr ""
 
-#: admin/class-admin.php:305
+#: admin/class-admin.php:336
 msgid "Comprueba si robots.txt y .htaccess difieren de la configuración guardada. Descarga las copias y las versiones preparadas; el asistente no muestra el código completo ni modifica .htaccess automáticamente."
 msgstr ""
 
-#: admin/class-admin.php:306
-msgid "Ajustes y final"
+#: admin/class-admin.php:337
+msgid "Resumen"
 msgstr ""
 
-#: admin/class-admin.php:306
-msgid "Comprueba los límites de texto y generación antes de terminar. Puedes guardar la configuración sin crear documentos o iniciar la generación utilizando la cola existente y su límite diario. Los pasos omitidos seguirán disponibles cuando vuelvas a abrir el asistente."
+#: admin/class-admin.php:337
+msgid "Revisa el estado real de cada paso: qué se ha generado ya y qué queda pendiente. Puedes generar ahora los documentos que aún falten, o dejarlo para más tarde desde Generación masiva."
 msgstr ""
 
-#: admin/class-admin.php:307
+#: admin/class-admin.php:338
 msgid "Resumen final"
 msgstr ""
 
-#: admin/class-admin.php:307
+#: admin/class-admin.php:338
 msgid "La configuración del asistente ha terminado. Revisa el estado real de los documentos y accede directamente a las áreas principales del plugin."
 msgstr ""
 
-#: admin/class-admin.php:328
+#: admin/class-admin.php:359
 msgid "Las reglas de AI Knowledge en robots.txt son diferentes de la configuración guardada."
 msgstr ""
 
-#: admin/class-admin.php:328
+#: admin/class-admin.php:359
 msgid "Las reglas de AI Knowledge en robots.txt coinciden con la configuración guardada."
 msgstr ""
 
-#: admin/class-admin.php:329
+#: admin/class-admin.php:360
 msgid "Descarga una copia actual antes de actualizar robots.txt con la versión preparada."
 msgstr ""
 
-#: admin/class-admin.php:330
+#: admin/class-admin.php:361
 #: admin/views/tab-visibilidad-ia.php:387
 msgid "Descargar copia actual de robots.txt"
 msgstr ""
 
-#: admin/class-admin.php:330
+#: admin/class-admin.php:361
 msgid "Actualizar robots.txt"
 msgstr ""
 
-#: admin/class-admin.php:331
+#: admin/class-admin.php:362
 msgid "Las reglas de AI Knowledge en .htaccess son diferentes de la configuración guardada."
 msgstr ""
 
-#: admin/class-admin.php:331
+#: admin/class-admin.php:362
 msgid "Las reglas de AI Knowledge en .htaccess coinciden con la configuración guardada."
 msgstr ""
 
-#: admin/class-admin.php:332
+#: admin/class-admin.php:363
 msgid "El plugin no modifica .htaccess desde el asistente. Descarga la versión preparada y sustitúyela manualmente; conserva siempre una copia por seguridad."
 msgstr ""
 
-#: admin/class-admin.php:333
+#: admin/class-admin.php:364
 #: admin/views/tab-visibilidad-ia.php:416
 msgid "Descargar .htaccess preparado"
 msgstr ""
 
-#: admin/class-admin.php:333
+#: admin/class-admin.php:364
 msgid "Comprobar cambios"
 msgstr ""
 
-#: admin/class-admin.php:337
+#: admin/class-admin.php:368
 msgid "Comprueba tu sitio en un agente externo antes de configurar el plugin. Después de completar la configuración, repite la comprobación con este mismo prompt para comparar el resultado."
 msgstr ""
 
-#: admin/class-admin.php:337
-#: admin/class-admin.php:359
+#: admin/class-admin.php:368
+#: admin/class-admin.php:432
 msgid "Copiar Prompt"
 msgstr ""
 
-#: admin/class-admin.php:338
+#: admin/class-admin.php:369
 msgid "Qué revisaremos"
 msgstr ""
 
-#: admin/class-admin.php:338
+#: admin/class-admin.php:369
 msgid "El origen de IA y el contenido que formará la base de conocimiento."
 msgstr ""
 
-#: admin/class-admin.php:338
+#: admin/class-admin.php:369
 msgid "Los datos del negocio y las integraciones disponibles."
 msgstr ""
 
-#: admin/class-admin.php:338
+#: admin/class-admin.php:369
 msgid "La visibilidad para IA y los límites de generación."
 msgstr ""
 
-#: admin/class-admin.php:340
+#: admin/class-admin.php:372
+msgid "Conexión de IA disponible: los pasos siguientes podrán generar contenido real."
+msgstr ""
+
+#: admin/class-admin.php:374
+msgid "No se detecta ninguna conexión de IA activa todavía."
+msgstr ""
+
+#: admin/class-admin.php:374
+msgid "Puedes continuar sin problema: los pasos siguientes guardarán tus datos igual, pero no generarán contenido con IA hasta que conectes un origen (aquí, en Conectores de WordPress, o activando Support Genix) y vuelvas a guardar ese paso."
+msgstr ""
+
+#: admin/class-admin.php:376
 #: admin/views/tab-ajustes.php:51
 #: admin/views/tab-ajustes.php:59
 msgid "Support Genix"
 msgstr ""
 
-#: admin/class-admin.php:340
+#: admin/class-admin.php:376
 #: admin/views/tab-ajustes.php:49
 #: admin/views/tab-ajustes.php:59
 msgid "Conectores de WordPress"
 msgstr ""
 
-#: admin/class-admin.php:340
+#: admin/class-admin.php:376
 msgid "Modelo"
 msgstr ""
 
-#: admin/class-admin.php:340
+#: admin/class-admin.php:376
 #: admin/views/tab-ajustes.php:73
 msgid "Automático (recomendado)"
 msgstr ""
 
-#: admin/class-admin.php:340
+#: admin/class-admin.php:376
 msgid "Configurar Conectores de WordPress"
 msgstr ""
 
-#: admin/class-admin.php:340
+#: admin/class-admin.php:376
 msgid "Abrir Support Genix"
 msgstr ""
 
-#: admin/class-admin.php:342
+#: admin/class-admin.php:377
+msgid "Largo máximo del texto"
+msgstr ""
+
+#: admin/class-admin.php:377
+msgid "Tokens de salida"
+msgstr ""
+
+#: admin/class-admin.php:377
+msgid "Límite diario"
+msgstr ""
+
+#: admin/class-admin.php:377
+#: admin/views/tab-carga-inicial.php:76
+msgid "Tamaño de lote"
+msgstr ""
+
+#: admin/class-admin.php:377
+msgid "Sin límite diario"
+msgstr ""
+
+#: admin/class-admin.php:377
+msgid "Avisar a IndexNow"
+msgstr ""
+
+#: admin/class-admin.php:379
 msgid "Tipos de contenido que quieres incluir"
 msgstr ""
 
-#: admin/class-admin.php:345
+#: admin/class-admin.php:382
 #: admin/views/tab-woocommerce.php:80
 msgid "Nombre de la tienda"
 msgstr ""
 
-#: admin/class-admin.php:345
+#: admin/class-admin.php:382
 #: admin/views/tab-woocommerce.php:84
 msgid "Moneda"
 msgstr ""
 
-#: admin/class-admin.php:345
+#: admin/class-admin.php:382
 #: admin/views/tab-woocommerce.php:88
 msgid "País base"
 msgstr ""
 
-#: admin/class-admin.php:345
+#: admin/class-admin.php:382
 #: admin/views/tab-woocommerce.php:92
 msgid "Condiciones de venta"
 msgstr ""
 
-#: admin/class-admin.php:345
+#: admin/class-admin.php:382
 #: admin/views/tab-woocommerce.php:103
 msgid "Política de devoluciones"
 msgstr ""
 
-#: admin/class-admin.php:345
+#: admin/class-admin.php:382
 #: admin/views/tab-woocommerce.php:255
 msgid "Plazo de entrega"
 msgstr ""
 
-#: admin/class-admin.php:345
+#: admin/class-admin.php:382
 msgid "Contacto y horario de la tienda"
 msgstr ""
 
-#: admin/class-admin.php:345
+#: admin/class-admin.php:382
 msgid "Recogida en tienda disponible"
 msgstr ""
 
-#: admin/class-admin.php:346
+#: admin/class-admin.php:383
 msgid "Límite de documentos relacionados"
 msgstr ""
 
-#: admin/class-admin.php:353
+#: admin/class-admin.php:387
+msgid "Al guardar este paso, se genera con IA y se publica de inmediato en llms.txt (excepción explícita de este paso del asistente a la norma habitual de revisar antes de publicar)."
+msgstr ""
+
+#: admin/class-admin.php:392
+#: includes/class-llms-faq.php:109
+msgid "Preguntas frecuentes"
+msgstr ""
+
+#: admin/class-admin.php:396
+msgid "Ya hay un FAQ publicado para este idioma. Al guardar de nuevo, se amplía/mejora, no se sustituye desde cero."
+msgstr ""
+
+#: admin/class-admin.php:399
+msgid "Todavía no hay FAQ generado para este idioma."
+msgstr ""
+
+#: admin/class-admin.php:408
 msgid "Categorías de crawlers"
 msgstr ""
 
-#: admin/class-admin.php:354
+#: admin/class-admin.php:409
 msgid "Permitir todos"
 msgstr ""
 
-#: admin/class-admin.php:354
+#: admin/class-admin.php:409
 msgid "Bloquear todos"
 msgstr ""
 
-#: admin/class-admin.php:355
+#: admin/class-admin.php:410
 #: admin/views/tab-visibilidad-ia.php:331
 msgid "Permitir"
 msgstr ""
 
-#: admin/class-admin.php:355
+#: admin/class-admin.php:410
 #: admin/views/tab-visibilidad-ia.php:332
 msgid "Bloquear"
 msgstr ""
 
-#: admin/class-admin.php:356
+#: admin/class-admin.php:411
 msgid "Acceso de crawlers bloqueados a llms.txt"
 msgstr ""
 
-#: admin/class-admin.php:356
+#: admin/class-admin.php:411
 msgid "Decide si un crawler bloqueado puede leer únicamente el archivo llms.txt o si también debe quedar bloqueado en todo el sitio."
 msgstr ""
 
-#: admin/class-admin.php:356
+#: admin/class-admin.php:411
 msgid "Aplicar la misma política a todo el sitio"
 msgstr ""
 
-#: admin/class-admin.php:356
+#: admin/class-admin.php:411
 msgid "Permitir solo llms.txt"
 msgstr ""
 
-#: admin/class-admin.php:356
+#: admin/class-admin.php:411
 msgid "Robots.txt y .htaccess"
 msgstr ""
 
-#: admin/class-admin.php:356
+#: admin/class-admin.php:411
 msgid "La política que guardes aquí sirve como base para preparar las reglas de robots.txt y .htaccess. Esos archivos se gestionan después desde la pantalla Visibilidad IA, donde puedes revisar el contenido antes de aplicarlo."
 msgstr ""
 
-#: admin/class-admin.php:357
-msgid "Largo máximo del texto"
-msgstr ""
-
-#: admin/class-admin.php:357
-msgid "Tokens de salida"
-msgstr ""
-
-#: admin/class-admin.php:357
-msgid "Límite diario"
-msgstr ""
-
-#: admin/class-admin.php:357
-#: admin/views/tab-carga-inicial.php:85
-msgid "Tamaño de lote"
-msgstr ""
-
-#: admin/class-admin.php:357
-msgid "Sin límite diario"
-msgstr ""
-
-#: admin/class-admin.php:357
-msgid "Avisar a IndexNow"
-msgstr ""
-
-#: admin/class-admin.php:359
+#: admin/class-admin.php:432
+#: admin/class-admin.php:1292
 msgid "Documentos registrados:"
 msgstr ""
 
-#: admin/class-admin.php:359
+#: admin/class-admin.php:432
+#: admin/class-admin.php:1293
 msgid "Documentos pendientes:"
 msgstr ""
 
-#: admin/class-admin.php:359
+#: admin/class-admin.php:432
 msgid "Pasos omitidos:"
 msgstr ""
 
-#: admin/class-admin.php:359
+#: admin/class-admin.php:432
 msgid "Ninguno"
 msgstr ""
 
-#: admin/class-admin.php:359
+#: admin/class-admin.php:432
+#: admin/class-admin.php:859
 #: admin/views/tab-visibilidad-ia.php:132
 msgid "Ver llms.txt"
 msgstr ""
 
-#: admin/class-admin.php:359
+#: admin/class-admin.php:432
 msgid "Recomendamos comprobar este prompt en un agente externo para verificar el funcionamiento del plugin y la visibilidad de tu web."
 msgstr ""
 
-#: admin/class-admin.php:359
-#: admin/class-admin.php:609
+#: admin/class-admin.php:432
+#: admin/class-admin.php:779
 msgid "Registro"
 msgstr ""
 
-#: admin/class-admin.php:359
-#: admin/class-admin.php:610
+#: admin/class-admin.php:432
+#: admin/class-admin.php:780
 #: admin/class-registry-table.php:344
 msgid "Contenido"
 msgstr ""
 
-#: admin/class-admin.php:359
-#: admin/class-admin.php:636
+#: admin/class-admin.php:432
+#: admin/class-admin.php:806
 msgid "Ajustes"
 msgstr ""
 
-#: admin/class-admin.php:367
+#: admin/class-admin.php:440
 #: admin/views/tab-visibilidad-ia.php:274
 msgid "Búsqueda/citas IA"
 msgstr ""
 
-#: admin/class-admin.php:367
+#: admin/class-admin.php:440
 #: admin/views/tab-visibilidad-ia.php:275
 msgid "Uso bajo demanda"
 msgstr ""
 
-#: admin/class-admin.php:368
+#: admin/class-admin.php:441
 #: admin/views/tab-visibilidad-ia.php:276
 msgid "Entrenamiento de modelos"
 msgstr ""
 
-#: admin/class-admin.php:368
+#: admin/class-admin.php:441
 #: admin/views/tab-visibilidad-ia.php:277
 msgid "SEO y scraping"
 msgstr ""
 
-#: admin/class-admin.php:369
+#: admin/class-admin.php:442
 #: admin/views/tab-visibilidad-ia.php:280
 msgid "Archivado y datasets"
 msgstr ""
 
-#: admin/class-admin.php:369
+#: admin/class-admin.php:442
 #: admin/views/tab-visibilidad-ia.php:278
 msgid "Scanners de seguridad"
 msgstr ""
 
-#: admin/class-admin.php:370
+#: admin/class-admin.php:443
 #: admin/views/tab-visibilidad-ia.php:279
 msgid "Buscadores tradicionales"
 msgstr ""
 
-#: admin/class-admin.php:399
+#: admin/class-admin.php:491
 msgid "Paso no válido."
 msgstr ""
 
-#: admin/class-admin.php:612
-msgid "FAQs"
-msgstr ""
-
-#: admin/class-admin.php:632
+#: admin/class-admin.php:802
 msgid "Genix"
 msgstr ""
 
-#: admin/class-admin.php:635
+#: admin/class-admin.php:805
 #: admin/views/tab-ajustes.php:26
 msgid "Generación masiva"
 msgstr ""
 
-#: admin/class-admin.php:689
+#: admin/class-admin.php:859
 msgid "Modo oscuro"
 msgstr ""
 
-#: admin/class-admin.php:694
-#: admin/class-admin.php:914
-#: admin/class-admin.php:1903
-#: admin/class-admin.php:2022
-#: admin/class-admin.php:2167
+#: admin/class-admin.php:864
+#: admin/class-admin.php:1084
+#: admin/class-admin.php:2160
+#: admin/class-admin.php:2279
+#: admin/class-admin.php:2424
 #: assets/admin.js:286
 msgid "Guardado."
 msgstr ""
 
-#: admin/class-admin.php:726
+#: admin/class-admin.php:896
 msgid "Leer documentación"
 msgstr ""
 
-#: admin/class-admin.php:754
+#: admin/class-admin.php:924
 #: includes/class-llms-txt.php:161
 #: assets/admin.js:403
 msgid "Documentación"
 msgstr ""
 
-#: admin/class-admin.php:758
+#: admin/class-admin.php:928
 msgid "Cerrar documentación"
 msgstr ""
 
-#: admin/class-admin.php:895
+#: admin/class-admin.php:1065
 msgid "Total de documentos:"
 msgstr ""
 
-#: admin/class-admin.php:1218
-#: admin/class-admin.php:1220
+#: admin/class-admin.php:1276
+msgid "Negocio:"
+msgstr ""
+
+#: admin/class-admin.php:1276
+msgid "Datos guardados."
+msgstr ""
+
+#: admin/class-admin.php:1276
+msgid "Todavía sin datos."
+msgstr ""
+
+#. translators: %s: idioma
+#: admin/class-admin.php:1283
+msgid "WooCommerce (%s):"
+msgstr ""
+
+#. translators: %s: idioma
+#: admin/class-admin.php:1283
+#: admin/class-admin.php:1287
+msgid "general"
+msgstr ""
+
+#. translators: %s: idioma
+#: admin/class-admin.php:1283
+msgid "Documentos generados."
+msgstr ""
+
+#. translators: %s: idioma
+#: admin/class-admin.php:1283
+#: admin/class-admin.php:1287
+msgid "Todavía sin generar."
+msgstr ""
+
+#. translators: %s: idioma
+#: admin/class-admin.php:1287
+msgid "FAQ (%s):"
+msgstr ""
+
+#. translators: %s: idioma
+#: admin/class-admin.php:1287
+msgid "Publicado."
+msgstr ""
+
+#: admin/class-admin.php:1290
+msgid "Chatbot:"
+msgstr ""
+
+#: admin/class-admin.php:1290
+msgid "Sincronizado con Genix."
+msgstr ""
+
+#: admin/class-admin.php:1290
+msgid "Todavía sin sincronizar."
+msgstr ""
+
+#: admin/class-admin.php:1314
+msgid "Generación en curso (procesando por lotes vía Action Scheduler)."
+msgstr ""
+
+#: admin/class-admin.php:1318
+msgid "Cancelar generación"
+msgstr ""
+
+#: admin/class-admin.php:1323
+msgid "\"Generar pendientes\" es seguro repetirlo: no regenera lo que ya está sincronizado y sin cambios, solo lo nuevo o lo que falló."
+msgstr ""
+
+#: admin/class-admin.php:1328
+msgid "Generar pendientes"
+msgstr ""
+
+#: admin/class-admin.php:1330
+msgid "Esto va a REGENERAR también el contenido que ya está sincronizado, no solo lo pendiente. Gasta IA de más y no se puede deshacer. ¿Seguro que quieres continuar?"
+msgstr ""
+
+#: admin/class-admin.php:1333
+msgid "Reiniciar todo"
+msgstr ""
+
+#: admin/class-admin.php:1475
+#: admin/class-admin.php:1477
 msgid "El origen de este documento ya no está publicado."
 msgstr ""
 
-#: admin/class-admin.php:1238
+#: admin/class-admin.php:1495
 msgid "Generado."
 msgstr ""
 
-#: admin/class-admin.php:1299
+#: admin/class-admin.php:1556
 msgid "No se encontró ningún producto o página con ese ID/URL."
 msgstr ""
 
-#: admin/class-admin.php:1306
+#: admin/class-admin.php:1563
 msgid "Ese contenido no está publicado."
 msgstr ""
 
-#: admin/class-admin.php:1311
+#: admin/class-admin.php:1568
 msgid "Ese contenido no está dentro del alcance configurado del plugin (pestaña Alcance/Exclusiones)."
 msgstr ""
 
-#: admin/class-admin.php:1566
-#: admin/class-admin.php:1624
+#: admin/class-admin.php:1823
+#: admin/class-admin.php:1881
 msgid "Borrador generado."
 msgstr ""
 
-#: admin/class-admin.php:1602
-#: admin/class-admin.php:1604
-#: admin/class-admin.php:1669
+#: admin/class-admin.php:1859
+#: admin/class-admin.php:1861
+#: admin/class-admin.php:1926
 msgid "Esta acción requiere Support Genix activo."
 msgstr ""
 
-#: admin/class-admin.php:1652
-#: admin/class-admin.php:1751
+#: admin/class-admin.php:1909
+#: admin/class-admin.php:2008
 msgid "Texto pulido."
 msgstr ""
 
-#: admin/class-admin.php:1837
+#: admin/class-admin.php:2094
 msgid "FAQ guardada."
 msgstr ""
 
-#: admin/class-admin.php:1871
+#: admin/class-admin.php:2128
 msgid "FAQ generada."
 msgstr ""
 
-#: admin/class-admin.php:2193
+#: admin/class-admin.php:2450
 msgid "Selección no válida: elige una de las opciones de la lista."
 msgstr ""
 
-#: admin/class-admin.php:2199
+#: admin/class-admin.php:2456
 msgid "No se pudo resolver la URL pública de ese contenido."
 msgstr ""
 
-#: admin/class-admin.php:2252
+#: admin/class-admin.php:2509
 msgid "Antes de sustituir llms.txt tienes que descargar la copia actual."
 msgstr ""
 
-#: admin/class-admin.php:2255
+#: admin/class-admin.php:2512
 msgid "No se pudo escribir el llms.txt físico en la raíz del sitio."
 msgstr ""
 
-#: admin/class-admin.php:2319
+#: admin/class-admin.php:2576
 msgid "No se pudo leer el robots.txt actual (ni físico ni virtual) para generar la copia de seguridad."
 msgstr ""
 
-#: admin/class-admin.php:2346
+#: admin/class-admin.php:2603
 msgid "Antes de aplicar el bloqueo tienes que descargar la copia actual de robots.txt. Pulsa \"Descargar copia actual\" y vuelve a intentarlo."
 msgstr ""
 
-#: admin/class-admin.php:2350
+#: admin/class-admin.php:2607
 #: admin/views/tab-visibilidad-ia.php:380
 msgid "robots.txt no es escribible en este servidor (permisos de la carpeta raíz)."
 msgstr ""
 
-#: admin/class-admin.php:2359
+#: admin/class-admin.php:2616
 msgid "No se pudo verificar la actualización de robots.txt. Comprueba los permisos de escritura de la raíz del sitio y vuelve a intentarlo."
 msgstr ""
 
-#: admin/class-admin.php:2382
-#: admin/class-admin.php:2414
+#: admin/class-admin.php:2639
+#: admin/class-admin.php:2671
 msgid "No se encontró un .htaccess editable en este servidor (nginx u otra configuración): usa el bloque de código manual en su lugar."
 msgstr ""
 
-#: admin/class-admin.php:2410
+#: admin/class-admin.php:2667
 msgid "Antes de aplicar el bloqueo tienes que descargar la copia actual de .htaccess. Pulsa \"Descargar copia actual\" y vuelve a intentarlo."
 msgstr ""
 
 #. translators: %d: numero de documentos con el origen actualizado desde que se fijaron a mano
-#: admin/class-admin.php:2458
+#: admin/class-admin.php:2715
 msgid "%d documento en modo manual tiene el origen actualizado desde que se fijó el texto. %s"
 msgid_plural "%d documentos en modo manual tienen el origen actualizado desde que se fijó el texto. %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/class-admin.php:2460
+#: admin/class-admin.php:2717
 msgid "Revisar en el Registro"
 msgstr ""
 
 #. translators: %d: numero de documentos con el origen actualizado desde que se fijaron a mano
-#: admin/class-admin.php:2485
+#: admin/class-admin.php:2742
 msgid "KB IA: %d desactualizado(s)"
 msgstr ""
 
@@ -860,90 +977,66 @@ msgstr ""
 msgid "Guardar ajustes"
 msgstr ""
 
-#: admin/views/tab-carga-inicial.php:16
+#: admin/views/tab-carga-inicial.php:15
 msgid "Genera de golpe los documentos de todo el contenido dentro del alcance, y ajusta aquí el límite diario, el tamaño de lote y el debounce de la cola."
 msgstr ""
 
 #. translators: 1: "X elemento(s)" ya pluralizado, 2: "X idioma(s)" ya pluralizado, 3: total documentos
-#: admin/views/tab-carga-inicial.php:23
+#: admin/views/tab-carga-inicial.php:22
 msgid "Alcance actual: %1$s × %2$s = %3$d documentos posibles."
 msgstr ""
 
 #. translators: %d: número de elementos
-#: admin/views/tab-carga-inicial.php:24
+#: admin/views/tab-carga-inicial.php:23
 msgid "%d elemento"
 msgid_plural "%d elementos"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: número de idiomas activos
-#: admin/views/tab-carga-inicial.php:25
+#: admin/views/tab-carga-inicial.php:24
 msgid "%d idioma"
 msgid_plural "%d idiomas"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/views/tab-carga-inicial.php:30
+#: admin/views/tab-carga-inicial.php:29
 msgid "Documentos ya sincronizados: %d."
 msgstr ""
 
-#: admin/views/tab-carga-inicial.php:32
+#: admin/views/tab-carga-inicial.php:31
 msgid "El límite diario está desactivado — la generación avanzará sin tope."
 msgstr ""
 
-#: admin/views/tab-carga-inicial.php:34
+#: admin/views/tab-carga-inicial.php:33
 msgid "Límite diario actual: %d generaciones/día."
 msgstr ""
 
-#: admin/views/tab-carga-inicial.php:38
-msgid "Generación en curso (procesando por lotes vía Action Scheduler)."
-msgstr ""
-
-#: admin/views/tab-carga-inicial.php:42
-msgid "Cancelar generación"
-msgstr ""
-
-#: admin/views/tab-carga-inicial.php:45
-msgid "\"Generar pendientes\" es seguro repetirlo: no regenera lo que ya está sincronizado y sin cambios, solo lo nuevo o lo que falló."
-msgstr ""
-
-#: admin/views/tab-carga-inicial.php:50
-msgid "Generar pendientes"
-msgstr ""
-
 #: admin/views/tab-carga-inicial.php:52
-msgid "Esto va a REGENERAR también el contenido que ya está sincronizado, no solo lo pendiente. Gasta IA de más y no se puede deshacer. ¿Seguro que quieres continuar?"
-msgstr ""
-
-#: admin/views/tab-carga-inicial.php:55
-msgid "Reiniciar todo"
-msgstr ""
-
-#: admin/views/tab-carga-inicial.php:61
 msgid "Revisa la pestaña Registro para ver el progreso, o Herramientas → Scheduled Actions (grupo woo-kb) para el detalle técnico."
 msgstr ""
 
-#: admin/views/tab-carga-inicial.php:66
+#: admin/views/tab-carga-inicial.php:57
 msgid "Ajustes de la cola"
 msgstr ""
 
-#: admin/views/tab-carga-inicial.php:72
+#: admin/views/tab-carga-inicial.php:63
 msgid "Límite diario de generaciones"
 msgstr ""
 
-#: admin/views/tab-carga-inicial.php:77
+#: admin/views/tab-carga-inicial.php:68
 msgid "Sin límite (usar solo en cargas manuales supervisadas — recuerda desactivarlo al terminar)"
 msgstr ""
 
-#: admin/views/tab-carga-inicial.php:80
+#: admin/views/tab-carga-inicial.php:71
 msgid "Aviso: el límite diario está DESACTIVADO."
 msgstr ""
 
-#: admin/views/tab-carga-inicial.php:89
+#: admin/views/tab-carga-inicial.php:80
 msgid "Retraso de debounce (segundos)"
 msgstr ""
 
-#: admin/views/tab-carga-inicial.php:93
+#: admin/views/tab-carga-inicial.php:84
 #: admin/views/tab-contenido.php:146
 #: admin/views/tab-negocio.php:41
 #: admin/views/tab-woocommerce.php:293
@@ -2222,10 +2315,6 @@ msgstr ""
 
 #: includes/class-genix-publish.php:61
 msgid "Este artículo está marcado en Genix como \"solo para el chatbot\": no es público ni siquiera dentro de Genix, así que no puede publicarse aquí."
-msgstr ""
-
-#: includes/class-llms-faq.php:109
-msgid "Preguntas frecuentes"
 msgstr ""
 
 #: includes/class-llms-faq.php:113
