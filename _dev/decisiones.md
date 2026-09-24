@@ -206,3 +206,69 @@ contenido) — no se forzó una invalidación especial para este cambio de códi
 - Esta decisión está documentada; la implementación y la validación siguen
   implementadas localmente el 2026-09-19. La prueba visual multiidioma y la
   revisión lingüística del catálogo siguen pendientes.
+
+## 2026-09-23 — Registro y guardados
+- Generar, guardar límite, guardar cambios y «Volver a Auto» en el Registro
+  usan AJAX con aviso flotante (toast); el formulario POST se conserva como
+  fallback. «Guardar cambios» empieza desactivado y solo se activa con edición.
+- Los artículos de Genix marcados «solo para el chatbot» nunca se publican. El
+  resto de artículos exclusivos de Genix solo salen en `/llms.txt` si el
+  usuario los hace públicos desde la pestaña Genix.
+- El prompt propio por documento solo pide estilo o enfoque; nunca sustituye
+  los datos reales.
+
+## 2026-09-24 — Asistente
+- Cada paso genera su documento al guardarse (contenido, WooCommerce, FAQs,
+  chatbot). Sin IA disponible, solo guarda y avisa; nunca bloquea.
+- El paso `faqs` genera y publica de una vez (excepción explícita a «revisar
+  antes de publicar», solo en el asistente).
+
+## 2026-09-24 — Idioma principal
+- FAQ, tienda y Negocio se generan solo en el idioma principal con una nota de
+  los demás idiomas. Páginas y productos siguen con un documento por idioma.
+- No se borran las filas antiguas de otros idiomas: es una limpieza con efecto
+  en `/llms.txt` y la decide el usuario.
+- Estrategia global de idiomas (Negocio manda, apartado «Idiomas» en los `.md`,
+  check «Separar por idioma»): `_dev/estrategia-idiomas.md`, sin implementar.
+
+## 2026-09-24 — Datos de compra en productos
+- Precio, descuento, envío, impuestos, variaciones (tope 100) y campos
+  personalizados los anexa el código sin IA; la IA solo redacta la
+  descripción.
+- El hash incluye la parte estable de esos datos (sin cantidades de stock): un
+  cambio de peso, envío, impuestos o variaciones regenera; una venta, no.
+- Títulos sin entidades HTML.
+
+## 2026-09-24 — Schema y feeds
+- Con Rank Math el plugin no emite su `Article` (módulo `rich-snippet`).
+- `products.xml` solo se publica y anuncia si `product` está en el alcance.
+
+## 2026-09-25 — Visibilidad IA: interruptor y reemplazo de .htaccess
+- «Incluir llms.txt para los modelos desactivados» es un interruptor grande
+  que se guarda con «Guardar configuración de crawlers» (POST con recarga, no
+  AJAX): así las propuestas de robots.txt y .htaccess se recalculan.
+- «Reemplazar .htaccess» (pestaña y asistente): solo cambia el bloque propio;
+  las reglas originales que chocan se comentan, nunca se borran. Exige copia
+  descargada (10 min, invalidada al recargar la pantalla), casilla de
+  responsabilidad y archivo escribible; si no, no toca nada.
+
+## 2026-09-25 — Release y proceso
+- Versión 1.3.0 publicada. El tag lo crea la API de GitHub Release; el script
+  ya no crea ni sube un tag local.
+- Proceso permanente: commit/push, cambios de versión y cualquier edición
+  requieren permiso explícito; una pregunta no es permiso. Ajustes pequeños,
+  en la sesión principal; subagente solo para trabajo grande.
+- Nunca dar por hecho algo visual sin confirmación del usuario. Sin colores ni
+  estilos nuevos que no salgan de una variable de Tabler o una clase existente
+  (`_dev/guia-estilo-visual.html`).
+- Los archivos de contenido real del sitio viven en `wp-content/llm/`, fuera
+  del repo. Contenido legal o de pago: solo «pulir redacción», nunca
+  generación libre.
+
+## 2026-09-25 — Precio y contacto comercial
+- Precios: **49 €/año por web**, **99 €/año sin límite de webs** y **lifetime
+  222 € sin límite de webs**. Servicio opcional de configuración: unos 50 €.
+- Contacto: Misha, help@22mw.online.
+- El material comercial vive en `_dev/comercial/` (nunca en ZIP ni release).
+- No se prometen resultados de posicionamiento en IA ni funciones «en
+  estudio» (modo WP, Polylang, TranslatePress).

@@ -87,6 +87,50 @@ Y a partir de ahí, cada pantalla tiene su propia guía:
 | [Generación masiva](tab-generacion-masiva.md) | Generar todos los documentos pendientes de golpe |
 | [Ajustes](tab-ajustes.md) | Configuración general: largo del texto, origen de la IA, etc. |
 
+## El asistente de configuración
+
+Si prefieres que te guíen, el plugin incluye un **asistente** paso a paso. Lo
+encuentras en el menú *Base de conocimiento IA → Asistente* y en la lista de
+plugins («Abrir asistente»); además, se abre solo la primera vez que activas el
+plugin.
+
+Recorre estos pasos, en este orden:
+
+1. **Bienvenida** — qué se va a revisar, y un prompt de auditoría para
+   comprobar tu sitio en un agente de IA externo *antes* de configurar nada.
+2. **Origen de IA** — qué conexión redactará los documentos (Conectores de
+   WordPress o Support Genix). Si todavía no tienes ninguna, puedes seguir sin
+   IA: cada paso posterior que necesite generar te avisará, sin bloquearte.
+3. **Límites de generación** — largo máximo del texto y límites diarios.
+4. **Contenido y alcance** — qué tipos de contenido entran. Al guardar, se
+   encola la generación de lo que entre en el alcance.
+5. **Negocio** — los datos estables de tu negocio.
+6. **WooCommerce** — datos de la tienda *(solo con WooCommerce)*. Al guardar,
+   se generan los documentos de información de tienda si hay conexión de IA.
+7. **FAQs** — preguntas frecuentes públicas, generadas con IA y publicadas en
+   `/llms.txt`. Solo aparece si hay una conexión de IA disponible.
+8. **Chatbot** — cómo usa Support Genix tu base de conocimiento; al guardar se
+   sincroniza con Genix *(solo con Genix)*.
+9. **Visibilidad IA** — qué crawlers pueden entrar, y si los bloqueados
+   pueden leer `/llms.txt`.
+10. **Archivos del servidor** — comprobar `robots.txt` y `.htaccess` y, si
+    quieres, aplicarlos.
+11. **Resumen** — el estado real de cada paso: qué está generado y qué falta.
+    Desde aquí puedes generar lo pendiente o dejarlo para más tarde en
+    [Generación masiva](tab-generacion-masiva.md).
+12. **Resumen final** — el estado real de los documentos, el prompt de
+    auditoría otra vez (para comparar con el resultado del principio) y
+    accesos directos a las pantallas principales.
+
+Puedes saltar cualquier paso y salir cuando quieras con el botón **Salir** de la
+cabecera; al volver, continúas por donde lo dejaste. El asistente no borra
+ninguna configuración existente.
+
+## Cabecera de las pantallas
+
+Arriba a la derecha encuentras **Ver llms.txt** (abre tu `/llms.txt` en una
+pestaña nueva) y el interruptor de **modo oscuro**.
+
 ## Preguntas frecuentes
 
 **¿Necesito WooCommerce para usar este plugin?**

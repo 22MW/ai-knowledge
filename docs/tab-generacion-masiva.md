@@ -24,6 +24,10 @@ Es el botón que usarás casi siempre. Es **seguro repetirlo**: no vuelve a
 generar lo que ya está sincronizado y sin cambios, solo lo nuevo o lo que
 falló anteriormente.
 
+> Si actualizas desde una versión anterior a la 1.3.0, tus productos ya
+> generados se regenerarán una sola vez al pulsar este botón, para incluir el
+> bloque «Datos de compra» (ver [WooCommerce](tab-woocommerce.md)).
+
 ## Reiniciar todo
 
 Este botón sí **regenera absolutamente todo**, incluido lo que ya estaba

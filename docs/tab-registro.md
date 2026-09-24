@@ -43,6 +43,9 @@ Desde cada fila puedes:
   [Contenido](tab-contenido.md), para que no se vuelva a generar solo —
   si quieres que vuelva a generarse, quítalo de esa lista de exclusiones.
 
+Cada acción se confirma con un aviso flotante que aparece por la derecha
+(verde si ha ido bien, rojo si ha fallado), estés donde estés en la fila.
+
 También puedes seleccionar varios documentos a la vez y borrarlos en
 bloque, con el mismo aviso sobre las exclusiones.
 
@@ -54,6 +57,16 @@ bloque, con el mismo aviso sobre las exclusiones.
 > estar disponible en `/llms.txt` automáticamente, sin que tengas que
 > hacer nada más aquí. En cuanto lo vuelvas a publicar, se genera de
 > nuevo solo.
+
+## Manual o Auto
+
+La columna **Control manual** te dice cómo se gestiona cada documento:
+
+- **Auto** — el plugin lo regenera solo cuando cambia el contenido original.
+- **Manual** — tú has fijado el texto y no se regenera.
+- **Origen actualizado** — aparece si el contenido original cambió después de
+  fijar el texto a mano. El botón **Marcar revisado** quita el aviso sin tocar
+  tu texto.
 
 ## Ajustes avanzados de cada documento
 
@@ -71,8 +84,15 @@ pestañas:
 - **Límite de caracteres** propio para este documento (si lo dejas en
   blanco, se usa el límite general de [Ajustes](tab-ajustes.md)).
 
-Tanto "Guardar límite" como "Guardar cambios" se guardan al instante, sin
-recargar la página (con el mismo fallback si no tienes JavaScript).
+El botón "Guardar cambios" empieza desactivado y solo se activa (en verde)
+cuando has editado el texto. Tanto "Guardar límite" como "Guardar cambios" se
+guardan al instante, sin recargar la página (con el mismo fallback si no
+tienes JavaScript).
+
+Si un documento está en **Manual** y quieres que vuelva a generarse con IA,
+pulsa **"Volver a Auto"** (está en las pestañas Contenido y Prompt de esa
+fila). Vuelve a modo automático y se regenera, ya usando el prompt propio si
+lo tiene.
 
 ### Pestaña "Prompt"
 
@@ -112,6 +132,11 @@ cambió, pero la decisión de actualizarlo es tuya.
 
 **¿Puedo buscar por el nombre de un producto?**
 Sí, el buscador de la parte superior busca por título.
+
+**Mi documento está en Manual y el prompt no hace nada, ¿por qué?**
+Porque un texto fijado a mano nunca se regenera con IA, así que el prompt no
+tiene efecto mientras esté en Manual. Pulsa "Volver a Auto" si quieres que
+vuelva a generarse y use ese prompt.
 
 **¿Para qué sirve el prompt propio de un documento?**
 Para casos puntuales en los que quieres que un documento concreto suene

@@ -182,13 +182,15 @@ echo "    ZIP subido"
 
 # ── Tag en main (opcional pero recomendado para trazabilidad) ─────────────────
 
-echo "[5/5] Mergeando $BRANCH_RELEASE en main y creando tag..."
+echo "[5/5] Mergeando $BRANCH_RELEASE en main..."
 
 git checkout main
 git merge "$BRANCH_RELEASE" --no-edit
-git tag "$TAG"
-git push origin main --tags
+# El tag $TAG ya lo creó GitHub al crear la release (paso 3): no se crea otro
+# en local ni se sube con --tags, porque el remoto lo rechazaría.
+git push origin main
 git checkout "$BRANCH_DEV"
+git fetch --tags --quiet || true
 
 echo ""
 echo "━━━ Release $TAG publicada correctamente ━━━"

@@ -20,6 +20,23 @@ No presentar este flujo como validado hasta realizar esas pruebas.
 2. Probar la pestaña WooCommerce: checkboxes, snapshot editable y «Pulir redacción con IA», especialmente la llamada a IA.
 3. Repetir la comprobación de feedback del botón del editor de documentos (Fase 1), que quedó sin evidencia suficiente en la primera prueba.
 
+## Pendiente de QA real — versión 1.3.0
+
+1. «Reemplazar .htaccess»: **probado en un servidor real** (2026-09-25, según
+   el usuario). Sin repetir salvo cambios.
+2. Documentos de producto: bloque «Datos de compra» con productos simples y
+   variables reales (precio, descuento, envío, impuestos, variaciones,
+   campos personalizados).
+3. Asistente rediseñado: generación por paso, resumen y conexión de IA.
+4. Interruptor «Incluir llms.txt para los modelos desactivados»: guardado con
+   recarga y propuestas de robots.txt y .htaccess actualizadas.
+5. Logo del menú y del icono de actualización (solo se ve con una
+   actualización pendiente).
+6. Constructores de página (Elementor u otros): no consta que el contenido
+   guardado fuera de `post_content` llegue al documento.
+7. Prueba visual de los catálogos de idioma (`ca`, `de_DE`, `en_US`, `eu`,
+   `fr_FR`) con cada locale.
+
 ## Pendiente de publicación documental
 
 - Sustituir las 13 marcas `[SCREENSHOT]`/`[VIDEO]` de [`docs/`](docs/index.md) por medios reales antes de publicar la documentación.
@@ -54,9 +71,9 @@ Implementado: `class-admin.php` selecciona `docs/{locale}/archivo.md` cuando
 existe y vuelve a `docs/archivo.md` cuando no existe; `admin.js` usa
 `wp.i18n`; el script se encola con `wp-i18n` y carga sus traducciones.
 
-Los catálogos inglés y catalán están completados; sus `.mo` y JSON JavaScript
-se incluyen en el release `1.1.3`. Pendiente únicamente el QA visual en
-WordPress con cada locale activo.
+Los catálogos `ca`, `de_DE`, `en_US`, `eu` y `fr_FR` están al día con las
+cadenas de la 1.3.0 (2026-09-25); los `.mo` y JSON JavaScript los genera el
+usuario. Pendiente únicamente el QA visual en WordPress con cada locale activo.
 
 ### Visibilidad IA, reglas y `llms.txt`
 
@@ -83,6 +100,33 @@ Queda pendiente validar visualmente la tabla y probar en un `.htaccess` real
 los modos de bloqueo total y `llms_only`, con copia previa y comprobación de
 que WordPress sigue respondiendo correctamente.
 
+### Modo WP: documentos sin IA
+
+Plan en [`modo-wp-sin-ia.md`](modo-wp-sin-ia.md). Interruptor global IA/WP,
+opción A/B para ediciones, valor `auto_wp` en `override_mode` y badge
+`Auto · IA` / `Auto · WP`. Sin implementar.
+
+### Estrategia de idiomas
+
+Plan en [`estrategia-idiomas.md`](estrategia-idiomas.md): capa común para
+WPML, Polylang y TranslatePress, idioma principal desde Negocio y check
+«Separar contenido por idioma». Sin implementar. Incluye el problema de
+TranslatePress del informe de supershippingwoo.com (problema 1).
+
+### Lado páginas del informe de incidencias
+
+Sin hacer: `Article` para páginas y Markdown sin precios (problema 4, parte de
+páginas).
+
+### Traducciones y limpieza pendientes
+
+- Etiquetas del bloque «Datos de compra» (`Generator::PURCHASE_LABELS`) y
+  «Estándar»/«cualquiera» en `Extractor_Woo`: español fijo, sin `__()`.
+- Los `confirm()` de `assets/admin.js` (robots.txt y .htaccess) están en
+  español fijo.
+- Filas antiguas de FAQ y tienda en otros idiomas: siguen en el Registro sin
+  regenerarse; se borran a mano desde el Registro.
+
 ### UX3 — WooCommerce: selección y prompt por campo a nivel de producto
 
 Nueva arquitectura para seleccionar y aportar texto por campo de cada producto. Es distinta de la selección ya implementada de envíos, impuestos, pagos y categorías. Requiere `rol-analista` antes de tocar código.
@@ -98,8 +142,6 @@ Hay estilos inline como `style="width:100%"` en varias vistas. Detectado, no abo
 ## Ideas sin planificar
 
 - Tags dinámicos en prompts y texto manual (`{post.title}`, datos de producto, etc.).
-- Asistente de configuración por pasos: consultar el plan de asistente en _dev.
-  MVP pendiente de validación funcional antes de implementar.
 - Cobertura de Google en avisos en tiempo real mediante Search Console Indexing API con OAuth propio. IndexNow no cubre Google.
 - Actualizar OpenAPI con las rutas de feeds. Está explícitamente fuera del alcance actual.
 
@@ -110,14 +152,8 @@ Hay estilos inline como `style="width:100%"` en varias vistas. Detectado, no abo
 - [`contexto-activo.md`](contexto-activo.md): relevo de la tarea activa.
 - [`docs/index.md`](../docs/index.md): índice de documentación del plugin.
 
-## Release 1.1.1 — seguimiento Git
+## Seguimiento de releases
 
-- Pendiente separado: resolver la divergencia histórica de la rama `main`
-  estable del plugin con `knowBaseDev` antes de volver a automatizar el merge
-  del script de release. No se debe resolver eliminando o restaurando `_dev/`
-  sin una decisión explícita.
-
-## Release 1.1.2 — preparación
-
-- Pendiente publicar la navegación contextual del popup y sus ajustes visuales
-  después de ejecutar la validación técnica y preparar el ZIP.
+- Las releases 1.2.0 a 1.3.0 se han fusionado en `main` con el script sin
+  conflictos (2026-09-25); la divergencia histórica de la 1.1.1 ya no bloquea.
+  El script ya no sube un tag local (lo crea GitHub al crear la release).
