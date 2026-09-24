@@ -202,12 +202,26 @@ class Htaccess_Guard {
 			return array();
 		}
 		$lines = preg_split( '/\r\n|\r|\n/', (string) file_get_contents( self::path() ) ); // phpcs:ignore
-		$found = array();
-		foreach ( $lines as $index => $line ) {
-			if ( preg_match( '/^# BEGIN ' . preg_quote( self::MARKER, '/' ) . '/', trim( $line ) ) ) {
-				$end = $index;
-				while ( isset( $lines[ $end ] ) && false === strpos( $lines[ $end ], '# END ' . self::MARKER ) ) { $end++; }
-				$index = $end;
+		$found  = array();
+		$inside = false;
+		$count  = count( $lines );
+		// Bucle for con bandera $inside (mismo patron que comment_action_conflicts()
+		// arriba): en un foreach, reasignar la variable de indice no salta lineas
+		// -- PHP no respeta ese salto, sigue avanzando una a una por el puntero
+		// interno. Con foreach, el bloque propio del plugin (# BEGIN ... # END)
+		// se recorria igual que el resto del archivo y sus propias reglas se
+		// marcaban como "conflicto" contra si mismas (bug real confirmado).
+		for ( $index = 0; $index < $count; $index++ ) {
+			$line = $lines[ $index ];
+			if ( 0 === strpos( trim( $line ), '# BEGIN ' . self::MARKER ) ) {
+				$inside = true;
+				continue;
+			}
+			if ( 0 === strpos( trim( $line ), '# END ' . self::MARKER ) ) {
+				$inside = false;
+				continue;
+			}
+			if ( $inside ) {
 				continue;
 			}
 			foreach ( $bot_user_agents as $ua ) {

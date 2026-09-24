@@ -482,53 +482,107 @@ class Admin
 
 	protected static function build_geo_prompt()
 	{
-		$content = "# Auditoría GEO de " . get_bloginfo('name') . "\n\n";
-		$content .= "Analiza {URL} como consultor GEO y evalúa cómo de accesible, comprensible y reutilizable es su contenido para buscadores, asistentes y sistemas de inteligencia artificial.\n\nRevisa únicamente lo que puedas comprobar realmente en la web. No inventes datos ni des por hecho que una funcionalidad existe si no puedes verificarla.\n\nEvalúa de forma práctica:\n\n- claridad de la entidad, negocio, servicios o productos;\n- estructura y calidad del contenido;\n- facilidad para que una IA entienda páginas, categorías, productos y relaciones entre contenidos;\n- consistencia de datos entre páginas;\n- información duplicada, contradictoria, antigua, vacía o poco útil;\n- accesibilidad del contenido sin depender excesivamente de JavaScript;\n- titles, metadatos y estructura semántica;\n- datos estructurados y schema cuando sean verificables;\n- robots.txt, sitemap, llms.txt y otros recursos orientados a crawlers o IA cuando puedan comprobarse;\n- versiones por idioma y posibles inconsistencias;\n- contenido estructurado o formatos adicionales como Markdown, JSON o endpoints de conocimiento si existen;\n- cualquier problema que pueda provocar que una IA interprete mal, ignore o mezcle información de la web.\n\nDiferencia siempre entre:\n\nError confirmado: problema observado directamente.\n\nRiesgo: algo que puede afectar al GEO pero no puede confirmarse completamente.\n\nRecomendación: mejora que podría aumentar la comprensión o visibilidad.\n\nEntrega el resultado en este formato:\n\n1. Resumen ejecutivo\n2. Hallazgos ordenados por prioridad\n3. Fortalezas GEO actuales\n4. Problemas confirmados\n5. Riesgos\n6. Acciones recomendadas por prioridad\n7. Conclusión general\n\nPara cada hallazgo importante, cita la URL o el elemento observado que lo justifica.\n\nNo conviertas en error algo que simplemente no puedas verificar. En ese caso indícalo como “no verificado”.\n\nEl objetivo es determinar hasta qué punto una IA puede entender correctamente la web y obtener información fiable de ella.\n";
-		$content = "# Auditoría GEO de " . get_bloginfo('name') . "\n\n";
-		$content .= <<<'GEO'
-Analiza [URL] como consultor GEO, centrándote en la visibilidad, accesibilidad y exposición técnica del contenido para buscadores, asistentes y sistemas de inteligencia artificial.
+		$content = <<<'GEO'
+# Auditoría GEO - Percepción IA
 
-El objetivo no es valorar si el contenido está bien redactado, sino comprobar qué información de la web puede descubrir, acceder, interpretar y reutilizar una IA.
+Analiza [URL] simulando cómo un agente de inteligencia artificial interpreta esta web.
 
-Revisa especialmente:
+El objetivo es saber qué información puede descubrir, comprender y reutilizar una IA actualmente.
 
-- si el contenido principal es accesible para crawlers e IA;
-- qué información está disponible directamente en HTML;
-- dependencia de JavaScript para acceder a contenido relevante;
-- robots.txt y posibles restricciones a bots;
-- llms.txt, si existe, y qué información expone;
-- sitemaps y capacidad de descubrimiento de URLs;
-- datos estructurados / Schema.org;
-- metadatos relevantes;
-- canonicals, indexabilidad y señales que puedan afectar a la visibilidad;
-- disponibilidad de versiones estructuradas del contenido como Markdown, JSON, feeds o endpoints específicos;
-- facilidad para identificar entidades, productos, servicios, categorías y relaciones entre ellos;
-- coherencia entre HTML, schema, Markdown, JSON y otros formatos cuando existan;
-- acceso de bots de IA conocidos cuando pueda verificarse;
-- posibles bloqueos, contenido invisible para crawlers o información que solo sea accesible para usuarios humanos.
+No hagas auditoría SEO.
+No analices keywords, posicionamiento, copywriting, diseño o estrategia comercial.
 
-No hagas una auditoría SEO tradicional ni centres el análisis en copywriting, keywords, densidad de texto o calidad comercial del contenido, salvo que afecten directamente a la comprensión por parte de sistemas de IA.
+## Recursos GEO
 
-Diferencia siempre entre:
+Comprueba directamente:
 
-Confirmado: observado directamente.
-Riesgo: posible problema que no puede verificarse completamente.
-No verificado: elemento al que no se ha podido acceder o comprobar.
-Recomendación: mejora técnica de visibilidad o exposición del conocimiento.
+- [URL]robots.txt
+- [URL]llms.txt
+- [URL]sitemap.xml
+- [URL]sitemap_index.xml
+- [URL]wp-sitemap.xml
+
+Para cada recurso indica:
+
+- URL comprobada.
+- Código HTTP.
+- Contenido encontrado.
+- Información disponible para una IA.
+
+## Comprensión de la entidad
+
+Analiza:
+
+- Qué entidad identifica una IA.
+- Qué producto, servicio o información representa.
+- Qué relaciones puede interpretar:
+  - empresa;
+  - producto;
+  - tecnologías;
+  - plataformas;
+  - servicios relacionados.
+
+## Información reutilizable por IA
+
+Indica qué puede responder una IA actualmente sobre:
+
+- qué es;
+- qué hace;
+- cómo funciona;
+- integraciones;
+- requisitos;
+- categorías;
+- relaciones detectadas.
+
+## Estructuras disponibles
+
+Comprueba únicamente elementos existentes:
+
+- Schema.org / JSON-LD.
+- SoftwareApplication.
+- Product.
+- Organization.
+- FAQ.
+- Markdown.
+- JSON.
+- APIs o endpoints estructurados.
+
+## Accesibilidad IA
+
+Analiza:
+
+- si la información principal es accesible;
+- si existen bloqueos para bots IA;
+- si existe contenido no accesible para agentes automáticos;
+- si depende de interacción humana o JavaScript.
+
+## Resultado
 
 Entrega:
 
-1. Resumen ejecutivo de visibilidad GEO
-2. Qué puede ver y entender actualmente una IA
-3. Qué información está estructurada o preparada para IA
-4. Bloqueos o limitaciones detectadas
-5. Hallazgos ordenados por prioridad
-6. Acciones recomendadas
-7. Conclusión sobre el nivel de exposición GEO de la web
+# 1. Cómo ve una IA esta web actualmente
 
-Cita siempre las URLs, respuestas HTTP, archivos o elementos observados que respalden cada conclusión.
+# 2. Información que puede extraer
 
-No inventes funcionalidades ni marques como error algo que simplemente no hayas podido verificar.
+# 3. Archivos y estructuras disponibles
+
+# 4. Limitaciones detectadas
+
+# 5. Nivel de comprensión IA:
+Bajo / Medio / Alto
+
+Usa siempre esta clasificación:
+
+- Confirmado: comprobado directamente.
+- Riesgo: posible limitación no confirmada.
+- No verificado: no se ha podido comprobar.
+
+Reglas:
+
+- No inventes datos.
+- No hagas recomendaciones.
+- No marques errores sin evidencia.
+- Cada conclusión debe estar respaldada por una URL, archivo, código HTTP o elemento técnico observado.
 GEO;
 		$content = str_replace('[URL]', home_url('/'), $content);
 		return $content;
