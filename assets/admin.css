@@ -62,5 +62,21 @@
 .wookb-assistant .wookb-assistant-toggle input{background:var(--tblr-secondary-bg,#e5e7eb)}.wookb-assistant .wookb-assistant-toggle input:checked{background:var(--tblr-primary,#007cab)}
 .wookb-assistant-toggle input:checked::before{height:1.5rem!important;width:1.5rem!important}
 .wookb-assistant-crawler-bulk{display:flex;justify-content:flex-end;gap:8px;margin:14px 0}.wookb-assistant-crawlers{max-height:33vh;overflow-y:auto;padding-right:8px;border:1px solid var(--tblr-border-color,#dce1e7);border-radius:6px}.wookb-assistant-crawler{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px;border-bottom:1px solid var(--tblr-border-color,#dce1e7)}.wookb-assistant-crawler:last-child{border-bottom:0}.wookb-assistant-crawler strong,.wookb-assistant-crawler span{display:block}.wookb-assistant-crawler span{font-size:12px;opacity:.75}.wookb-assistant-crawler p{margin:5px 0 0;font-size:13px}.wookb-assistant-crawler select{flex:0 0 120px}
+/* Interruptor "Incluir llms.txt para los modelos desactivados" (pestaña Visibilidad IA y asistente).
+   Usa el mismo interruptor del asistente (.wookb-assistant-toggle); fuera del asistente se le
+   dan los mismos colores para que se vea igual en las dos partes. */
+.wookb-visibility-switch{border:2px solid var(--tblr-border-color,#c9ced6);border-radius:10px;padding:18px 22px;margin:14px 0 22px;max-width:860px}
+.wookb-visibility-switch.is-on{border-color:var(--tblr-primary,#007cab)}
+.wookb-visibility-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.wookb-visibility-switch .wookb-assistant-toggle input{background:var(--tblr-secondary-bg,#e5e7eb)}
+.wookb-visibility-switch .wookb-assistant-toggle input:checked{background:var(--tblr-primary,#007cab)}
+.wookb-visibility-switch .wookb-assistant-toggle span{font-size:19px;line-height:1.3}
+.wookb-visibility-state{font-size:12px;letter-spacing:.06em;padding:4px 10px;border-radius:999px;background:var(--tblr-secondary-bg,#e5e7eb);color:var(--tblr-body-color)}
+.wookb-visibility-switch.is-on .wookb-visibility-state{background:var(--tblr-primary,#007cab);color:#fff}
+.wookb-visibility-state .on{display:none}
+.wookb-visibility-switch.is-on .wookb-visibility-state .on{display:inline}
+.wookb-visibility-switch.is-on .wookb-visibility-state .off{display:none}
+.wookb-visibility-effects{margin:10px 0;padding-left:20px;list-style:disc}
+.wookb-visibility-effects li{margin:8px 0;font-size:14px}
 /* Enlaces finales del asistente */
 .wookb-assistant-links:before{content:'Salir del asistente y acceder a los ajustes del plugin';display:block;width:100%;font-weight:600;margin-bottom:4px}

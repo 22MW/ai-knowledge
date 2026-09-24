@@ -269,6 +269,11 @@ $htaccess_conflicts = Htaccess_Guard::conflicts( $crawler_blocked_bots, $crawler
 <p class="description">
 	<?php esc_html_e( 'Lista de crawlers de IA conocidos, su finalidad y la acción asignada a cada uno. Esta configuración se aplica tanto a robots.txt como a las reglas de .htaccess que aparecen más abajo.', 'ai-knowledge' ); ?>
 </p>
+<?php // Un solo formulario: el interruptor de visibilidad y las acciones de cada bot se guardan juntos con "Guardar configuración de crawlers" (recarga la página para que las propuestas de robots.txt y .htaccess de abajo salgan actualizadas). ?>
+<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+	<input type="hidden" name="action" value="wookb_save_crawler_actions" />
+	<?php wp_nonce_field( 'wookb_save_crawler_actions' ); ?>
+	<?php echo Admin::render_visibility_switch( $crawler_visibility_mode ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado campo a campo dentro del propio metodo. ?>
 <?php
 $category_labels = array(
 	'ai_search'                => __( 'Búsqueda/citas IA', 'ai-knowledge' ),
@@ -302,9 +307,6 @@ $category_labels = array(
 	<button type="button" class="button" data-wookb-crawler-bulk="allow"><?php esc_html_e( 'Permitir todos (visibles)', 'ai-knowledge' ); ?></button>
 	<button type="button" class="button" data-wookb-crawler-bulk="block"><?php esc_html_e( 'Bloquear todos (visibles)', 'ai-knowledge' ); ?></button>
 </div>
-<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-	<input type="hidden" name="action" value="wookb_save_crawler_actions" />
-	<?php wp_nonce_field( 'wookb_save_crawler_actions' ); ?>
 	<div style="overflow-x:auto;">
 	<table class="wp-list-table widefat striped" style="min-width:800px;">
 		<thead>
@@ -341,18 +343,6 @@ $category_labels = array(
 		<?php submit_button( __( 'Guardar configuración de crawlers', 'ai-knowledge' ), 'primary', 'submit', false ); ?>
 		<button type="button" class="button" data-wookb-crawler-toggle><?php esc_html_e( 'Ver todos los crawlers', 'ai-knowledge' ); ?></button>
 	</div>
-</form>
-
-<h3><?php esc_html_e( 'Visibilidad para los bots bloqueados', 'ai-knowledge' ); ?></h3>
-<p class="description"><?php esc_html_e( 'Puedes bloquear el resto del sitio y mantener visible únicamente /llms.txt para los bots configurados como Bloquear.', 'ai-knowledge' ); ?></p>
-<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-	<input type="hidden" name="action" value="wookb_save_crawler_visibility" />
-	<?php wp_nonce_field( 'wookb_save_crawler_visibility' ); ?>
-	<select name="crawler_visibility_mode">
-		<option value="site" <?php selected( 'site', $crawler_visibility_mode ); ?>><?php esc_html_e( 'Bloquear el sitio completo', 'ai-knowledge' ); ?></option>
-		<option value="llms_only" <?php selected( 'llms_only', $crawler_visibility_mode ); ?>><?php esc_html_e( 'Solo permitir visibilidad de llms.txt', 'ai-knowledge' ); ?></option>
-	</select>
-	<?php submit_button( __( 'Guardar modo de visibilidad', 'ai-knowledge' ), 'secondary', 'submit', false ); ?>
 </form>
 
 <h3><?php esc_html_e( 'robots.txt', 'ai-knowledge' ); ?></h3>

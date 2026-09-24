@@ -4,6 +4,14 @@ Todas las modificaciones relevantes de este plugin se documentan en este archivo
 
 ## [Sin publicar]
 
+### Visibilidad IA
+
+- «Visibilidad para los bots bloqueados» pasa a ser un interruptor grande,
+  «Incluir llms.txt para los modelos desactivados», con el efecto explicado.
+  En la pestaña va antes de la tabla de crawlers y se guarda con «Guardar
+  configuración de crawlers» (recarga la página y actualiza las propuestas de
+  robots.txt y .htaccess). El asistente usa el mismo interruptor.
+
 ### Productos WooCommerce
 
 - Los documentos de producto llevan un bloque "Datos de compra" generado por

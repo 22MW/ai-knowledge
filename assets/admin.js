@@ -189,6 +189,14 @@
 		applyCrawlerFilters();
 	} );
 
+	// Interruptor "Incluir llms.txt para los modelos desactivados" (pestaña
+	// Visibilidad IA y asistente): actualiza la etiqueta ACTIVADO/DESACTIVADO al
+	// momento; el guardado lo hacen los botones de cada pantalla. Delegado en
+	// document: el asistente inyecta sus pasos por AJAX.
+	$( document ).on( 'change', '.wookb-visibility-switch input[type="checkbox"]', function () {
+		$( this ).closest( '.wookb-visibility-switch' ).toggleClass( 'is-on', this.checked );
+	} );
+
 	/**
 	 * Fase AJAX 1: guardados simples. El action del formulario se conserva
 	 * para que admin-post.php siga funcionando si JavaScript no esta activo.
@@ -203,8 +211,6 @@
 			'wookb_save_business_summary',
 			'wookb_save_woocommerce_settings',
 			'wookb_save_llms_faq',
-			'wookb_save_crawler_actions',
-			'wookb_save_crawler_visibility',
 			'wookb_generate_business_summary_draft',
 			'wookb_generate_faqs_draft',
 			'wookb_generate_prompt_draft',

@@ -32,8 +32,6 @@ class Admin
 			'wookb_save_business_summary' => 'save_business_summary',
 			'wookb_save_woocommerce_settings' => 'save_woocommerce_settings',
 			'wookb_save_llms_faq' => 'save_llms_faq',
-			'wookb_save_crawler_actions' => 'save_crawler_actions',
-			'wookb_save_crawler_visibility' => 'save_crawler_visibility',
 			'wookb_generate_business_summary_draft' => 'generate_business_summary_draft',
 			'wookb_generate_faqs_draft' => 'generate_faqs_draft',
 			'wookb_generate_prompt_draft' => 'generate_prompt_draft',
@@ -96,7 +94,6 @@ class Admin
 		add_action('admin_post_wookb_download_llms_backup', array(__CLASS__, 'download_llms_backup'));
 		add_action('admin_post_wookb_apply_llms_physical', array(__CLASS__, 'apply_llms_physical'));
 		add_action('admin_post_wookb_save_crawler_actions', array(__CLASS__, 'save_crawler_actions'));
-		add_action('admin_post_wookb_save_crawler_visibility', array(__CLASS__, 'save_crawler_visibility'));
 		add_action('admin_post_wookb_download_robots_backup', array(__CLASS__, 'download_robots_backup'));
 		add_action('admin_post_wookb_apply_robots_block', array(__CLASS__, 'apply_robots_block'));
 		add_action('admin_post_wookb_download_htaccess_backup', array(__CLASS__, 'download_htaccess_backup'));
@@ -407,7 +404,7 @@ class Admin
 			<nav class="wookb-assistant-subnav" aria-label="<?php esc_attr_e('Categorías de crawlers', 'ai-knowledge'); ?>"><?php foreach ($categories as $key => $item) : ?><button type="button" class="button<?php echo $key === $category ? ' button-primary' : ''; ?>" data-assistant-category="<?php echo esc_attr($key); ?>"><?php echo esc_html($item['title']); ?></button><?php endforeach; ?></nav>
 			<h3><?php echo esc_html($categories[$category]['title']); ?></h3><?php if (!empty($categories[$category]['description'])) : ?><p><?php echo esc_html($categories[$category]['description']); ?></p><?php endif; ?><div class="wookb-assistant-crawler-bulk"><button type="button" class="button" data-crawler-bulk="allow"><?php esc_html_e('Permitir todos', 'ai-knowledge'); ?></button> <button type="button" class="button" data-crawler-bulk="block"><?php esc_html_e('Bloquear todos', 'ai-knowledge'); ?></button></div>
 			<div class="wookb-assistant-crawlers"><?php foreach (Crawler_Catalog::all() as $crawler) : if ($crawler['category'] !== $category) continue; ?><div class="wookb-assistant-crawler"><div><strong><?php echo esc_html($crawler['user_agent']); ?></strong><span><?php echo esc_html($crawler['operator']); ?></span><?php if ($crawler['description'] !== $categories[$category]['description']) : ?><p><?php echo esc_html($crawler['description']); ?></p><?php endif; ?></div><select name="crawler_action[<?php echo esc_attr($crawler['user_agent']); ?>]"><option value="allow" <?php selected('allow', $actions[$crawler['user_agent']]); ?>><?php esc_html_e('Permitir', 'ai-knowledge'); ?></option><option value="block" <?php selected('block', $actions[$crawler['user_agent']]); ?>><?php esc_html_e('Bloquear', 'ai-knowledge'); ?></option></select></div><?php endforeach; ?></div>
-			<h3><?php esc_html_e('Acceso de crawlers bloqueados a llms.txt', 'ai-knowledge'); ?></h3><p><?php esc_html_e('Decide si un crawler bloqueado puede leer únicamente el archivo llms.txt o si también debe quedar bloqueado en todo el sitio.', 'ai-knowledge'); ?></p><div class="wookb-assistant-field"><label><input type="radio" name="crawler_visibility_mode" value="site" <?php checked('site', $settings['crawler_visibility_mode']); ?> /> <?php esc_html_e('Aplicar la misma política a todo el sitio', 'ai-knowledge'); ?></label><label><input type="radio" name="crawler_visibility_mode" value="llms_only" <?php checked('llms_only', $settings['crawler_visibility_mode']); ?> /> <?php esc_html_e('Permitir solo llms.txt', 'ai-knowledge'); ?></label></div><h3><?php esc_html_e('Robots.txt y .htaccess', 'ai-knowledge'); ?></h3><p><?php esc_html_e('La política que guardes aquí sirve como base para preparar las reglas de robots.txt y .htaccess. Esos archivos se gestionan después desde la pantalla Visibilidad IA, donde puedes revisar el contenido antes de aplicarlo.', 'ai-knowledge'); ?></p>
+			<h3><?php esc_html_e('Acceso de crawlers bloqueados a llms.txt', 'ai-knowledge'); ?></h3><?php echo self::render_visibility_switch($settings['crawler_visibility_mode']); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado campo a campo dentro del propio metodo. ?><h3><?php esc_html_e('Robots.txt y .htaccess', 'ai-knowledge'); ?></h3><p><?php esc_html_e('La política que guardes aquí sirve como base para preparar las reglas de robots.txt y .htaccess. Esos archivos se gestionan después desde la pantalla Visibilidad IA, donde puedes revisar el contenido antes de aplicarlo.', 'ai-knowledge'); ?></p>
 		<?php elseif ('finish' === $step) :
 			// Paso RESUMEN (antes era el paso de limites): SOLO consultas de
 			// lectura, ya baratas (Registry, Llms_Faq, get_option...). NUNCA
@@ -1321,6 +1318,47 @@ GEO;
 		);
 
 		self::redirect('prompt');
+	}
+
+	/**
+	 * Interruptor "Incluir llms.txt para los modelos desactivados" (valor
+	 * guardado: crawler_visibility_mode, 'llms_only' = activado, 'site' =
+	 * desactivado). Compartido por la pestaña Visibilidad IA y el paso del
+	 * asistente: mismo marcado, mismo interruptor (.wookb-assistant-toggle).
+	 *
+	 * El input hidden 'site' va ANTES del checkbox con el mismo name: si el
+	 * checkbox esta marcado, PHP se queda con el ultimo valor ('llms_only');
+	 * si no, llega 'site' (un checkbox sin marcar no envia nada). Sirve tanto
+	 * para el POST normal como para el serializeArray() del asistente.
+	 * No guarda por si mismo: en la pestaña se guarda con "Guardar
+	 * configuración de crawlers" y en el asistente con los botones de siempre.
+	 */
+	public static function render_visibility_switch($mode)
+	{
+		$on = 'llms_only' === $mode;
+		ob_start();
+		?>
+		<div class="wookb-visibility-switch<?php echo $on ? ' is-on' : ''; ?>">
+			<input type="hidden" name="crawler_visibility_mode" value="site" />
+			<div class="wookb-visibility-head">
+				<label class="wookb-assistant-toggle">
+					<input type="checkbox" name="crawler_visibility_mode" value="llms_only" <?php checked($on); ?> />
+					<span><?php esc_html_e('Incluir llms.txt para los modelos desactivados', 'ai-knowledge'); ?></span>
+				</label>
+				<strong class="wookb-visibility-state">
+					<span class="on"><?php esc_html_e('ACTIVADO', 'ai-knowledge'); ?></span>
+					<span class="off"><?php esc_html_e('DESACTIVADO', 'ai-knowledge'); ?></span>
+				</strong>
+			</div>
+			<p class="description"><?php esc_html_e('Modelos desactivados = los bots que has marcado como Bloquear en la tabla de crawlers.', 'ai-knowledge'); ?></p>
+			<ul class="wookb-visibility-effects">
+				<li><strong><?php esc_html_e('Activado:', 'ai-knowledge'); ?></strong> <?php esc_html_e('los bots bloqueados no pueden entrar en tu web, pero sí leen /llms.txt, el resumen que has preparado para ellos. Cualquier otra página les responde 404.', 'ai-knowledge'); ?></li>
+				<li><strong><?php esc_html_e('Desactivado:', 'ai-knowledge'); ?></strong> <?php esc_html_e('los bots bloqueados no pueden acceder a nada, ni siquiera a /llms.txt. Es un bloqueo total del sitio.', 'ai-knowledge'); ?></li>
+			</ul>
+			<p class="description"><?php esc_html_e('Este ajuste solo cambia las reglas propuestas para robots.txt y .htaccess. Nada se modifica en tu servidor hasta que tú lo apliques.', 'ai-knowledge'); ?></p>
+		</div>
+		<?php
+		return ob_get_clean();
 	}
 
 	/**
@@ -2613,20 +2651,18 @@ GEO;
 			}
 		}
 
-		Scope::update_settings(array('crawler_actions' => $actions));
+		$settings = array('crawler_actions' => $actions);
 
-		self::redirect('visibilidad-ia');
-	}
-
-	/** Guarda el modo de visibilidad aplicado a los bloques de crawler. */
-	public static function save_crawler_visibility()
-	{
-		self::verify('wookb_save_crawler_visibility');
-		$mode = isset($_POST['crawler_visibility_mode']) ? sanitize_key(wp_unslash($_POST['crawler_visibility_mode'])) : 'site'; // phpcs:ignore
-		if (! in_array($mode, array('site', 'llms_only'), true)) {
-			$mode = 'site';
+		// Interruptor "Incluir llms.txt para los modelos desactivados": va en el
+		// mismo formulario y se guarda junto a las acciones de cada bot. Solo se
+		// toca si viene en el POST, para no reiniciarlo a 'site' si faltara.
+		if (isset($_POST['crawler_visibility_mode'])) { // phpcs:ignore
+			$mode = sanitize_key(wp_unslash($_POST['crawler_visibility_mode'])); // phpcs:ignore
+			$settings['crawler_visibility_mode'] = in_array($mode, array('site', 'llms_only'), true) ? $mode : 'site';
 		}
-		Scope::update_settings(array('crawler_visibility_mode' => $mode));
+
+		Scope::update_settings($settings);
+
 		self::redirect('visibilidad-ia');
 	}
 

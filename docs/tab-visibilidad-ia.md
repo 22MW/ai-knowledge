@@ -78,9 +78,22 @@ un bloque propio. En cada actualización sustituye entero solo ese bloque.
 
 Esto sí es un bloqueo de verdad a nivel de servidor: si un bot marcado
 como "Bloquear" en la tabla intenta acceder, el servidor rechaza la
-petición directamente, la respete o no. En modo «Solo permitir visibilidad
-de `llms.txt`», esos bots pueden leer `/llms.txt` y reciben `404` en el resto
-del sitio.
+petición directamente, la respete o no.
+
+El interruptor **«Incluir llms.txt para los modelos desactivados»** decide
+qué pasa con esos bots bloqueados:
+
+- **Activado:** no pueden entrar en tu web, pero sí leen `/llms.txt`, el
+  resumen que has preparado para ellos. Cualquier otra página les responde
+  `404`.
+- **Desactivado:** no pueden acceder a nada, ni siquiera a `/llms.txt`. Es un
+  bloqueo total del sitio.
+
+Este ajuste solo cambia las reglas propuestas para `robots.txt` y
+`.htaccess`; nada se modifica en tu servidor hasta que tú lo apliques. Está
+al principio de la tabla de crawlers y se guarda con **«Guardar configuración
+de crawlers»** (la página se recarga y las propuestas se actualizan). También
+lo encuentras en el paso de Visibilidad IA del asistente.
 
 Las reglas de `.htaccess` se agrupan por comportamiento para evitar bloques
 repetidos y se colocan antes de las reglas de WordPress, de modo que el bloqueo
