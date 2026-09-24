@@ -856,7 +856,7 @@ GEO;
 		// oscuro en cada carga).
 		echo '<script>(function(){var w=document.currentScript.parentNode;var t=null;try{t=window.localStorage.getItem("wookb_theme");}catch(e){}if("dark"!==t&&"light"!==t){if(window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches){t="light";}else{t="dark";}}w.setAttribute("data-bs-theme",t);})();</script>';
 		echo '<div class="wookb-header-row"><h3>' . esc_html__('Base de conocimiento IA', 'ai-knowledge') . '</h3>';
-		echo '<button type="button" class="wookb-theme-toggle"> ' . esc_html__('Modo oscuro', 'ai-knowledge') . '</button></div>';
+		echo '<button type="button" class="wookb-theme-toggle"> ' . esc_html__('Modo oscuro', 'ai-knowledge') . '</button> <a class="wookb-theme-toggle wookb-btn-success" href="' . esc_url(home_url('/llms.txt')) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Ver llms.txt', 'ai-knowledge') . '</a></div>';
 
 		self::render_registry_summary();
 
