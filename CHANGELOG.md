@@ -4,6 +4,11 @@ Todas las modificaciones relevantes de este plugin se documentan en este archivo
 
 ## [Sin publicar]
 
+### Identidad
+
+- Logo propio en el menú de WordPress y como icono del plugin en la pantalla
+  de actualizaciones.
+
 ### Visibilidad IA
 
 - «Visibilidad para los bots bloqueados» pasa a ser un interruptor grande,

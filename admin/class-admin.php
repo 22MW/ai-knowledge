@@ -134,7 +134,7 @@ class Admin
 			self::capability(),
 			'ai-knowledge',
 			array(__CLASS__, 'render'),
-			'dashicons-admin-generic',
+			AIKB_URL . 'assets/ai-knowledge-logo.svg',
 			58
 		);
 
