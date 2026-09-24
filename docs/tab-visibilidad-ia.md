@@ -99,12 +99,22 @@ Las reglas de `.htaccess` se agrupan por comportamiento para evitar bloques
 repetidos y se colocan antes de las reglas de WordPress, de modo que el bloqueo
 se evalúe antes de enviar la petición a `index.php`.
 
-El plugin muestra el `.htaccess` actual y el archivo completo propuesto. El
-archivo real no se sobrescribe automáticamente: puedes copiar el código o
-descargar el archivo preparado y sustituirlo manualmente.
+El plugin muestra el `.htaccess` actual y el archivo completo propuesto. Puedes
+copiar el código o descargar el archivo preparado y sustituirlo a mano, o
+reemplazarlo desde aquí (también en el asistente) con el botón **«Reemplazar
+.htaccess»**. Ese botón está desactivado hasta que:
 
-> `robots.txt` se guarda con confirmación y copia previa. `.htaccess` se
-> prepara para copiar o descargar, pero no se sobrescribe automáticamente.
+1. descargues la copia del `.htaccess` actual, y
+2. marques la casilla «Asumo toda la responsabilidad y sé lo que estoy
+   haciendo».
+
+Antes de escribir, el plugin comprueba que el archivo existe y se puede
+modificar. Si no (por ejemplo, nginx o permisos insuficientes), te lo indica y
+no toca nada. Al reemplazar solo se cambia el bloque de AI Knowledge; el resto
+del archivo se conserva. Si una regla tuya contradice un bot que permites, se
+comenta, no se borra.
+
+> `robots.txt` y `.htaccess` se guardan con confirmación y copia previa.
 
 ### Registro de accesos de crawlers de IA
 

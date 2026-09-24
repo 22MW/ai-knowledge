@@ -329,7 +329,7 @@ class Admin
 			'faqs' => array('number' => 7, 'title' => __('FAQs', 'ai-knowledge'), 'description' => __('Genera con IA las preguntas frecuentes públicas de tu negocio a partir de los datos ya introducidos, y las publica directamente en llms.txt. Este paso solo aparece si hay una conexión de IA disponible.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=faqs')),
 			'chatbot' => array('number' => 8, 'title' => __('Chatbot', 'ai-knowledge'), 'description' => __('Configura cómo Support Genix utilizará la base de conocimiento, cuántos documentos relacionados podrá consultar y qué información adicional debe tener en cuenta. Al guardar, se sincroniza con Genix si hay conexión disponible. Este paso solo aparece cuando la integración está disponible.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=prompt')),
 			'visibility' => array('number' => 9, 'title' => __('Visibilidad IA', 'ai-knowledge'), 'description' => __('Decide qué familias de crawlers pueden acceder al sitio y cómo se gestiona su acceso a llms.txt. Al guardar, esta selección queda conservada para utilizarla en las reglas de visibilidad del plugin.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=visibilidad-ia')),
-			'server' => array('number' => 10, 'title' => __('Archivos del servidor', 'ai-knowledge'), 'description' => __('Comprueba si robots.txt y .htaccess difieren de la configuración guardada. Descarga las copias y las versiones preparadas; el asistente no muestra el código completo ni modifica .htaccess automáticamente.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=visibilidad-ia')),
+			'server' => array('number' => 10, 'title' => __('Archivos del servidor', 'ai-knowledge'), 'description' => __('Comprueba si robots.txt y .htaccess difieren de la configuración guardada. Descarga las copias y las versiones preparadas; el asistente no muestra el código completo; reemplazar .htaccess exige copia descargada y una casilla de responsabilidad.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=visibilidad-ia')),
 			'finish' => array('number' => 11, 'title' => __('Resumen', 'ai-knowledge'), 'description' => __('Revisa el estado real de cada paso: qué se ha generado ya y qué queda pendiente. Puedes generar ahora los documentos que aún falten, o dejarlo para más tarde desde Generación masiva.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=carga-inicial')),
 			'success' => array('number' => 12, 'title' => __('Resumen final', 'ai-knowledge'), 'description' => __('La configuración del asistente ha terminado. Revisa el estado real de los documentos y accede directamente a las áreas principales del plugin.', 'ai-knowledge')),
 		);
@@ -351,13 +351,22 @@ class Admin
 			$robots_generated = Robots_Txt_Guard::generate_full_file($crawler_actions, $mode);
 			$htaccess_current = Htaccess_Guard::is_available() ? (string) file_get_contents(Htaccess_Guard::path()) : '';
 			$htaccess_generated = Htaccess_Guard::generate_full_file($crawler_actions, $mode);
+			// Cada carga del paso invalida la copia descargada antes: hay que
+			// volver a descargarla (vale 10 minutos).
+			Robots_Txt_Guard::clear_backup_confirmation();
+			Htaccess_Guard::clear_backup_confirmation();
 			$robots_backup_ready = Robots_Txt_Guard::backup_confirmed();
 			if (!Robots_Txt_Guard::managed_block_matches($robots_current, $crawler_actions, $mode)) : ?><p class="notice notice-warning inline"><strong><?php esc_html_e('Las reglas de AI Knowledge en robots.txt son diferentes de la configuración guardada.', 'ai-knowledge'); ?></strong></p><?php else : ?><p class="notice notice-success inline"><?php esc_html_e('Las reglas de AI Knowledge en robots.txt coinciden con la configuración guardada.', 'ai-knowledge'); ?></p><?php endif; ?>
 			<p><?php esc_html_e('Descarga una copia actual antes de actualizar robots.txt con la versión preparada.', 'ai-knowledge'); ?></p>
 			<p><button type="button" class="button" data-server-action="wookb_download_robots_backup" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_download_robots_backup')); ?>"><?php esc_html_e('Descargar copia actual de robots.txt', 'ai-knowledge'); ?></button> <button type="button" class="button button-primary" data-server-action="wookb_apply_robots_block" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_apply_robots_block')); ?>" data-return-assistant="1" <?php disabled(!$robots_backup_ready); ?>><?php esc_html_e('Actualizar robots.txt', 'ai-knowledge'); ?></button></p>
 			<?php if (!Htaccess_Guard::managed_block_matches($htaccess_current, $crawler_actions, $mode)) : ?><p class="notice notice-warning inline"><strong><?php esc_html_e('Las reglas de AI Knowledge en .htaccess son diferentes de la configuración guardada.', 'ai-knowledge'); ?></strong></p><?php else : ?><p class="notice notice-success inline"><?php esc_html_e('Las reglas de AI Knowledge en .htaccess coinciden con la configuración guardada.', 'ai-knowledge'); ?></p><?php endif; ?>
-			<p><?php esc_html_e('El plugin no modifica .htaccess desde el asistente. Descarga la versión preparada y sustitúyela manualmente; conserva siempre una copia por seguridad.', 'ai-knowledge'); ?></p>
-			<p><button type="button" class="button" data-server-action="wookb_download_htaccess_generated" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_download_htaccess_generated')); ?>"><?php esc_html_e('Descargar .htaccess preparado', 'ai-knowledge'); ?></button></p><p><button type="button" class="button" data-assistant-check-server><?php esc_html_e('Comprobar cambios', 'ai-knowledge'); ?></button></p><?php
+			<p><?php esc_html_e('Puedes reemplazar el .htaccess desde aquí: solo se cambia el bloque de AI Knowledge y tus reglas que choquen se comentan, no se borran. Descarga primero la copia actual y marca la casilla.', 'ai-knowledge'); ?></p>
+			<p><button type="button" class="button" data-server-action="wookb_download_htaccess_generated" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_download_htaccess_generated')); ?>"><?php esc_html_e('Descargar .htaccess preparado', 'ai-knowledge'); ?></button></p>
+			<?php if (!Htaccess_Guard::is_available()) : ?><p class="notice notice-warning inline"><?php esc_html_e('No se puede reemplazar el .htaccess: no existe o el servidor no permite escribirlo. No se ha intentado modificar nada; usa el archivo preparado a mano.', 'ai-knowledge'); ?></p><?php else : ?>
+			<p><button type="button" class="button" data-server-action="wookb_download_htaccess_backup" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_download_htaccess_backup')); ?>"><?php esc_html_e('Descargar copia actual de .htaccess', 'ai-knowledge'); ?></button></p>
+			<p><label><input type="checkbox" data-wookb-htaccess-ack /> <?php esc_html_e('Asumo toda la responsabilidad y sé lo que estoy haciendo.', 'ai-knowledge'); ?></label></p>
+			<p><button type="button" class="button button-primary" data-server-action="wookb_apply_htaccess_block" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_apply_htaccess_block')); ?>" data-return-assistant="1" data-wookb-htaccess-apply="1" data-backup-ready="<?php echo Htaccess_Guard::backup_confirmed() ? '1' : '0'; ?>" disabled><?php esc_html_e('Reemplazar .htaccess', 'ai-knowledge'); ?></button></p><?php endif; ?>
+			<p><button type="button" class="button" data-assistant-check-server><?php esc_html_e('Comprobar cambios', 'ai-knowledge'); ?></button></p><?php
 			return ob_get_clean();
 		}
 		if ('welcome' === $step) : $geo_prompt = self::build_geo_prompt(); ?>
@@ -2775,14 +2784,28 @@ GEO;
 			wp_die(esc_html__('Antes de aplicar el bloqueo tienes que descargar la copia actual de .htaccess. Pulsa "Descargar copia actual" y vuelve a intentarlo.', 'ai-knowledge'));
 		}
 
-		if (! Htaccess_Guard::is_available()) {
-			wp_die(esc_html__('No se encontró un .htaccess editable en este servidor (nginx u otra configuración): usa el bloque de código manual en su lugar.', 'ai-knowledge'));
+		if (empty($_POST['wookb_htaccess_ack'])) {
+			wp_die(esc_html__('Marca la casilla de responsabilidad antes de reemplazar el .htaccess.', 'ai-knowledge'));
 		}
 
-		Htaccess_Guard::apply_actions(Crawler_Catalog::effective_actions(), Scope::settings()['crawler_visibility_mode']);
+		if (! Htaccess_Guard::is_available()) {
+			wp_die(esc_html__('No se puede modificar el .htaccess: no existe o el servidor no permite escribirlo. No se ha cambiado nada; usa el archivo preparado a mano.', 'ai-knowledge'));
+		}
+
+		$actions = Crawler_Catalog::effective_actions();
+		$mode = Scope::settings()['crawler_visibility_mode'];
+		$written = Htaccess_Guard::apply_actions($actions, $mode);
+		$verified = $written && Htaccess_Guard::managed_block_matches((string) file_get_contents(Htaccess_Guard::path()), $actions, $mode); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		if (! $verified) {
+			wp_die(esc_html__('No se pudo verificar la actualización del .htaccess. Comprueba los permisos y restaura tu copia si hace falta.', 'ai-knowledge'));
+		}
 		// Uso unico: la confirmacion de descarga solo vale para esta aplicacion.
 		Htaccess_Guard::clear_backup_confirmation();
 
+		if (! empty($_POST['wookb_return_assistant'])) {
+			wp_safe_redirect(admin_url('admin.php?page=ai-knowledge-assistant&step=server&wookb_notice=1'));
+			exit;
+		}
 		self::redirect('visibilidad-ia');
 	}
 

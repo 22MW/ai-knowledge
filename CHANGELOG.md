@@ -4,6 +4,8 @@ Todas las modificaciones relevantes de este plugin se documentan en este archivo
 
 ## [Sin publicar]
 
+## [1.3.0] - 2026-09-24
+
 ### Identidad
 
 - Logo propio en el menú de WordPress y como icono del plugin en la pantalla
@@ -16,6 +18,16 @@ Todas las modificaciones relevantes de este plugin se documentan en este archivo
   En la pestaña va antes de la tabla de crawlers y se guarda con «Guardar
   configuración de crawlers» (recarga la página y actualiza las propuestas de
   robots.txt y .htaccess). El asistente usa el mismo interruptor.
+- Nuevo botón «Reemplazar .htaccess» (pestaña y asistente): exige descargar la
+  copia actual y marcar una casilla de responsabilidad, comprueba los permisos
+  antes de escribir y no toca nada si no se puede. Solo cambia el bloque de
+  AI Knowledge; las reglas tuyas que choquen se comentan, no se borran.
+- La copia descargada de robots.txt y .htaccess deja de valer al recargar la
+  pantalla: hay que descargarla de nuevo (caduca a los 10 minutos).
+- «Archivo actual» y «Archivo completo después del cambio» de .htaccess van en
+  dos columnas, con el aviso de coincidencia justo encima, como robots.txt.
+  Los bloques de reemplazo llevan borde (azul en robots.txt, naranja en
+  .htaccess).
 
 ### Productos WooCommerce
 

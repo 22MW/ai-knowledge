@@ -64,6 +64,11 @@ if ( file_exists( Robots_Txt_Guard::path() ) ) {
 // Fase 11 (revision UX 2026-09-16): disponibilidad real de robots.txt/.htaccess
 // y confirmacion de descarga vigente, comprobadas en cada render (doble
 // proteccion server-side, no basta con deshabilitar el boton en el HTML).
+// Cada carga de la pantalla invalida la copia descargada antes: hay que volver
+// a descargarla (vale 10 minutos, y la descarga de esta pantalla habilita el
+// boton sin recargar).
+Robots_Txt_Guard::clear_backup_confirmation();
+Htaccess_Guard::clear_backup_confirmation();
 $robots_available   = Robots_Txt_Guard::is_available();
 $robots_confirmed   = Robots_Txt_Guard::backup_confirmed();
 $llms_backup_confirmed = (bool) get_transient( 'wookb_llms_backup_confirmed_' . get_current_user_id() );
@@ -365,6 +370,7 @@ $category_labels = array(
 
 <p><strong><?php esc_html_e( '⚠ Esta acción modifica el archivo robots.txt del sitio. Descarga una copia antes de continuar.', 'ai-knowledge' ); ?></strong></p>
 
+<div class="wookb-replace-box wookb-replace-box--robots">
 <?php if ( ! $robots_available ) : ?>
 	<div class="notice notice-warning inline">
 		<p><?php esc_html_e( 'robots.txt no es escribible en este servidor (permisos de la carpeta raíz).', 'ai-knowledge' ); ?></p>
@@ -383,36 +389,59 @@ $category_labels = array(
 		<?php submit_button( __( 'Aplicar bloqueo a robots.txt', 'ai-knowledge' ), 'delete', 'submit', false, $robots_confirmed ? array( 'data-wookb-apply' => 'robots' ) : array( 'disabled' => 'disabled', 'data-wookb-apply' => 'robots' ) ); ?>
 	</form>
 <?php endif; ?>
+</div>
 
 <hr />
 
 <h3><?php esc_html_e( 'Bloqueo en el servidor mediante .htaccess', 'ai-knowledge' ); ?></h3>
-<?php if ( $htaccess_managed_matches ) : ?><div class="notice notice-success inline"><p><?php esc_html_e( 'Las reglas de AI Knowledge coinciden con la configuración guardada.', 'ai-knowledge' ); ?></p></div><?php else : ?><div class="notice notice-warning inline"><p><?php esc_html_e( 'Las reglas de AI Knowledge son diferentes de la configuración guardada.', 'ai-knowledge' ); ?></p></div><?php endif; ?>
-<?php if ( $htaccess_conflicts ) : ?><div class="notice notice-warning inline"><p><?php esc_html_e( 'Se han detectado reglas originales de .htaccess que contradicen el bloque propuesto. Al aplicar, se conservarán y se comentarán.', 'ai-knowledge' ); ?></p><ul><?php foreach ( $htaccess_conflicts as $conflict ) : ?><li><code><?php echo esc_html( $conflict ); ?></code></li><?php endforeach; ?></ul></div><?php endif; ?>
 <p class="description">
 	<?php esc_html_e( 'robots.txt comunica preferencias de rastreo, pero un bot puede ignorarlas. Estas reglas rechazan en el servidor las solicitudes que se identifican como alguno de los bots marcados como Bloquear.', 'ai-knowledge' ); ?>
 </p>
 <p><strong><?php esc_html_e( '⚠ Modifica un archivo fuera de este plugin que puede afectar a todo el sitio si algo sale mal. Descarga la copia actual antes de continuar.', 'ai-knowledge' ); ?></strong></p>
 
-<p class="description"><?php esc_html_e( 'Archivo completo preparado. Puedes copiarlo y pegarlo manualmente en tu servidor o descargarlo. AI Knowledge no sobrescribe el .htaccess real.', 'ai-knowledge' ); ?></p>
-<p class="description"><?php esc_html_e( 'Archivo actual', 'ai-knowledge' ); ?></p>
-<textarea readonly rows="16" style="width:100%;max-width:1000px;"><?php echo esc_textarea( $htaccess_current_content ); ?></textarea>
-<p class="description"><?php esc_html_e( 'Archivo completo después del cambio', 'ai-knowledge' ); ?></p>
-<textarea readonly rows="16" style="width:100%;max-width:1000px;" id="wookb-generated-htaccess"><?php echo esc_textarea( $htaccess_full_preview ); ?></textarea>
-<p><button type="button" class="button" data-wookb-copy-target="wookb-generated-htaccess"><?php esc_html_e( 'Copiar código', 'ai-knowledge' ); ?></button>
-<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;margin-left:8px;">
+<p class="description"><?php esc_html_e( 'Archivo completo preparado. Puedes copiarlo y pegarlo manualmente en tu servidor o descargarlo. También puedes reemplazarlo desde aquí con el botón de más abajo.', 'ai-knowledge' ); ?></p>
+
+<?php if ( $htaccess_managed_matches ) : ?><div class="notice notice-success inline"><p><?php esc_html_e( 'Las reglas de AI Knowledge coinciden con la configuración guardada.', 'ai-knowledge' ); ?></p></div><?php else : ?><div class="notice notice-warning inline"><p><?php esc_html_e( 'Las reglas de AI Knowledge son diferentes de la configuración guardada.', 'ai-knowledge' ); ?></p></div><?php endif; ?>
+<?php if ( $htaccess_conflicts ) : ?><div class="notice notice-warning inline"><p><?php esc_html_e( 'Se han detectado reglas originales de .htaccess que contradicen el bloque propuesto. Al aplicar, se conservarán y se comentarán.', 'ai-knowledge' ); ?></p><ul><?php foreach ( $htaccess_conflicts as $conflict ) : ?><li><code><?php echo esc_html( $conflict ); ?></code></li><?php endforeach; ?></ul></div><?php endif; ?>
+<div class="wookb-crawler-compare">
+	<div>
+		<p class="description"><?php esc_html_e( 'Archivo actual', 'ai-knowledge' ); ?></p>
+		<textarea readonly rows="16"><?php echo esc_textarea( $htaccess_current_content ); ?></textarea>
+	</div>
+	<div>
+		<p class="description"><?php esc_html_e( 'Archivo completo después del cambio', 'ai-knowledge' ); ?></p>
+		<textarea readonly rows="16" id="wookb-generated-htaccess"><?php echo esc_textarea( $htaccess_full_preview ); ?></textarea>
+	</div>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0;">
+<button type="button" class="button" data-wookb-copy-target="wookb-generated-htaccess"><?php esc_html_e( 'Copiar código', 'ai-knowledge' ); ?></button>
+<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;">
 	<input type="hidden" name="action" value="wookb_download_htaccess_generated" />
 	<?php wp_nonce_field( 'wookb_download_htaccess_generated' ); ?>
 	<?php submit_button( __( 'Descargar .htaccess preparado', 'ai-knowledge' ), 'secondary', 'submit', false ); ?>
-</form></p>
+</form>
+</div>
 
+<div class="wookb-replace-box wookb-replace-box--htaccess">
 <?php if ( ! $htaccess_available ) : ?>
 	<div class="notice notice-warning inline">
-		<p><?php esc_html_e( 'No se encontró un .htaccess editable en este servidor (por ejemplo, nginx no lo usa, o los permisos no permiten escribirlo). Añade el bloque de arriba a mano en la configuración de tu servidor.', 'ai-knowledge' ); ?></p>
+		<p><?php esc_html_e( 'No se puede reemplazar el .htaccess: no existe o el servidor no permite escribirlo (por ejemplo, nginx no lo usa, o los permisos del archivo lo impiden). No se ha intentado modificar nada. Copia el archivo preparado y pégalo a mano, o corrige los permisos.', 'ai-knowledge' ); ?></p>
 	</div>
 <?php else : ?>
-	<p class="description"><?php esc_html_e( 'El archivo real no se modifica desde aquí. Copia el contenido generado o descarga el archivo preparado y sustitúyelo manualmente después de conservar tu copia original.', 'ai-knowledge' ); ?></p>
+	<p class="description"><?php esc_html_e( 'Reemplazar solo cambia el bloque de AI Knowledge; el resto del archivo se conserva. Si una regla tuya contradice un bot permitido, se comenta, no se borra. Para activar el botón: descarga la copia actual y marca la casilla.', 'ai-knowledge' ); ?></p>
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wookb-download-form" data-wookb-unlock="htaccess" style="display:inline-block;margin-right:10px;">
+		<input type="hidden" name="action" value="wookb_download_htaccess_backup" />
+		<?php wp_nonce_field( 'wookb_download_htaccess_backup' ); ?>
+		<?php submit_button( __( 'Descargar copia actual de .htaccess', 'ai-knowledge' ), 'secondary', 'submit', false ); ?>
+	</form>
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;" onsubmit="return confirm('<?php echo esc_js( __( 'Vas a modificar el .htaccess real del sitio. ¿Confirmas que ya descargaste la copia y quieres continuar?', 'ai-knowledge' ) ); ?>');">
+		<input type="hidden" name="action" value="wookb_apply_htaccess_block" />
+		<?php wp_nonce_field( 'wookb_apply_htaccess_block' ); ?>
+		<p><label><input type="checkbox" name="wookb_htaccess_ack" value="1" data-wookb-htaccess-ack /> <?php esc_html_e( 'Asumo toda la responsabilidad y sé lo que estoy haciendo.', 'ai-knowledge' ); ?></label></p>
+		<?php submit_button( __( 'Reemplazar .htaccess', 'ai-knowledge' ), 'delete', 'submit', false, array( 'disabled' => 'disabled', 'data-wookb-htaccess-apply' => '1', 'data-backup-ready' => $htaccess_confirmed ? '1' : '0' ) ); ?>
+	</form>
 <?php endif; ?>
+</div>
 
 <hr />
 

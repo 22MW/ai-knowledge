@@ -4,7 +4,7 @@ Tags: woocommerce, chatbot, ia, llms.txt, wpml, crawlers, robots.txt
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.1
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -117,6 +117,9 @@ Sí. En **Visibilidad IA** selecciona el modo que permite únicamente `/llms.txt
 == Changelog ==
 
 Ver `CHANGELOG.md` para el historial completo y detallado de cambios.
+
+= 1.3.0 =
+Documentos de producto con bloque «Datos de compra» (precio, descuento, envío, impuestos, variaciones y campos personalizados) generado sin IA. Interruptor «Incluir llms.txt para los modelos desactivados» y botón «Reemplazar .htaccess» con copia previa y casilla de responsabilidad. Corregido el conflicto con Rank Math y el alcance de products.xml. Logo propio en el menú y en las actualizaciones.
 
 = 1.2.1 =
 Asistente de configuración rediseñado: cada paso genera su documento al guardarlo (Negocio, WooCommerce, FAQs, Chatbot, Contenido), con comprobación real de conexión de IA y un resumen final. Registro con acciones instantáneas por AJAX y prompt propio por documento. Nueva sección para publicar en `/llms.txt` artículos exclusivos de Support Genix.
