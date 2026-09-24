@@ -4,6 +4,22 @@ Todas las modificaciones relevantes de este plugin se documentan en este archivo
 
 ## [Sin publicar]
 
+## [1.3.1] - 2026-09-25
+
+### Traducciones
+
+- Catálogos de catalán, alemán, inglés, euskera y francés al día con los
+  textos de la 1.3.0: interruptor «Incluir llms.txt para los modelos
+  desactivados», «Reemplazar .htaccess» con su casilla y avisos de permisos,
+  y textos del asistente.
+
+### Documentación
+
+- Guía de usuario actualizada: asistente de configuración, Registro
+  (Manual/Auto, «Volver a Auto», avisos), bloque «Datos de compra» de los
+  productos, idioma principal, JSON-LD con otros plugins SEO, `products.xml`
+  y la copia previa de robots.txt y .htaccess.
+
 ## [1.3.0] - 2026-09-24
 
 ### Identidad

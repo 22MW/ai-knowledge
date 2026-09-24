@@ -50,6 +50,31 @@ mano:
 - **Notas legales adicionales** — cualquier aviso legal extra que quieras
   incluir.
 
+## El documento de cada producto: «Datos de compra»
+
+Además de la descripción, cada producto lleva al final un bloque **«Datos de
+compra»**. Lo monta el plugin directamente desde WooCommerce, **sin IA**: la IA
+solo redacta la descripción, y estos datos salen siempre, sin depender del
+prompt ni del límite de caracteres. Cada sección aparece solo si el producto
+tiene ese dato.
+
+- **Precio y disponibilidad** — precio actual, precio anterior, descuento en
+  porcentaje, fecha de fin de la oferta y disponibilidad (con las unidades si
+  las gestionas).
+- **Envío** — si es físico o virtual, si es descargable, clase de envío, peso y
+  dimensiones, con un enlace al documento de tienda para las zonas y tarifas.
+- **Impuestos** — estado fiscal, clase, tipos aplicables y si los precios
+  llevan impuestos incluidos.
+- **Variaciones** — una tabla con cada variación (atributos, precio, precio
+  anterior, descuento, disponibilidad y SKU), hasta un máximo de 100; si hay
+  más, se indica cuántas quedan fuera.
+- **Campos personalizados** — los que hayas elegido en
+  [Contenido](tab-contenido.md).
+
+Los datos son los del momento en que se genera el documento. Si cambias el
+peso, el envío, los impuestos, el precio o las variaciones de un producto, su
+documento se regenera; una venta que solo cambia el stock no lo regenera.
+
 ## Generar los documentos de tienda
 
 A diferencia de tus productos y páginas (que se generan solos según su
@@ -59,9 +84,10 @@ configuración junta. Por eso **no se generan solos** al guardar cambios
 aquí — tienes que pulsar **"Generar/actualizar ahora"** cuando quieras
 que reflejen los datos más recientes.
 
-Cada documento generado se puede pulir con IA (solo redacción y formato,
-sin cambiar ni inventar datos) directamente desde esta pantalla, para
-cada idioma activo.
+Los documentos de tienda se generan en el **idioma principal** del sitio. Si tu
+web es multiidioma, llevan al final una nota con los demás idiomas en los que
+está disponible. Cada documento generado se puede pulir con IA (solo redacción
+y formato, sin cambiar ni inventar datos) directamente desde esta pantalla.
 
 ## Preguntas frecuentes
 

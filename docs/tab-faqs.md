@@ -40,8 +40,10 @@ por la IA.
 
 ## Si tu web es multiidioma
 
-Verás un selector de idioma arriba: cada idioma tiene su propia FAQ y su
-propio documento publicado, igual que el resto del contenido de tu web.
+Verás un selector de idioma arriba para editar la FAQ de cada idioma. La FAQ
+que se publica en `/llms.txt` es la del **idioma principal** del sitio, y el
+documento añade al final una nota con los demás idiomas en los que está
+disponible la web.
 
 ## Preguntas frecuentes
 

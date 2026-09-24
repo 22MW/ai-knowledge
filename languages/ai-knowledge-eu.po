@@ -2384,3 +2384,102 @@ msgstr "Ez da Genix-eko artikulua aurkitu."
 #: includes/class-genix-publish.php:61
 msgid "Este artículo está marcado en Genix como \"solo para el chatbot\": no es público ni siquiera dentro de Genix, así que no puede publicarse aquí."
 msgstr "Artikulu hau Genix-en \"chatbotarentzat bakarrik\" gisa markatuta dago: ez da publikoa Genixen barruan ere, hortaz ezin da hemen argitaratu."
+
+#: admin/class-admin.php:1358
+msgid "ACTIVADO"
+msgstr "GAITUTA"
+
+#: admin/class-admin.php:1364
+msgid "Activado:"
+msgstr "Gaituta:"
+
+#: admin/views/tab-visibilidad-ia.php:402
+msgid "Archivo completo preparado. Puedes copiarlo y pegarlo manualmente en tu servidor o descargarlo. También puedes reemplazarlo desde aquí con el botón de más abajo."
+msgstr "Fitxategi osoa prest. Kopiatu eta eskuz zure zerbitzarian txerta dezakezu, edo deskargatu. Hemendik ere ordezka dezakezu beheko botoiarekin."
+
+#: admin/class-admin.php:367
+#: admin/views/tab-visibilidad-ia.php:440
+msgid "Asumo toda la responsabilidad y sé lo que estoy haciendo."
+msgstr "Ardura osoa hartzen dut eta badakit zer ari naizen egiten."
+
+#: admin/class-admin.php:332
+msgid "Comprueba si robots.txt y .htaccess difieren de la configuración guardada. Descarga las copias y las versiones preparadas; el asistente no muestra el código completo; reemplazar .htaccess exige copia descargada y una casilla de responsabilidad."
+msgstr "Egiaztatzen du robots.txt eta .htaccess gordetako konfiguraziotik desberdinak diren. Deskargatu kopiak eta prestatutako bertsioak; laguntzaileak ez du kode osoa erakusten; .htaccess ordezkatzeko deskargatutako kopia bat eta erantzukizun-laukia behar dira."
+
+#: admin/class-admin.php:1359
+msgid "DESACTIVADO"
+msgstr "GAITUGABETUTA"
+
+#: admin/class-admin.php:1365
+msgid "Desactivado:"
+msgstr "Gaitugabetuta:"
+
+#: admin/class-admin.php:366
+#: admin/views/tab-visibilidad-ia.php:435
+msgid "Descargar copia actual de .htaccess"
+msgstr "Deskargatu .htaccess-en uneko kopia"
+
+#: admin/class-admin.php:1367
+msgid "Este ajuste solo cambia las reglas propuestas para robots.txt y .htaccess. Nada se modifica en tu servidor hasta que tú lo apliques."
+msgstr "Doikuntza honek robots.txt eta .htaccess-erako proposatutako arauak soilik aldatzen ditu. Ez da ezer aldatzen zure zerbitzarian zuk aplikatu arte."
+
+#: admin/class-admin.php:1407
+msgid "FAQ:"
+msgstr "FAQ:"
+
+#: admin/class-admin.php:1355
+msgid "Incluir llms.txt para los modelos desactivados"
+msgstr "Sartu llms.txt desgaitutako ereduentzat"
+
+#: admin/class-admin.php:2788
+msgid "Marca la casilla de responsabilidad antes de reemplazar el .htaccess."
+msgstr "Markatu erantzukizun-laukia .htaccess ordezkatu aurretik."
+
+#: admin/class-admin.php:1362
+msgid "Modelos desactivados = los bots que has marcado como Bloquear en la tabla de crawlers."
+msgstr "Desgaitutako ereduak = crawler-en taulan Blokeatu gisa markatu dituzun botak."
+
+#: admin/class-admin.php:2800
+msgid "No se pudo verificar la actualización del .htaccess. Comprueba los permisos y restaura tu copia si hace falta."
+msgstr "Ezin izan da .htaccess-en eguneratzea egiaztatu. Egiaztatu baimenak eta leheneratu zure kopia beharrezkoa bada."
+
+#: admin/class-admin.php:2792
+msgid "No se puede modificar el .htaccess: no existe o el servidor no permite escribirlo. No se ha cambiado nada; usa el archivo preparado a mano."
+msgstr "Ezin da .htaccess aldatu: ez dago edo zerbitzariak ez du idaztea onartzen. Ez da ezer aldatu; erabili prestatutako fitxategia eskuz."
+
+#: admin/views/tab-visibilidad-ia.php:428
+msgid "No se puede reemplazar el .htaccess: no existe o el servidor no permite escribirlo (por ejemplo, nginx no lo usa, o los permisos del archivo lo impiden). No se ha intentado modificar nada. Copia el archivo preparado y pégalo a mano, o corrige los permisos."
+msgstr "Ezin da .htaccess ordezkatu: ez dago edo zerbitzariak ez du idaztea onartzen (adibidez, nginx-ek ez du erabiltzen, edo fitxategiaren baimenek galarazten dute). Ez da ezer aldatzen saiatu. Kopiatu prestatutako fitxategia eta itsatsi eskuz, edo zuzendu baimenak."
+
+#: admin/class-admin.php:365
+msgid "No se puede reemplazar el .htaccess: no existe o el servidor no permite escribirlo. No se ha intentado modificar nada; usa el archivo preparado a mano."
+msgstr "Ezin da .htaccess ordezkatu: ez dago edo zerbitzariak ez du idaztea onartzen. Ez da ezer aldatzen saiatu; erabili prestatutako fitxategia eskuz."
+
+#: admin/class-admin.php:363
+msgid "Puedes reemplazar el .htaccess desde aquí: solo se cambia el bloque de AI Knowledge y tus reglas que choquen se comentan, no se borran. Descarga primero la copia actual y marca la casilla."
+msgstr ".htaccess hemendik ordezka dezakezu: AI Knowledge-ren blokea soilik aldatzen da eta talka egiten duten zure arauak iruzkin bihurtzen dira, ez dira ezabatzen. Deskargatu lehenik uneko kopia eta markatu laukia."
+
+#: admin/class-admin.php:368
+#: admin/views/tab-visibilidad-ia.php:441
+msgid "Reemplazar .htaccess"
+msgstr "Ordezkatu .htaccess"
+
+#: admin/views/tab-visibilidad-ia.php:431
+msgid "Reemplazar solo cambia el bloque de AI Knowledge; el resto del archivo se conserva. Si una regla tuya contradice un bot permitido, se comenta, no se borra. Para activar el botón: descarga la copia actual y marca la casilla."
+msgstr "Ordezkatzeak AI Knowledge-ren blokea soilik aldatzen du; fitxategiaren gainerakoa mantentzen da. Zure arau batek baimendutako bot bati kontra egiten badio, iruzkin bihurtzen da, ez da ezabatzen. Botoia gaitzeko: deskargatu uneko kopia eta markatu laukia."
+
+#: admin/views/tab-visibilidad-ia.php:437
+msgid "Vas a modificar el .htaccess real del sitio. ¿Confirmas que ya descargaste la copia y quieres continuar?"
+msgstr "Guneko benetako .htaccess aldatuko duzu. Berretsi kopia deskargatu duzula eta jarraitu nahi duzula?"
+
+#: admin/class-admin.php:1405
+msgid "WooCommerce:"
+msgstr "WooCommerce:"
+
+#: admin/class-admin.php:1365
+msgid "los bots bloqueados no pueden acceder a nada, ni siquiera a /llms.txt. Es un bloqueo total del sitio."
+msgstr "blokeatutako botek ezin dute ezer atzitu, ezta /llms.txt ere. Guneko blokeo osoa da."
+
+#: admin/class-admin.php:1364
+msgid "los bots bloqueados no pueden entrar en tu web, pero sí leen /llms.txt, el resumen que has preparado para ellos. Cualquier otra página les responde 404."
+msgstr "blokeatutako botek ezin dute zure webgunean sartu, baina /llms.txt irakurtzen dute, haientzat prestatu duzun laburpena. Beste edozein orrik 404 erantzuten die."

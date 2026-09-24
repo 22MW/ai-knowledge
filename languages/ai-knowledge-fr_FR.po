@@ -2384,3 +2384,102 @@ msgstr "L'article Genix n'a pas été trouvé."
 #: includes/class-genix-publish.php:61
 msgid "Este artículo está marcado en Genix como \"solo para el chatbot\": no es público ni siquiera dentro de Genix, así que no puede publicarse aquí."
 msgstr "Cet article est marqué dans Genix comme « réservé au chatbot » : il n'est pas public, même au sein de Genix, il ne peut donc pas être publié ici."
+
+#: admin/class-admin.php:1358
+msgid "ACTIVADO"
+msgstr "ACTIVÉ"
+
+#: admin/class-admin.php:1364
+msgid "Activado:"
+msgstr "Activé :"
+
+#: admin/views/tab-visibilidad-ia.php:402
+msgid "Archivo completo preparado. Puedes copiarlo y pegarlo manualmente en tu servidor o descargarlo. También puedes reemplazarlo desde aquí con el botón de más abajo."
+msgstr "Fichier complet préparé. Vous pouvez le copier et le coller manuellement sur votre serveur ou le télécharger. Vous pouvez aussi le remplacer d’ici avec le bouton ci-dessous."
+
+#: admin/class-admin.php:367
+#: admin/views/tab-visibilidad-ia.php:440
+msgid "Asumo toda la responsabilidad y sé lo que estoy haciendo."
+msgstr "J’assume l’entière responsabilité et je sais ce que je fais."
+
+#: admin/class-admin.php:332
+msgid "Comprueba si robots.txt y .htaccess difieren de la configuración guardada. Descarga las copias y las versiones preparadas; el asistente no muestra el código completo; reemplazar .htaccess exige copia descargada y una casilla de responsabilidad."
+msgstr "Vérifie si robots.txt et .htaccess diffèrent de la configuration enregistrée. Téléchargez les copies et les versions préparées ; l’assistant n’affiche pas le code complet ; remplacer le .htaccess exige une copie téléchargée et une case de responsabilité."
+
+#: admin/class-admin.php:1359
+msgid "DESACTIVADO"
+msgstr "DÉSACTIVÉ"
+
+#: admin/class-admin.php:1365
+msgid "Desactivado:"
+msgstr "Désactivé :"
+
+#: admin/class-admin.php:366
+#: admin/views/tab-visibilidad-ia.php:435
+msgid "Descargar copia actual de .htaccess"
+msgstr "Télécharger la copie actuelle de .htaccess"
+
+#: admin/class-admin.php:1367
+msgid "Este ajuste solo cambia las reglas propuestas para robots.txt y .htaccess. Nada se modifica en tu servidor hasta que tú lo apliques."
+msgstr "Ce réglage ne modifie que les règles proposées pour robots.txt et .htaccess. Rien n’est modifié sur votre serveur tant que vous ne l’appliquez pas."
+
+#: admin/class-admin.php:1407
+msgid "FAQ:"
+msgstr "FAQ :"
+
+#: admin/class-admin.php:1355
+msgid "Incluir llms.txt para los modelos desactivados"
+msgstr "Inclure llms.txt pour les modèles désactivés"
+
+#: admin/class-admin.php:2788
+msgid "Marca la casilla de responsabilidad antes de reemplazar el .htaccess."
+msgstr "Cochez la case de responsabilité avant de remplacer le .htaccess."
+
+#: admin/class-admin.php:1362
+msgid "Modelos desactivados = los bots que has marcado como Bloquear en la tabla de crawlers."
+msgstr "Modèles désactivés = les bots que vous avez marqués comme Bloquer dans le tableau des crawlers."
+
+#: admin/class-admin.php:2800
+msgid "No se pudo verificar la actualización del .htaccess. Comprueba los permisos y restaura tu copia si hace falta."
+msgstr "Impossible de vérifier la mise à jour du .htaccess. Vérifiez les permissions et restaurez votre copie si nécessaire."
+
+#: admin/class-admin.php:2792
+msgid "No se puede modificar el .htaccess: no existe o el servidor no permite escribirlo. No se ha cambiado nada; usa el archivo preparado a mano."
+msgstr "Le .htaccess ne peut pas être modifié : il n’existe pas ou le serveur n’autorise pas l’écriture. Rien n’a été modifié ; utilisez le fichier préparé manuellement."
+
+#: admin/views/tab-visibilidad-ia.php:428
+msgid "No se puede reemplazar el .htaccess: no existe o el servidor no permite escribirlo (por ejemplo, nginx no lo usa, o los permisos del archivo lo impiden). No se ha intentado modificar nada. Copia el archivo preparado y pégalo a mano, o corrige los permisos."
+msgstr "Le .htaccess ne peut pas être remplacé : il n’existe pas ou le serveur n’autorise pas l’écriture (par exemple, nginx ne l’utilise pas, ou les permissions du fichier l’en empêchent). Aucune modification n’a été tentée. Copiez le fichier préparé et collez-le manuellement, ou corrigez les permissions."
+
+#: admin/class-admin.php:365
+msgid "No se puede reemplazar el .htaccess: no existe o el servidor no permite escribirlo. No se ha intentado modificar nada; usa el archivo preparado a mano."
+msgstr "Le .htaccess ne peut pas être remplacé : il n’existe pas ou le serveur n’autorise pas l’écriture. Aucune modification n’a été tentée ; utilisez le fichier préparé manuellement."
+
+#: admin/class-admin.php:363
+msgid "Puedes reemplazar el .htaccess desde aquí: solo se cambia el bloque de AI Knowledge y tus reglas que choquen se comentan, no se borran. Descarga primero la copia actual y marca la casilla."
+msgstr "Vous pouvez remplacer le .htaccess d’ici : seul le bloc d’AI Knowledge est modifié et vos règles en conflit sont commentées, pas supprimées. Téléchargez d’abord la copie actuelle et cochez la case."
+
+#: admin/class-admin.php:368
+#: admin/views/tab-visibilidad-ia.php:441
+msgid "Reemplazar .htaccess"
+msgstr "Remplacer le .htaccess"
+
+#: admin/views/tab-visibilidad-ia.php:431
+msgid "Reemplazar solo cambia el bloque de AI Knowledge; el resto del archivo se conserva. Si una regla tuya contradice un bot permitido, se comenta, no se borra. Para activar el botón: descarga la copia actual y marca la casilla."
+msgstr "Le remplacement ne modifie que le bloc d’AI Knowledge ; le reste du fichier est conservé. Si l’une de vos règles contredit un bot autorisé, elle est commentée, pas supprimée. Pour activer le bouton : téléchargez la copie actuelle et cochez la case."
+
+#: admin/views/tab-visibilidad-ia.php:437
+msgid "Vas a modificar el .htaccess real del sitio. ¿Confirmas que ya descargaste la copia y quieres continuar?"
+msgstr "Vous allez modifier le .htaccess réel du site. Confirmez-vous avoir téléchargé la copie et souhaitez-vous continuer ?"
+
+#: admin/class-admin.php:1405
+msgid "WooCommerce:"
+msgstr "WooCommerce :"
+
+#: admin/class-admin.php:1365
+msgid "los bots bloqueados no pueden acceder a nada, ni siquiera a /llms.txt. Es un bloqueo total del sitio."
+msgstr "les bots bloqués ne peuvent accéder à rien, pas même à /llms.txt. C’est un blocage total du site."
+
+#: admin/class-admin.php:1364
+msgid "los bots bloqueados no pueden entrar en tu web, pero sí leen /llms.txt, el resumen que has preparado para ellos. Cualquier otra página les responde 404."
+msgstr "les bots bloqués ne peuvent pas entrer sur votre site, mais ils lisent /llms.txt, le résumé que vous avez préparé pour eux. Toute autre page leur répond 404."

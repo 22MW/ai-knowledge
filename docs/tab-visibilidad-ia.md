@@ -35,7 +35,13 @@ Un resumen de las distintas formas en que se publica tu contenido:
   sin pasar por IA, disponibles vía la API propia del plugin.
 - **JSON-LD (Schema.org)** — datos estructurados estándar (tipo Producto,
   Artículo...) incrustados en el código de cada página, para que los
-  buscadores identifiquen mejor de qué trata cada contenido.
+  buscadores identifiquen mejor de qué trata cada contenido. Si WooCommerce,
+  Rank Math (con su módulo de Schema activo), Yoast SEO o AIOSEO ya los
+  publican, el plugin no añade los suyos para no duplicarlos.
+- **Feed de productos (`products.xml`)** — el catálogo en formato Google
+  Merchant, dentro de la API del plugin. Solo se publica y se anuncia (en
+  `/llms.txt` y en el `<head>`) si los productos están dentro del alcance
+  configurado en [Contenido](tab-contenido.md).
 - **Contenido pendiente de sincronizar** — cuánto de tu alcance
   configurado en [Contenido](tab-contenido.md) todavía no tiene documento
   generado.
@@ -68,7 +74,10 @@ por `.htaccess` de más abajo.
 `robots.txt` es una petición educada: la mayoría de bots serios la
 respetan, pero técnicamente un bot puede ignorarla. El plugin muestra el
 archivo actual y una propuesta completa antes de guardar. Antes de aplicar
-el cambio, **te obliga a descargar una copia de seguridad**.
+el cambio, **te obliga a descargar una copia de seguridad**. Esa copia vale 10
+minutos y solo para la pantalla en la que la descargaste: si recargas la página
+o vuelves desde otra, hay que descargarla otra vez. Lo mismo ocurre con
+`.htaccess`.
 
 El plugin conserva las reglas externas. Si una regla original contradice la
 configuración elegida, la comenta sin borrarla y añade sus reglas activas en

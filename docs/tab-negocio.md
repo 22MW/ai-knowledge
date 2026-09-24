@@ -55,8 +55,9 @@ Sí, escríbelo en el campo de instrucciones antes de generar. Esas
 instrucciones prevalecen sobre el formato por defecto.
 
 **¿Se puede tener el resumen en varios idiomas?**
-El resumen de negocio actual es uno solo. Si tu sitio es multiidioma, la
-sección de [FAQs](tab-faqs.md) sí gestiona un documento por idioma.
+El resumen de negocio se genera en el idioma principal del sitio. Si tu web es
+multiidioma, el documento añade al final una nota con los demás idiomas en los
+que está disponible.
 
 ---
 [Ver también: [Genix](tab-chatbot.md) · [FAQs](tab-faqs.md) · [Visibilidad IA](tab-visibilidad-ia.md)]
