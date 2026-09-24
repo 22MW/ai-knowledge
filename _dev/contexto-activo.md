@@ -451,6 +451,51 @@ sobre las secciones "Páginas"/"Documentación" dentro de `/llms.txt`.
   estado/fecha/enlaces/contenido de la fila, no el HTML condicional de
   "Ajustes avanzados". Una recarga de la pestaña los refleja bien.
 
+### Rediseño del asistente de configuración (2026-09-24)
+
+Implementado el diseño del `arquitecto` (aprobado por el usuario, 2 decisiones
+ya resueltas) en `admin/class-admin.php` y `admin/views/tab-carga-inicial.php`.
+Cada paso genera su documento en cuanto se guarda, en vez de todo junto al
+final:
+
+- Orden nuevo: welcome → ai → limits (antes "finish") → content → business →
+  woocommerce → faqs (paso NUEVO) → chatbot → visibility → server → finish
+  (reescrito como RESUMEN de solo lectura) → success.
+- `assistant_ai_available()` (nuevo helper): `AI_Client::available_models()`
+  no vacío O `Chatbot_Prompt::is_genix_ready()`. Gatea el paso `faqs` y decide,
+  dentro de `assistant_save_step()`, si `woocommerce`/`faqs`/`chatbot` generan
+  contenido real o solo guardan datos con aviso (nunca bloquea, nunca fatal —
+  mismo patrón de captura de errores que `sync_store_docs()`).
+- `content` ahora llama a `Queue::start_seed()` al guardarse (después de
+  `limits`, que ya dejó guardado el límite diario/tamaño de lote).
+- `woocommerce` llama a `Store_Info_Doc::generate_all()` si hay conexión.
+- `faqs` (nuevo paso) genera y PUBLICA de una vez por idioma activo
+  (excepción explícita y confirmada por el usuario a la norma de "revisar
+  antes de publicar", solo para este paso del asistente).
+- `chatbot` llama a `Chatbot_Prompt::sync(true)` si hay conexión.
+- Paso `finish` rediseñado: solo lecturas baratas (Registry, Llms_Faq::read,
+  Chatbot_Prompt::read, filas de Store_Info_Doc) — nunca dispara nada, porque
+  `assistant_screen_content()` se precalcula para TODOS los pasos disponibles
+  en cada carga de la página (`Admin::assets()`), no solo al guardar.
+- Nuevo `Admin::render_seed_controls()`: extrae los botones "Generar
+  pendientes"/"Reiniciar todo" (antes solo en `tab-carga-inicial.php`) para
+  reutilizarlos también en el resumen del asistente — mismos handlers de
+  `admin-post.php`, sin duplicar lógica, solo el marcado.
+- Limpieza de código muerto: quitada la acción `'generate'` (botón "Generar
+  documentos iniciales" ya no existe) de `assistant_panel()`,
+  `render_assistant()` y `assistant_navigate()` — el bug real que esto
+  corregía (`Llms_Faq::persist_doc()` solo se llamaba en el camino sin JS,
+  nunca en AJAX) ya no aplica: el paso `faqs` genera y publica siempre por el
+  mismo camino (`assistant_save_step()`), sea AJAX o no.
+- Bug real encontrado y corregido durante la implementación (no estaba en el
+  diseño original): `assistant_save_step('ai')` escribe su propio
+  `ai_connection` en la opción `aikb_setup_assistant` vía `get_option()`/
+  `update_option()` propios; sin releer esa opción justo después en
+  `render_assistant()`/`assistant_navigate()`, el `update_option()` de más
+  abajo (con el `$state` capturado ANTES de la llamada) lo sobrescribía y lo
+  perdía. Corregido con un `$state = get_option(...)` de refresco en los dos
+  sitios.
+
 ### QA pendiente (todo, no se ha probado en real)
 
 Ver lista de pruebas manuales en el informe del subagente. Ninguna de las 5

@@ -9,7 +9,6 @@ $ids       = Scope::resolve_ids();
 $langs     = Wpml::active_languages();
 $total     = count( $ids ) * count( $langs );
 $settings  = Scope::settings();
-$running   = (bool) get_option( 'wookb_seed_running' );
 $counted   = Registry::count( array( 'status' => 'synced' ) );
 ?>
 <p class="description">
@@ -19,10 +18,10 @@ $counted   = Registry::count( array( 'status' => 'synced' ) );
 <p>
 	<?php
 	printf(
-		/* translators: 1: nº elementos, 2: nº idiomas, 3: total documentos */
-		esc_html__( 'Alcance actual: %1$d elementos × %2$d idiomas = %3$d documentos posibles.', 'ai-knowledge' ),
-		count( $ids ),
-		count( $langs ),
+		/* translators: 1: "X elemento(s)" ya pluralizado, 2: "X idioma(s)" ya pluralizado, 3: total documentos */
+		esc_html__( 'Alcance actual: %1$s × %2$s = %3$d documentos posibles.', 'ai-knowledge' ),
+		esc_html( sprintf( /* translators: %d: número de elementos */ _n( '%d elemento', '%d elementos', count( $ids ), 'ai-knowledge' ), count( $ids ) ) ),
+		esc_html( sprintf( /* translators: %d: número de idiomas activos */ _n( '%d idioma', '%d idiomas', count( $langs ), 'ai-knowledge' ), count( $langs ) ) ),
 		$total
 	);
 	?>
@@ -34,28 +33,20 @@ $counted   = Registry::count( array( 'status' => 'synced' ) );
 	<p><?php printf( esc_html__( 'Límite diario actual: %d generaciones/día.', 'ai-knowledge' ), (int) $settings['daily_limit'] ); ?></p>
 <?php endif; ?>
 
-<?php if ( $running ) : ?>
-	<p><strong><?php esc_html_e( 'Generación en curso (procesando por lotes vía Action Scheduler).', 'ai-knowledge' ); ?></strong></p>
-	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-		<input type="hidden" name="action" value="wookb_cancel_seed" />
-		<?php wp_nonce_field( 'wookb_cancel_seed' ); ?>
-		<?php submit_button( __( 'Cancelar generación', 'ai-knowledge' ), 'delete' ); ?>
-	</form>
-<?php else : ?>
-	<p class="description"><?php esc_html_e( '"Generar pendientes" es seguro repetirlo: no regenera lo que ya está sincronizado y sin cambios, solo lo nuevo o lo que falló.', 'ai-knowledge' ); ?></p>
-	<div class="wookb-toolbar-row">
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wookb-toolbar-form">
-			<input type="hidden" name="action" value="wookb_start_seed" />
-			<?php wp_nonce_field( 'wookb_start_seed' ); ?>
-			<?php submit_button( __( 'Generar pendientes', 'ai-knowledge' ), 'primary', 'submit', false ); ?>
-		</form>
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wookb-toolbar-form" onsubmit="return confirm('<?php echo esc_js( __( 'Esto va a REGENERAR también el contenido que ya está sincronizado, no solo lo pendiente. Gasta IA de más y no se puede deshacer. ¿Seguro que quieres continuar?', 'ai-knowledge' ) ); ?>');">
-			<input type="hidden" name="action" value="wookb_start_seed_force" />
-			<?php wp_nonce_field( 'wookb_start_seed_force' ); ?>
-			<?php submit_button( __( 'Reiniciar todo', 'ai-knowledge' ), 'secondary', 'submit', false ); ?>
-		</form>
-	</div>
-<?php endif; ?>
+<?php
+// Resumen de estado (Negocio/WooCommerce/FAQ/Chatbot/documentos), extraido a
+// Admin::render_assistant_summary() para reutilizarlo tambien aqui -- mismo
+// resumen que ya se ve en el paso "finish" del asistente.
+echo Admin::render_assistant_summary(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado campo a campo dentro del propio metodo.
+?>
+
+<?php
+// Botones "Generar pendientes"/"Reiniciar todo" (o "Cancelar generación"),
+// extraidos a Admin::render_seed_controls() para reutilizarlos tambien en
+// el paso "finish" del asistente de configuracion -- misma logica, mismo
+// marcado, un solo sitio de mantenimiento.
+echo Admin::render_seed_controls(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado campo a campo dentro del propio metodo.
+?>
 
 <p class="description">
 	<?php esc_html_e( 'Revisa la pestaña Registro para ver el progreso, o Herramientas → Scheduled Actions (grupo woo-kb) para el detalle técnico.', 'ai-knowledge' ); ?>
