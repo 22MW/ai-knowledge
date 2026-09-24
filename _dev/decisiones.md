@@ -272,3 +272,4 @@ contenido) — no se forzó una invalidación especial para este cambio de códi
 - El material comercial vive en `_dev/comercial/` (nunca en ZIP ni release).
 - No se prometen resultados de posicionamiento en IA ni funciones «en
   estudio» (modo WP, Polylang, TranslatePress).
+- Resultado comprobado por el usuario en más de una web: el prompt de auditoría GEO suele dar BAJO o MEDIO antes y ALTO después de configurar el plugin. Se puede afirmar así en el material comercial, sin cifras ni garantías.
