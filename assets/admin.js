@@ -177,6 +177,15 @@
 			$( this ).closest( '[data-wookb-crawler-row]' ).attr( 'data-crawler-action', $( this ).val() );
 			applyCrawlerFilters();
 		} );
+		// "Permitir/Bloquear todos (visibles)": solo las filas que el filtro
+		// de tipo/estado (mas "Ver todos los crawlers") deja visibles ahora
+		// mismo -- dispara 'change' en cada select para reutilizar el mismo
+		// handler de arriba (actualiza data-crawler-action y refresca el
+		// contador), en vez de duplicar esa logica aqui.
+		$filters.on( 'click', '[data-wookb-crawler-bulk]', function () {
+			var value = $( this ).attr( 'data-wookb-crawler-bulk' );
+			$rows.filter( ':visible' ).find( 'select[name^="crawler_action"]' ).val( value ).trigger( 'change' );
+		} );
 		applyCrawlerFilters();
 	} );
 

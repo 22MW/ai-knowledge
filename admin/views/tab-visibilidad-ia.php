@@ -299,6 +299,8 @@ $category_labels = array(
 		</select>
 	</label>
 	<span class="description" data-wookb-crawler-count aria-live="polite"></span>
+	<button type="button" class="button" data-wookb-crawler-bulk="allow"><?php esc_html_e( 'Permitir todos (visibles)', 'ai-knowledge' ); ?></button>
+	<button type="button" class="button" data-wookb-crawler-bulk="block"><?php esc_html_e( 'Bloquear todos (visibles)', 'ai-knowledge' ); ?></button>
 </div>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 	<input type="hidden" name="action" value="wookb_save_crawler_actions" />

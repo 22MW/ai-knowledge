@@ -222,9 +222,14 @@ body.toplevel_page_ai-knowledge #wpcontent {
 /* Exito: confirmar/resolver algo (Marcar revisado). --tblr-cyan (variable
    real de Tabler, no color inventado): no verde puro (junto al rojo de
    "peligro" quedaba mal) ni azul (se confundia con "info"). */
-.wookb-wrap .button.wookb-btn-success {
+.wookb-wrap .button.wookb-btn-success,
+.wookb-wrap .wookb-theme-toggle.wookb-btn-success {
   background: var(--tblr-cyan, #17a2b8);
   color: #fff;
+}
+.wookb-wrap a.wookb-theme-toggle.wookb-btn-success {
+  text-decoration: none;
+  display: inline-block;
 }
 /* Info: enlaces/acciones secundarias no urgentes. */
 .wookb-wrap .button.wookb-btn-info {

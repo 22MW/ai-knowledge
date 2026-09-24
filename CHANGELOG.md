@@ -2,6 +2,44 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [1.2.1] - 2026-09-24
+
+### Asistente de configuración
+
+- Cada paso genera su documento en cuanto se guarda (Negocio, WooCommerce,
+  FAQs, Chatbot, Contenido), en vez de todo junto al final. Nuevo paso
+  "FAQs". El paso final pasa a ser un resumen de solo lectura con los
+  botones "Generar pendientes"/"Reiniciar todo" (también visibles ahora en
+  "Generación masiva").
+- Corregido bug real de formularios anidados que dejaba sin efecto los
+  botones "Atrás"/"Continuar" en el paso de resumen.
+- Comprobación real de conexión de IA al guardar el paso "Origen de IA",
+  con aviso si no hay conexión disponible, sin bloquear el asistente.
+
+### Registro
+
+- "Generar", "Guardar límite/cambios" y "Volver a Auto" pasan a AJAX con
+  fallback tradicional. Ajustes avanzados se divide en pestañas Contenido/
+  Prompt, con prompt propio por documento e idioma. Avisos de guardado
+  pasan a notificaciones flotantes.
+- Corregido: un post que pasaba a Borrador sin usar la papelera se quedaba
+  visible en el Registro y en `/llms.txt` indefinidamente.
+
+### Genix
+
+- Nueva sección "Artículos exclusivos de Genix" en la pestaña Genix, para
+  publicar en `/llms.txt` artículos escritos directamente en Support Genix
+  sin documento propio en el plugin. Salen agrupados bajo "Documentación".
+- `sgkb-docs` deja de poder elegirse como tipo de contenido documentable.
+- Restaurado el puente con Genix para el chatbot, desactivado por una
+  regresión anterior. Corregido falso positivo de conflicto en `.htaccess`.
+
+### Otros
+
+- Prompt GEO de auditoría renovado. Botón "Ver llms.txt" junto al de modo
+  oscuro. Nuevo catálogo de idioma vasco (eu); traducciones actualizadas en
+  catalán, alemán, inglés, euskera y francés.
+
 ## [1.2.0] - 2026-09-23
 
 ### Internacionalización y documentación

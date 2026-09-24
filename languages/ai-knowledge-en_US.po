@@ -1893,3 +1893,500 @@ msgstr "Invalid post ID."
 #: assets/admin.js
 msgid "Mostrar menos crawlers"
 msgstr "Show fewer crawlers"
+
+#: admin/class-admin.php:168
+#: admin/class-admin.php:276
+msgid "Asistente de configuración"
+msgstr "Setup Wizard"
+
+#: admin/class-admin.php:169
+msgid "Asistente"
+msgstr "Wizard"
+
+#: admin/class-admin.php:179
+msgid "Abrir asistente"
+msgstr "Open wizard"
+
+#: admin/class-admin.php:227
+#: admin/class-admin.php:512
+msgid "Guardado correctamente."
+msgstr "Saved successfully."
+
+#: admin/class-admin.php:256
+msgid "Versión %s"
+msgstr "Version %s"
+
+#: admin/class-admin.php:256
+msgid "Salir"
+msgstr "Exit"
+
+#: admin/class-admin.php:257
+msgid "Progreso del asistente"
+msgstr "Wizard progress"
+
+#: admin/class-admin.php:300
+msgid "Atrás"
+msgstr "Back"
+
+#: admin/class-admin.php:301
+msgid "Salir del asistente"
+msgstr "Exit the wizard"
+
+#: admin/class-admin.php:303
+msgid "Guardar configuración"
+msgstr "Save settings"
+
+#: admin/class-admin.php:304
+msgid "Continuar"
+msgstr "Continue"
+
+#: admin/class-admin.php:327
+msgid "Bienvenida"
+msgstr "Welcome"
+
+#: admin/class-admin.php:327
+msgid "AI Knowledge convierte el contenido de tu sitio en documentos preparados para buscadores, asistentes y sistemas de inteligencia artificial. Este recorrido revisará contigo las decisiones principales sin borrar una configuración existente. Puedes saltar cualquier paso, salir cuando quieras y continuar más adelante desde el mismo punto."
+msgstr "AI Knowledge turns your site's content into documents ready for search engines, assistants and AI systems. This walkthrough will review the main decisions with you without deleting any existing configuration. You can skip any step, leave at any time and continue later from the same point."
+
+#: admin/class-admin.php:328
+msgid "Elige el servicio que ayudará a redactar y mejorar los documentos. AI Knowledge utiliza las conexiones ya configuradas mediante los Conectores de WordPress o Support Genix y nunca guarda aquí sus claves. Si todavía no existe una conexión, puedes continuar sin IA y configurarla después: cada paso siguiente que genere contenido avisará si no hay conexión, sin bloquearte."
+msgstr "Choose the service that will help write and improve the documents. AI Knowledge uses the connections already configured via WordPress Connectors or Support Genix, and never stores your keys here. If there is no connection yet, you can continue without AI and set it up later: every following step that generates content will warn you if there's no connection, without blocking you."
+
+#: admin/class-admin.php:329
+msgid "Límites de generación"
+msgstr "Generation limits"
+
+#: admin/class-admin.php:329
+msgid "Comprueba el largo máximo del texto y los límites de generación antes de continuar: a partir de aquí, cada paso puede generar contenido real con IA en cuanto lo guardes."
+msgstr "Check the maximum text length and the generation limits before continuing: from here on, each step can generate real content with AI as soon as you save it."
+
+#: admin/class-admin.php:330
+msgid "Contenido y alcance"
+msgstr "Content and scope"
+
+#: admin/class-admin.php:330
+msgid "Selecciona los tipos de contenido público que deben formar parte de la base de conocimiento. La selección determina qué entradas, páginas, productos u otros contenidos podrán generar documentos. Al guardar, se encola la generación de todo lo que entre en el alcance. Las taxonomías, términos, identificadores y campos personalizados pueden configurarse después desde la pantalla Contenido del plugin."
+msgstr "Select the public content types that should be part of the knowledge base. The selection determines which posts, pages, products or other content can generate documents. Saving this step queues generation for everything within scope. Taxonomies, terms, IDs and custom fields can be configured later from the Content screen of the plugin."
+
+#: admin/class-admin.php:331
+msgid "Añade la información estable que una IA necesita para comprender correctamente tu negocio: identidad, ubicación, público, contacto, horario y enfoque. Estos datos complementan el contenido del sitio y ayudan a producir respuestas coherentes sin inventar información."
+msgstr "Add the stable information an AI needs to correctly understand your business: identity, location, audience, contact, hours and focus. This data complements your site's content and helps produce consistent answers without inventing information."
+
+#: admin/class-admin.php:332
+msgid "Revisa los datos generales de la tienda, el país, la moneda, las condiciones de compra, la recogida, los plazos y el contacto. Al guardar, se generan los documentos de información de tienda si hay conexión de IA disponible. Los envíos, impuestos, pagos, categorías y otras opciones avanzadas pueden completarse después en una ventana nueva sin perder el progreso."
+msgstr "Review the store's general data, country, currency, purchase conditions, pickup, timeframes and contact details. Saving this step generates the store information documents if an AI connection is available. Shipping, taxes, payments, categories and other advanced options can be completed later in a new window without losing progress."
+
+#: admin/class-admin.php:333
+msgid "Genera con IA las preguntas frecuentes públicas de tu negocio a partir de los datos ya introducidos, y las publica directamente en llms.txt. Este paso solo aparece si hay una conexión de IA disponible."
+msgstr "Generate the public FAQs for your business with AI from the data already entered, and publish them straight to llms.txt. This step only appears if an AI connection is available."
+
+#: admin/class-admin.php:334
+msgid "Configura cómo Support Genix utilizará la base de conocimiento, cuántos documentos relacionados podrá consultar y qué información adicional debe tener en cuenta. Al guardar, se sincroniza con Genix si hay conexión disponible. Este paso solo aparece cuando la integración está disponible."
+msgstr "Configure how Support Genix will use the knowledge base, how many related documents it can show, and what extra information it should take into account. Saving this step syncs with Genix if a connection is available. This step only appears when the integration is available."
+
+#: admin/class-admin.php:335
+msgid "Decide qué familias de crawlers pueden acceder al sitio y cómo se gestiona su acceso a llms.txt. Al guardar, esta selección queda conservada para utilizarla en las reglas de visibilidad del plugin."
+msgstr "Decide which crawler families can access the site and how their access to llms.txt is managed. Saving this selection keeps it in place to use in the plugin's visibility rules."
+
+#: admin/class-admin.php:336
+msgid "Archivos del servidor"
+msgstr "Server files"
+
+#: admin/class-admin.php:336
+msgid "Comprueba si robots.txt y .htaccess difieren de la configuración guardada. Descarga las copias y las versiones preparadas; el asistente no muestra el código completo ni modifica .htaccess automáticamente."
+msgstr "Check whether robots.txt and .htaccess differ from the saved configuration. Download the current copies and the prepared versions; the wizard does not show the full code or modify .htaccess automatically."
+
+#: admin/class-admin.php:337
+msgid "Resumen"
+msgstr "Summary"
+
+#: admin/class-admin.php:337
+msgid "Revisa el estado real de cada paso: qué se ha generado ya y qué queda pendiente. Puedes generar ahora los documentos que aún falten, o dejarlo para más tarde desde Generación masiva."
+msgstr "Review the real status of each step: what has already been generated and what's still pending. You can generate the documents that are still missing now, or leave it for later from Bulk generation."
+
+#: admin/class-admin.php:338
+msgid "Resumen final"
+msgstr "Final summary"
+
+#: admin/class-admin.php:338
+msgid "La configuración del asistente ha terminado. Revisa el estado real de los documentos y accede directamente a las áreas principales del plugin."
+msgstr "The wizard setup has finished. Review the real status of your documents and go straight to the plugin's main areas."
+
+#: admin/class-admin.php:359
+msgid "Las reglas de AI Knowledge en robots.txt son diferentes de la configuración guardada."
+msgstr "AI Knowledge's rules in robots.txt differ from the saved configuration."
+
+#: admin/class-admin.php:359
+msgid "Las reglas de AI Knowledge en robots.txt coinciden con la configuración guardada."
+msgstr "AI Knowledge's rules in robots.txt match the saved configuration."
+
+#: admin/class-admin.php:360
+msgid "Descarga una copia actual antes de actualizar robots.txt con la versión preparada."
+msgstr "Download a current copy before updating robots.txt with the prepared version."
+
+#: admin/class-admin.php:361
+msgid "Actualizar robots.txt"
+msgstr "Update robots.txt"
+
+#: admin/class-admin.php:362
+msgid "Las reglas de AI Knowledge en .htaccess son diferentes de la configuración guardada."
+msgstr "AI Knowledge's rules in .htaccess differ from the saved configuration."
+
+#: admin/class-admin.php:362
+msgid "Las reglas de AI Knowledge en .htaccess coinciden con la configuración guardada."
+msgstr "AI Knowledge's rules in .htaccess match the saved configuration."
+
+#: admin/class-admin.php:363
+msgid "El plugin no modifica .htaccess desde el asistente. Descarga la versión preparada y sustitúyela manualmente; conserva siempre una copia por seguridad."
+msgstr "The plugin does not modify .htaccess from the wizard. Download the prepared version and replace it manually; always keep a backup copy."
+
+#: admin/class-admin.php:364
+msgid "Comprobar cambios"
+msgstr "Check for changes"
+
+#: admin/class-admin.php:368
+msgid "Comprueba tu sitio en un agente externo antes de configurar el plugin. Después de completar la configuración, repite la comprobación con este mismo prompt para comparar el resultado."
+msgstr "Check your site with an external agent before configuring the plugin. After completing the setup, repeat the check with this same prompt to compare the result."
+
+#: admin/class-admin.php:368
+#: admin/class-admin.php:432
+msgid "Copiar Prompt"
+msgstr "Copy Prompt"
+
+#: admin/class-admin.php:369
+msgid "Qué revisaremos"
+msgstr "What we'll review"
+
+#: admin/class-admin.php:369
+msgid "El origen de IA y el contenido que formará la base de conocimiento."
+msgstr "The AI source and the content that will make up the knowledge base."
+
+#: admin/class-admin.php:369
+msgid "Los datos del negocio y las integraciones disponibles."
+msgstr "Your business data and the available integrations."
+
+#: admin/class-admin.php:369
+msgid "La visibilidad para IA y los límites de generación."
+msgstr "AI visibility and generation limits."
+
+#: admin/class-admin.php:372
+msgid "Conexión de IA disponible: los pasos siguientes podrán generar contenido real."
+msgstr "AI connection available: the following steps will be able to generate real content."
+
+#: admin/class-admin.php:374
+msgid "No se detecta ninguna conexión de IA activa todavía."
+msgstr "No active AI connection detected yet."
+
+#: admin/class-admin.php:374
+msgid "Puedes continuar sin problema: los pasos siguientes guardarán tus datos igual, pero no generarán contenido con IA hasta que conectes un origen (aquí, en Conectores de WordPress, o activando Support Genix) y vuelvas a guardar ese paso."
+msgstr "You can continue without any problem: the following steps will still save your data, but they won't generate content with AI until you connect a source (here, in WordPress Connectors, or by activating Support Genix) and save that step again."
+
+#: admin/class-admin.php:376
+msgid "Modelo"
+msgstr "Model"
+
+#: admin/class-admin.php:376
+msgid "Configurar Conectores de WordPress"
+msgstr "Set up WordPress Connectors"
+
+#: admin/class-admin.php:376
+msgid "Abrir Support Genix"
+msgstr "Open Support Genix"
+
+#: admin/class-admin.php:377
+msgid "Largo máximo del texto"
+msgstr "Maximum text length"
+
+#: admin/class-admin.php:377
+msgid "Tokens de salida"
+msgstr "Output tokens"
+
+#: admin/class-admin.php:377
+msgid "Límite diario"
+msgstr "Daily limit"
+
+#: admin/class-admin.php:377
+msgid "Sin límite diario"
+msgstr "No daily limit"
+
+#: admin/class-admin.php:377
+msgid "Avisar a IndexNow"
+msgstr "Notify IndexNow"
+
+#: admin/class-admin.php:379
+msgid "Tipos de contenido que quieres incluir"
+msgstr "Content types you want to include"
+
+#: admin/class-admin.php:382
+msgid "Contacto y horario de la tienda"
+msgstr "Store contact and hours"
+
+#: admin/class-admin.php:382
+msgid "Recogida en tienda disponible"
+msgstr "In-store pickup available"
+
+#: admin/class-admin.php:383
+msgid "Límite de documentos relacionados"
+msgstr "Related documents limit"
+
+#: admin/class-admin.php:387
+msgid "Al guardar este paso, se genera con IA y se publica de inmediato en llms.txt (excepción explícita de este paso del asistente a la norma habitual de revisar antes de publicar)."
+msgstr "Saving this step generates content with AI and publishes it to llms.txt immediately (an explicit exception, for this wizard step only, to the usual rule of reviewing before publishing)."
+
+#: admin/class-admin.php:396
+msgid "Ya hay un FAQ publicado para este idioma. Al guardar de nuevo, se amplía/mejora, no se sustituye desde cero."
+msgstr "There is already a published FAQ for this language. Saving again expands/improves it, it does not start from scratch."
+
+#: admin/class-admin.php:399
+msgid "Todavía no hay FAQ generado para este idioma."
+msgstr "There is no FAQ generated yet for this language."
+
+#: admin/class-admin.php:408
+msgid "Categorías de crawlers"
+msgstr "Crawler categories"
+
+#: admin/class-admin.php:409
+msgid "Permitir todos"
+msgstr "Allow all"
+
+#: admin/class-admin.php:409
+msgid "Bloquear todos"
+msgstr "Block all"
+
+#: admin/class-admin.php:411
+msgid "Acceso de crawlers bloqueados a llms.txt"
+msgstr "Blocked crawlers' access to llms.txt"
+
+#: admin/class-admin.php:411
+msgid "Decide si un crawler bloqueado puede leer únicamente el archivo llms.txt o si también debe quedar bloqueado en todo el sitio."
+msgstr "Decide whether a blocked crawler can read only the llms.txt file, or whether it should also be blocked across the whole site."
+
+#: admin/class-admin.php:411
+msgid "Aplicar la misma política a todo el sitio"
+msgstr "Apply the same policy to the whole site"
+
+#: admin/class-admin.php:411
+msgid "Permitir solo llms.txt"
+msgstr "Allow llms.txt only"
+
+#: admin/class-admin.php:411
+msgid "Robots.txt y .htaccess"
+msgstr "Robots.txt and .htaccess"
+
+#: admin/class-admin.php:411
+msgid "La política que guardes aquí sirve como base para preparar las reglas de robots.txt y .htaccess. Esos archivos se gestionan después desde la pantalla Visibilidad IA, donde puedes revisar el contenido antes de aplicarlo."
+msgstr "The policy you save here is used as the basis for preparing the robots.txt and .htaccess rules. Those files are then managed from the AI Visibility screen, where you can review the content before applying it."
+
+#: admin/class-admin.php:432
+#: admin/class-admin.php:1292
+msgid "Documentos registrados:"
+msgstr "Registered documents:"
+
+#: admin/class-admin.php:432
+#: admin/class-admin.php:1293
+msgid "Documentos pendientes:"
+msgstr "Pending documents:"
+
+#: admin/class-admin.php:432
+msgid "Pasos omitidos:"
+msgstr "Skipped steps:"
+
+#: admin/class-admin.php:432
+msgid "Ninguno"
+msgstr "None"
+
+#: admin/class-admin.php:432
+msgid "Recomendamos comprobar este prompt en un agente externo para verificar el funcionamiento del plugin y la visibilidad de tu web."
+msgstr "We recommend checking this prompt with an external agent to verify the plugin's behaviour and your site's visibility."
+
+#: admin/class-admin.php:491
+msgid "Paso no válido."
+msgstr "Invalid step."
+
+#: admin/class-admin.php:802
+msgid "Genix"
+msgstr "Genix"
+
+#: admin/class-admin.php:1276
+msgid "Negocio:"
+msgstr "Business:"
+
+#: admin/class-admin.php:1276
+msgid "Datos guardados."
+msgstr "Data saved."
+
+#: admin/class-admin.php:1276
+msgid "Todavía sin datos."
+msgstr "No data yet."
+
+#. translators: %s: idioma
+#: admin/class-admin.php:1283
+msgid "WooCommerce (%s):"
+msgstr "WooCommerce (%s):"
+
+#. translators: %s: idioma
+#: admin/class-admin.php:1283
+#: admin/class-admin.php:1287
+msgid "general"
+msgstr "general"
+
+#. translators: %s: idioma
+#: admin/class-admin.php:1283
+msgid "Documentos generados."
+msgstr "Documents generated."
+
+#. translators: %s: idioma
+#: admin/class-admin.php:1283
+#: admin/class-admin.php:1287
+msgid "Todavía sin generar."
+msgstr "Not generated yet."
+
+#. translators: %s: idioma
+#: admin/class-admin.php:1287
+msgid "FAQ (%s):"
+msgstr "FAQ (%s):"
+
+#. translators: %s: idioma
+#: admin/class-admin.php:1287
+msgid "Publicado."
+msgstr "Published."
+
+#: admin/class-admin.php:1290
+msgid "Chatbot:"
+msgstr "Chatbot:"
+
+#: admin/class-admin.php:1290
+msgid "Sincronizado con Genix."
+msgstr "Synced with Genix."
+
+#: admin/class-admin.php:1290
+msgid "Todavía sin sincronizar."
+msgstr "Not synced yet."
+
+#: admin/class-admin.php:1475
+#: admin/class-admin.php:1477
+msgid "El origen de este documento ya no está publicado."
+msgstr "This document's source is no longer published."
+
+#: admin/class-admin.php:1495
+msgid "Generado."
+msgstr "Generated."
+
+#: admin/class-admin.php:1563
+msgid "Ese contenido no está publicado."
+msgstr "That content is not published."
+
+#: admin/class-admin.php:2616
+msgid "No se pudo verificar la actualización de robots.txt. Comprueba los permisos de escritura de la raíz del sitio y vuelve a intentarlo."
+msgstr "Could not verify the robots.txt update. Check the site root's write permissions and try again."
+
+#: admin/class-registry-table.php:376
+msgid "Este documento está en modo Manual."
+msgstr "This document is in Manual mode."
+
+#: admin/class-registry-table.php:377
+msgid "El texto está fijado a mano y nunca se regenera con IA, así que el prompt no tiene ningún efecto mientras esté en Manual. Pulsa \"Volver a Auto\" si quieres que vuelva a generarse con IA y usar el prompt."
+msgstr "The text is fixed by hand and is never regenerated with AI, so the prompt has no effect while it stays in Manual mode. Click \"Back to Auto\" if you want it to be generated with AI again and use the prompt."
+
+#: admin/class-registry-table.php:385
+msgid "Prompt para este documento"
+msgstr "Prompt for this document"
+
+#: admin/class-registry-table.php:387
+msgid "Instrucciones propias de este documento (estilo, enfoque). No sustituyen los datos reales del contenido: si está vacío, se usa el prompt genérico de siempre."
+msgstr "Instructions specific to this document (style, focus). They don't replace the content's real data: if left empty, the generic prompt is used as always."
+
+#: admin/class-registry-table.php:391
+msgid "Guardar prompt"
+msgstr "Save prompt"
+
+#. translators: 1: "X elemento(s)" ya pluralizado, 2: "X idioma(s)" ya pluralizado, 3: total documentos
+#: admin/views/tab-carga-inicial.php:22
+msgid "Alcance actual: %1$s × %2$s = %3$d documentos posibles."
+msgstr "Current scope: %1$s × %2$s = %3$d possible documents."
+
+#. translators: %d: número de elementos
+#: admin/views/tab-carga-inicial.php:23
+msgid "%d elemento"
+msgid_plural "%d elementos"
+msgstr[0] "%d item"
+msgstr[1] "%d items"
+
+#. translators: %d: número de idiomas activos
+#: admin/views/tab-carga-inicial.php:24
+msgid "%d idioma"
+msgid_plural "%d idiomas"
+msgstr[0] "%d language"
+msgstr[1] "%d languages"
+
+#: admin/views/tab-prompt.php:119
+msgid "Artículos exclusivos de Genix"
+msgstr "Genix-only articles"
+
+#: admin/views/tab-prompt.php:121
+msgid "Artículos escritos directamente en Support Genix, sin producto ni página de este sitio detrás. Puedes copiarlos tal cual (sin IA) a un documento propio y hacerlos públicos, para que entren en llms.txt."
+msgstr "Articles written directly in Support Genix, without a product or page on this site behind them. You can copy them as-is (without AI) into their own document and make them public, so they get included in llms.txt."
+
+#: admin/views/tab-prompt.php:124
+msgid "No hay artículos exclusivos de Genix (o todos los que existen ya tienen su propio documento generado por este plugin)."
+msgstr "There are no Genix-only articles (or all the ones that exist already have their own document generated by this plugin)."
+
+#: admin/views/tab-prompt.php:129
+msgid "Artículo"
+msgstr "Article"
+
+#: admin/views/tab-prompt.php:147
+msgid "Publicado"
+msgstr "Published"
+
+#: admin/views/tab-prompt.php:147
+msgid "No publicado"
+msgstr "Not published"
+
+#: admin/views/tab-prompt.php:154
+msgid "Actualizar contenido"
+msgstr "Update content"
+
+#: admin/views/tab-prompt.php:154
+msgid "Generar contenido"
+msgstr "Generate content"
+
+#: admin/views/tab-prompt.php:161
+msgid "Quitar"
+msgstr "Remove"
+
+#: admin/views/tab-visibilidad-ia.php:302
+msgid "Permitir todos (visibles)"
+msgstr "Allow all (visible)"
+
+#: admin/views/tab-visibilidad-ia.php:303
+msgid "Bloquear todos (visibles)"
+msgstr "Block all (visible)"
+
+#: admin/views/tab-visibilidad-ia.php:359
+#: admin/views/tab-visibilidad-ia.php:400
+msgid "Las reglas de AI Knowledge coinciden con la configuración guardada."
+msgstr "AI Knowledge's rules match the saved configuration."
+
+#: admin/views/tab-visibilidad-ia.php:359
+#: admin/views/tab-visibilidad-ia.php:400
+msgid "Las reglas de AI Knowledge son diferentes de la configuración guardada."
+msgstr "AI Knowledge's rules differ from the saved configuration."
+
+#: includes/class-genix-publish.php:52
+#: includes/class-genix-publish.php:115
+msgid "Genix no está activo."
+msgstr "Genix is not active."
+
+#: includes/class-genix-publish.php:57
+msgid "No se encontró el artículo de Genix."
+msgstr "Could not find the Genix article."
+
+#: includes/class-genix-publish.php:61
+msgid "Este artículo está marcado en Genix como \"solo para el chatbot\": no es público ni siquiera dentro de Genix, así que no puede publicarse aquí."
+msgstr "This article is marked in Genix as \"chatbot only\": it is not public even within Genix, so it cannot be published here."
+
+#: includes/class-store-info-doc.php:97
+#: includes/class-store-info-doc.php:123
+msgid "WooCommerce no está activo."
+msgstr "WooCommerce is not active."
