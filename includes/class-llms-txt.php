@@ -77,7 +77,7 @@ class Llms_Txt {
 		// endpoint no basta si nada enlaza a él.
 		$lines[] = '## Feeds';
 		$lines[] = '';
-		if ( class_exists( 'WooCommerce' ) ) {
+		if ( class_exists( 'WooCommerce' ) && Scope::has_post_type_in_scope( 'product' ) ) {
 			$lines[] = '- [' . __( 'Feed de productos (Google Merchant)', 'ai-knowledge' ) . '](' . rest_url( 'ai-knowledge/v1/feeds/products.xml' ) . '): ' . __( 'para comparadores y plataformas de shopping.', 'ai-knowledge' );
 		}
 		$lines[] = '- [' . __( 'Feed de contenido (JSON)', 'ai-knowledge' ) . '](' . rest_url( 'ai-knowledge/v1/feeds/content.json' ) . '): ' . __( 'el resto del contenido del alcance, sin paginar.', 'ai-knowledge' );

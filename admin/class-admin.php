@@ -32,8 +32,6 @@ class Admin
 			'wookb_save_business_summary' => 'save_business_summary',
 			'wookb_save_woocommerce_settings' => 'save_woocommerce_settings',
 			'wookb_save_llms_faq' => 'save_llms_faq',
-			'wookb_save_crawler_actions' => 'save_crawler_actions',
-			'wookb_save_crawler_visibility' => 'save_crawler_visibility',
 			'wookb_generate_business_summary_draft' => 'generate_business_summary_draft',
 			'wookb_generate_faqs_draft' => 'generate_faqs_draft',
 			'wookb_generate_prompt_draft' => 'generate_prompt_draft',
@@ -96,7 +94,6 @@ class Admin
 		add_action('admin_post_wookb_download_llms_backup', array(__CLASS__, 'download_llms_backup'));
 		add_action('admin_post_wookb_apply_llms_physical', array(__CLASS__, 'apply_llms_physical'));
 		add_action('admin_post_wookb_save_crawler_actions', array(__CLASS__, 'save_crawler_actions'));
-		add_action('admin_post_wookb_save_crawler_visibility', array(__CLASS__, 'save_crawler_visibility'));
 		add_action('admin_post_wookb_download_robots_backup', array(__CLASS__, 'download_robots_backup'));
 		add_action('admin_post_wookb_apply_robots_block', array(__CLASS__, 'apply_robots_block'));
 		add_action('admin_post_wookb_download_htaccess_backup', array(__CLASS__, 'download_htaccess_backup'));
@@ -137,7 +134,7 @@ class Admin
 			self::capability(),
 			'ai-knowledge',
 			array(__CLASS__, 'render'),
-			'dashicons-admin-generic',
+			AIKB_URL . 'assets/ai-knowledge-logo.svg',
 			58
 		);
 
@@ -298,7 +295,6 @@ class Admin
 				<?php endif; ?>
 				<div class="wookb-assistant-actions">
 					<?php if ('welcome' !== $step) : ?><button type="submit" class="button" name="assistant_action" value="back"><?php esc_html_e('Atrás', 'ai-knowledge'); ?></button><?php endif; ?>
-					<?php if (!in_array($step, array('welcome', 'finish', 'success'), true)) : ?> <button type="submit" class="button" name="assistant_action" value="exit"><?php esc_html_e('Salir del asistente', 'ai-knowledge'); ?></button><?php endif; ?>
 					<span class="wookb-assistant-actions-main">
 						<?php if (!in_array($step, array('welcome', 'success', 'finish'), true)) : ?><button type="submit" class="button" name="assistant_action" value="save"><?php esc_html_e('Guardar configuración', 'ai-knowledge'); ?></button><?php endif; ?>
 						<?php if ('success' !== $step) : ?><button type="submit" class="button button-primary" name="assistant_action" value="continue"><?php esc_html_e('Continuar', 'ai-knowledge'); ?></button><?php endif; ?>
@@ -333,7 +329,7 @@ class Admin
 			'faqs' => array('number' => 7, 'title' => __('FAQs', 'ai-knowledge'), 'description' => __('Genera con IA las preguntas frecuentes públicas de tu negocio a partir de los datos ya introducidos, y las publica directamente en llms.txt. Este paso solo aparece si hay una conexión de IA disponible.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=faqs')),
 			'chatbot' => array('number' => 8, 'title' => __('Chatbot', 'ai-knowledge'), 'description' => __('Configura cómo Support Genix utilizará la base de conocimiento, cuántos documentos relacionados podrá consultar y qué información adicional debe tener en cuenta. Al guardar, se sincroniza con Genix si hay conexión disponible. Este paso solo aparece cuando la integración está disponible.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=prompt')),
 			'visibility' => array('number' => 9, 'title' => __('Visibilidad IA', 'ai-knowledge'), 'description' => __('Decide qué familias de crawlers pueden acceder al sitio y cómo se gestiona su acceso a llms.txt. Al guardar, esta selección queda conservada para utilizarla en las reglas de visibilidad del plugin.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=visibilidad-ia')),
-			'server' => array('number' => 10, 'title' => __('Archivos del servidor', 'ai-knowledge'), 'description' => __('Comprueba si robots.txt y .htaccess difieren de la configuración guardada. Descarga las copias y las versiones preparadas; el asistente no muestra el código completo ni modifica .htaccess automáticamente.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=visibilidad-ia')),
+			'server' => array('number' => 10, 'title' => __('Archivos del servidor', 'ai-knowledge'), 'description' => __('Comprueba si robots.txt y .htaccess difieren de la configuración guardada. Descarga las copias y las versiones preparadas; el asistente no muestra el código completo; reemplazar .htaccess exige copia descargada y una casilla de responsabilidad.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=visibilidad-ia')),
 			'finish' => array('number' => 11, 'title' => __('Resumen', 'ai-knowledge'), 'description' => __('Revisa el estado real de cada paso: qué se ha generado ya y qué queda pendiente. Puedes generar ahora los documentos que aún falten, o dejarlo para más tarde desde Generación masiva.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=carga-inicial')),
 			'success' => array('number' => 12, 'title' => __('Resumen final', 'ai-knowledge'), 'description' => __('La configuración del asistente ha terminado. Revisa el estado real de los documentos y accede directamente a las áreas principales del plugin.', 'ai-knowledge')),
 		);
@@ -355,13 +351,22 @@ class Admin
 			$robots_generated = Robots_Txt_Guard::generate_full_file($crawler_actions, $mode);
 			$htaccess_current = Htaccess_Guard::is_available() ? (string) file_get_contents(Htaccess_Guard::path()) : '';
 			$htaccess_generated = Htaccess_Guard::generate_full_file($crawler_actions, $mode);
+			// Cada carga del paso invalida la copia descargada antes: hay que
+			// volver a descargarla (vale 10 minutos).
+			Robots_Txt_Guard::clear_backup_confirmation();
+			Htaccess_Guard::clear_backup_confirmation();
 			$robots_backup_ready = Robots_Txt_Guard::backup_confirmed();
 			if (!Robots_Txt_Guard::managed_block_matches($robots_current, $crawler_actions, $mode)) : ?><p class="notice notice-warning inline"><strong><?php esc_html_e('Las reglas de AI Knowledge en robots.txt son diferentes de la configuración guardada.', 'ai-knowledge'); ?></strong></p><?php else : ?><p class="notice notice-success inline"><?php esc_html_e('Las reglas de AI Knowledge en robots.txt coinciden con la configuración guardada.', 'ai-knowledge'); ?></p><?php endif; ?>
 			<p><?php esc_html_e('Descarga una copia actual antes de actualizar robots.txt con la versión preparada.', 'ai-knowledge'); ?></p>
 			<p><button type="button" class="button" data-server-action="wookb_download_robots_backup" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_download_robots_backup')); ?>"><?php esc_html_e('Descargar copia actual de robots.txt', 'ai-knowledge'); ?></button> <button type="button" class="button button-primary" data-server-action="wookb_apply_robots_block" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_apply_robots_block')); ?>" data-return-assistant="1" <?php disabled(!$robots_backup_ready); ?>><?php esc_html_e('Actualizar robots.txt', 'ai-knowledge'); ?></button></p>
 			<?php if (!Htaccess_Guard::managed_block_matches($htaccess_current, $crawler_actions, $mode)) : ?><p class="notice notice-warning inline"><strong><?php esc_html_e('Las reglas de AI Knowledge en .htaccess son diferentes de la configuración guardada.', 'ai-knowledge'); ?></strong></p><?php else : ?><p class="notice notice-success inline"><?php esc_html_e('Las reglas de AI Knowledge en .htaccess coinciden con la configuración guardada.', 'ai-knowledge'); ?></p><?php endif; ?>
-			<p><?php esc_html_e('El plugin no modifica .htaccess desde el asistente. Descarga la versión preparada y sustitúyela manualmente; conserva siempre una copia por seguridad.', 'ai-knowledge'); ?></p>
-			<p><button type="button" class="button" data-server-action="wookb_download_htaccess_generated" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_download_htaccess_generated')); ?>"><?php esc_html_e('Descargar .htaccess preparado', 'ai-knowledge'); ?></button></p><p><button type="button" class="button" data-assistant-check-server><?php esc_html_e('Comprobar cambios', 'ai-knowledge'); ?></button></p><?php
+			<p><?php esc_html_e('Puedes reemplazar el .htaccess desde aquí: solo se cambia el bloque de AI Knowledge y tus reglas que choquen se comentan, no se borran. Descarga primero la copia actual y marca la casilla.', 'ai-knowledge'); ?></p>
+			<p><button type="button" class="button" data-server-action="wookb_download_htaccess_generated" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_download_htaccess_generated')); ?>"><?php esc_html_e('Descargar .htaccess preparado', 'ai-knowledge'); ?></button></p>
+			<?php if (!Htaccess_Guard::is_available()) : ?><p class="notice notice-warning inline"><?php esc_html_e('No se puede reemplazar el .htaccess: no existe o el servidor no permite escribirlo. No se ha intentado modificar nada; usa el archivo preparado a mano.', 'ai-knowledge'); ?></p><?php else : ?>
+			<p><button type="button" class="button" data-server-action="wookb_download_htaccess_backup" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_download_htaccess_backup')); ?>"><?php esc_html_e('Descargar copia actual de .htaccess', 'ai-knowledge'); ?></button></p>
+			<p><label><input type="checkbox" data-wookb-htaccess-ack /> <?php esc_html_e('Asumo toda la responsabilidad y sé lo que estoy haciendo.', 'ai-knowledge'); ?></label></p>
+			<p><button type="button" class="button button-primary" data-server-action="wookb_apply_htaccess_block" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_apply_htaccess_block')); ?>" data-return-assistant="1" data-wookb-htaccess-apply="1" data-backup-ready="<?php echo Htaccess_Guard::backup_confirmed() ? '1' : '0'; ?>" disabled><?php esc_html_e('Reemplazar .htaccess', 'ai-knowledge'); ?></button></p><?php endif; ?>
+			<p><button type="button" class="button" data-assistant-check-server><?php esc_html_e('Comprobar cambios', 'ai-knowledge'); ?></button></p><?php
 			return ob_get_clean();
 		}
 		if ('welcome' === $step) : $geo_prompt = self::build_geo_prompt(); ?>
@@ -382,23 +387,23 @@ class Admin
 			<div class="wookb-assistant-fields"><?php foreach (array('wc_store_name' => __('Nombre de la tienda', 'ai-knowledge'), 'wc_currency' => __('Moneda', 'ai-knowledge'), 'wc_base_country' => __('País base', 'ai-knowledge')) as $key => $label) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($label); ?></span><input type="text" name="<?php echo esc_attr($key); ?>" value="<?php echo esc_attr($settings[$key]); ?>" /></label><?php endforeach; ?><label class="wookb-assistant-field"><span><?php esc_html_e('Condiciones de venta', 'ai-knowledge'); ?></span><textarea name="wc_terms_text" rows="3"><?php echo esc_textarea($settings['wc_terms_text']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Política de devoluciones', 'ai-knowledge'); ?></span><textarea name="wc_returns_text" rows="3"><?php echo esc_textarea($settings['wc_returns_text']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Plazo de entrega', 'ai-knowledge'); ?></span><textarea name="delivery_time_note" rows="3"><?php echo esc_textarea($settings['delivery_time_note']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Contacto y horario de la tienda', 'ai-knowledge'); ?></span><textarea name="wc_contact_hours" rows="3"><?php echo esc_textarea($settings['wc_contact_hours']); ?></textarea></label><label class="wookb-assistant-toggle"><input type="checkbox" name="wc_pickup_available" value="1" <?php checked(!empty($settings['wc_pickup_available'])); ?> /><span><?php esc_html_e('Recogida en tienda disponible', 'ai-knowledge'); ?></span></label></div>
 		<?php elseif ('chatbot' === $step) : $answers = Chatbot_Prompt_Builder::get_saved_answers(); ?><div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Límite de documentos relacionados', 'ai-knowledge'); ?></span><input type="number" min="0" name="chatbot_docs_list_limit" value="<?php echo esc_attr($settings['chatbot_docs_list_limit']); ?>" /></label><?php foreach (Chatbot_Prompt_Builder::questions_by_group('chatbot') as $key => $question) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($question['label']); ?></span><?php if ('textarea' === $question['type']) : ?><textarea name="answers[<?php echo esc_attr($key); ?>]" rows="3"><?php echo esc_textarea($answers[$key]); ?></textarea><?php else : ?><input type="text" name="answers[<?php echo esc_attr($key); ?>]" value="<?php echo esc_attr($answers[$key]); ?>" /><?php endif; ?></label><?php endforeach; ?></div>
 		<?php elseif ('faqs' === $step) :
-			$faq_langs = Wpml::active_languages() ?: array('es');
+			// Cambio de comportamiento (2026-09-24): el FAQ ya solo se genera
+			// en el idioma principal (ver assistant_save_step('faqs')), no en
+			// cada idioma activo -- un solo bloque, no un foreach por idioma.
+			$faq_lang = Wpml::default_language();
+			$faq_error = get_transient('wookb_assistant_faqs_error_' . $faq_lang);
+			$faq_current = Llms_Faq::read($faq_lang);
 			?>
 			<p class="description"><?php esc_html_e('Al guardar este paso, se genera con IA y se publica de inmediato en llms.txt (excepción explícita de este paso del asistente a la norma habitual de revisar antes de publicar).', 'ai-knowledge'); ?></p>
-			<?php foreach ($faq_langs as $faq_lang) :
-				$faq_error = get_transient('wookb_assistant_faqs_error_' . $faq_lang);
-				$faq_current = Llms_Faq::read($faq_lang);
-				?>
-				<h3><?php echo esc_html(count($faq_langs) > 1 ? strtoupper($faq_lang) : __('Preguntas frecuentes', 'ai-knowledge')); ?></h3>
-				<?php if ($faq_error) : ?>
-					<p class="notice notice-warning inline"><?php echo esc_html($faq_error); ?></p>
-				<?php elseif ('' !== $faq_current) : ?>
-					<p class="notice notice-success inline"><?php esc_html_e('Ya hay un FAQ publicado para este idioma. Al guardar de nuevo, se amplía/mejora, no se sustituye desde cero.', 'ai-knowledge'); ?></p>
-					<textarea readonly rows="8" style="width:100%;max-width:100%;font-size:13px;"><?php echo esc_textarea($faq_current); ?></textarea>
-				<?php else : ?>
-					<p class="description"><?php esc_html_e('Todavía no hay FAQ generado para este idioma.', 'ai-knowledge'); ?></p>
-				<?php endif; ?>
-			<?php endforeach; ?>
+			<h3><?php esc_html_e('Preguntas frecuentes', 'ai-knowledge'); ?></h3>
+			<?php if ($faq_error) : ?>
+				<p class="notice notice-warning inline"><?php echo esc_html($faq_error); ?></p>
+			<?php elseif ('' !== $faq_current) : ?>
+				<p class="notice notice-success inline"><?php esc_html_e('Ya hay un FAQ publicado para este idioma. Al guardar de nuevo, se amplía/mejora, no se sustituye desde cero.', 'ai-knowledge'); ?></p>
+				<textarea readonly rows="8" style="width:100%;max-width:100%;font-size:13px;"><?php echo esc_textarea($faq_current); ?></textarea>
+			<?php else : ?>
+				<p class="description"><?php esc_html_e('Todavía no hay FAQ generado para este idioma.', 'ai-knowledge'); ?></p>
+			<?php endif; ?>
 		<?php elseif ('visibility' === $step) :
 			$categories = self::assistant_crawler_categories();
 			$category = isset($_POST['assistant_category']) ? sanitize_key(wp_unslash($_POST['assistant_category'])) : 'ai_search'; // phpcs:ignore
@@ -408,7 +413,7 @@ class Admin
 			<nav class="wookb-assistant-subnav" aria-label="<?php esc_attr_e('Categorías de crawlers', 'ai-knowledge'); ?>"><?php foreach ($categories as $key => $item) : ?><button type="button" class="button<?php echo $key === $category ? ' button-primary' : ''; ?>" data-assistant-category="<?php echo esc_attr($key); ?>"><?php echo esc_html($item['title']); ?></button><?php endforeach; ?></nav>
 			<h3><?php echo esc_html($categories[$category]['title']); ?></h3><?php if (!empty($categories[$category]['description'])) : ?><p><?php echo esc_html($categories[$category]['description']); ?></p><?php endif; ?><div class="wookb-assistant-crawler-bulk"><button type="button" class="button" data-crawler-bulk="allow"><?php esc_html_e('Permitir todos', 'ai-knowledge'); ?></button> <button type="button" class="button" data-crawler-bulk="block"><?php esc_html_e('Bloquear todos', 'ai-knowledge'); ?></button></div>
 			<div class="wookb-assistant-crawlers"><?php foreach (Crawler_Catalog::all() as $crawler) : if ($crawler['category'] !== $category) continue; ?><div class="wookb-assistant-crawler"><div><strong><?php echo esc_html($crawler['user_agent']); ?></strong><span><?php echo esc_html($crawler['operator']); ?></span><?php if ($crawler['description'] !== $categories[$category]['description']) : ?><p><?php echo esc_html($crawler['description']); ?></p><?php endif; ?></div><select name="crawler_action[<?php echo esc_attr($crawler['user_agent']); ?>]"><option value="allow" <?php selected('allow', $actions[$crawler['user_agent']]); ?>><?php esc_html_e('Permitir', 'ai-knowledge'); ?></option><option value="block" <?php selected('block', $actions[$crawler['user_agent']]); ?>><?php esc_html_e('Bloquear', 'ai-knowledge'); ?></option></select></div><?php endforeach; ?></div>
-			<h3><?php esc_html_e('Acceso de crawlers bloqueados a llms.txt', 'ai-knowledge'); ?></h3><p><?php esc_html_e('Decide si un crawler bloqueado puede leer únicamente el archivo llms.txt o si también debe quedar bloqueado en todo el sitio.', 'ai-knowledge'); ?></p><div class="wookb-assistant-field"><label><input type="radio" name="crawler_visibility_mode" value="site" <?php checked('site', $settings['crawler_visibility_mode']); ?> /> <?php esc_html_e('Aplicar la misma política a todo el sitio', 'ai-knowledge'); ?></label><label><input type="radio" name="crawler_visibility_mode" value="llms_only" <?php checked('llms_only', $settings['crawler_visibility_mode']); ?> /> <?php esc_html_e('Permitir solo llms.txt', 'ai-knowledge'); ?></label></div><h3><?php esc_html_e('Robots.txt y .htaccess', 'ai-knowledge'); ?></h3><p><?php esc_html_e('La política que guardes aquí sirve como base para preparar las reglas de robots.txt y .htaccess. Esos archivos se gestionan después desde la pantalla Visibilidad IA, donde puedes revisar el contenido antes de aplicarlo.', 'ai-knowledge'); ?></p>
+			<h3><?php esc_html_e('Acceso de crawlers bloqueados a llms.txt', 'ai-knowledge'); ?></h3><?php echo self::render_visibility_switch($settings['crawler_visibility_mode']); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado campo a campo dentro del propio metodo. ?><h3><?php esc_html_e('Robots.txt y .htaccess', 'ai-knowledge'); ?></h3><p><?php esc_html_e('La política que guardes aquí sirve como base para preparar las reglas de robots.txt y .htaccess. Esos archivos se gestionan después desde la pantalla Visibilidad IA, donde puedes revisar el contenido antes de aplicarlo.', 'ai-knowledge'); ?></p>
 		<?php elseif ('finish' === $step) :
 			// Paso RESUMEN (antes era el paso de limites): SOLO consultas de
 			// lectura, ya baratas (Registry, Llms_Faq, get_option...). NUNCA
@@ -605,18 +610,24 @@ class Admin
 		} elseif ('faqs' === $step) {
 			// Paso nuevo. Excepcion explicita, ya confirmada por el usuario, a
 			// la norma general de "revisar antes de publicar": aqui se genera
-			// Y se publica de una vez, para cada idioma activo. Solo si hay
-			// conexion -- si no, no hay nada que hacer en este paso (no tiene
-			// campos propios que guardar, es puramente de generacion).
+			// Y se publica de una vez. Solo si hay conexion -- si no, no hay
+			// nada que hacer en este paso (no tiene campos propios que
+			// guardar, es puramente de generacion).
+			//
+			// Cambio de comportamiento confirmado por el usuario (2026-09-24):
+			// antes se generaba un documento por cada idioma ACTIVO de WPML,
+			// igual que un producto/pagina con traduccion real. El FAQ no
+			// tiene traduccion real detras -- lo redacta el propio plugin, no
+			// hay contenido distinto que traducir por idioma. Ahora se genera
+			// SOLO en el idioma PRINCIPAL del sitio (Wpml::default_language()).
 			if (self::assistant_ai_available()) {
 				$answers = Chatbot_Prompt_Builder::get_saved_answers();
-				foreach (Wpml::active_languages() ?: array('es') as $faq_lang) {
-					$current_faq = Llms_Faq::read($faq_lang);
-					$draft = Chatbot_Prompt_Builder::generate_faqs($answers, $current_faq, '');
-					if (is_wp_error($draft)) {
-						set_transient('wookb_assistant_faqs_error_' . $faq_lang, $draft->get_error_message(), MINUTE_IN_SECONDS);
-						continue;
-					}
+				$faq_lang = Wpml::default_language();
+				$current_faq = Llms_Faq::read($faq_lang);
+				$draft = Chatbot_Prompt_Builder::generate_faqs($answers, $current_faq, '');
+				if (is_wp_error($draft)) {
+					set_transient('wookb_assistant_faqs_error_' . $faq_lang, $draft->get_error_message(), MINUTE_IN_SECONDS);
+				} else {
 					delete_transient('wookb_assistant_faqs_error_' . $faq_lang);
 					Llms_Faq::save($draft, $faq_lang);
 					Llms_Faq::persist_doc($faq_lang);
@@ -653,106 +664,173 @@ class Admin
 	protected static function build_geo_prompt()
 	{
 		$content = <<<'GEO'
-# Auditoría GEO - Percepción IA
+# Auditoría GEO - Visibilidad IA de una web
 
-Analiza [URL] simulando cómo un agente de inteligencia artificial interpreta esta web.
+Analiza la web: [URL]
 
-El objetivo es saber qué información puede descubrir, comprender y reutilizar una IA actualmente.
+Objetivo:
+Evaluar cómo una inteligencia artificial, agente autónomo o buscador con IA puede descubrir, interpretar y acceder a esta web actualmente.
 
-No hagas auditoría SEO.
-No analices keywords, posicionamiento, copywriting, diseño o estrategia comercial.
+NO hagas auditoría SEO.
+NO analices keywords.
+NO analices posicionamiento.
+NO analices copywriting.
+NO analices diseño visual.
+NO valores estrategia comercial.
 
-## Recursos GEO
+Analiza únicamente la capa técnica de visibilidad, accesibilidad y comprensión para sistemas IA.
 
-Comprueba directamente:
+---
+
+## Recursos GEO y archivos técnicos
+
+Comprueba directamente todos los recursos disponibles:
 
 - [URL]robots.txt
 - [URL]llms.txt
 - [URL]sitemap.xml
 - [URL]sitemap_index.xml
 - [URL]wp-sitemap.xml
+- feeds XML
+- feeds JSON
+- endpoints públicos
+- APIs relacionadas
+- archivos Markdown
+- documentación para IA
+- cualquier archivo específico GEO encontrado
 
-Para cada recurso indica:
+Para cada recurso:
 
-- URL comprobada.
+- URL exacta comprobada.
 - Código HTTP.
-- Contenido encontrado.
-- Información disponible para una IA.
+- Si existe o no.
+- Si ha podido ser leído completamente.
+- Información que aporta a una IA.
 
-## Comprensión de la entidad
+IMPORTANTE:
+No marques un archivo como "no verificado" sin intentar acceder primero.
+Si no puedes leerlo indica exactamente:
+- motivo del fallo;
+- bloqueo encontrado;
+- error HTTP;
+- limitación técnica.
 
+No dejes recursos sin intentar comprobar.
+
+---
+
+# Analiza exclusivamente:
+
+## 1. Percepción IA actual
+
+Explica brevemente:
+
+- Qué puede entender una IA de la web.
+- Qué nivel de acceso tiene.
+- Si existe una capa preparada para agentes IA.
+- Si la información está organizada para interpretación automática.
+
+Máximo 50 líneas.
+
+---
+
+## 2. Tabla comparativa técnica
+
+Entrega una tabla:
+
+| Elemento | Estado | Resultado observado | Impacto para IA |
+|---|---|---|---|
+| robots.txt | | | |
+| llms.txt | | | |
+| sitemap | | | |
+| Markdown IA | | | |
+| JSON | | | |
+| Feeds | | | |
+| APIs | | | |
+| Schema.org | | | |
+| Product | | | |
+| Organization | | | |
+| FAQ | | | |
+| Otros recursos GEO | | | |
+
+---
+
+## 3. Calidad de archivos GEO
+
+Evalúa únicamente la calidad técnica de cada archivo:
+
+### llms.txt
 Analiza:
 
-- Qué entidad identifica una IA.
-- Qué producto, servicio o información representa.
-- Qué relaciones puede interpretar:
-  - empresa;
-  - producto;
-  - tecnologías;
-  - plataformas;
-  - servicios relacionados.
+- existencia;
+- estructura;
+- claridad para modelos IA;
+- enlaces útiles;
+- organización;
+- actualización;
+- relación con otros recursos.
 
-## Información reutilizable por IA
-
-Indica qué puede responder una IA actualmente sobre:
-
-- qué es;
-- qué hace;
-- cómo funciona;
-- integraciones;
-- requisitos;
-- categorías;
-- relaciones detectadas.
-
-## Estructuras disponibles
-
-Comprueba únicamente elementos existentes:
-
-- Schema.org / JSON-LD.
-- SoftwareApplication.
-- Product.
-- Organization.
-- FAQ.
-- Markdown.
-- JSON.
-- APIs o endpoints estructurados.
-
-## Accesibilidad IA
-
+### robots.txt
 Analiza:
 
-- si la información principal es accesible;
-- si existen bloqueos para bots IA;
-- si existe contenido no accesible para agentes automáticos;
-- si depende de interacción humana o JavaScript.
+- acceso permitido/bloqueado para bots IA;
+- reglas específicas;
+- coherencia con llms.txt.
 
-## Resultado
+### JSON / APIs / Feeds
+Analiza:
 
-Entrega:
+- existencia;
+- accesibilidad;
+- formato;
+- utilidad para agentes IA.
 
-# 1. Cómo ve una IA esta web actualmente
+NO evalúes la calidad del texto comercial.
+Evalúa únicamente si sirve como fuente interpretable por IA.
 
-# 2. Información que puede extraer
+---
 
-# 3. Archivos y estructuras disponibles
+## 4. Problemas detectados
 
-# 4. Limitaciones detectadas
+Lista únicamente problemas confirmados.
 
-# 5. Nivel de comprensión IA:
-Bajo / Medio / Alto
-
-Usa siempre esta clasificación:
+Clasificación:
 
 - Confirmado: comprobado directamente.
 - Riesgo: posible limitación no confirmada.
 - No verificado: no se ha podido comprobar.
 
-Reglas:
+No inventes problemas.
 
-- No inventes datos.
-- No hagas recomendaciones.
-- No marques errores sin evidencia.
-- Cada conclusión debe estar respaldada por una URL, archivo, código HTTP o elemento técnico observado.
+---
+
+## 5. Nivel final de visibilidad IA
+
+Clasifica:
+
+BAJO / MEDIO / ALTO
+
+Basado únicamente en:
+
+- accesibilidad;
+- archivos GEO;
+- estructuras técnicas;
+- facilidad de interpretación automática.
+
+No valores contenido, SEO ni marketing.
+
+---
+
+Formato final obligatorio:
+
+1. Resumen humano (máximo 50 líneas).
+2. Tabla comparativa técnica.
+3. Nivel de visibilidad IA.
+4. Problemas confirmados.
+
+No incluyas recomendaciones generales.
+No expliques qué se podría hacer.
+Entrega únicamente el estado actual de la web.
 GEO;
 		$content = str_replace('[URL]', home_url('/'), $content);
 		return $content;
@@ -856,7 +934,7 @@ GEO;
 		// oscuro en cada carga).
 		echo '<script>(function(){var w=document.currentScript.parentNode;var t=null;try{t=window.localStorage.getItem("wookb_theme");}catch(e){}if("dark"!==t&&"light"!==t){if(window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches){t="light";}else{t="dark";}}w.setAttribute("data-bs-theme",t);})();</script>';
 		echo '<div class="wookb-header-row"><h3>' . esc_html__('Base de conocimiento IA', 'ai-knowledge') . '</h3>';
-		echo '<button type="button" class="wookb-theme-toggle"> ' . esc_html__('Modo oscuro', 'ai-knowledge') . '</button> <a class="wookb-theme-toggle wookb-btn-success" href="' . esc_url(home_url('/llms.txt')) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Ver llms.txt', 'ai-knowledge') . '</a></div>';
+		echo '<div class="wookb-header-btn-group"><a class="wookb-header-btn wookb-btn-success" href="' . esc_url(home_url('/llms.txt')) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Ver llms.txt', 'ai-knowledge') . '</a> <button type="button" class="wookb-header-btn wookb-theme-toggle"> ' . esc_html__('Modo oscuro', 'ai-knowledge') . '</button></div></div>';
 
 		self::render_registry_summary();
 
@@ -1252,6 +1330,47 @@ GEO;
 	}
 
 	/**
+	 * Interruptor "Incluir llms.txt para los modelos desactivados" (valor
+	 * guardado: crawler_visibility_mode, 'llms_only' = activado, 'site' =
+	 * desactivado). Compartido por la pestaña Visibilidad IA y el paso del
+	 * asistente: mismo marcado, mismo interruptor (.wookb-assistant-toggle).
+	 *
+	 * El input hidden 'site' va ANTES del checkbox con el mismo name: si el
+	 * checkbox esta marcado, PHP se queda con el ultimo valor ('llms_only');
+	 * si no, llega 'site' (un checkbox sin marcar no envia nada). Sirve tanto
+	 * para el POST normal como para el serializeArray() del asistente.
+	 * No guarda por si mismo: en la pestaña se guarda con "Guardar
+	 * configuración de crawlers" y en el asistente con los botones de siempre.
+	 */
+	public static function render_visibility_switch($mode)
+	{
+		$on = 'llms_only' === $mode;
+		ob_start();
+		?>
+		<div class="wookb-visibility-switch<?php echo $on ? ' is-on' : ''; ?>">
+			<input type="hidden" name="crawler_visibility_mode" value="site" />
+			<div class="wookb-visibility-head">
+				<label class="wookb-assistant-toggle">
+					<input type="checkbox" name="crawler_visibility_mode" value="llms_only" <?php checked($on); ?> />
+					<span><?php esc_html_e('Incluir llms.txt para los modelos desactivados', 'ai-knowledge'); ?></span>
+				</label>
+				<strong class="wookb-visibility-state">
+					<span class="on"><?php esc_html_e('ACTIVADO', 'ai-knowledge'); ?></span>
+					<span class="off"><?php esc_html_e('DESACTIVADO', 'ai-knowledge'); ?></span>
+				</strong>
+			</div>
+			<p class="description"><?php esc_html_e('Modelos desactivados = los bots que has marcado como Bloquear en la tabla de crawlers.', 'ai-knowledge'); ?></p>
+			<ul class="wookb-visibility-effects">
+				<li><strong><?php esc_html_e('Activado:', 'ai-knowledge'); ?></strong> <?php esc_html_e('los bots bloqueados no pueden entrar en tu web, pero sí leen /llms.txt, el resumen que has preparado para ellos. Cualquier otra página les responde 404.', 'ai-knowledge'); ?></li>
+				<li><strong><?php esc_html_e('Desactivado:', 'ai-knowledge'); ?></strong> <?php esc_html_e('los bots bloqueados no pueden acceder a nada, ni siquiera a /llms.txt. Es un bloqueo total del sitio.', 'ai-knowledge'); ?></li>
+			</ul>
+			<p class="description"><?php esc_html_e('Este ajuste solo cambia las reglas propuestas para robots.txt y .htaccess. Nada se modifica en tu servidor hasta que tú lo apliques.', 'ai-knowledge'); ?></p>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
 	 * Resumen de estado (Negocio/WooCommerce/FAQ/Chatbot/documentos), extraido
 	 * del paso "finish" del asistente para reutilizarlo tambien en
 	 * admin/views/tab-carga-inicial.php -- SOLO consultas de lectura, ya
@@ -1267,25 +1386,25 @@ GEO;
 				break;
 			}
 		}
-		$summary_langs = Wpml::active_languages() ?: array('es');
+		// Cambio de comportamiento (2026-09-24): WooCommerce y FAQ ya solo se
+		// generan en el idioma principal (Store_Info_Doc::generate_all(),
+		// Llms_Faq vía assistant_save_step('faqs')), no por cada idioma
+		// activo -- un solo bloque cada uno, sin foreach por idioma.
+		$default_lang = Wpml::default_language();
 		$chatbot_synced = '' !== Chatbot_Prompt::read() && Chatbot_Prompt::is_genix_ready();
 		$doc_summary = Registry::summary();
 		ob_start();
 		?>
 		<div class="wookb-assistant-summary">
 			<p><strong><?php esc_html_e('Negocio:', 'ai-knowledge'); ?></strong> <?php echo $business_has_data ? esc_html__('Datos guardados.', 'ai-knowledge') : esc_html__('Todavía sin datos.', 'ai-knowledge'); ?></p>
-			<?php if (class_exists('WooCommerce')) : ?>
-				<?php foreach ($summary_langs as $wc_lang) :
-					$store_info_row = Registry::find(Store_Info_Doc::SOURCE_ID_STORE_INFO, $wc_lang);
-					$catalog_row = Registry::find(Store_Info_Doc::SOURCE_ID_SHOP_CATALOG, $wc_lang);
-					$wc_synced = ($store_info_row && $store_info_row->md_path) || ($catalog_row && $catalog_row->md_path);
-					?>
-					<p><strong><?php echo esc_html(sprintf(/* translators: %s: idioma */ __('WooCommerce (%s):', 'ai-knowledge'), count($summary_langs) > 1 ? strtoupper($wc_lang) : __('general', 'ai-knowledge'))); ?></strong> <?php echo $wc_synced ? esc_html__('Documentos generados.', 'ai-knowledge') : esc_html__('Todavía sin generar.', 'ai-knowledge'); ?></p>
-				<?php endforeach; ?>
+			<?php if (class_exists('WooCommerce')) :
+				$store_info_row = Registry::find(Store_Info_Doc::SOURCE_ID_STORE_INFO, $default_lang);
+				$catalog_row = Registry::find(Store_Info_Doc::SOURCE_ID_SHOP_CATALOG, $default_lang);
+				$wc_synced = ($store_info_row && $store_info_row->md_path) || ($catalog_row && $catalog_row->md_path);
+				?>
+				<p><strong><?php esc_html_e('WooCommerce:', 'ai-knowledge'); ?></strong> <?php echo $wc_synced ? esc_html__('Documentos generados.', 'ai-knowledge') : esc_html__('Todavía sin generar.', 'ai-knowledge'); ?></p>
 			<?php endif; ?>
-			<?php foreach ($summary_langs as $faq_summary_lang) : ?>
-				<p><strong><?php echo esc_html(sprintf(/* translators: %s: idioma */ __('FAQ (%s):', 'ai-knowledge'), count($summary_langs) > 1 ? strtoupper($faq_summary_lang) : __('general', 'ai-knowledge'))); ?></strong> <?php echo '' !== Llms_Faq::read($faq_summary_lang) ? esc_html__('Publicado.', 'ai-knowledge') : esc_html__('Todavía sin generar.', 'ai-knowledge'); ?></p>
-			<?php endforeach; ?>
+			<p><strong><?php esc_html_e('FAQ:', 'ai-knowledge'); ?></strong> <?php echo '' !== Llms_Faq::read($default_lang) ? esc_html__('Publicado.', 'ai-knowledge') : esc_html__('Todavía sin generar.', 'ai-knowledge'); ?></p>
 			<?php if (Chatbot_Prompt::is_genix_ready()) : ?>
 				<p><strong><?php esc_html_e('Chatbot:', 'ai-knowledge'); ?></strong> <?php echo $chatbot_synced ? esc_html__('Sincronizado con Genix.', 'ai-knowledge') : esc_html__('Todavía sin sincronizar.', 'ai-knowledge'); ?></p>
 			<?php endif; ?>
@@ -2541,20 +2660,18 @@ GEO;
 			}
 		}
 
-		Scope::update_settings(array('crawler_actions' => $actions));
+		$settings = array('crawler_actions' => $actions);
 
-		self::redirect('visibilidad-ia');
-	}
-
-	/** Guarda el modo de visibilidad aplicado a los bloques de crawler. */
-	public static function save_crawler_visibility()
-	{
-		self::verify('wookb_save_crawler_visibility');
-		$mode = isset($_POST['crawler_visibility_mode']) ? sanitize_key(wp_unslash($_POST['crawler_visibility_mode'])) : 'site'; // phpcs:ignore
-		if (! in_array($mode, array('site', 'llms_only'), true)) {
-			$mode = 'site';
+		// Interruptor "Incluir llms.txt para los modelos desactivados": va en el
+		// mismo formulario y se guarda junto a las acciones de cada bot. Solo se
+		// toca si viene en el POST, para no reiniciarlo a 'site' si faltara.
+		if (isset($_POST['crawler_visibility_mode'])) { // phpcs:ignore
+			$mode = sanitize_key(wp_unslash($_POST['crawler_visibility_mode'])); // phpcs:ignore
+			$settings['crawler_visibility_mode'] = in_array($mode, array('site', 'llms_only'), true) ? $mode : 'site';
 		}
-		Scope::update_settings(array('crawler_visibility_mode' => $mode));
+
+		Scope::update_settings($settings);
+
 		self::redirect('visibilidad-ia');
 	}
 
@@ -2667,14 +2784,28 @@ GEO;
 			wp_die(esc_html__('Antes de aplicar el bloqueo tienes que descargar la copia actual de .htaccess. Pulsa "Descargar copia actual" y vuelve a intentarlo.', 'ai-knowledge'));
 		}
 
-		if (! Htaccess_Guard::is_available()) {
-			wp_die(esc_html__('No se encontró un .htaccess editable en este servidor (nginx u otra configuración): usa el bloque de código manual en su lugar.', 'ai-knowledge'));
+		if (empty($_POST['wookb_htaccess_ack'])) {
+			wp_die(esc_html__('Marca la casilla de responsabilidad antes de reemplazar el .htaccess.', 'ai-knowledge'));
 		}
 
-		Htaccess_Guard::apply_actions(Crawler_Catalog::effective_actions(), Scope::settings()['crawler_visibility_mode']);
+		if (! Htaccess_Guard::is_available()) {
+			wp_die(esc_html__('No se puede modificar el .htaccess: no existe o el servidor no permite escribirlo. No se ha cambiado nada; usa el archivo preparado a mano.', 'ai-knowledge'));
+		}
+
+		$actions = Crawler_Catalog::effective_actions();
+		$mode = Scope::settings()['crawler_visibility_mode'];
+		$written = Htaccess_Guard::apply_actions($actions, $mode);
+		$verified = $written && Htaccess_Guard::managed_block_matches((string) file_get_contents(Htaccess_Guard::path()), $actions, $mode); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		if (! $verified) {
+			wp_die(esc_html__('No se pudo verificar la actualización del .htaccess. Comprueba los permisos y restaura tu copia si hace falta.', 'ai-knowledge'));
+		}
 		// Uso unico: la confirmacion de descarga solo vale para esta aplicacion.
 		Htaccess_Guard::clear_backup_confirmation();
 
+		if (! empty($_POST['wookb_return_assistant'])) {
+			wp_safe_redirect(admin_url('admin.php?page=ai-knowledge-assistant&step=server&wookb_notice=1'));
+			exit;
+		}
 		self::redirect('visibilidad-ia');
 	}
 

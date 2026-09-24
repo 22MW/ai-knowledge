@@ -2,6 +2,68 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [Sin publicar]
+
+## [1.3.0] - 2026-09-24
+
+### Identidad
+
+- Logo propio en el menú de WordPress y como icono del plugin en la pantalla
+  de actualizaciones.
+
+### Visibilidad IA
+
+- «Visibilidad para los bots bloqueados» pasa a ser un interruptor grande,
+  «Incluir llms.txt para los modelos desactivados», con el efecto explicado.
+  En la pestaña va antes de la tabla de crawlers y se guarda con «Guardar
+  configuración de crawlers» (recarga la página y actualiza las propuestas de
+  robots.txt y .htaccess). El asistente usa el mismo interruptor.
+- Nuevo botón «Reemplazar .htaccess» (pestaña y asistente): exige descargar la
+  copia actual y marcar una casilla de responsabilidad, comprueba los permisos
+  antes de escribir y no toca nada si no se puede. Solo cambia el bloque de
+  AI Knowledge; las reglas tuyas que choquen se comentan, no se borran.
+- La copia descargada de robots.txt y .htaccess deja de valer al recargar la
+  pantalla: hay que descargarla de nuevo (caduca a los 10 minutos).
+- «Archivo actual» y «Archivo completo después del cambio» de .htaccess van en
+  dos columnas, con el aviso de coincidencia justo encima, como robots.txt.
+  Los bloques de reemplazo llevan borde (azul en robots.txt, naranja en
+  .htaccess).
+
+### Productos WooCommerce
+
+- Los documentos de producto llevan un bloque "Datos de compra" generado por
+  código, sin IA, desde la base de datos: precio actual, precio anterior,
+  descuento, fecha fin de oferta y disponibilidad; envío (clase, peso,
+  dimensiones, si requiere envío); impuestos (estado, clase y tipo
+  aplicable); todas las variaciones (tope de 100) y los campos
+  personalizados elegidos en Configuración (también en otros tipos de
+  contenido). La IA solo redacta la descripción.
+- El hash de cambios incluye la parte estable de esos datos (sin cantidades
+  de stock): un cambio de peso, envío, impuestos o variaciones regenera el
+  documento; una venta no. Los productos ya generados se regenerarán una vez
+  al pulsar "Generar pendientes".
+- Corregido: los títulos salían con entidades HTML (`&#8211;` en vez de "–").
+
+### Schema, feeds y alcance
+
+- Corregido: con Rank Math activo el plugin seguía emitiendo su `Article`
+  porque comprobaba un módulo inexistente (`schema`; el real es
+  `rich-snippet`).
+- El feed de productos (`products.xml`) ya no se publica ni se anuncia en
+  `<head>` y `llms.txt` cuando `product` está fuera del alcance.
+
+### Asistente e idiomas
+
+- FAQ y documentos de tienda se generan solo en el idioma principal, con una
+  nota de los demás idiomas disponibles (también en el documento de Negocio).
+- Nuevo prompt de auditoría GEO (visibilidad técnica para IA), usado en el
+  primer y el último paso del asistente.
+- Cabecera del admin: "Ver llms.txt" y el modo oscuro quedan agrupados a la
+  derecha, y "Ver llms.txt" abre de verdad en pestaña nueva (antes el
+  script del modo oscuro interceptaba su clic y le cambiaba el texto).
+- Quitado el botón "Salir del asistente" de los pasos; queda solo el "Salir"
+  de la cabecera.
+
 ## [1.2.1] - 2026-09-24
 
 ### Asistente de configuración

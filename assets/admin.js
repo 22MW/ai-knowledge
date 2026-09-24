@@ -189,6 +189,14 @@
 		applyCrawlerFilters();
 	} );
 
+	// Interruptor "Incluir llms.txt para los modelos desactivados" (pestaña
+	// Visibilidad IA y asistente): actualiza la etiqueta ACTIVADO/DESACTIVADO al
+	// momento; el guardado lo hacen los botones de cada pantalla. Delegado en
+	// document: el asistente inyecta sus pasos por AJAX.
+	$( document ).on( 'change', '.wookb-visibility-switch input[type="checkbox"]', function () {
+		$( this ).closest( '.wookb-visibility-switch' ).toggleClass( 'is-on', this.checked );
+	} );
+
 	/**
 	 * Fase AJAX 1: guardados simples. El action del formulario se conserva
 	 * para que admin-post.php siga funcionando si JavaScript no esta activo.
@@ -203,8 +211,6 @@
 			'wookb_save_business_summary',
 			'wookb_save_woocommerce_settings',
 			'wookb_save_llms_faq',
-			'wookb_save_crawler_actions',
-			'wookb_save_crawler_visibility',
 			'wookb_generate_business_summary_draft',
 			'wookb_generate_faqs_draft',
 			'wookb_generate_prompt_draft',
@@ -459,6 +465,17 @@
 	 * al aplicar) -- esto es solo comodidad de interfaz, quitar el atributo
 	 * "disabled" aqui no salta esa comprobacion.
 	 */
+	// "Reemplazar .htaccess": el boton solo se habilita con la copia actual
+	// descargada (data-backup-ready) Y la casilla de responsabilidad marcada.
+	// El servidor vuelve a exigir ambas cosas.
+	window.wookbRefreshHtaccessApply = function () {
+		var ack = $( '[data-wookb-htaccess-ack]' ).is( ':checked' );
+		$( '[data-wookb-htaccess-apply]' ).each( function () {
+			$( this ).prop( 'disabled', ! ( ack && '1' === this.getAttribute( 'data-backup-ready' ) ) );
+		} );
+	};
+	$( document ).on( 'change', '[data-wookb-htaccess-ack]', window.wookbRefreshHtaccessApply );
+
 	$( function () {
 		$( '[data-wookb-copy-target]' ).on( 'click', function () {
 			var target = document.getElementById( $( this ).data( 'wookb-copy-target' ) );
@@ -501,7 +518,12 @@
 				// Descarga confirmada: habilita el boton "Aplicar" hermano sin
 				// recargar. El servidor ya marco el transient de confirmacion
 				// dentro de la misma peticion fetch de arriba.
-				$( '[data-wookb-apply="' + type + '"]' ).prop( 'disabled', false );
+				if ( 'htaccess' === type ) {
+					$( '[data-wookb-htaccess-apply]' ).attr( 'data-backup-ready', '1' );
+					window.wookbRefreshHtaccessApply();
+				} else {
+					$( '[data-wookb-apply="' + type + '"]' ).prop( 'disabled', false );
+				}
 				$( '[data-wookb-unlock-notice="' + type + '"]' ).hide();
 			} ).catch( function () {
 				// Si falla la descarga por fetch, se cae al comportamiento normal
@@ -538,12 +560,16 @@
 		e.stopImmediatePropagation();
 		var button = this, action = button.getAttribute('data-server-action');
 		if ('wookb_apply_robots_block' === action && !window.confirm('Confirma que ya descargaste la copia y quieres actualizar robots.txt.')) return false;
+		if ('wookb_apply_htaccess_block' === action) {
+			if (!$('[data-wookb-htaccess-ack]').is(':checked') || !window.confirm('Confirma que ya descargaste la copia y quieres reemplazar el .htaccess.')) return false;
+		}
+		if ('wookb_download_htaccess_backup' === action) { $('[data-wookb-htaccess-apply]').attr('data-backup-ready', '1'); window.wookbRefreshHtaccessApply(); }
 		if ('wookb_download_robots_backup' === action) $('[data-server-action="wookb_apply_robots_block"]').prop('disabled', false).removeAttr('disabled');
 		var detached = document.createElement('form');
 		detached.method = 'post';
 		detached.action = data.adminPostUrl;
 		detached.style.display = 'none';
-		[['action', action], ['_wpnonce', button.getAttribute('data-server-nonce')]].concat(button.getAttribute('data-return-assistant') ? [['wookb_return_assistant', '1']] : []).forEach(function (pair) { var input = document.createElement('input'); input.type = 'hidden'; input.name = pair[0]; input.value = pair[1]; detached.appendChild(input); });
+		[['action', action], ['_wpnonce', button.getAttribute('data-server-nonce')]].concat(button.getAttribute('data-return-assistant') ? [['wookb_return_assistant', '1']] : []).concat('wookb_apply_htaccess_block' === action ? [['wookb_htaccess_ack', '1']] : []).forEach(function (pair) { var input = document.createElement('input'); input.type = 'hidden'; input.name = pair[0]; input.value = pair[1]; detached.appendChild(input); });
 		document.body.appendChild(detached);
 		detached.submit();
 		return false;

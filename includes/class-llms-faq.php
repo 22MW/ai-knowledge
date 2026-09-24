@@ -150,8 +150,16 @@ class Llms_Faq {
 			return;
 		}
 
-		$title    = self::title();
-		$markdown = "# {$title}\n\n" . $content;
+		// Cambio de comportamiento confirmado por el usuario (2026-09-24): el
+		// FAQ ya solo se publica en el idioma principal (ver los llamadores
+		// de este metodo), no en cada idioma activo -- sin nota, una IA que
+		// lea este documento no sabria que el sitio existe en otros idiomas.
+		$title      = self::title();
+		$lang_note  = Wpml::languages_note( $lang );
+		$markdown   = "# {$title}\n\n" . $content;
+		if ( '' !== $lang_note ) {
+			$markdown .= "\n\n" . $lang_note;
+		}
 		$relative = Markdown_Store::write(
 			$lang,
 			'preguntas-frecuentes',

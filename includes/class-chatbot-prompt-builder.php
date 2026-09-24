@@ -211,6 +211,16 @@ class Chatbot_Prompt_Builder {
 			$lines[] = 'Contacto: ' . $answers['contacto'];
 		}
 
+		// Pedido explícito del usuario (2026-09-24): este documento no tiene
+		// versión por idioma (siempre es el mismo, en el idioma principal
+		// del sitio) -- sin esta nota, una IA que lo lea no sabría que el
+		// sitio existe también en otros idiomas.
+		$lang_note = class_exists( '\AIKB\Wpml' ) ? Wpml::languages_note( Wpml::default_language() ) : '';
+		if ( '' !== $lang_note ) {
+			$lines[] = '';
+			$lines[] = $lang_note;
+		}
+
 		$content = implode( "\n", $lines ) . "\n";
 
 		$dir = WP_CONTENT_DIR . '/llm';

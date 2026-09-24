@@ -135,9 +135,23 @@ final class Github_Updater {
 			'new_version' => $remote_version,
 			'url'         => 'https://github.com/' . self::REPO,
 			'package'     => $this->get_package_url( $release ),
+			'icons'       => $this->get_icons(),
 		);
 
 		return $transient;
+	}
+
+	/**
+	 * Icono del plugin para las pantallas de actualizaciones.
+	 *
+	 * @return array<string,string>
+	 */
+	private function get_icons(): array {
+		$url = AIKB_URL . 'assets/ai-knowledge-icon.svg';
+		return array(
+			'svg'     => $url,
+			'default' => $url,
+		);
 	}
 
 	/**
@@ -167,6 +181,7 @@ final class Github_Updater {
 		$info->requires      = '5.8';
 		$info->requires_php  = '7.4';
 		$info->download_link = $this->get_package_url( $release );
+		$info->icons         = $this->get_icons();
 		$info->sections      = array(
 			'description' => 'Genera documentos de base de conocimiento a partir de tu contenido y los publica para que buscadores y agentes de IA los entiendan.',
 			'changelog'   => $this->format_release_changelog( $release ),

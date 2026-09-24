@@ -176,6 +176,25 @@ class Scope {
 		return array_values( array_diff( (array) $settings['post_types'], array( 'sgkb-docs' ) ) );
 	}
 
+	/**
+	 * ¿Hay algo de este post_type dentro del alcance? True si el tipo está en
+	 * los tipos efectivos, o si algún ID forzado a incluir es de ese tipo
+	 * (misma regla que is_included()). Barato: sin WP_Query. Sirve para no
+	 * publicar ni anunciar salidas de un tipo que el admin ha excluido (p.ej.
+	 * el feed de productos con 'product' fuera del alcance).
+	 */
+	public static function has_post_type_in_scope( $post_type ) {
+		if ( in_array( $post_type, self::effective_post_types(), true ) ) {
+			return true;
+		}
+		foreach ( (array) self::settings()['id_actions'] as $post_id => $action ) {
+			if ( 'include' === $action && get_post_type( (int) $post_id ) === $post_type ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static function resolve_ids() {
 		$settings    = self::settings();
 		$post_types  = self::effective_post_types();

@@ -20,7 +20,12 @@ class Extractor_Base {
 		$data = array(
 			'id'          => $post_id,
 			'post_type'   => $post->post_type,
-			'title'       => get_the_title( $post_id ),
+			// get_the_title() pasa por wptexturize y devuelve entidades HTML
+			// (p.ej. &#8211; en vez de "–"): se decodifican para que el
+			// documento lleve el titulo real. Nota: compute_hash() incluye el
+			// titulo, asi que los documentos con guiones/comillas en el
+			// titulo cambian de hash y se regeneran la proxima vez.
+			'title'       => html_entity_decode( get_the_title( $post_id ), ENT_QUOTES, 'UTF-8' ),
 			'content'     => wp_strip_all_tags( $post->post_content ),
 			'excerpt'     => wp_strip_all_tags( $post->post_excerpt ),
 			'url'         => get_permalink( $post_id ),

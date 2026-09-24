@@ -233,6 +233,35 @@ class Document_Pipeline {
 			isset( $data['custom_fields'] ) ? wp_json_encode( $data['custom_fields'] ) : '',
 			$data['url'],
 		);
+
+		// Datos de compra (solo productos WooCommerce, bloque "Datos de
+		// compra" del documento): envio, impuestos, fecha de oferta, variaciones,
+		// SKU... Se anaden SOLO si el documento los tiene: un elemento extra
+		// vacio cambiaria igualmente el implode() y con ello el hash de TODAS las
+		// paginas/entradas, forzando una regeneracion con IA que no hace falta.
+		// Sin cantidades de stock (ver purchase_hash_subset()).
+		if ( isset( $data['purchase'] ) && is_array( $data['purchase'] ) ) {
+			$normalized[] = wp_json_encode( self::purchase_hash_subset( $data['purchase'] ) );
+		}
+
 		return hash( 'sha256', implode( '|', $normalized ) );
+	}
+
+	/**
+	 * Parte estable de $data['purchase'] para el hash: todo salvo las cantidades
+	 * de stock (del producto y de cada variacion). Cada venta cambia esa
+	 * cantidad, y si entrara en el hash cada compra regeneraria el documento
+	 * con una llamada de IA; el estado (en stock/agotado) si entra.
+	 */
+	protected static function purchase_hash_subset( array $purchase ) {
+		unset( $purchase['stock_quantity'] );
+		if ( ! empty( $purchase['variations'] ) && is_array( $purchase['variations'] ) ) {
+			foreach ( $purchase['variations'] as $i => $variation ) {
+				if ( is_array( $variation ) ) {
+					unset( $purchase['variations'][ $i ]['stock_quantity'] );
+				}
+			}
+		}
+		return $purchase;
 	}
 }
