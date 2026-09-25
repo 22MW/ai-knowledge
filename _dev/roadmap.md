@@ -1,6 +1,6 @@
 # Roadmap activo — AI Knowledge & Visibility
 
-Este documento contiene únicamente trabajo pendiente o por decidir. El historial de fases y rondas cerradas está en [`roadmap-historico.md`](roadmap-historico.md).
+Este documento contiene únicamente trabajo pendiente o por decidir. Lo cerrado está en [`temp/roadmap-historico.md`](temp/roadmap-historico.md).
 
 ## Pendiente de QA real
 
@@ -22,63 +22,59 @@ No presentar este flujo como validado hasta realizar esas pruebas.
 
 ## Pendiente de QA real — versión 1.3.0
 
-1. «Reemplazar .htaccess»: **probado en un servidor real** (2026-09-25, según
-   el usuario). Sin repetir salvo cambios.
-2. Documentos de producto: bloque «Datos de compra» con productos simples y
+1. Documentos de producto: bloque «Datos de compra» con productos simples y
    variables reales (precio, descuento, envío, impuestos, variaciones,
    campos personalizados).
-3. Asistente rediseñado: generación por paso, resumen y conexión de IA.
-4. Interruptor «Incluir llms.txt para los modelos desactivados»: guardado con
+2. Asistente rediseñado: generación por paso, resumen y conexión de IA.
+3. Interruptor «Incluir llms.txt para los modelos desactivados»: guardado con
    recarga y propuestas de robots.txt y .htaccess actualizadas.
-5. Logo del menú y del icono de actualización (solo se ve con una
+4. Logo del menú y del icono de actualización (solo se ve con una
    actualización pendiente).
-6. Constructores de página (Elementor u otros): no consta que el contenido
+5. Constructores de página (Elementor u otros): no consta que el contenido
    guardado fuera de `post_content` llegue al documento.
-7. Prueba visual de los catálogos de idioma (`ca`, `de_DE`, `en_US`, `eu`,
+6. Prueba visual de los catálogos de idioma (`ca`, `de_DE`, `en_US`, `eu`,
    `fr_FR`) con cada locale.
+
+## Pendiente — estrategia de idiomas
+
+La estrategia está implementada y probada con WPML real (docthinks, 2026-09-25).
+Falta:
+
+1. **Genix:** el chatbot responde «no tengo información» incluso en español con
+   los documentos correctos y publicados. Incidencia de Genix, aparte de los
+   idiomas. Después, comprobar el chatbot en inglés y en catalán con un único
+   documento por contenido (riesgo: la búsqueda de Genix filtra por el idioma
+   del visitante).
+2. **Comprobar con otros plugins de idiomas y otros escenarios:**
+   - Sitio sin plugin de idiomas: «Idiomas» de Negocio sin el check, línea del
+     idioma sin español fijo.
+   - Instalación antigua con documentos ya en varios idiomas: tras actualizar,
+     el check sale marcado y no cambia nada.
+   - Polylang: idiomas detectados, check, «Generar pendientes» con todos los
+     contenidos, `llms.txt` sin prefijo.
+   - TranslatePress: idiomas detectados, sin check, `/es/llms.txt` sirve lo
+     mismo que la raíz (el informe de supershippingwoo.com). Su API está escrita
+     de memoria de la documentación y no está verificada.
+3. Validar si las IA siguen de verdad los enlaces «Disponible en» (evidencia
+   débil sobre `hreflang`).
 
 ## Pendiente de publicación documental
 
-- Sustituir las 13 marcas `[SCREENSHOT]`/`[VIDEO]` de [`docs/`](docs/index.md) por medios reales antes de publicar la documentación.
+- Sustituir las 15 marcas `[SCREENSHOT]`/`[VIDEO]` de [`docs/`](docs/index.md) por medios reales antes de publicar la documentación.
 
 ## Pendiente de revisión Git
 
+- La versión 1.3.2 (estrategia de idiomas) está preparada en `knowBaseDev` pero sin
+  commitear ni publicar. El commit, el push y la release los decide el usuario.
 - Revisar el diff pendiente de `Scope::is_included()` junto al fix publicado de `tax_query` (`v1.1.0.1`) y decidir si se confirma commit y push. No se ha propuesto ni autorizado ninguna operación Git en este roadmap.
 
 ## Próximas mejoras, sin empezar
 
-### Internacionalización del plugin y documentación por idioma
+### Internacionalización del plugin
 
-Implementación local realizada; queda pendiente la prueba visual y la
-traducción lingüística real de los catálogos:
-
-- Crear `languages/ai-knowledge.pot` como plantilla universal.
-- Crear inicialmente `languages/ai-knowledge-es_ES.po`; el español es el
-  idioma base.
-- Revisar todos los textos visibles del plugin: PHP, JavaScript, botones,
-  errores, avisos y mensajes AJAX.
-- Internacionalizar los textos dinámicos de `assets/admin.js` y generar el
-  JSON de traducción JavaScript si WordPress lo necesita.
-- Mantener `docs/` como documentación base en español.
-- Permitir traducciones opcionales en `docs/{locale}/`, por ejemplo
-  `docs/en_US/` o `docs/fr_FR/`.
-- Si existe `docs/{locale}/archivo.md`, usarlo; si no existe, usar
-  `docs/archivo.md` como fallback.
-- No crear ahora copias traducidas de los `.md`, ni sustituir ni borrar la
-  documentación española.
-
-Implementado: `class-admin.php` selecciona `docs/{locale}/archivo.md` cuando
-existe y vuelve a `docs/archivo.md` cuando no existe; `admin.js` usa
-`wp.i18n`; el script se encola con `wp-i18n` y carga sus traducciones.
-
-Los catálogos `ca`, `de_DE`, `en_US`, `eu` y `fr_FR` están al día con las
-cadenas de la 1.3.0 (2026-09-25); los `.mo` y JSON JavaScript los genera el
-usuario. Pendiente únicamente el QA visual en WordPress con cada locale activo.
-
-### Visibilidad IA, reglas y `llms.txt`
-
-La implementación está cerrada y trasladada al histórico. Solo queda el QA
-real indicado arriba.
+Implementada. Queda el QA visual en WordPress con cada locale activo (`ca`,
+`de_DE`, `en_US`, `eu`, `fr_FR`) y los `.mo` y JSON JavaScript, que genera el
+usuario.
 
 ### Gestión avanzada de crawlers — pendiente de QA real
 
@@ -105,18 +101,6 @@ que WordPress sigue respondiendo correctamente.
 Plan en [`modo-wp-sin-ia.md`](modo-wp-sin-ia.md). Interruptor global IA/WP,
 opción A/B para ediciones, valor `auto_wp` en `override_mode` y badge
 `Auto · IA` / `Auto · WP`. Sin implementar.
-
-### Estrategia de idiomas
-
-Plan en [`estrategia-idiomas.md`](estrategia-idiomas.md): capa común para
-WPML, Polylang y TranslatePress, idioma principal desde Negocio y check
-«Crear por idioma». **Fases 0 a 6 implementadas (2026-09-25), sin commitear y
-sin probar.** Pendiente: ejecutar la matriz de pruebas, actualizar la guía de
-usuario (`docs/`) y decidir el commit. **Ajustes de la prueba en docthinks
-(`ajustes-idiomas-docthinks.md`) aplicados el 2026-09-25, sin probar**
-(pendiente: repetir la prueba con el check desmarcado y marcado). Sigue fuera de alcance el problema de
-TranslatePress del informe de supershippingwoo.com (problema 1) y los `.po`
-de los textos nuevos.
 
 ### Lado páginas del informe de incidencias
 
@@ -152,13 +136,8 @@ Hay estilos inline como `style="width:100%"` en varias vistas. Detectado, no abo
 
 ## Referencias
 
-- [`roadmap-historico.md`](roadmap-historico.md): fases, rondas y evidencia de trabajo cerrado.
+- [`temp/roadmap-historico.md`](temp/roadmap-historico.md): fases, rondas y evidencia de trabajo cerrado.
 - [`decisiones.md`](decisiones.md): decisiones permanentes.
 - [`contexto-activo.md`](contexto-activo.md): relevo de la tarea activa.
+- [`temp/estrategia-idiomas.md`](temp/estrategia-idiomas.md): plan y estado de la estrategia de idiomas.
 - [`docs/index.md`](../docs/index.md): índice de documentación del plugin.
-
-## Seguimiento de releases
-
-- Las releases 1.2.0 a 1.3.0 se han fusionado en `main` con el script sin
-  conflictos (2026-09-25); la divergencia histórica de la 1.1.1 ya no bloquea.
-  El script ya no sube un tag local (lo crea GitHub al crear la release).

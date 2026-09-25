@@ -20,6 +20,25 @@ datos, así que cuanto más completos estén, mejor saldrá.
 
 [SCREENSHOT: formulario de datos de negocio con varios campos rellenados]
 
+### Idioma principal e idiomas de la web
+
+En este mismo formulario (y en el paso Negocio del asistente) indicas el
+**idioma principal**: es el idioma en el que se generan tus documentos (el de
+cada contenido, `llms.txt`, las preguntas frecuentes, la tienda y este resumen).
+
+- Si usas un plugin de idiomas (WPML, Polylang o TranslatePress) se detectan
+  solos: el idioma principal se elige entre los que detecta y los demás salen
+  como texto informativo. Si no cambias nada, se sigue el idioma por defecto de
+  ese plugin.
+- Sin plugin de idiomas, el idioma principal es el de tu WordPress.
+- Puedes **añadir a mano otros idiomas** de tu web, uno por línea, con el
+  código y el nombre (por ejemplo `fr Français`). Sirven para el chatbot, para
+  `llms.txt` y para el resumen.
+
+Si cambias el idioma principal, aparece un aviso: pulsa **Reiniciar todo** en
+[Generación masiva](tab-generacion-masiva.md) para que los documentos ya
+generados se ajusten.
+
 ## 2. Resumen para llms.txt (con IA)
 
 Un resumen corto y público que se usa como carta de presentación de tu
@@ -56,8 +75,8 @@ instrucciones prevalecen sobre el formato por defecto.
 
 **¿Se puede tener el resumen en varios idiomas?**
 El resumen de negocio se genera en el idioma principal del sitio. Si tu web es
-multiidioma, el documento añade al final una nota con los demás idiomas en los
-que está disponible.
+multiidioma, el documento añade al final «Disponible en», con la portada de cada
+idioma.
 
 ---
 [Ver también: [Genix](tab-chatbot.md) · [FAQs](tab-faqs.md) · [Visibilidad IA](tab-visibilidad-ia.md)]

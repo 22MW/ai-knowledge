@@ -26,7 +26,8 @@ por título, además de elegir cuántas filas ver por página.
 
 ¿Un producto o página no tiene fila aquí todavía? Escribe su ID o pega su
 URL en el campo de arriba de todo y pulsa **"Generar ahora"**: se genera
-al instante, en todos los idiomas activos, sin esperar a la próxima
+al instante el documento de ese contenido (uno solo o, si tienes marcado
+«Crear por idioma», uno por cada versión que exista), sin esperar a la próxima
 ejecución automática.
 
 ## Acciones sobre cada documento

@@ -229,8 +229,10 @@ contenido) — no se forzó una invalidación especial para este cambio de códi
 - No se borran las filas antiguas de otros idiomas: es una limpieza con efecto
   en `/llms.txt` y la decide el usuario.
 - Estrategia global de idiomas (Negocio manda, apartado «Idiomas» en los `.md`,
-  check «Crear por idioma»): `_dev/estrategia-idiomas.md`. Implementada el
-  2026-09-25, sin probar.
+  check «Crear por idioma»): `_dev/temp/estrategia-idiomas.md`. Implementada y
+  probada con WPML real el 2026-09-25 (sustituye lo anterior de «Páginas y
+  productos siguen con un documento por idioma»: por defecto hay un documento
+  por contenido).
 
 ## 2026-09-24 — Datos de compra en productos
 - Precio, descuento, envío, impuestos, variaciones (tope 100) y campos
@@ -286,7 +288,7 @@ contenido) — no se forzó una invalidación especial para este cambio de códi
   de WordPress. Sin `es` fijo.
 - Cambiar el check o el idioma principal deja un aviso hasta usar «Reiniciar
   todo», que borra los `.md` por idioma y los puentes que sobran.
-- Detalle y decisiones menores en `_dev/estrategia-idiomas.md`.
+- Detalle y decisiones menores en `_dev/temp/estrategia-idiomas.md`.
 
 ## 2026-09-25 — Ajustes tras la prueba en docthinks (WPML)
 - Una sola función por proveedor da la URL de un contenido en SU idioma
@@ -311,3 +313,11 @@ contenido) — no se forzó una invalidación especial para este cambio de códi
   tienda, Negocio, artículos de Genix ni filas en modo manual.
 - Guardar de nuevo el paso FAQ del asistente regenera con IA (con el FAQ actual
   como referencia) y sustituye el publicado.
+
+## 2026-09-25 — Idiomas, tercera tanda
+- El selector de idiomas no tiene lista fija: principal entre los detectados (o
+  idioma de WordPress) y otros idiomas escritos a mano con su nombre.
+- «Crear por idioma» es un modo de generación: vive en Carga inicial junto a
+  «Reiniciar todo» (y en el asistente). Se mantiene la carpeta `llm/{idioma}/`.
+- El botón del editor no añade el tipo al alcance: incluye el ID del original
+  (y el propio con el check).

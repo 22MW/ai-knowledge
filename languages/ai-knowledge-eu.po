@@ -1,20 +1,21 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AI Knowledge & Visibility 1.1.2.2\n"
+"Project-Id-Version: AI Knowledge & Visibility 1.3.1.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/ai-knowledge\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-19T12:52:21+00:00\n"
-"PO-Revision-Date: 2026-09-19 17:19+0200\n"
+"POT-Creation-Date: 2026-09-25T17:23:08+00:00\n"
+"PO-Revision-Date: 2026-09-25 17:29+0000\n"
 "Language: eu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: ChatGPT\n"
 "X-Domain: ai-knowledge\n"
 
 #. Plugin Name of the plugin
+#: admin/class-admin.php:255
 msgid "AI Knowledge & Visibility"
 msgstr "AI Knowledge & Visibility"
 
@@ -31,169 +32,829 @@ msgstr "Ezagutza-baseko dokumentuak sortzen ditu (.md + Support Genix-en sgkb-do
 msgid "22MW"
 msgstr "22MW"
 
-#: admin/class-admin.php:93
-#: admin/class-admin.php:94
-#: admin/class-admin.php:191
-#: includes/class-editor-metabox.php:50
+#: admin/class-admin.php:125
+#: admin/class-admin.php:134
+#: admin/class-admin.php:135
+#: admin/class-admin.php:948
+#: includes/class-editor-metabox.php:72
 msgid "Base de conocimiento IA"
 msgstr "AA ezagutza-basea"
 
-#: admin/class-admin.php:134
-msgid "Registro"
-msgstr "Erregistroa"
+#: admin/class-admin.php:167
+#: admin/class-admin.php:275
+msgid "Asistente de configuración"
+msgstr "Konfigurazio-laguntzailea"
 
-#: admin/class-admin.php:135
-msgid "Contenido"
-msgstr "Edukia"
+#: admin/class-admin.php:168
+msgid "Asistente"
+msgstr "Laguntzailea"
 
-#: admin/class-admin.php:136
-#: admin/views/tab-woocommerce.php:270
+#: admin/class-admin.php:178
+msgid "Abrir asistente"
+msgstr "Ireki laguntzailea"
+
+#: admin/class-admin.php:202
+#: admin/class-admin.php:502
+#: admin/class-admin.php:666
+#: admin/class-admin.php:932
+#: admin/class-admin.php:1164
+#: includes/class-editor-metabox.php:83
+#: includes/class-editor-metabox.php:124
+msgid "No tienes permisos suficientes."
+msgstr "Ez duzu behar adina baimen."
+
+#: admin/class-admin.php:226
+#: admin/class-admin.php:528
+msgid "Guardado correctamente."
+msgstr "Ondo gorde da."
+
+#: admin/class-admin.php:255
+msgid "Versión %s"
+msgstr "Bertsioa %s"
+
+#: admin/class-admin.php:255
+msgid "Salir"
+msgstr "Irten"
+
+#: admin/class-admin.php:256
+msgid "Progreso del asistente"
+msgstr "Laguntzailearen aurrerapena"
+
+#: admin/class-admin.php:304
+msgid "Atrás"
+msgstr "Atzera"
+
+#: admin/class-admin.php:306
+msgid "Guardar configuración"
+msgstr "Gorde konfigurazioa"
+
+#: admin/class-admin.php:307
+msgid "Continuar"
+msgstr "Jarraitu"
+
+#: admin/class-admin.php:330
+msgid "Bienvenida"
+msgstr "Ongi etorri"
+
+#: admin/class-admin.php:330
+msgid "AI Knowledge convierte el contenido de tu sitio en documentos preparados para buscadores, asistentes y sistemas de inteligencia artificial. Este recorrido revisará contigo las decisiones principales sin borrar una configuración existente. Puedes saltar cualquier paso, salir cuando quieras y continuar más adelante desde el mismo punto."
+msgstr "AI Knowledge-k zure gunearen edukia bilatzaileentzat, laguntzaileentzat eta adimen artifizialeko sistementzat prestatutako dokumentu bihurtzen du. Ibilbide honek zurekin batera erabaki nagusiak berrikusiko ditu, dagoen konfiguraziorik ezabatu gabe. Edozein pausu saltatu, nahi duzunean irten eta geroago puntu beretik jarraitu dezakezu."
+
+#: admin/class-admin.php:331
+#: admin/class-admin.php:388
+#: admin/views/tab-ajustes.php:46
+msgid "Origen de IA"
+msgstr "AAren jatorria"
+
+#: admin/class-admin.php:331
+msgid "Elige el servicio que ayudará a redactar y mejorar los documentos. AI Knowledge utiliza las conexiones ya configuradas mediante los Conectores de WordPress o Support Genix y nunca guarda aquí sus claves. Si todavía no existe una conexión, puedes continuar sin IA y configurarla después: cada paso siguiente que genere contenido avisará si no hay conexión, sin bloquearte."
+msgstr "Aukeratu dokumentuak idazten eta hobetzen lagunduko duen zerbitzua. AI Knowledge-k WordPress Konektoreen edo Support Genix-en bidez jadanik konfiguratutako konexioak erabiltzen ditu, eta ez du inoiz zure gakorik hemen gordetzen. Konexiorik ez badago oraindik, AA gabe jarrai dezakezu eta geroago konfiguratu: eduki sortzen duen hurrengo pausu bakoitzak abisatuko dizu konexiorik ez badago, blokeatu gabe."
+
+#: admin/class-admin.php:332
+msgid "Límites de generación"
+msgstr "Sortze-mugak"
+
+#: admin/class-admin.php:332
+msgid "Comprueba el largo máximo del texto y los límites de generación antes de continuar: a partir de aquí, cada paso puede generar contenido real con IA en cuanto lo guardes."
+msgstr "Egiaztatu testuaren gehienezko luzera eta sortze-mugak jarraitu aurretik: hemendik aurrera, pausu bakoitzak AArekin eduki erreala sor dezake gordetzen duzun bezain laster."
+
+#: admin/class-admin.php:333
+msgid "Contenido y alcance"
+msgstr "Edukia eta irismena"
+
+#: admin/class-admin.php:333
+msgid "Selecciona los tipos de contenido público que deben formar parte de la base de conocimiento. La selección determina qué entradas, páginas, productos u otros contenidos podrán generar documentos. Al guardar, se encola la generación de todo lo que entre en el alcance. Las taxonomías, términos, identificadores y campos personalizados pueden configurarse después desde la pantalla Contenido del plugin."
+msgstr "Hautatu ezagutza-basean egon behar duten eduki mota publikoak. Hautaketa honek zehazten du zer sarrera, orrialde, produktu edo bestelako eduki dokumentu sor dezakeen. Gordetzean, irismenean sartzen den guztiaren sorkuntza ilaran jartzen da. Taxonomiak, terminoak, IDak eta eremu pertsonalizatuak geroago konfigura daitezke pluginaren Edukia pantailatik."
+
+#: admin/class-admin.php:334
+#: admin/class-admin.php:448
+#: admin/class-admin.php:871
+#: admin/views/tab-woocommerce.php:271
 msgid "Negocio"
 msgstr "Negozioa"
 
-#: admin/class-admin.php:137
-msgid "FAQs"
-msgstr "FAQak"
+#: admin/class-admin.php:334
+msgid "Añade la información estable que una IA necesita para comprender correctamente tu negocio: identidad, ubicación, público, contacto, horario y enfoque. Estos datos complementan el contenido del sitio y ayudan a producir respuestas coherentes sin inventar información."
+msgstr "Gehitu AA batek zure negozioa ondo ulertzeko behar duen informazio egonkorra: identitatea, kokapena, publikoa, kontaktua, ordutegia eta ikuspegia. Datu horiek gunearen edukia osatzen dute eta informazioa asmatu gabe erantzun koherenteak sortzen laguntzen dute."
 
-#: admin/class-admin.php:143
-#: admin/views/tab-ajustes.php:162
+#: admin/class-admin.php:335
+#: admin/class-admin.php:448
+#: admin/class-admin.php:878
 msgid "WooCommerce"
 msgstr "WooCommerce"
 
-#: admin/class-admin.php:148
+#: admin/class-admin.php:335
+msgid "Revisa los datos generales de la tienda, el país, la moneda, las condiciones de compra, la recogida, los plazos y el contacto. Al guardar, se generan los documentos de información de tienda si hay conexión de IA disponible. Los envíos, impuestos, pagos, categorías y otras opciones avanzadas pueden completarse después en una ventana nueva sin perder el progreso."
+msgstr "Berrikusi dendaren datu orokorrak, herrialdea, moneta, erosketa-baldintzak, jasotzea, epeak eta kontaktua. Gordetzean, dendaren informazio-dokumentuak sortzen dira AA konexioa eskuragarri badago. Bidalketak, zergak, ordainketak, kategoriak eta beste aukera aurreratu batzuk geroago leiho berri batean bete daitezke aurrerapena galdu gabe."
+
+#: admin/class-admin.php:336
+#: admin/class-admin.php:872
+msgid "FAQs"
+msgstr "FAQak"
+
+#: admin/class-admin.php:336
+msgid "Genera con IA las preguntas frecuentes públicas de tu negocio a partir de los datos ya introducidos, y las publica directamente en llms.txt. Este paso solo aparece si hay una conexión de IA disponible."
+msgstr "Sortu AArekin zure negozioaren galdera publiko maiztuak jadanik sartutako datuetatik, eta zuzenean argitaratu llms.txt-en. Pausu hau AA konexioa eskuragarri dagoenean bakarrik agertzen da."
+
+#: admin/class-admin.php:337
 msgid "Chatbot"
 msgstr "Chatbota"
 
-#: admin/class-admin.php:150
+#: admin/class-admin.php:337
+msgid "Configura cómo Support Genix utilizará la base de conocimiento, cuántos documentos relacionados podrá consultar y qué información adicional debe tener en cuenta. Al guardar, se sincroniza con Genix si hay conexión disponible. Este paso solo aparece cuando la integración está disponible."
+msgstr "Konfiguratu Support Genix-ek ezagutza-basea nola erabiliko duen, zenbat dokumentu erlazionatu kontsulta ahal izango dituen eta zer informazio gehigarri kontuan hartu behar duen. Gordetzean, Genixekin sinkronizatzen da konexioa eskuragarri badago. Pausu hau integrazioa eskuragarri dagoenean bakarrik agertzen da."
+
+#: admin/class-admin.php:338
+#: admin/class-admin.php:448
+#: admin/class-admin.php:894
 msgid "Visibilidad IA"
 msgstr "AA ikusgaitasuna"
 
-#: admin/class-admin.php:151
+#: admin/class-admin.php:338
+msgid "Decide qué familias de crawlers pueden acceder al sitio y cómo se gestiona su acceso a llms.txt. Al guardar, esta selección queda conservada para utilizarla en las reglas de visibilidad del plugin."
+msgstr "Erabaki zer crawler-familiak sartu ahal izango diren gunean eta nola kudeatzen den haien sarbidea llms.txt-era. Gordetzean, hautaketa hori gorde egiten da pluginaren ikusgarritasun-arauetan erabiltzeko."
+
+#: admin/class-admin.php:339
+msgid "Archivos del servidor"
+msgstr "Zerbitzariaren fitxategiak"
+
+#: admin/class-admin.php:339
+msgid "Comprueba si robots.txt y .htaccess difieren de la configuración guardada. Descarga las copias y las versiones preparadas; el asistente no muestra el código completo; reemplazar .htaccess exige copia descargada y una casilla de responsabilidad."
+msgstr "Egiaztatzen du robots.txt eta .htaccess gordetako konfiguraziotik desberdinak diren. Deskargatu kopiak eta prestatutako bertsioak; laguntzaileak ez du kode osoa erakusten; .htaccess ordezkatzeko deskargatutako kopia bat eta erantzukizun-laukia behar dira."
+
+#: admin/class-admin.php:340
+msgid "Resumen"
+msgstr "Laburpena"
+
+#: admin/class-admin.php:340
+msgid "Revisa el estado real de cada paso: qué se ha generado ya y qué queda pendiente. Puedes generar ahora los documentos que aún falten, o dejarlo para más tarde desde Generación masiva."
+msgstr "Berrikusi pausu bakoitzaren benetako egoera: zer sortu den jada eta zer dagoen zain. Falta diren dokumentuak orain sor ditzakezu, edo geroagorako utzi Sorkuntza masibotik."
+
+#: admin/class-admin.php:341
+msgid "Resumen final"
+msgstr "Amaierako laburpena"
+
+#: admin/class-admin.php:341
+msgid "La configuración del asistente ha terminado. Revisa el estado real de los documentos y accede directamente a las áreas principales del plugin."
+msgstr "Laguntzailearen konfigurazioa amaitu da. Berrikusi zure dokumentuen benetako egoera eta joan zuzenean pluginaren area nagusietara."
+
+#: admin/class-admin.php:366
+msgid "Las reglas de AI Knowledge en robots.txt son diferentes de la configuración guardada."
+msgstr "AI Knowledge-ren robots.txt-eko arauak gordetako konfiguraziotik desberdinak dira."
+
+#: admin/class-admin.php:366
+msgid "Las reglas de AI Knowledge en robots.txt coinciden con la configuración guardada."
+msgstr "AI Knowledge-ren robots.txt-eko arauak gordetako konfigurazioarekin bat datoz."
+
+#: admin/class-admin.php:367
+msgid "Descarga una copia actual antes de actualizar robots.txt con la versión preparada."
+msgstr "Deskargatu uneko kopia bat robots.txt prestatutako bertsioarekin eguneratu aurretik."
+
+#: admin/class-admin.php:368
+#: admin/views/tab-visibilidad-ia.php:383
+msgid "Descargar copia actual de robots.txt"
+msgstr "Deskargatu robots.txt-ren uneko kopia"
+
+#: admin/class-admin.php:368
+msgid "Actualizar robots.txt"
+msgstr "Eguneratu robots.txt"
+
+#: admin/class-admin.php:369
+msgid "Las reglas de AI Knowledge en .htaccess son diferentes de la configuración guardada."
+msgstr "AI Knowledge-ren .htaccess-eko arauak gordetako konfiguraziotik desberdinak dira."
+
+#: admin/class-admin.php:369
+msgid "Las reglas de AI Knowledge en .htaccess coinciden con la configuración guardada."
+msgstr "AI Knowledge-ren .htaccess-eko arauak gordetako konfigurazioarekin bat datoz."
+
+#: admin/class-admin.php:370
+msgid "Puedes reemplazar el .htaccess desde aquí: solo se cambia el bloque de AI Knowledge y tus reglas que choquen se comentan, no se borran. Descarga primero la copia actual y marca la casilla."
+msgstr ".htaccess hemendik ordezka dezakezu: AI Knowledge-ren blokea soilik aldatzen da eta talka egiten duten zure arauak iruzkin bihurtzen dira, ez dira ezabatzen. Deskargatu lehenik uneko kopia eta markatu laukia."
+
+#: admin/class-admin.php:371
+#: admin/views/tab-visibilidad-ia.php:421
+msgid "Descargar .htaccess preparado"
+msgstr "Deskargatu prestatutako .htaccess"
+
+#: admin/class-admin.php:372
+msgid "No se puede reemplazar el .htaccess: no existe o el servidor no permite escribirlo. No se ha intentado modificar nada; usa el archivo preparado a mano."
+msgstr "Ezin da .htaccess ordezkatu: ez dago edo zerbitzariak ez du idaztea onartzen. Ez da ezer aldatzen saiatu; erabili prestatutako fitxategia eskuz."
+
+#: admin/class-admin.php:373
+#: admin/views/tab-visibilidad-ia.php:435
+msgid "Descargar copia actual de .htaccess"
+msgstr "Deskargatu .htaccess-en uneko kopia"
+
+#: admin/class-admin.php:374
+#: admin/views/tab-visibilidad-ia.php:440
+msgid "Asumo toda la responsabilidad y sé lo que estoy haciendo."
+msgstr "Ardura osoa hartzen dut eta badakit zer ari naizen egiten."
+
+#: admin/class-admin.php:375
+#: admin/views/tab-visibilidad-ia.php:441
+msgid "Reemplazar .htaccess"
+msgstr "Ordezkatu .htaccess"
+
+#: admin/class-admin.php:376
+msgid "Comprobar cambios"
+msgstr "Egiaztatu aldaketak"
+
+#: admin/class-admin.php:380
+msgid "Comprueba tu sitio en un agente externo antes de configurar el plugin. Después de completar la configuración, repite la comprobación con este mismo prompt para comparar el resultado."
+msgstr "Egiaztatu zure gunea kanpoko agente batean plugina konfiguratu aurretik. Konfigurazioa amaitu ondoren, errepikatu egiaztapena prompt berarekin emaitza alderatzeko."
+
+#: admin/class-admin.php:380
+#: admin/class-admin.php:448
+msgid "Copiar Prompt"
+msgstr "Kopiatu prompta"
+
+#: admin/class-admin.php:381
+msgid "Qué revisaremos"
+msgstr "Zer berrikusiko dugun"
+
+#: admin/class-admin.php:381
+msgid "El origen de IA y el contenido que formará la base de conocimiento."
+msgstr "AAren jatorria eta ezagutza-basea osatuko duen edukia."
+
+#: admin/class-admin.php:381
+msgid "Los datos del negocio y las integraciones disponibles."
+msgstr "Negozioaren datuak eta eskuragarri dauden integrazioak."
+
+#: admin/class-admin.php:381
+msgid "La visibilidad para IA y los límites de generación."
+msgstr "AArako ikusgarritasuna eta sortze-mugak."
+
+#: admin/class-admin.php:384
+msgid "Conexión de IA disponible: los pasos siguientes podrán generar contenido real."
+msgstr "AA konexioa eskuragarri: hurrengo pausuek benetako edukia sortu ahal izango dute."
+
+#: admin/class-admin.php:386
+msgid "No se detecta ninguna conexión de IA activa todavía."
+msgstr "Oraindik ez da AA konexio aktiborik detektatu."
+
+#: admin/class-admin.php:386
+msgid "Puedes continuar sin problema: los pasos siguientes guardarán tus datos igual, pero no generarán contenido con IA hasta que conectes un origen (aquí, en Conectores de WordPress, o activando Support Genix) y vuelvas a guardar ese paso."
+msgstr "Arazorik gabe jarraitu dezakezu: hurrengo pausuek zure datuak gorde egingo dituzte hala ere, baina ez dute AArekin edukirik sortuko jatorri bat konektatu (hemen, WordPress Konektoreetan, edo Support Genix aktibatuz) eta pausu hori berriro gorde arte."
+
+#: admin/class-admin.php:388
+#: admin/views/tab-ajustes.php:51
+#: admin/views/tab-ajustes.php:59
+msgid "Support Genix"
+msgstr "Support Genix"
+
+#: admin/class-admin.php:388
+#: admin/views/tab-ajustes.php:49
+#: admin/views/tab-ajustes.php:59
+msgid "Conectores de WordPress"
+msgstr "WordPress konektoreak"
+
+#: admin/class-admin.php:388
+msgid "Modelo"
+msgstr "Modeloa"
+
+#: admin/class-admin.php:388
+#: admin/views/tab-ajustes.php:73
+msgid "Automático (recomendado)"
+msgstr "Automatikoa (gomendatua)"
+
+#: admin/class-admin.php:388
+msgid "Configurar Conectores de WordPress"
+msgstr "Konfiguratu WordPress Konektoreak"
+
+#: admin/class-admin.php:388
+msgid "Abrir Support Genix"
+msgstr "Ireki Support Genix"
+
+#: admin/class-admin.php:389
+msgid "Largo máximo del texto"
+msgstr "Testuaren gehienezko luzera"
+
+#: admin/class-admin.php:389
+msgid "Tokens de salida"
+msgstr "Irteerako tokenak"
+
+#: admin/class-admin.php:389
+msgid "Límite diario"
+msgstr "Eguneroko muga"
+
+#: admin/class-admin.php:389
+#: admin/views/tab-carga-inicial.php:78
+msgid "Tamaño de lote"
+msgstr "Lote-tamaina"
+
+#: admin/class-admin.php:389
+msgid "Sin límite diario"
+msgstr "Eguneroko mugarik gabe"
+
+#: admin/class-admin.php:389
+msgid "Avisar a IndexNow"
+msgstr "Abisatu IndexNow"
+
+#: admin/class-admin.php:391
+msgid "Tipos de contenido que quieres incluir"
+msgstr "Sartu nahi dituzun eduki motak"
+
+#: admin/class-admin.php:394
+#: admin/views/tab-woocommerce.php:81
+msgid "Nombre de la tienda"
+msgstr "Dendaren izena"
+
+#: admin/class-admin.php:394
+#: admin/views/tab-woocommerce.php:85
+msgid "Moneda"
+msgstr "Moneta"
+
+#: admin/class-admin.php:394
+#: admin/views/tab-woocommerce.php:89
+msgid "País base"
+msgstr "Oinarrizko herrialdea"
+
+#: admin/class-admin.php:394
+#: admin/views/tab-woocommerce.php:93
+msgid "Condiciones de venta"
+msgstr "Salmenta-baldintzak"
+
+#: admin/class-admin.php:394
+#: admin/views/tab-woocommerce.php:104
+msgid "Política de devoluciones"
+msgstr "Itzulketen politika"
+
+#: admin/class-admin.php:394
+#: admin/views/tab-woocommerce.php:256
+msgid "Plazo de entrega"
+msgstr "Entrega-epea"
+
+#: admin/class-admin.php:394
+msgid "Contacto y horario de la tienda"
+msgstr "Dendaren kontaktua eta ordutegia"
+
+#: admin/class-admin.php:394
+msgid "Recogida en tienda disponible"
+msgstr "Dendan jasotzea eskuragarri"
+
+#: admin/class-admin.php:395
+msgid "Límite de documentos relacionados"
+msgstr "Dokumentu erlazionatuen muga"
+
+#: admin/class-admin.php:404
+msgid "Al guardar este paso, se genera con IA y se publica de inmediato en llms.txt (excepción explícita de este paso del asistente a la norma habitual de revisar antes de publicar)."
+msgstr "Pausu hau gordetzean, AArekin sortzen da eta berehala argitaratzen llms.txt-en (salbuespen esplizitua, laguntzailearen pausu honetarako bakarrik, argitaratu aurretik berrikusteko ohiko arauari)."
+
+#: admin/class-admin.php:405
+#: includes/class-llms-faq.php:109
+msgid "Preguntas frecuentes"
+msgstr "Ohiko galderak"
+
+#. translators: %s: fecha y hora de generación
+#: admin/class-admin.php:412
+msgid "Ya hay un FAQ publicado en llms.txt (generado el %s). Al guardar este paso otra vez (con «Guardar configuración» o «Continuar»), la IA vuelve a redactarlo tomando este texto como referencia y el resultado sustituye al publicado: puede cambiar. Para conservar el actual, sal del paso con «Atrás» o desde el progreso, sin guardar."
+msgstr "llms.txt-n FAQ bat argitaratuta dago jada (%s data honetan sortua). Urrats hau berriro gordetzen baduzu («Gorde konfigurazioa» edo «Jarraitu» erabiliz), AAk berriro idatziko du testu hau erreferentziatzat hartuta, eta emaitzak argitaratutakoa ordezkatuko du: alda daiteke. Egungoa mantentzeko, atera urratsetik «Atzera» erabiliz edo aurrerapenetik, gorde gabe."
+
+#: admin/class-admin.php:413
+msgid "Ya hay un FAQ publicado en llms.txt. Al guardar este paso otra vez (con «Guardar configuración» o «Continuar»), la IA vuelve a redactarlo tomando este texto como referencia y el resultado sustituye al publicado: puede cambiar. Para conservar el actual, sal del paso con «Atrás» o desde el progreso, sin guardar."
+msgstr "llms.txt-n FAQ bat argitaratuta dago jada. Urrats hau berriro gordetzen baduzu («Gorde konfigurazioa» edo «Jarraitu» erabiliz), AAk berriro idatziko du testu hau erreferentziatzat hartuta, eta emaitzak argitaratutakoa ordezkatuko du: alda daiteke. Egungoa mantentzeko, atera urratsetik «Atzera» erabiliz edo aurrerapenetik, gorde gabe."
+
+#: admin/class-admin.php:416
+msgid "Todavía no hay FAQ generado para este idioma."
+msgstr "Hizkuntza honetarako ez dago oraindik FAQrik sortuta."
+
+#: admin/class-admin.php:424
+msgid "Categorías de crawlers"
+msgstr "Crawler kategoriak"
+
+#: admin/class-admin.php:425
+msgid "Permitir todos"
+msgstr "Baimendu guztiak"
+
+#: admin/class-admin.php:425
+msgid "Bloquear todos"
+msgstr "Blokeatu guztiak"
+
+#: admin/class-admin.php:426
+#: admin/views/tab-visibilidad-ia.php:338
+msgid "Permitir"
+msgstr "Baimendu"
+
+#: admin/class-admin.php:426
+#: admin/views/tab-visibilidad-ia.php:339
+msgid "Bloquear"
+msgstr "Blokeatu"
+
+#: admin/class-admin.php:427
+msgid "Acceso de crawlers bloqueados a llms.txt"
+msgstr "Blokeatutako crawlerren sarbidea llms.txt-era"
+
+#: admin/class-admin.php:427
+msgid "Robots.txt y .htaccess"
+msgstr "Robots.txt eta .htaccess"
+
+#: admin/class-admin.php:427
+msgid "La política que guardes aquí sirve como base para preparar las reglas de robots.txt y .htaccess. Esos archivos se gestionan después desde la pantalla Visibilidad IA, donde puedes revisar el contenido antes de aplicarlo."
+msgstr "Hemen gordetzen duzun politikak robots.txt eta .htaccess arauak prestatzeko oinarri gisa balio du. Fitxategi horiek gero AA Ikusgarritasuna pantailatik kudeatzen dira, non edukia aplikatu aurretik berrikusi ahal izango duzun."
+
+#: admin/class-admin.php:448
+#: admin/class-admin.php:1423
+msgid "Documentos registrados:"
+msgstr "Erregistratutako dokumentuak:"
+
+#: admin/class-admin.php:448
+#: admin/class-admin.php:1424
+msgid "Documentos pendientes:"
+msgstr "Zain dauden dokumentuak:"
+
+#: admin/class-admin.php:448
+msgid "Pasos omitidos:"
+msgstr "Saltatutako pausuak:"
+
+#: admin/class-admin.php:448
+#: includes/class-no-language-plugin.php:23
+msgid "Ninguno"
+msgstr "Bat ere ez"
+
+#: admin/class-admin.php:448
+#: admin/class-admin.php:949
+#: admin/views/tab-visibilidad-ia.php:137
+msgid "Ver llms.txt"
+msgstr "Ikusi llms.txt"
+
+#: admin/class-admin.php:448
+msgid "Recomendamos comprobar este prompt en un agente externo para verificar el funcionamiento del plugin y la visibilidad de tu web."
+msgstr "Prompt hau kanpoko agente batean egiaztatzea gomendatzen dugu, pluginaren funtzionamendua eta zure gunearen ikusgarritasuna egiaztatzeko."
+
+#: admin/class-admin.php:448
+#: admin/class-admin.php:869
+msgid "Registro"
+msgstr "Erregistroa"
+
+#: admin/class-admin.php:448
+#: admin/class-admin.php:870
+#: admin/class-registry-table.php:344
+msgid "Contenido"
+msgstr "Edukia"
+
+#: admin/class-admin.php:448
+#: admin/class-admin.php:896
+msgid "Ajustes"
+msgstr "Ezarpenak"
+
+#: admin/class-admin.php:456
+#: admin/views/tab-visibilidad-ia.php:284
+msgid "Búsqueda/citas IA"
+msgstr "AA bilaketa/aipamenak"
+
+#: admin/class-admin.php:456
+#: admin/views/tab-visibilidad-ia.php:285
+msgid "Uso bajo demanda"
+msgstr "Eskaeraren araberako erabilera"
+
+#: admin/class-admin.php:457
+#: admin/views/tab-visibilidad-ia.php:286
+msgid "Entrenamiento de modelos"
+msgstr "Ereduen entrenamendua"
+
+#: admin/class-admin.php:457
+#: admin/views/tab-visibilidad-ia.php:287
+msgid "SEO y scraping"
+msgstr "SEO eta scraping-a"
+
+#: admin/class-admin.php:458
+#: admin/views/tab-visibilidad-ia.php:290
+msgid "Archivado y datasets"
+msgstr "Artxibatzea eta datasetak"
+
+#: admin/class-admin.php:458
+#: admin/views/tab-visibilidad-ia.php:288
+msgid "Scanners de seguridad"
+msgstr "Segurtasun-eskanerrak"
+
+#: admin/class-admin.php:459
+#: admin/views/tab-visibilidad-ia.php:289
+msgid "Buscadores tradicionales"
+msgstr "Bilatzaile tradizionalak"
+
+#: admin/class-admin.php:507
+msgid "Paso no válido."
+msgstr "Pausu baliogabea."
+
+#: admin/class-admin.php:892
+msgid "Genix"
+msgstr "Genix"
+
+#: admin/class-admin.php:895
 #: admin/views/tab-ajustes.php:26
 msgid "Generación masiva"
 msgstr "Sorkuntza masiboa"
 
-#: admin/class-admin.php:152
-msgid "Ajustes"
-msgstr "Ezarpenak"
-
-#: admin/class-admin.php:175
-#: admin/class-admin.php:407
-#: includes/class-editor-metabox.php:61
-#: includes/class-editor-metabox.php:102
-msgid "No tienes permisos suficientes."
-msgstr "Ez duzu behar adina baimen."
-
-#: admin/class-admin.php:192
+#: admin/class-admin.php:949
 msgid "Modo oscuro"
 msgstr "Modu iluna"
 
-#: admin/class-admin.php:197
-#: admin/class-admin.php:417
-#: assets/admin.js:170
+#: admin/class-admin.php:954
+#: admin/class-admin.php:1174
+#: admin/class-admin.php:2103
+#: admin/class-admin.php:2464
+#: admin/class-admin.php:2583
+#: admin/class-admin.php:2728
+#: assets/admin.js:293
 msgid "Guardado."
 msgstr "Gordeta."
 
-#: admin/class-admin.php:229
+#: admin/class-admin.php:986
 msgid "Leer documentación"
 msgstr "Irakurri dokumentazioa"
 
-#: admin/class-admin.php:257
-#: assets/admin.js:253
+#: admin/class-admin.php:1014
+#: includes/class-llms-txt.php:176
+#: assets/admin.js:415
 msgid "Documentación"
 msgstr "Dokumentazioa"
 
-#: admin/class-admin.php:261
+#: admin/class-admin.php:1018
 msgid "Cerrar documentación"
 msgstr "Itxi dokumentazioa"
 
-#: admin/class-admin.php:398
+#: admin/class-admin.php:1155
 msgid "Total de documentos:"
 msgstr "Dokumentuak guztira:"
 
-#: admin/class-admin.php:753
+#: admin/class-admin.php:1367
+msgid "Incluir llms.txt para los modelos desactivados"
+msgstr "Sartu llms.txt desgaitutako ereduentzat"
+
+#: admin/class-admin.php:1370
+msgid "ACTIVADO"
+msgstr "GAITUTA"
+
+#: admin/class-admin.php:1371
+msgid "DESACTIVADO"
+msgstr "GAITUGABETUTA"
+
+#: admin/class-admin.php:1374
+msgid "Modelos desactivados = los bots que has marcado como Bloquear en la tabla de crawlers."
+msgstr "Desgaitutako ereduak = crawler-en taulan Blokeatu gisa markatu dituzun botak."
+
+#: admin/class-admin.php:1376
+msgid "Activado:"
+msgstr "Gaituta:"
+
+#: admin/class-admin.php:1376
+msgid "los bots bloqueados no pueden entrar en tu web, pero sí leen /llms.txt, el resumen que has preparado para ellos. Cualquier otra página les responde 404."
+msgstr "blokeatutako botek ezin dute zure webgunean sartu, baina /llms.txt irakurtzen dute, haientzat prestatu duzun laburpena. Beste edozein orrik 404 erantzuten die."
+
+#: admin/class-admin.php:1377
+msgid "Desactivado:"
+msgstr "Gaitugabetuta:"
+
+#: admin/class-admin.php:1377
+msgid "los bots bloqueados no pueden acceder a nada, ni siquiera a /llms.txt. Es un bloqueo total del sitio."
+msgstr "blokeatutako botek ezin dute ezer atzitu, ezta /llms.txt ere. Guneko blokeo osoa da."
+
+#: admin/class-admin.php:1379
+msgid "Este ajuste solo cambia las reglas propuestas para robots.txt y .htaccess. Nada se modifica en tu servidor hasta que tú lo apliques."
+msgstr "Doikuntza honek robots.txt eta .htaccess-erako proposatutako arauak soilik aldatzen ditu. Ez da ezer aldatzen zure zerbitzarian zuk aplikatu arte."
+
+#: admin/class-admin.php:1411
+msgid "Negocio:"
+msgstr "Negozioa:"
+
+#: admin/class-admin.php:1411
+msgid "Datos guardados."
+msgstr "Datuak gordeta."
+
+#: admin/class-admin.php:1411
+msgid "Todavía sin datos."
+msgstr "Oraindik datu gabe."
+
+#: admin/class-admin.php:1417
+msgid "WooCommerce:"
+msgstr "WooCommerce:"
+
+#: admin/class-admin.php:1417
+msgid "Documentos generados."
+msgstr "Dokumentuak sortuta."
+
+#: admin/class-admin.php:1417
+#: admin/class-admin.php:1419
+msgid "Todavía sin generar."
+msgstr "Oraindik sortu gabe."
+
+#: admin/class-admin.php:1419
+msgid "FAQ:"
+msgstr "FAQ:"
+
+#: admin/class-admin.php:1419
+msgid "Publicado."
+msgstr "Argitaratuta."
+
+#: admin/class-admin.php:1421
+msgid "Chatbot:"
+msgstr "Chatbota:"
+
+#: admin/class-admin.php:1421
+msgid "Sincronizado con Genix."
+msgstr "Genixekin sinkronizatuta."
+
+#: admin/class-admin.php:1421
+msgid "Todavía sin sincronizar."
+msgstr "Oraindik sinkronizatu gabe."
+
+#: admin/class-admin.php:1459
+msgid "fr Français"
+msgstr "fr Français"
+
+#. translators: %s: idiomas detectados
+#: admin/class-admin.php:1461
+msgid "Detectados por tu plugin de idiomas: %s."
+msgstr "Zure hizkuntza-pluginak detektatuak: %s."
+
+#: admin/class-admin.php:1465
+msgid "Es el idioma de los documentos que genera el plugin (llms.txt, FAQ, tienda, Negocio y el .md de cada contenido). Se elige entre los idiomas que detecta tu plugin de idiomas."
+msgstr "Pluginak sortzen dituen dokumentuen hizkuntza da (llms.txt, FAQ, denda, Negozioa eta eduki bakoitzaren .md). Zure hizkuntza-pluginak detektatzen dituen hizkuntzen artean aukeratzen da."
+
+#: admin/class-admin.php:1466
+msgid "Es el idioma de los documentos que genera el plugin (llms.txt, FAQ, tienda, Negocio y el .md de cada contenido). Sin plugin de idiomas es el idioma de WordPress."
+msgstr "Pluginak sortzen dituen dokumentuen hizkuntza da (llms.txt, FAQ, denda, Negozioa eta eduki bakoitzaren .md). Hizkuntza-plugin gabe, WordPressen hizkuntza da."
+
+#: admin/class-admin.php:1467
+msgid "Otros idiomas de la web que quieras añadir a mano: uno por línea, con el código y el nombre (por ejemplo «fr Français»). Se usan para el prompt del chatbot, llms.txt y el resumen."
+msgstr "Eskuz gehitu nahi dituzun webguneko beste hizkuntzak: bat lerroko, kodearekin eta izenarekin (adibidez, «fr Français»). Chatbotaren promptean, llms.txt-n eta laburpenean erabiltzen dira."
+
+#: admin/class-admin.php:1470
+#: admin/class-admin.php:1473
+msgid "Idioma principal"
+msgstr "Hizkuntza nagusia"
+
+#: admin/class-admin.php:1471
+#: admin/class-admin.php:1474
+#: includes/class-chatbot-prompt-builder.php:254
+#: includes/class-chatbot-prompt-builder.php:308
+#: includes/class-chatbot-prompt-builder.php:475
+msgid "Idiomas de la web"
+msgstr "Webguneko hizkuntzak"
+
+#: admin/class-admin.php:1491
+msgid "Crear por idioma"
+msgstr "Sortu hizkuntza bakoitzeko"
+
+#. translators: %s: nombre del plugin de idiomas, p. ej. WPML
+#: admin/class-admin.php:1496
+msgid "Tu plugin de idiomas (%s) crea un contenido distinto por idioma. Desmarcado (recomendado): un solo .md por contenido, en el idioma principal, y todas las traducciones lo enlazan. Marcado: además se crea un .md por cada traducción que exista (sin documentos puente). Genix sigue este ajuste. Al cambiarlo, pulsa «Reiniciar todo» para borrar y regenerar lo que ya no corresponda."
+msgstr "Zure hizkuntza-pluginak (%s) eduki bereizia sortzen du hizkuntza bakoitzeko. Markatu gabe (gomendatua): .md bakarra eduki bakoitzeko, hizkuntza nagusian, eta itzulpen guztiek hara estekatzen dute. Markatuta: horrez gain, .md bat sortzen da dagoen itzulpen bakoitzeko (zubi-dokumenturik gabe). Genixek ezarpen hau jarraitzen du. Aldatu ondoren, sakatu «Berrabiarazi dena» dagokiona ez dena ezabatzeko eta berriro sortzeko."
+
+#: admin/class-admin.php:1508
+msgid "Crear un .md por cada traducción que exista"
+msgstr "Sortu .md bat dagoen itzulpen bakoitzeko"
+
+#: admin/class-admin.php:1511
+#: admin/views/tab-carga-inicial.php:86
+#: admin/views/tab-contenido.php:146
+#: admin/views/tab-negocio.php:43
+#: admin/views/tab-woocommerce.php:294
+msgid "Guardar"
+msgstr "Gorde"
+
+#: admin/class-admin.php:1533
+msgid "Has cambiado la configuración de idiomas. Para que los documentos ya generados se ajusten, pulsa «Reiniciar todo»: se borran los que ya no corresponden y se regenera el resto."
+msgstr "Hizkuntza-konfigurazioa aldatu duzu. Sortutako dokumentuak egokitu daitezen, sakatu «Berrabiarazi dena»: dagokienak ez direnak ezabatzen dira eta gainerakoa berriro sortzen da."
+
+#. translators: %d: número de documentos que se borrarán
+#: admin/class-admin.php:1556
+msgid "Esto va a REGENERAR también el contenido que ya está sincronizado y va a BORRAR %d documento que ya no corresponde (tipo de contenido fuera del alcance, documento puente o traducción sin «Crear por idioma»). No toca el FAQ, la tienda, Negocio, los artículos de Genix ni los documentos en modo manual. Gasta IA de más y no se puede deshacer. ¿Seguro que quieres continuar?"
+msgid_plural "Esto va a REGENERAR también el contenido que ya está sincronizado y va a BORRAR %d documentos que ya no corresponden (tipos de contenido fuera del alcance, documentos puente o traducciones sin «Crear por idioma»). No toca el FAQ, la tienda, Negocio, los artículos de Genix ni los documentos en modo manual. Gasta IA de más y no se puede deshacer. ¿Seguro que quieres continuar?"
+msgstr[0] "Honek dagoeneko sinkronizatuta dagoen edukia ere BERRIRO SORTUKO du eta ez dagokion %d dokumentu EZABATUKO du (irismenetik kanpoko eduki mota, zubi-dokumentua edo «Sortu hizkuntza bakoitzeko» gabeko itzulpena). Ez ditu ukitzen FAQa, denda, Negozioa, Genixen artikuluak ez eskuzko moduko dokumentuak. AA gehiago erabiltzen du eta ezin da desegin. Ziur jarraitu nahi duzula?"
+msgstr[1] "Honek dagoeneko sinkronizatuta dagoen edukia ere BERRIRO SORTUKO du eta ez dagozkien %d dokumentu EZABATUKO ditu (irismenetik kanpoko eduki motak, zubi-dokumentuak edo «Sortu hizkuntza bakoitzeko» gabeko itzulpenak). Ez ditu ukitzen FAQa, denda, Negozioa, Genixen artikuluak ez eskuzko moduko dokumentuak. AA gehiago erabiltzen du eta ezin da desegin. Ziur jarraitu nahi duzula?"
+
+#: admin/class-admin.php:1569
+msgid "Reiniciar todo"
+msgstr "Berrabiarazi dena"
+
+#: admin/class-admin.php:1581
+msgid "Generación en curso (procesando por lotes vía Action Scheduler)."
+msgstr "Sorkuntza martxan (loteka prozesatzen Action Scheduler bidez)."
+
+#: admin/class-admin.php:1585
+msgid "Cancelar generación"
+msgstr "Utzi sorkuntza"
+
+#: admin/class-admin.php:1590
+msgid "\"Generar pendientes\" es seguro repetirlo: no regenera lo que ya está sincronizado y sin cambios, solo lo nuevo o lo que falló."
+msgstr "\"Sortu zain daudenak\" lasai errepika daiteke: ez du berriro sortzen dagoeneko sinkronizatuta eta aldaketarik gabe dagoena; berria edo huts egin duena bakarrik."
+
+#: admin/class-admin.php:1595
+msgid "Generar pendientes"
+msgstr "Sortu zain daudenak"
+
+#: admin/class-admin.php:1738
+#: admin/class-admin.php:1740
+msgid "El origen de este documento ya no está publicado."
+msgstr "Dokumentu honen jatorria ez dago jada argitaratuta."
+
+#: admin/class-admin.php:1758
+msgid "Generado."
+msgstr "Sortuta."
+
+#: admin/class-admin.php:1819
 msgid "No se encontró ningún producto o página con ese ID/URL."
 msgstr "Ez da ID/URL hori duen produkturik edo orririk aurkitu."
 
-#: admin/class-admin.php:758
+#: admin/class-admin.php:1826
+msgid "Ese contenido no está publicado."
+msgstr "Eduki hori ez dago argitaratuta."
+
+#: admin/class-admin.php:1831
 msgid "Ese contenido no está dentro del alcance configurado del plugin (pestaña Alcance/Exclusiones)."
 msgstr "Eduki hori ez dago pluginerako konfiguratutako irismenaren barruan (Irismena/Bazterketak fitxa)."
 
-#: admin/class-admin.php:1009
-#: admin/class-admin.php:1067
+#: admin/class-admin.php:2133
+#: admin/class-admin.php:2191
 msgid "Borrador generado."
 msgstr "Zirriborroa sortuta."
 
-#: admin/class-admin.php:1045
-#: admin/class-admin.php:1047
-#: admin/class-admin.php:1112
+#: admin/class-admin.php:2169
+#: admin/class-admin.php:2171
+#: admin/class-admin.php:2236
 msgid "Esta acción requiere Support Genix activo."
 msgstr "Ekintza honek Support Genix aktibo egotea eskatzen du."
 
-#: admin/class-admin.php:1095
-#: admin/class-admin.php:1194
+#: admin/class-admin.php:2219
+#: admin/class-admin.php:2318
 msgid "Texto pulido."
 msgstr "Testua hobetu da."
 
-#: admin/class-admin.php:1280
+#: admin/class-admin.php:2398
 msgid "FAQ guardada."
 msgstr "FAQa gordeta."
 
-#: admin/class-admin.php:1314
+#: admin/class-admin.php:2432
 msgid "FAQ generada."
 msgstr "FAQa sortuta."
 
-#: admin/class-admin.php:1541
+#: admin/class-admin.php:2754
 msgid "Selección no válida: elige una de las opciones de la lista."
 msgstr "Hautaketa baliogabea: aukeratu zerrendako aukeretako bat."
 
-#: admin/class-admin.php:1547
+#: admin/class-admin.php:2760
 msgid "No se pudo resolver la URL pública de ese contenido."
 msgstr "Ezin izan da eduki horren URL publikoa ebatzi."
 
-#: admin/class-admin.php:1600
+#: admin/class-admin.php:2813
 msgid "Antes de sustituir llms.txt tienes que descargar la copia actual."
 msgstr "llms.txt ordezkatu aurretik uneko kopia deskargatu behar duzu."
 
-#: admin/class-admin.php:1603
+#: admin/class-admin.php:2816
 msgid "No se pudo escribir el llms.txt físico en la raíz del sitio."
 msgstr "Ezin izan da llms.txt fitxategi fisikoa gunearen erroan idatzi."
 
-#: admin/class-admin.php:1667
+#: admin/class-admin.php:2878
 msgid "No se pudo leer el robots.txt actual (ni físico ni virtual) para generar la copia de seguridad."
 msgstr "Ezin izan da uneko robots.txt irakurri (ez fisikoa, ez birtuala) segurtasun-kopia sortzeko."
 
-#: admin/class-admin.php:1694
+#: admin/class-admin.php:2905
 msgid "Antes de aplicar el bloqueo tienes que descargar la copia actual de robots.txt. Pulsa \"Descargar copia actual\" y vuelve a intentarlo."
 msgstr "Blokeoa aplikatu aurretik uneko robots.txt kopia deskargatu behar duzu. Sakatu \"Deskargatu uneko kopia\" eta saiatu berriro."
 
-#: admin/class-admin.php:1698
-#: admin/views/tab-visibilidad-ia.php:373
+#: admin/class-admin.php:2909
+#: admin/views/tab-visibilidad-ia.php:376
 msgid "robots.txt no es escribible en este servidor (permisos de la carpeta raíz)."
 msgstr "robots.txt ezin da zerbitzari honetan idatzi (erroko karpetaren baimenak)."
 
-#: admin/class-admin.php:1719
-#: admin/class-admin.php:1751
+#: admin/class-admin.php:2918
+msgid "No se pudo verificar la actualización de robots.txt. Comprueba los permisos de escritura de la raíz del sitio y vuelve a intentarlo."
+msgstr "Ezin izan da robots.txt-en eguneraketa egiaztatu. Egiaztatu gunearen erroaren idazteko baimenak eta saiatu berriro."
+
+#: admin/class-admin.php:2941
 msgid "No se encontró un .htaccess editable en este servidor (nginx u otra configuración): usa el bloque de código manual en su lugar."
 msgstr "Ez da .htaccess fitxategi editagarririk aurkitu zerbitzari honetan (nginx edo beste konfigurazio bat): erabili eskuzko kode-blokea haren ordez."
 
-#: admin/class-admin.php:1747
+#: admin/class-admin.php:2969
 msgid "Antes de aplicar el bloqueo tienes que descargar la copia actual de .htaccess. Pulsa \"Descargar copia actual\" y vuelve a intentarlo."
 msgstr "Blokeoa aplikatu aurretik uneko .htaccess kopia deskargatu behar duzu. Sakatu \"Deskargatu uneko kopia\" eta saiatu berriro."
 
+#: admin/class-admin.php:2973
+msgid "Marca la casilla de responsabilidad antes de reemplazar el .htaccess."
+msgstr "Markatu erantzukizun-laukia .htaccess ordezkatu aurretik."
+
+#: admin/class-admin.php:2977
+msgid "No se puede modificar el .htaccess: no existe o el servidor no permite escribirlo. No se ha cambiado nada; usa el archivo preparado a mano."
+msgstr "Ezin da .htaccess aldatu: ez dago edo zerbitzariak ez du idaztea onartzen. Ez da ezer aldatu; erabili prestatutako fitxategia eskuz."
+
+#: admin/class-admin.php:2985
+msgid "No se pudo verificar la actualización del .htaccess. Comprueba los permisos y restaura tu copia si hace falta."
+msgstr "Ezin izan da .htaccess-en eguneratzea egiaztatu. Egiaztatu baimenak eta leheneratu zure kopia beharrezkoa bada."
+
 #. translators: %d: numero de documentos con el origen actualizado desde que se fijaron a mano
-#: admin/class-admin.php:1795
+#: admin/class-admin.php:3031
 msgid "%d documento en modo manual tiene el origen actualizado desde que se fijó el texto. %s"
 msgid_plural "%d documentos en modo manual tienen el origen actualizado desde que se fijó el texto. %s"
 msgstr[0] "Eskuzko moduko %d dokumenturen jatorria eguneratu da testua finkatu zenetik. %s"
 msgstr[1] "Eskuzko moduko %d dokumenturen jatorria eguneratu da testua finkatu zenetik. %s"
 
-#: admin/class-admin.php:1797
+#: admin/class-admin.php:3033
 msgid "Revisar en el Registro"
 msgstr "Berrikusi Erregistroan"
 
 #. translators: %d: numero de documentos con el origen actualizado desde que se fijaron a mano
-#: admin/class-admin.php:1822
+#: admin/class-admin.php:3058
 msgid "KB IA: %d desactualizado(s)"
 msgstr "AA EB: %d zaharkituta"
 
@@ -217,103 +878,131 @@ msgstr "Errorea"
 msgid "Sin origen"
 msgstr "Jatorririk gabe"
 
-#: admin/class-registry-table.php:38
+#: admin/class-registry-table.php:58
 msgid "Origen"
 msgstr "Jatorria"
 
-#: admin/class-registry-table.php:45
+#: admin/class-registry-table.php:65
+#: admin/views/tab-prompt.php:130
 msgid "Idioma"
 msgstr "Hizkuntza"
 
-#: admin/class-registry-table.php:47
+#: admin/class-registry-table.php:67
+#: admin/views/tab-prompt.php:131
 msgid "Estado"
 msgstr "Egoera"
 
-#: admin/class-registry-table.php:48
+#: admin/class-registry-table.php:68
 msgid "Actualizado"
 msgstr "Eguneratuta"
 
-#: admin/class-registry-table.php:49
+#: admin/class-registry-table.php:69
 msgid "Enlaces"
 msgstr "Estekak"
 
-#: admin/class-registry-table.php:50
+#: admin/class-registry-table.php:70
 msgid "Control manual"
 msgstr "Eskuzko kontrola"
 
-#: admin/class-registry-table.php:51
+#: admin/class-registry-table.php:71
+#: admin/views/tab-prompt.php:132
 msgid "Acciones"
 msgstr "Ekintzak"
 
-#: admin/class-registry-table.php:112
+#: admin/class-registry-table.php:132
 msgid "Borrar seleccionados"
 msgstr "Ezabatu hautatutakoak"
 
-#: admin/class-registry-table.php:113
+#: admin/class-registry-table.php:133
 msgid "Regenerar seleccionados"
 msgstr "Birsortu hautatutakoak"
 
-#: admin/class-registry-table.php:226
+#: admin/class-registry-table.php:236
 msgid "Manual"
 msgstr "Eskuz"
 
-#: admin/class-registry-table.php:228
+#: admin/class-registry-table.php:238
 msgid "Auto"
 msgstr "Auto"
 
-#: admin/class-registry-table.php:231
+#: admin/class-registry-table.php:241
 msgid "Origen actualizado"
 msgstr "Jatorria eguneratuta"
 
-#: admin/class-registry-table.php:232
+#: admin/class-registry-table.php:242
 msgid "Marcar revisado"
 msgstr "Markatu berrikusita"
 
-#: admin/class-registry-table.php:290
+#: admin/class-registry-table.php:305
 msgid "Vuelve a modo automatico y regenera este documento con IA ahora mismo. ¿Continuar?"
 msgstr "Itzuli modu automatikora eta birsortu dokumentu hau AArekin orain. Jarraitu?"
 
-#: admin/class-registry-table.php:306
+#: admin/class-registry-table.php:326
 msgid "Ajustes avanzados"
 msgstr "Ezarpen aurreratuak"
 
-#: admin/class-registry-table.php:308
+#: admin/class-registry-table.php:328
 msgid "Puente:"
 msgstr "Zubia:"
 
-#: admin/class-registry-table.php:309
+#: admin/class-registry-table.php:329
 msgid "Sí"
 msgstr "Bai"
 
-#: admin/class-registry-table.php:311
+#: admin/class-registry-table.php:331
 msgid "Hash:"
 msgstr "Hasha:"
 
-#: admin/class-registry-table.php:317
+#: admin/class-registry-table.php:345
+msgid "Prompt"
+msgstr "Prompta"
+
+#: admin/class-registry-table.php:352
 msgid "Límite de caracteres"
 msgstr "Karaktere-muga"
 
-#: admin/class-registry-table.php:330
+#: admin/class-registry-table.php:365
 msgid "Guardar límite"
 msgstr "Gorde muga"
 
-#: admin/class-registry-table.php:331
+#: admin/class-registry-table.php:366
 msgid "Guardar cambios"
 msgstr "Gorde aldaketak"
 
-#: admin/class-registry-table.php:333
+#: admin/class-registry-table.php:368
+#: admin/class-registry-table.php:380
 msgid "Volver a Auto"
 msgstr "Itzuli Auto modura"
 
-#: admin/class-registry-table.php:373
+#: admin/class-registry-table.php:376
+msgid "Este documento está en modo Manual."
+msgstr "Dokumentu hau modu Eskuzkoan dago."
+
+#: admin/class-registry-table.php:377
+msgid "El texto está fijado a mano y nunca se regenera con IA, así que el prompt no tiene ningún efecto mientras esté en Manual. Pulsa \"Volver a Auto\" si quieres que vuelva a generarse con IA y usar el prompt."
+msgstr "Testua eskuz finkatuta dago eta ez da inoiz AArekin birsortzen, hortaz promptak ez du eraginik Eskuzkoan dagoen bitartean. Sakatu \"Itzuli Automatikora\" AArekin berriro sortzea eta prompta erabiltzea nahi baduzu."
+
+#: admin/class-registry-table.php:385
+msgid "Prompt para este documento"
+msgstr "Dokumentu honetarako prompta"
+
+#: admin/class-registry-table.php:387
+msgid "Instrucciones propias de este documento (estilo, enfoque). No sustituyen los datos reales del contenido: si está vacío, se usa el prompt genérico de siempre."
+msgstr "Dokumentu honi berari dagozkion jarraibideak (estiloa, ikuspegia). Ez dituzte edukiaren benetako datuak ordezten: hutsik utziz gero, betiko prompt generikoa erabiltzen da."
+
+#: admin/class-registry-table.php:391
+msgid "Guardar prompt"
+msgstr "Gorde prompta"
+
+#: admin/class-registry-table.php:431
 msgid "¿Borrar documento y post asociado? El origen se añadirá a \"IDs a excluir\" en Contenido, para que no se vuelva a generar solo (quítalo de esa lista si quieres que se vuelva a generar)."
 msgstr "Dokumentua eta lotutako argitalpena ezabatu? Jatorria Edukia ataleko \"Baztertu beharreko IDak\" zerrendara gehituko da, berriro automatikoki sor ez dadin (kendu zerrenda horretatik berriro sortzea nahi baduzu)."
 
-#: admin/class-registry-table.php:385
+#: admin/class-registry-table.php:443
 msgid "Generar"
 msgstr "Sortu"
 
-#: admin/class-registry-table.php:386
+#: admin/class-registry-table.php:444
 msgid "Borrar"
 msgstr "Ezabatu"
 
@@ -342,20 +1031,6 @@ msgstr "Irteerako tokenak dokumentuko"
 msgid "Techo técnico de la petición a la IA (para que la respuesta no se corte a mitad), no el largo del texto — eso lo controla el campo de arriba."
 msgstr "AAri egindako eskaeraren goi-muga teknikoa (erantzuna erdian moztu ez dadin), ez testuaren luzera — hori goiko eremuak kontrolatzen du."
 
-#: admin/views/tab-ajustes.php:46
-msgid "Origen de IA"
-msgstr "AAren jatorria"
-
-#: admin/views/tab-ajustes.php:49
-#: admin/views/tab-ajustes.php:59
-msgid "Conectores de WordPress"
-msgstr "WordPress konektoreak"
-
-#: admin/views/tab-ajustes.php:51
-#: admin/views/tab-ajustes.php:59
-msgid "Support Genix"
-msgstr "Support Genix"
-
 #. translators: %1$s modelo, %2$s origen
 #: admin/views/tab-ajustes.php:57
 msgid "Configuración activa: modelo %1$s, origen %2$s."
@@ -372,10 +1047,6 @@ msgstr "Hautatutako jatorria ez dago konektatuta."
 #: admin/views/tab-ajustes.php:70
 msgid "Modelo de WordPress"
 msgstr "WordPress eredua"
-
-#: admin/views/tab-ajustes.php:73
-msgid "Automático (recomendado)"
-msgstr "Automatikoa (gomendatua)"
 
 #: admin/views/tab-ajustes.php:91
 msgid "No hay modelos compatibles conectados todavía."
@@ -414,205 +1085,150 @@ msgstr "Gunearen gakoa (automatikoki sortua): %s"
 msgid "Guardar ajustes"
 msgstr "Gorde ezarpenak"
 
-#. translators: %s: enlace a la pestaña Prompt
-#: admin/views/tab-ajustes.php:148
-msgid "El prompt de sistema del chatbot se gestiona en la pestaña %s."
-msgstr "Chatbotaren sistema-prompta %s fitxan kudeatzen da."
-
-#: admin/views/tab-ajustes.php:149
-msgid "Prompt"
-msgstr "Prompta"
-
-#. translators: %s: enlace a la pestaña WooCommerce
-#: admin/views/tab-ajustes.php:161
-msgid "Los documentos de información de tienda (cómo comprar, condiciones, envío, pago, impuestos) se generan desde la pestaña %s."
-msgstr "Dendaren informazio-dokumentuak (nola erosi, baldintzak, bidalketa, ordainketa, zergak) %s fitxatik sortzen dira."
-
 #: admin/views/tab-carga-inicial.php:16
 msgid "Genera de golpe los documentos de todo el contenido dentro del alcance, y ajusta aquí el límite diario, el tamaño de lote y el debounce de la cola."
 msgstr "Sortu kolpe batean irismeneko eduki guztiaren dokumentuak, eta doitu hemen eguneroko muga, lote-tamaina eta ilararen debounce-a."
 
-#. translators: 1: nº elementos, 2: nº idiomas, 3: total documentos
-#: admin/views/tab-carga-inicial.php:23
-msgid "Alcance actual: %1$d elementos × %2$d idiomas = %3$d documentos posibles."
-msgstr "Uneko irismena: %1$d elementu × %2$d hizkuntza = %3$d dokumentu posible."
+#. translators: %d: total de documentos posibles
+#: admin/views/tab-carga-inicial.php:24
+msgid "Alcance actual: %d documento posible."
+msgid_plural "Alcance actual: %d documentos posibles."
+msgstr[0] "Uneko irismena: %d dokumentu posible."
+msgstr[1] "Uneko irismena: %d dokumentu posible."
 
-#: admin/views/tab-carga-inicial.php:30
+#: admin/views/tab-carga-inicial.php:29
 msgid "Documentos ya sincronizados: %d."
 msgstr "Dagoeneko sinkronizatutako dokumentuak: %d."
 
-#: admin/views/tab-carga-inicial.php:32
+#: admin/views/tab-carga-inicial.php:31
 msgid "El límite diario está desactivado — la generación avanzará sin tope."
 msgstr "Eguneroko muga desgaituta dago — sorkuntzak mugarik gabe egingo du aurrera."
 
-#: admin/views/tab-carga-inicial.php:34
+#: admin/views/tab-carga-inicial.php:33
 msgid "Límite diario actual: %d generaciones/día."
 msgstr "Uneko eguneroko muga: %d sorkuntza/egun."
 
-#: admin/views/tab-carga-inicial.php:38
-msgid "Generación en curso (procesando por lotes vía Action Scheduler)."
-msgstr "Sorkuntza martxan (loteka prozesatzen Action Scheduler bidez)."
-
-#: admin/views/tab-carga-inicial.php:42
-msgid "Cancelar generación"
-msgstr "Utzi sorkuntza"
-
-#: admin/views/tab-carga-inicial.php:45
-msgid "\"Generar pendientes\" es seguro repetirlo: no regenera lo que ya está sincronizado y sin cambios, solo lo nuevo o lo que falló."
-msgstr "\"Sortu zain daudenak\" lasai errepika daiteke: ez du berriro sortzen dagoeneko sinkronizatuta eta aldaketarik gabe dagoena; berria edo huts egin duena bakarrik."
-
-#: admin/views/tab-carga-inicial.php:50
-msgid "Generar pendientes"
-msgstr "Sortu zain daudenak"
-
-#: admin/views/tab-carga-inicial.php:52
-msgid "Esto va a REGENERAR también el contenido que ya está sincronizado, no solo lo pendiente. Gasta IA de más y no se puede deshacer. ¿Seguro que quieres continuar?"
-msgstr "Honek dagoeneko sinkronizatuta dagoen edukia ere BIRSORTUKO du, ez bakarrik zain dagoena. AA gehiago kontsumitzen du eta ezin da desegin. Ziur jarraitu nahi duzula?"
-
-#: admin/views/tab-carga-inicial.php:55
-msgid "Reiniciar todo"
-msgstr "Berrabiarazi dena"
-
-#: admin/views/tab-carga-inicial.php:61
+#: admin/views/tab-carga-inicial.php:54
 msgid "Revisa la pestaña Registro para ver el progreso, o Herramientas → Scheduled Actions (grupo woo-kb) para el detalle técnico."
 msgstr "Berrikusi Erregistroa fitxa aurrerapena ikusteko, edo Tresnak → Scheduled Actions (woo-kb taldea) xehetasun teknikoetarako."
 
-#: admin/views/tab-carga-inicial.php:66
+#: admin/views/tab-carga-inicial.php:59
 msgid "Ajustes de la cola"
 msgstr "Ilararen ezarpenak"
 
-#: admin/views/tab-carga-inicial.php:72
+#: admin/views/tab-carga-inicial.php:65
 msgid "Límite diario de generaciones"
 msgstr "Sorkuntzen eguneroko muga"
 
-#: admin/views/tab-carga-inicial.php:77
+#: admin/views/tab-carga-inicial.php:70
 msgid "Sin límite (usar solo en cargas manuales supervisadas — recuerda desactivarlo al terminar)"
 msgstr "Mugarik gabe (erabili soilik gainbegiratutako eskuzko kargetan — gogoratu amaitzean desgaitzea)"
 
-#: admin/views/tab-carga-inicial.php:80
+#: admin/views/tab-carga-inicial.php:73
 msgid "Aviso: el límite diario está DESACTIVADO."
 msgstr "Oharra: eguneroko muga DESGAITUTA dago."
 
-#: admin/views/tab-carga-inicial.php:85
-msgid "Tamaño de lote"
-msgstr "Lote-tamaina"
-
-#: admin/views/tab-carga-inicial.php:89
+#: admin/views/tab-carga-inicial.php:82
 msgid "Retraso de debounce (segundos)"
 msgstr "Debounce-atzerapena (segundoak)"
 
-#: admin/views/tab-carga-inicial.php:93
-#: admin/views/tab-contenido.php:145
-#: admin/views/tab-negocio.php:41
-#: admin/views/tab-woocommerce.php:293
-msgid "Guardar"
-msgstr "Gorde"
-
-#: admin/views/tab-contenido.php:13
+#: admin/views/tab-contenido.php:14
 msgid "Qué contenido de tu web entra en la base de conocimiento: qué tipos de contenido, qué categorías/etiquetas concretas, IDs sueltos adicionales o excluidos, y qué campos personalizados se envían a la IA. Nada se genera para lo que no esté incluido aquí, y un ID excluido nunca genera documento aunque su tipo de contenido o término esté incluido."
 msgstr "Zure webguneko zer eduki sartzen den ezagutza-basean: zer eduki mota, zer kategoria/etiketa zehatz, ID solte gehigarri edo baztertu, eta zer eremu pertsonalizatu bidaltzen zaizkion AAri. Hemen sartuta ez dagoenetik ez da ezer sortzen, eta baztertutako ID batek ez du inoiz dokumenturik sortzen, nahiz eta haren eduki mota edo terminoa sartuta egon."
 
-#: admin/views/tab-contenido.php:20
+#: admin/views/tab-contenido.php:21
 msgid "Tipos de contenido a incluir"
 msgstr "Sartu beharreko eduki motak"
 
-#: admin/views/tab-contenido.php:23
+#: admin/views/tab-contenido.php:24
 msgid "Modo"
 msgstr "Modua"
 
-#: admin/views/tab-contenido.php:27
+#: admin/views/tab-contenido.php:28
 msgid "Solo los tipos marcados abajo"
 msgstr "Behean markatutako motak bakarrik"
 
-#: admin/views/tab-contenido.php:31
+#: admin/views/tab-contenido.php:32
 msgid "Todos los tipos públicos"
 msgstr "Mota publiko guztiak"
 
-#: admin/views/tab-contenido.php:36
+#: admin/views/tab-contenido.php:37
 msgid "CPTs a incluir"
 msgstr "Sartu beharreko CPTak"
 
-#: admin/views/tab-contenido.php:48
+#: admin/views/tab-contenido.php:49
 msgid "Solo se usa si el modo es \"Solo los tipos marcados\"."
 msgstr "Modua \"Markatutako motak bakarrik\" denean soilik erabiltzen da."
 
-#: admin/views/tab-contenido.php:52
+#: admin/views/tab-contenido.php:53
 msgid "CPTs a excluir cuando el modo es \"Todos\""
 msgstr "Baztertu beharreko CPTak modua \"Guztiak\" denean"
 
-#: admin/views/tab-contenido.php:64
+#: admin/views/tab-contenido.php:65
 msgid "Solo se usa si el modo es \"Todos los tipos públicos\": el resto de tipos, presentes y futuros, entra automáticamente."
 msgstr "Modua \"Mota publiko guztiak\" denean soilik erabiltzen da: gainerako motak, oraingoak eta etorkizunekoak, automatikoki sartzen dira."
 
-#: admin/views/tab-contenido.php:68
+#: admin/views/tab-contenido.php:69
 msgid "Taxonomías / términos"
 msgstr "Taxonomiak / terminoak"
 
-#: admin/views/tab-contenido.php:95
+#: admin/views/tab-contenido.php:96
 msgid "Nada marcado = todos los términos. Marcado = solo entran posts con ese término."
 msgstr "Ezer markatu gabe = termino guztiak. Markatuta = termino hori duten argitalpenak bakarrik sartzen dira."
 
-#: admin/views/tab-contenido.php:101
+#: admin/views/tab-contenido.php:102
 msgid "IDs sueltos"
 msgstr "ID solteak"
 
-#: admin/views/tab-contenido.php:103
+#: admin/views/tab-contenido.php:104
 msgid "IDs a incluir"
 msgstr "Sartu beharreko IDak"
 
-#: admin/views/tab-contenido.php:107
+#: admin/views/tab-contenido.php:108
 msgid "IDs separados por comas, independiente de CPT/taxonomía."
 msgstr "Komaz bereizitako IDak, CPT/taxonomiatik independente."
 
-#: admin/views/tab-contenido.php:109
+#: admin/views/tab-contenido.php:110
 msgid "IDs a excluir"
 msgstr "Baztertu beharreko IDak"
 
-#: admin/views/tab-contenido.php:113
+#: admin/views/tab-contenido.php:114
 msgid "IDs separados por comas: nunca generan documento, aunque su tipo de contenido o término esté incluido."
 msgstr "Komaz bereizitako IDak: ez dute inoiz dokumenturik sortzen, nahiz eta haien eduki mota edo terminoa sartuta egon."
 
-#: admin/views/tab-contenido.php:117
+#: admin/views/tab-contenido.php:118
 msgid "Campos custom a incluir por CPT"
 msgstr "CPT bakoitzeko sartu beharreko eremu pertsonalizatuak"
 
-#: admin/views/tab-contenido.php:139
+#: admin/views/tab-contenido.php:140
 msgid "No se detectaron campos custom en los posts analizados."
 msgstr "Ez da eremu pertsonalizaturik hauteman aztertutako argitalpenetan."
 
-#: admin/views/tab-faqs.php:22
+#: admin/views/tab-faqs.php:20
 msgid "Contenido en Markdown que se publica como documento propio (enlazado desde /llms.txt, igual que el resto de documentos) y aparece en la pestaña Registro. Distinto del prompt del chatbot: esto es contenido público, no instrucciones internas."
 msgstr "Dokumentu propio gisa argitaratzen den Markdown edukia (/llms.txt-etik estekatua, gainerako dokumentuak bezala) eta Erregistroa fitxan agertzen dena. Chatbotaren promptetik desberdina da: hau eduki publikoa da, ez barne-jarraibideak."
 
-#: admin/views/tab-faqs.php:35
-msgid "Cambiar"
-msgstr "Aldatu"
-
-#: admin/views/tab-faqs.php:37
-msgid "Sitio multiidioma: una FAQ (y un documento) por idioma, igual que el resto del contenido."
-msgstr "Hizkuntza anitzeko gunea: FAQ bat (eta dokumentu bat) hizkuntza bakoitzeko, gainerako edukiarekin bezala."
-
-#: admin/views/tab-faqs.php:49
+#: admin/views/tab-faqs.php:33
 msgid "Instrucciones para generar o ampliar las FAQs (opcional)"
 msgstr "FAQak sortzeko edo zabaltzeko jarraibideak (aukerakoa)"
 
-#: admin/views/tab-faqs.php:50
+#: admin/views/tab-faqs.php:34
 msgid "Indica el tono, número de preguntas, formato, orden o estructura que quieres."
 msgstr "Adierazi nahi duzun tonua, galdera kopurua, formatua, ordena edo egitura."
 
-#: admin/views/tab-faqs.php:51
+#: admin/views/tab-faqs.php:35
 msgid "Puedes escribir una indicación breve o pegar un prompt completo. Estas instrucciones prevalecen sobre el formato predeterminado, pero solo pueden usar los datos de Negocio y la FAQ actual. Revisa el borrador antes de guardarlo."
 msgstr "Jarraibide labur bat idatz dezakezu edo prompt oso bat itsatsi. Jarraibide hauek lehenetsitako formatuaren gainetik daude, baina Negozioa ataleko datuak eta uneko FAQa bakarrik erabil ditzakete. Berrikusi zirriborroa gorde aurretik."
 
-#: admin/views/tab-faqs.php:53
+#: admin/views/tab-faqs.php:37
 msgid "Generar/ampliar con IA"
 msgstr "Sortu/zabaldu AArekin"
 
-#: admin/views/tab-faqs.php:54
+#: admin/views/tab-faqs.php:38
 msgid "Usa los datos guardados en la pestaña Negocio. Si ya hay FAQ guardada (en este idioma), la amplía o mejora en vez de partir de cero — puedes repetir esto todas las veces que haga falta: amplía los datos de Negocio (guárdalos primero) o edita la FAQ a mano abajo, guarda, y vuelve a generar para mejorar el resultado."
 msgstr "Negozioa fitxan gordetako datuak erabiltzen ditu. Dagoeneko FAQ bat gordeta badago (hizkuntza honetan), handitu edo hobetu egiten du hutsetik hasi beharrean — nahi adina aldiz errepika dezakezu: zabaldu Negozioa ataleko datuak (gorde lehenik) edo editatu eskuz beheko FAQa, gorde, eta birsortu emaitza hobetzeko."
 
-#: admin/views/tab-faqs.php:62
+#: admin/views/tab-faqs.php:46
 msgid "Guardar FAQ"
 msgstr "Gorde FAQa"
 
@@ -620,35 +1236,35 @@ msgstr "Gorde FAQa"
 msgid "Datos del negocio en sí: válidos con o sin WooCommerce (lo específico de WooCommerce vive en su propia pestaña). Se usan para el prompt del chatbot (pestaña Chatbot, si Genix está activo) y para llms.txt/llm/info.md."
 msgstr "Negozioaren beraren datuak: WooCommercerekin edo gabe balio dute (WooCommerceren berezitasunak bere fitxan daude). Chatbotaren prompterako (Chatbota fitxa, Genix aktibo badago) eta llms.txt/llm/info.md-rako erabiltzen dira."
 
-#: admin/views/tab-negocio.php:21
+#: admin/views/tab-negocio.php:22
 msgid "1. Datos"
 msgstr "1. Datuak"
 
-#: admin/views/tab-negocio.php:46
+#: admin/views/tab-negocio.php:48
 msgid "2. Resumen para llms.txt (con IA)"
 msgstr "2. llms.txt-erako laburpena (AArekin)"
 
-#: admin/views/tab-negocio.php:48
+#: admin/views/tab-negocio.php:50
 msgid "Genera o pule un resumen independiente usando todos los datos guardados arriba, incluido \"Enfoque del negocio\". Se usa como cita de apertura pública en /llms.txt, el archivo que leen los buscadores de IA. Guardar o borrar este resumen no modifica los datos fuente. Si el resultado se queda corto, amplía los datos de arriba, guárdalos primero y vuelve a generar."
 msgstr "Sortu edo hobetu laburpen independente bat goian gordetako datu guztiak erabiliz, \"Negozioaren ikuspegia\" barne. /llms.txt-en hasierako aipamen publiko gisa erabiltzen da, AA bilatzaileek irakurtzen duten fitxategian. Laburpen hau gordetzeak edo ezabatzeak ez ditu iturburu-datuak aldatzen. Emaitza motz geratzen bada, zabaldu goiko datuak, gorde lehenik eta sortu berriro."
 
-#: admin/views/tab-negocio.php:59
+#: admin/views/tab-negocio.php:61
 msgid "Instrucciones para generar o pulir el texto (opcional)"
 msgstr "Testua sortzeko edo hobetzeko jarraibideak (aukerakoa)"
 
-#: admin/views/tab-negocio.php:60
+#: admin/views/tab-negocio.php:62
 msgid "Indica el tono, formato, orden o estructura que quieres para el resumen."
 msgstr "Adierazi laburpenerako nahi duzun tonua, formatua, ordena edo egitura."
 
-#: admin/views/tab-negocio.php:61
+#: admin/views/tab-negocio.php:63
 msgid "Puedes escribir una indicación breve o pegar un prompt completo. Estas instrucciones prevalecen sobre el formato predeterminado, pero solo pueden usar los datos guardados arriba. Revisa el borrador antes de guardarlo."
 msgstr "Jarraibide labur bat idatz dezakezu edo prompt oso bat itsatsi. Jarraibide hauek lehenetsitako formatuaren gainetik daude, baina goian gordetako datuak bakarrik erabil ditzakete. Berrikusi zirriborroa gorde aurretik."
 
-#: admin/views/tab-negocio.php:63
+#: admin/views/tab-negocio.php:65
 msgid "Generar/pulir con IA"
 msgstr "Sortu/hobetu AArekin"
 
-#: admin/views/tab-negocio.php:70
+#: admin/views/tab-negocio.php:72
 msgid "Guardar resumen"
 msgstr "Gorde laburpena"
 
@@ -713,8 +1329,8 @@ msgid "Edita libremente. Cuando termines, puedes pulir la redacción con IA (sin
 msgstr "Editatu libreki. Amaitzean, idazkera AArekin hobetu dezakezu (edukia aldatu gabe) edo zuzenean gorde."
 
 #: admin/views/tab-prompt.php:101
-#: admin/views/tab-woocommerce.php:333
-#: admin/views/tab-woocommerce.php:352
+#: admin/views/tab-woocommerce.php:334
+#: admin/views/tab-woocommerce.php:353
 msgid "Pulir redacción con IA"
 msgstr "Hobetu idazkera AArekin"
 
@@ -725,6 +1341,42 @@ msgstr "Gorde eta sinkronizatu Genixekin"
 #: admin/views/tab-prompt.php:109
 msgid "Support Genix detectado. Listo para sincronizar."
 msgstr "Support Genix detektatu da. Sinkronizatzeko prest."
+
+#: admin/views/tab-prompt.php:119
+msgid "Artículos exclusivos de Genix"
+msgstr "Genix-eko artikulu esklusiboak"
+
+#: admin/views/tab-prompt.php:121
+msgid "Artículos escritos directamente en Support Genix, sin producto ni página de este sitio detrás. Puedes copiarlos tal cual (sin IA) a un documento propio y hacerlos públicos, para que entren en llms.txt."
+msgstr "Support Genix-en zuzenean idatzitako artikuluak, atzean gune honen produktu edo orriak izan gabe. Bere hartara (AA gabe) dokumentu propio batean kopiatu eta publiko egin ditzakezu, llms.txt-en sar daitezen."
+
+#: admin/views/tab-prompt.php:124
+msgid "No hay artículos exclusivos de Genix (o todos los que existen ya tienen su propio documento generado por este plugin)."
+msgstr "Ez dago Genix-eko artikulu esklusiborik (edo daudenak jadanik dute plugin honek sortutako beren dokumentua)."
+
+#: admin/views/tab-prompt.php:129
+msgid "Artículo"
+msgstr "Artikulua"
+
+#: admin/views/tab-prompt.php:147
+msgid "Publicado"
+msgstr "Argitaratuta"
+
+#: admin/views/tab-prompt.php:147
+msgid "No publicado"
+msgstr "Argitaratu gabe"
+
+#: admin/views/tab-prompt.php:154
+msgid "Actualizar contenido"
+msgstr "Eguneratu edukia"
+
+#: admin/views/tab-prompt.php:154
+msgid "Generar contenido"
+msgstr "Sortu edukia"
+
+#: admin/views/tab-prompt.php:161
+msgid "Quitar"
+msgstr "Kendu"
 
 #: admin/views/tab-registro.php:14
 msgid "Todos los documentos generados: su estado, cuándo se actualizaron, y acceso a su contenido. Desde aquí puedes regenerar, borrar, fijar texto manual o filtrar por estado/idioma."
@@ -759,7 +1411,7 @@ msgid "Generar ahora"
 msgstr "Sortu orain"
 
 #: admin/views/tab-registro.php:79
-#: admin/views/tab-visibilidad-ia.php:292
+#: admin/views/tab-visibilidad-ia.php:306
 msgid "Todos los estados"
 msgstr "Egoera guztiak"
 
@@ -796,392 +1448,346 @@ msgstr "Berrabiarazi ilara"
 msgid "¿Borrar los documentos seleccionados y sus posts asociados? Sus orígenes se añadirán a \"IDs a excluir\" en Contenido, para que no se vuelvan a generar solos (quítalos de esa lista si quieres que se vuelvan a generar)."
 msgstr "Hautatutako dokumentuak eta haien lotutako argitalpenak ezabatu? Haien jatorriak Edukia ataleko \"Baztertu beharreko IDak\" zerrendara gehituko dira, automatikoki berriro sor ez daitezen (kendu zerrenda horretatik berriro sortzea nahi baduzu)."
 
-#: admin/views/tab-visibilidad-ia.php:99
+#: admin/views/tab-visibilidad-ia.php:108
 msgid "Comprueba cómo se publica el contenido para buscadores y agentes de IA, revisa si las páginas sincronizadas pueden rastrearse y decide qué crawlers de IA pueden acceder a la web. El estado de exposición y la comprobación de accesibilidad son de solo lectura. Las acciones sobre robots.txt y .htaccess modifican archivos reales y siempre requieren confirmación."
 msgstr "Egiaztatu nola argitaratzen den edukia bilatzaile eta AA agenteentzat, berrikusi sinkronizatutako orriak arakatu daitezkeen, eta erabaki zein AA crawler sar daitezkeen webgunera. Esposizio-egoera eta irisgarritasun-egiaztapena irakurtzeko soilik dira. robots.txt eta .htaccess gaineko ekintzek benetako fitxategiak aldatzen dituzte eta beti baieztapena behar dute."
 
-#: admin/views/tab-visibilidad-ia.php:103
+#: admin/views/tab-visibilidad-ia.php:112
 msgid "Estado de exposición"
 msgstr "Esposizio-egoera"
 
-#: admin/views/tab-visibilidad-ia.php:106
+#: admin/views/tab-visibilidad-ia.php:115
 msgid "llms.txt"
 msgstr "llms.txt"
 
-#: admin/views/tab-visibilidad-ia.php:108
+#: admin/views/tab-visibilidad-ia.php:117
 msgid "Este archivo ayuda a los asistentes de IA a entender qué contiene tu web y dónde encontrar la información más importante."
 msgstr "Fitxategi honek AA laguntzaileei zure webguneak zer duen eta informaziorik garrantzitsuena non aurkitu ulertzen laguntzen die."
 
-#: admin/views/tab-visibilidad-ia.php:110
+#: admin/views/tab-visibilidad-ia.php:119
 msgid "Archivo físico gestionado por AI Knowledge."
 msgstr "AI Knowledge-k kudeatutako fitxategi fisikoa."
 
 #. translators: %s: fecha de última modificación del archivo físico
-#: admin/views/tab-visibilidad-ia.php:116
+#: admin/views/tab-visibilidad-ia.php:125
 msgid "Modificado por última vez: %s."
 msgstr "Azken aldaketa: %s."
 
-#: admin/views/tab-visibilidad-ia.php:125
+#: admin/views/tab-visibilidad-ia.php:134
 msgid "Ver el archivo actual"
 msgstr "Ikusi uneko fitxategia"
 
-#: admin/views/tab-visibilidad-ia.php:127
-#: includes/class-editor-metabox.php:70
+#: admin/views/tab-visibilidad-ia.php:136
+#: includes/class-editor-metabox.php:92
 msgid "Estado:"
 msgstr "Egoera:"
 
-#: admin/views/tab-visibilidad-ia.php:127
+#: admin/views/tab-visibilidad-ia.php:136
 msgid "Todavía no existe el archivo físico."
 msgstr "Fitxategi fisikoa oraindik ez da existitzen."
 
-#: admin/views/tab-visibilidad-ia.php:128
-msgid "Ver llms.txt"
-msgstr "Ikusi llms.txt"
-
-#: admin/views/tab-visibilidad-ia.php:130
+#: admin/views/tab-visibilidad-ia.php:139
 msgid "Guardar una copia física"
 msgstr "Gorde kopia fisiko bat"
 
-#: admin/views/tab-visibilidad-ia.php:131
+#: admin/views/tab-visibilidad-ia.php:140
 msgid "AI Knowledge puede guardar llms.txt como archivo real en la raíz de tu web."
 msgstr "AI Knowledge-k llms.txt benetako fitxategi gisa gorde dezake zure webgunearen erroan."
 
-#: admin/views/tab-visibilidad-ia.php:133
+#: admin/views/tab-visibilidad-ia.php:142
 msgid "Ya existe un llms.txt. Descarga una copia antes de sustituirlo."
 msgstr "Dagoeneko badago llms.txt bat. Deskargatu kopia bat ordezkatu aurretik."
 
-#: admin/views/tab-visibilidad-ia.php:137
+#: admin/views/tab-visibilidad-ia.php:146
 msgid "Descargar copia actual de llms.txt"
 msgstr "Deskargatu llms.txt-ren uneko kopia"
 
-#: admin/views/tab-visibilidad-ia.php:140
+#: admin/views/tab-visibilidad-ia.php:149
 msgid "Todavía no existe un archivo físico. Puedes crearlo con el contenido generado por AI Knowledge."
 msgstr "Oraindik ez dago fitxategi fisikorik. AI Knowledge-k sortutako edukiarekin sor dezakezu."
 
-#: admin/views/tab-visibilidad-ia.php:142
+#: admin/views/tab-visibilidad-ia.php:151
 msgid "Descarga la copia actual primero; el botón se habilitará automáticamente al terminar."
 msgstr "Deskargatu lehenik uneko kopia; botoia automatikoki gaituko da amaitzean."
 
-#: admin/views/tab-visibilidad-ia.php:143
+#: admin/views/tab-visibilidad-ia.php:152
 msgid "Vas a sustituir el llms.txt físico de la raíz por el generado por AI Knowledge. ¿Confirmas que ya descargaste la copia?"
 msgstr "Erroko llms.txt fisikoa AI Knowledge-k sortutakoarekin ordezkatuko duzu. Baieztatzen duzu kopia dagoeneko deskargatu duzula?"
 
-#: admin/views/tab-visibilidad-ia.php:143
+#: admin/views/tab-visibilidad-ia.php:152
 msgid "Vas a crear un llms.txt físico en la raíz con el contenido generado por AI Knowledge. ¿Quieres continuar?"
 msgstr "Erroan llms.txt fitxategi fisiko bat sortuko duzu AI Knowledge-k sortutako edukiarekin. Jarraitu nahi duzu?"
 
-#: admin/views/tab-visibilidad-ia.php:146
+#: admin/views/tab-visibilidad-ia.php:155
 msgid "Sustituir por el generado"
 msgstr "Ordezkatu sortutakoarekin"
 
-#: admin/views/tab-visibilidad-ia.php:146
+#: admin/views/tab-visibilidad-ia.php:155
 msgid "Crear archivo físico"
 msgstr "Sortu fitxategi fisikoa"
 
-#: admin/views/tab-visibilidad-ia.php:151
+#: admin/views/tab-visibilidad-ia.php:160
 msgid "Markdown público"
 msgstr "Markdown publikoa"
 
-#: admin/views/tab-visibilidad-ia.php:153
+#: admin/views/tab-visibilidad-ia.php:162
 msgid "El mismo contenido que usa el chatbot, publicado como archivo Markdown para que crawlers y agentes de IA puedan leerlo sin procesar el HTML de la página."
 msgstr "Chatbotak erabiltzen duen eduki bera, Markdown fitxategi gisa argitaratua, crawler eta AA agenteek orriaren HTMLa prozesatu gabe irakur dezaten."
 
-#: admin/views/tab-visibilidad-ia.php:155
 #: admin/views/tab-visibilidad-ia.php:164
+#: admin/views/tab-visibilidad-ia.php:173
 msgid "Ver un ejemplo real"
 msgstr "Ikusi benetako adibide bat"
 
-#: admin/views/tab-visibilidad-ia.php:160
+#: admin/views/tab-visibilidad-ia.php:169
 msgid "JSON estructurado"
 msgstr "JSON egituratua"
 
-#: admin/views/tab-visibilidad-ia.php:162
+#: admin/views/tab-visibilidad-ia.php:171
 msgid "Los datos originales de WordPress y WooCommerce en formato JSON, sin pasar por una IA. Permite consultar la información exacta mediante la API del sitio."
 msgstr "WordPress eta WooCommerceren jatorrizko datuak JSON formatuan, AAtik igaro gabe. Gunearen APIaren bidez informazio zehatza kontsultatzeko aukera ematen du."
 
-#: admin/views/tab-visibilidad-ia.php:169
+#: admin/views/tab-visibilidad-ia.php:178
 msgid "JSON-LD (Schema.org)"
 msgstr "JSON-LD (Schema.org)"
 
-#: admin/views/tab-visibilidad-ia.php:171
+#: admin/views/tab-visibilidad-ia.php:180
 msgid "Datos estructurados de Schema.org, como Product o Article, incluidos en el código de cada página para ayudar a los buscadores a identificar el tipo de contenido."
 msgstr "Schema.org-eko datu egituratuak, Product edo Article bezalakoak, orri bakoitzaren kodean sartuta bilatzaileei eduki mota identifikatzen laguntzeko."
 
 #. translators: %s: enlace a una página de ejemplo
-#: admin/views/tab-visibilidad-ia.php:180
+#: admin/views/tab-visibilidad-ia.php:189
 msgid "Se incluye dentro de cada página: %s y revisa en el código fuente el bloque <script type=\"application/ld+json\">."
 msgstr "Orri bakoitzean sartzen da: %s eta iturburu-kodean berrikusi <script type=\"application/ld+json\"> blokea."
 
-#: admin/views/tab-visibilidad-ia.php:181
+#: admin/views/tab-visibilidad-ia.php:190
 msgid "abre un ejemplo real"
 msgstr "ireki benetako adibide bat"
 
-#: admin/views/tab-visibilidad-ia.php:189
+#: admin/views/tab-visibilidad-ia.php:198
 msgid "Contenido pendiente de sincronizar"
 msgstr "Sinkronizatzeko zain dagoen edukia"
 
 #. translators: %d: numero de elementos del alcance sin sincronizar todavia
-#: admin/views/tab-visibilidad-ia.php:196
+#: admin/views/tab-visibilidad-ia.php:205
 msgid "Queda %d elemento sin sincronizar."
 msgid_plural "Quedan %d elementos sin sincronizar."
 msgstr[0] "%d elementu geratzen da sinkronizatu gabe."
 msgstr[1] "%d elementu geratzen dira sinkronizatu gabe."
 
-#: admin/views/tab-visibilidad-ia.php:202
+#: admin/views/tab-visibilidad-ia.php:211
 msgid "Todo el contenido del alcance está sincronizado."
 msgstr "Irismeneko eduki guztia sinkronizatuta dago."
 
-#: admin/views/tab-visibilidad-ia.php:210
-#: admin/views/tab-visibilidad-ia.php:254
+#: admin/views/tab-visibilidad-ia.php:219
+#: admin/views/tab-visibilidad-ia.php:263
 msgid "Comprobar accesibilidad"
 msgstr "Egiaztatu irisgarritasuna"
 
-#: admin/views/tab-visibilidad-ia.php:211
+#: admin/views/tab-visibilidad-ia.php:220
 msgid "Elige una URL ya sincronizada y comprueba en vivo si robots.txt permite rastrearla y si lleva noindex — avisa si ambas señales se contradicen entre sí."
 msgstr "Aukeratu dagoeneko sinkronizatutako URL bat eta egiaztatu zuzenean robots.txt-ek arakatzea baimentzen duen eta noindex duen — bi seinaleak kontraesanean badaude abisatuko du."
 
-#: admin/views/tab-visibilidad-ia.php:224
+#: admin/views/tab-visibilidad-ia.php:233
 msgid "robots.txt: permitida."
 msgstr "robots.txt: baimenduta."
 
-#: admin/views/tab-visibilidad-ia.php:225
+#: admin/views/tab-visibilidad-ia.php:234
 msgid "robots.txt: bloqueada."
 msgstr "robots.txt: blokeatuta."
 
-#: admin/views/tab-visibilidad-ia.php:232
+#: admin/views/tab-visibilidad-ia.php:241
 msgid "Señal noindex: sí (meta robots o cabecera X-Robots-Tag)."
 msgstr "noindex seinalea: bai (meta robots edo X-Robots-Tag goiburua)."
 
-#: admin/views/tab-visibilidad-ia.php:233
+#: admin/views/tab-visibilidad-ia.php:242
 msgid "Señal noindex: no."
 msgstr "noindex seinalea: ez."
 
-#: admin/views/tab-visibilidad-ia.php:237
+#: admin/views/tab-visibilidad-ia.php:246
 msgid "⚠ Conflicto de señales: robots.txt y noindex no coinciden — revisa la configuración."
 msgstr "⚠ Seinale-gatazka: robots.txt eta noindex ez datoz bat — berrikusi konfigurazioa."
 
-#: admin/views/tab-visibilidad-ia.php:244
+#: admin/views/tab-visibilidad-ia.php:253
 msgid "Todavía no hay contenido sincronizado que comprobar."
 msgstr "Oraindik ez dago egiaztatzeko sinkronizatutako edukirik."
 
-#: admin/views/tab-visibilidad-ia.php:262
+#: admin/views/tab-visibilidad-ia.php:271
 msgid "Gestión de crawlers de IA"
 msgstr "AA crawler-en kudeaketa"
 
-#: admin/views/tab-visibilidad-ia.php:264
+#: admin/views/tab-visibilidad-ia.php:273
 msgid "Configuración por bot"
 msgstr "Bot bakoitzeko konfigurazioa"
 
-#: admin/views/tab-visibilidad-ia.php:266
+#: admin/views/tab-visibilidad-ia.php:275
 msgid "Lista de crawlers de IA conocidos, su finalidad y la acción asignada a cada uno. Esta configuración se aplica tanto a robots.txt como a las reglas de .htaccess que aparecen más abajo."
 msgstr "AA crawler ezagunen zerrenda, haien helburua eta bakoitzari esleitutako ekintza. Konfigurazio hau robots.txt-i zein beherago agertzen diren .htaccess arauei aplikatzen zaie."
 
-#: admin/views/tab-visibilidad-ia.php:270
-msgid "Búsqueda/citas IA"
-msgstr "AA bilaketa/aipamenak"
-
-#: admin/views/tab-visibilidad-ia.php:271
-msgid "Uso bajo demanda"
-msgstr "Eskaeraren araberako erabilera"
-
-#: admin/views/tab-visibilidad-ia.php:272
-msgid "Entrenamiento de modelos"
-msgstr "Ereduen entrenamendua"
-
-#: admin/views/tab-visibilidad-ia.php:273
-msgid "SEO y scraping"
-msgstr "SEO eta scraping-a"
-
-#: admin/views/tab-visibilidad-ia.php:274
-msgid "Scanners de seguridad"
-msgstr "Segurtasun-eskanerrak"
-
-#: admin/views/tab-visibilidad-ia.php:275
-msgid "Buscadores tradicionales"
-msgstr "Bilatzaile tradizionalak"
-
-#: admin/views/tab-visibilidad-ia.php:276
-msgid "Archivado y datasets"
-msgstr "Artxibatzea eta datasetak"
-
-#: admin/views/tab-visibilidad-ia.php:281
+#: admin/views/tab-visibilidad-ia.php:295
 msgid "Filtrar por tipo"
 msgstr "Iragazi motaren arabera"
 
-#: admin/views/tab-visibilidad-ia.php:283
+#: admin/views/tab-visibilidad-ia.php:297
 msgid "Todos los tipos"
 msgstr "Mota guztiak"
 
-#: admin/views/tab-visibilidad-ia.php:290
+#: admin/views/tab-visibilidad-ia.php:304
 msgid "Filtrar por estado"
 msgstr "Iragazi egoeraren arabera"
 
-#: admin/views/tab-visibilidad-ia.php:293
+#: admin/views/tab-visibilidad-ia.php:307
 msgid "Permitidos"
 msgstr "Baimenduak"
 
-#: admin/views/tab-visibilidad-ia.php:294
+#: admin/views/tab-visibilidad-ia.php:308
 msgid "Bloqueados"
 msgstr "Blokeatuak"
 
-#: admin/views/tab-visibilidad-ia.php:306
-#: admin/views/tab-visibilidad-ia.php:439
+#: admin/views/tab-visibilidad-ia.php:312
+msgid "Permitir todos (visibles)"
+msgstr "Baimendu guztiak (ikusgarriak)"
+
+#: admin/views/tab-visibilidad-ia.php:313
+msgid "Bloquear todos (visibles)"
+msgstr "Blokeatu guztiak (ikusgarriak)"
+
+#: admin/views/tab-visibilidad-ia.php:319
+#: admin/views/tab-visibilidad-ia.php:466
 msgid "Bot"
 msgstr "Bota"
 
-#: admin/views/tab-visibilidad-ia.php:307
+#: admin/views/tab-visibilidad-ia.php:320
 msgid "Operador"
 msgstr "Operadorea"
 
-#: admin/views/tab-visibilidad-ia.php:308
-#: admin/views/tab-visibilidad-ia.php:440
+#: admin/views/tab-visibilidad-ia.php:321
+#: admin/views/tab-visibilidad-ia.php:467
 msgid "Categoría"
 msgstr "Kategoria"
 
-#: admin/views/tab-visibilidad-ia.php:309
+#: admin/views/tab-visibilidad-ia.php:322
 msgid "Descripción"
 msgstr "Deskribapena"
 
-#: admin/views/tab-visibilidad-ia.php:310
+#: admin/views/tab-visibilidad-ia.php:323
 msgid "Acción"
 msgstr "Ekintza"
 
-#: admin/views/tab-visibilidad-ia.php:325
-msgid "Permitir"
-msgstr "Baimendu"
-
-#: admin/views/tab-visibilidad-ia.php:326
-msgid "Bloquear"
-msgstr "Blokeatu"
-
-#: admin/views/tab-visibilidad-ia.php:335
+#: admin/views/tab-visibilidad-ia.php:348
 msgid "Guardar configuración de crawlers"
 msgstr "Gorde crawler-en konfigurazioa"
 
-#: admin/views/tab-visibilidad-ia.php:336
-#: assets/admin.js:83
+#: admin/views/tab-visibilidad-ia.php:349
+#: assets/admin.js:169
 msgid "Ver todos los crawlers"
 msgstr "Ikusi crawler guztiak"
 
-#: admin/views/tab-visibilidad-ia.php:340
-msgid "Visibilidad para los bots bloqueados"
-msgstr "Blokeatutako botentzako ikusgaitasuna"
-
-#: admin/views/tab-visibilidad-ia.php:341
-msgid "Puedes bloquear el resto del sitio y mantener visible únicamente /llms.txt para los bots configurados como Bloquear."
-msgstr "Gunearen gainerakoa blokeatu eta /llms.txt bakarrik ikusgai utz dezakezu Blokeatu moduan konfiguratutako botentzat."
-
-#: admin/views/tab-visibilidad-ia.php:346
-msgid "Bloquear el sitio completo"
-msgstr "Blokeatu gune osoa"
-
-#: admin/views/tab-visibilidad-ia.php:347
-msgid "Solo permitir visibilidad de llms.txt"
-msgstr "Baimendu llms.txt bakarrik ikusgai egotea"
-
-#: admin/views/tab-visibilidad-ia.php:349
-msgid "Guardar modo de visibilidad"
-msgstr "Gorde ikusgaitasun-modua"
-
-#: admin/views/tab-visibilidad-ia.php:352
+#: admin/views/tab-visibilidad-ia.php:353
 msgid "robots.txt"
 msgstr "robots.txt"
 
-#: admin/views/tab-visibilidad-ia.php:353
+#: admin/views/tab-visibilidad-ia.php:354
+#: admin/views/tab-visibilidad-ia.php:404
+msgid "Las reglas de AI Knowledge coinciden con la configuración guardada."
+msgstr "AI Knowledge-ren arauak gordetako konfigurazioarekin bat datoz."
+
+#: admin/views/tab-visibilidad-ia.php:354
+#: admin/views/tab-visibilidad-ia.php:404
+msgid "Las reglas de AI Knowledge son diferentes de la configuración guardada."
+msgstr "AI Knowledge-ren arauak gordetako konfiguraziotik desberdinak dira."
+
+#: admin/views/tab-visibilidad-ia.php:355
 msgid "Se han detectado reglas originales que contradicen el bloque propuesto. Al aplicar, se conservarán y se comentarán para dejar constancia del conflicto:"
 msgstr "Proposatutako blokearekin kontraesanean dauden jatorrizko arauak detektatu dira. Aplikatzean, mantendu eta iruzkindu egingo dira gatazkaren berri uzteko:"
 
-#: admin/views/tab-visibilidad-ia.php:356
+#: admin/views/tab-visibilidad-ia.php:358
 msgid "Actual (lo que vería un crawler ahora mismo)"
 msgstr "Unekoa (crawler batek orain ikusiko lukeena)"
 
-#: admin/views/tab-visibilidad-ia.php:364
-#: admin/views/tab-visibilidad-ia.php:402
+#: admin/views/tab-visibilidad-ia.php:366
+#: admin/views/tab-visibilidad-ia.php:412
 msgid "Archivo completo después del cambio"
 msgstr "Fitxategi osoa aldaketaren ondoren"
 
-#: admin/views/tab-visibilidad-ia.php:369
+#: admin/views/tab-visibilidad-ia.php:371
 msgid "⚠ Esta acción modifica el archivo robots.txt del sitio. Descarga una copia antes de continuar."
 msgstr "⚠ Ekintza honek guneko robots.txt fitxategia aldatzen du. Deskargatu kopia bat jarraitu aurretik."
 
-#: admin/views/tab-visibilidad-ia.php:376
+#: admin/views/tab-visibilidad-ia.php:379
 msgid "Descarga la copia actual primero (botón de la izquierda); se habilitará automáticamente al terminar."
 msgstr "Deskargatu lehenik uneko kopia (ezkerreko botoia); amaitzean automatikoki gaituko da."
 
-#: admin/views/tab-visibilidad-ia.php:380
-msgid "Descargar copia actual de robots.txt"
-msgstr "Deskargatu robots.txt-ren uneko kopia"
-
-#: admin/views/tab-visibilidad-ia.php:383
+#: admin/views/tab-visibilidad-ia.php:386
 msgid "Vas a modificar el robots.txt real del sitio con los bots marcados como Bloquear en la tabla de arriba. ¿Confirmas que ya descargaste la copia y quieres continuar?"
 msgstr "Guneko benetako robots.txt aldatuko duzu goiko taulan Blokeatu gisa markatutako botekin. Baieztatzen duzu kopia dagoeneko deskargatu duzula eta jarraitu nahi duzula?"
 
-#: admin/views/tab-visibilidad-ia.php:386
+#: admin/views/tab-visibilidad-ia.php:389
 msgid "Aplicar bloqueo a robots.txt"
 msgstr "Aplikatu blokeoa robots.txt-i"
 
-#: admin/views/tab-visibilidad-ia.php:392
+#: admin/views/tab-visibilidad-ia.php:396
 msgid "Bloqueo en el servidor mediante .htaccess"
 msgstr "Zerbitzari-mailako blokeoa .htaccess bidez"
 
-#: admin/views/tab-visibilidad-ia.php:393
-msgid "Se han detectado reglas originales de .htaccess que contradicen el bloque propuesto. Al aplicar, se conservarán y se comentarán."
-msgstr "Proposatutako blokearekin kontraesanean dauden jatorrizko .htaccess arauak detektatu dira. Aplikatzean, mantendu eta iruzkindu egingo dira."
-
-#: admin/views/tab-visibilidad-ia.php:395
+#: admin/views/tab-visibilidad-ia.php:398
 msgid "robots.txt comunica preferencias de rastreo, pero un bot puede ignorarlas. Estas reglas rechazan en el servidor las solicitudes que se identifican como alguno de los bots marcados como Bloquear."
 msgstr "robots.txt-ek arakatze-hobespenak komunikatzen ditu, baina bot batek ezikusi egin diezazkieke. Arau hauek Blokeatu gisa markatutako botetako baten gisa identifikatzen diren eskaerak zerbitzarian baztertzen dituzte."
 
-#: admin/views/tab-visibilidad-ia.php:397
+#: admin/views/tab-visibilidad-ia.php:400
 msgid "⚠ Modifica un archivo fuera de este plugin que puede afectar a todo el sitio si algo sale mal. Descarga la copia actual antes de continuar."
 msgstr "⚠ Plugin honetatik kanpoko fitxategi bat aldatzen du, eta zerbait gaizki ateraz gero gune osoari eragin diezaioke. Deskargatu uneko kopia jarraitu aurretik."
 
-#: admin/views/tab-visibilidad-ia.php:399
-msgid "Archivo completo preparado. Puedes copiarlo y pegarlo manualmente en tu servidor o descargarlo. AI Knowledge no sobrescribe el .htaccess real."
-msgstr "Fitxategi osoa prestatuta. Eskuz kopiatu eta itsatsi dezakezu zerbitzarian edo deskargatu. AI Knowledge-k ez du benetako .htaccess gainidazten."
+#: admin/views/tab-visibilidad-ia.php:402
+msgid "Archivo completo preparado. Puedes copiarlo y pegarlo manualmente en tu servidor o descargarlo. También puedes reemplazarlo desde aquí con el botón de más abajo."
+msgstr "Fitxategi osoa prest. Kopiatu eta eskuz zure zerbitzarian txerta dezakezu, edo deskargatu. Hemendik ere ordezka dezakezu beheko botoiarekin."
 
-#: admin/views/tab-visibilidad-ia.php:400
+#: admin/views/tab-visibilidad-ia.php:405
+msgid "Se han detectado reglas originales de .htaccess que contradicen el bloque propuesto. Al aplicar, se conservarán y se comentarán."
+msgstr "Proposatutako blokearekin kontraesanean dauden jatorrizko .htaccess arauak detektatu dira. Aplikatzean, mantendu eta iruzkindu egingo dira."
+
+#: admin/views/tab-visibilidad-ia.php:408
 msgid "Archivo actual"
 msgstr "Uneko fitxategia"
 
-#: admin/views/tab-visibilidad-ia.php:404
+#: admin/views/tab-visibilidad-ia.php:417
 msgid "Copiar código"
 msgstr "Kopiatu kodea"
 
-#: admin/views/tab-visibilidad-ia.php:408
-msgid "Descargar .htaccess preparado"
-msgstr "Deskargatu prestatutako .htaccess"
+#: admin/views/tab-visibilidad-ia.php:428
+msgid "No se puede reemplazar el .htaccess: no existe o el servidor no permite escribirlo (por ejemplo, nginx no lo usa, o los permisos del archivo lo impiden). No se ha intentado modificar nada. Copia el archivo preparado y pégalo a mano, o corrige los permisos."
+msgstr "Ezin da .htaccess ordezkatu: ez dago edo zerbitzariak ez du idaztea onartzen (adibidez, nginx-ek ez du erabiltzen, edo fitxategiaren baimenek galarazten dute). Ez da ezer aldatzen saiatu. Kopiatu prestatutako fitxategia eta itsatsi eskuz, edo zuzendu baimenak."
 
-#: admin/views/tab-visibilidad-ia.php:413
-msgid "No se encontró un .htaccess editable en este servidor (por ejemplo, nginx no lo usa, o los permisos no permiten escribirlo). Añade el bloque de arriba a mano en la configuración de tu servidor."
-msgstr "Ez da .htaccess fitxategi editagarririk aurkitu zerbitzari honetan (adibidez, nginx-ek ez duelako erabiltzen edo baimenek idaztea eragozten dutelako). Gehitu goiko blokea eskuz zerbitzariaren konfigurazioan."
+#: admin/views/tab-visibilidad-ia.php:431
+msgid "Reemplazar solo cambia el bloque de AI Knowledge; el resto del archivo se conserva. Si una regla tuya contradice un bot permitido, se comenta, no se borra. Para activar el botón: descarga la copia actual y marca la casilla."
+msgstr "Ordezkatzeak AI Knowledge-ren blokea soilik aldatzen du; fitxategiaren gainerakoa mantentzen da. Zure arau batek baimendutako bot bati kontra egiten badio, iruzkin bihurtzen da, ez da ezabatzen. Botoia gaitzeko: deskargatu uneko kopia eta markatu laukia."
 
-#: admin/views/tab-visibilidad-ia.php:416
-msgid "El archivo real no se modifica desde aquí. Copia el contenido generado o descarga el archivo preparado y sustitúyelo manualmente después de conservar tu copia original."
-msgstr "Benetako fitxategia ez da hemendik aldatzen. Kopiatu sortutako edukia edo deskargatu prestatutako fitxategia eta ordezkatu eskuz, jatorrizko kopia gordeta duzunean."
+#: admin/views/tab-visibilidad-ia.php:437
+msgid "Vas a modificar el .htaccess real del sitio. ¿Confirmas que ya descargaste la copia y quieres continuar?"
+msgstr "Guneko benetako .htaccess aldatuko duzu. Berretsi kopia deskargatu duzula eta jarraitu nahi duzula?"
 
-#: admin/views/tab-visibilidad-ia.php:421
+#: admin/views/tab-visibilidad-ia.php:448
 msgid "Registro de accesos de crawlers de IA"
 msgstr "AA crawler-en sarbide-erregistroa"
 
 #. translators: %d: numero maximo de filas guardadas
-#: admin/views/tab-visibilidad-ia.php:426
+#: admin/views/tab-visibilidad-ia.php:453
 msgid "Solo se registra tráfico que coincide con el catálogo de arriba (nunca tráfico humano ni bots desconocidos). Límite duro de %d filas: al superarlo se borran las más antiguas."
 msgstr "Goiko katalogoarekin bat datorren trafikoa bakarrik erregistratzen da (inoiz ez giza trafikoa edo bot ezezagunak). %d errenkadako muga zorrotza: gainditzean zaharrenak ezabatzen dira."
 
-#: admin/views/tab-visibilidad-ia.php:431
+#: admin/views/tab-visibilidad-ia.php:458
 msgid "Total registrado:"
 msgstr "Erregistratutako guztira:"
 
-#: admin/views/tab-visibilidad-ia.php:433
+#: admin/views/tab-visibilidad-ia.php:460
 msgid "Todavía no se ha registrado ningún acceso de un crawler conocido."
 msgstr "Oraindik ez da crawler ezagun baten sarbiderik erregistratu."
 
-#: admin/views/tab-visibilidad-ia.php:441
+#: admin/views/tab-visibilidad-ia.php:468
 msgid "URL"
 msgstr "URL"
 
-#: admin/views/tab-visibilidad-ia.php:442
+#: admin/views/tab-visibilidad-ia.php:469
 msgid "Fecha"
 msgstr "Data"
 
@@ -1189,216 +1795,192 @@ msgstr "Data"
 msgid "Esta pestaña requiere WooCommerce activo."
 msgstr "Fitxa honek WooCommerce aktibo egotea eskatzen du."
 
-#: admin/views/tab-woocommerce.php:66
+#: admin/views/tab-woocommerce.php:67
 msgid "Información de tu tienda que se genera como documentos propios (envíos, impuestos, pagos, condiciones, catálogo) para que el chatbot y los buscadores de IA la conozcan. WooCommerce te lo detecta solo, pero todos los campos se guardan y son editables: lo que se guarda una vez ya no desaparece aunque cambies o borres algo en WooCommerce."
 msgstr "Zure dendaren informazioa dokumentu propio gisa sortzen da (bidalketak, zergak, ordainketak, baldintzak, katalogoa), chatbotak eta AA bilatzaileek ezagutu dezaten. WooCommerce-k automatikoki detektatzen du, baina eremu guztiak gordetzen dira eta editagarriak dira: behin gordetakoa ez da desagertzen, WooCommercen zerbait aldatu edo ezabatzen baduzu ere."
 
-#: admin/views/tab-woocommerce.php:76
+#: admin/views/tab-woocommerce.php:77
 msgid "Datos generales"
 msgstr "Datu orokorrak"
 
-#: admin/views/tab-woocommerce.php:77
+#: admin/views/tab-woocommerce.php:78
 msgid "Precargados con el valor real de WooCommerce; edítalos si hace falta. Una vez guardados, no se pierden aunque cambies o borres algo en WooCommerce."
 msgstr "WooCommerceren benetako balioarekin aurrez kargatuta; editatu beharrezkoa bada. Behin gordeta, ez dira galtzen WooCommercen zerbait aldatu edo ezabatzen baduzu ere."
 
-#: admin/views/tab-woocommerce.php:80
-msgid "Nombre de la tienda"
-msgstr "Dendaren izena"
-
-#: admin/views/tab-woocommerce.php:84
-msgid "Moneda"
-msgstr "Moneta"
-
-#: admin/views/tab-woocommerce.php:88
-msgid "País base"
-msgstr "Oinarrizko herrialdea"
-
-#: admin/views/tab-woocommerce.php:92
-msgid "Condiciones de venta"
-msgstr "Salmenta-baldintzak"
-
-#: admin/views/tab-woocommerce.php:96
-#: admin/views/tab-woocommerce.php:107
+#: admin/views/tab-woocommerce.php:97
+#: admin/views/tab-woocommerce.php:108
 msgid "Editar la página real en WordPress"
 msgstr "Editatu benetako orria WordPressen"
 
-#: admin/views/tab-woocommerce.php:98
+#: admin/views/tab-woocommerce.php:99
 msgid "[pendiente] No hay página de condiciones de venta configurada en WooCommerce (Ajustes > Cuentas y privacidad) — precarga vacía, escríbelo a mano si hace falta."
 msgstr "[zain] Ez dago salmenta-baldintzen orririk konfiguratuta WooCommercen (Ezarpenak > Kontuak eta pribatutasuna) — aurrekarga hutsik; idatzi eskuz beharrezkoa bada."
 
-#: admin/views/tab-woocommerce.php:103
-msgid "Política de devoluciones"
-msgstr "Itzulketen politika"
-
-#: admin/views/tab-woocommerce.php:109
+#: admin/views/tab-woocommerce.php:110
 msgid "[pendiente] No hay página de devoluciones/reembolsos configurada en WooCommerce (Ajustes > Cuentas y privacidad) — precarga vacía, escríbelo a mano si hace falta."
 msgstr "[zain] Ez dago itzulketen/diru-itzulketen orririk konfiguratuta WooCommercen (Ezarpenak > Kontuak eta pribatutasuna) — aurrekarga hutsik; idatzi eskuz beharrezkoa bada."
 
-#: admin/views/tab-woocommerce.php:114
+#: admin/views/tab-woocommerce.php:115
 msgid "Métodos de pago"
 msgstr "Ordainketa-metodoak"
 
-#: admin/views/tab-woocommerce.php:121
+#: admin/views/tab-woocommerce.php:122
 msgid "[pendiente] No hay pasarelas de pago instaladas todavía."
 msgstr "[zain] Oraindik ez dago ordainketa-pasabiderik instalatuta."
 
-#: admin/views/tab-woocommerce.php:132
-#: admin/views/tab-woocommerce.php:160
+#: admin/views/tab-woocommerce.php:133
+#: admin/views/tab-woocommerce.php:161
 msgid "(desactivado)"
 msgstr "(desgaituta)"
 
-#: admin/views/tab-woocommerce.php:137
-#: admin/views/tab-woocommerce.php:234
+#: admin/views/tab-woocommerce.php:138
+#: admin/views/tab-woocommerce.php:235
 msgid "Si nunca has guardado esta pestaña, salen todas marcadas por defecto; si guardas sin marcar ninguna, no entra ninguna."
 msgstr "Fitxa hau inoiz gorde ez baduzu, guztiak markatuta agertzen dira lehenespenez; ezer markatu gabe gordetzen baduzu, ez da bat ere sartzen."
 
-#: admin/views/tab-woocommerce.php:141
+#: admin/views/tab-woocommerce.php:142
 msgid "Envíos"
 msgstr "Bidalketak"
 
-#: admin/views/tab-woocommerce.php:148
+#: admin/views/tab-woocommerce.php:149
 msgid "[pendiente] No hay zonas de envío configuradas todavía."
 msgstr "[zain] Oraindik ez dago bidalketa-eremurik konfiguratuta."
 
-#: admin/views/tab-woocommerce.php:166
-#: admin/views/tab-woocommerce.php:210
+#: admin/views/tab-woocommerce.php:167
+#: admin/views/tab-woocommerce.php:211
 msgid "Si nunca has guardado esta pestaña, salen todos marcados por defecto; si guardas sin marcar ninguno, no entra ninguno."
 msgstr "Fitxa hau inoiz gorde ez baduzu, guztiak markatuta agertzen dira lehenespenez; bat ere markatu gabe gordetzen baduzu, ez da bat ere sartzen."
 
-#: admin/views/tab-woocommerce.php:170
+#: admin/views/tab-woocommerce.php:171
 msgid "Impuestos / IVA"
 msgstr "Zergak / BEZa"
 
-#: admin/views/tab-woocommerce.php:175
+#: admin/views/tab-woocommerce.php:176
 msgid "[pendiente] Los impuestos están desactivados en WooCommerce (Ajustes > Impuestos)."
 msgstr "[zain] Zergak desgaituta daude WooCommercen (Ezarpenak > Zergak)."
 
-#: admin/views/tab-woocommerce.php:193
+#: admin/views/tab-woocommerce.php:194
 msgid "Todos los países"
 msgstr "Herrialde guztiak"
 
-#: admin/views/tab-woocommerce.php:203
+#: admin/views/tab-woocommerce.php:204
 msgid "[pendiente] No hay ningún tipo de impuesto dado de alta todavía."
 msgstr "[zain] Oraindik ez dago zerga-tasarik alta emanda."
 
-#: admin/views/tab-woocommerce.php:207
+#: admin/views/tab-woocommerce.php:208
 msgid "Los precios mostrados ya incluyen impuestos."
 msgstr "Erakutsitako prezioek zergak barne hartzen dituzte."
 
-#: admin/views/tab-woocommerce.php:208
+#: admin/views/tab-woocommerce.php:209
 msgid "Los precios mostrados NO incluyen impuestos."
 msgstr "Erakutsitako prezioek EZ dituzte zergak barne hartzen."
 
-#: admin/views/tab-woocommerce.php:215
+#: admin/views/tab-woocommerce.php:216
 msgid "Catálogo: categorías a incluir"
 msgstr "Katalogoa: sartu beharreko kategoriak"
 
-#: admin/views/tab-woocommerce.php:222
+#: admin/views/tab-woocommerce.php:223
 msgid "[pendiente] No hay categorías de producto con productos publicados todavía."
 msgstr "[zain] Oraindik ez dago argitaratutako produktuak dituen produktu-kategoriarik."
 
-#: admin/views/tab-woocommerce.php:238
+#: admin/views/tab-woocommerce.php:239
 msgid "Pedido mínimo / envío gratis"
 msgstr "Gutxieneko eskaera / doako bidalketa"
 
-#: admin/views/tab-woocommerce.php:241
+#: admin/views/tab-woocommerce.php:242
 msgid "Solo se usa si ningún método de envío marcado arriba es de tipo \"Envío gratis\" con importe mínimo configurado en WooCommerce (si lo es, se detecta solo). Ej: \"Envío gratis a partir de 50€\"."
 msgstr "Goian markatutako bidalketa-metodoetako bat ere WooCommercen gutxieneko zenbatekoa konfiguratuta duen \"Doako bidalketa\" motakoa ez bada bakarrik erabiltzen da (hala bada, automatikoki detektatzen da). Adib.: \"Doako bidalketa 50 €-tik aurrera\"."
 
-#: admin/views/tab-woocommerce.php:245
+#: admin/views/tab-woocommerce.php:246
 msgid "Recogida en tienda"
 msgstr "Dendan jasotzea"
 
-#: admin/views/tab-woocommerce.php:249
+#: admin/views/tab-woocommerce.php:250
 msgid "Disponible"
 msgstr "Eskuragarri"
 
-#: admin/views/tab-woocommerce.php:251
+#: admin/views/tab-woocommerce.php:252
 msgid "Solo se usa si ningún método de envío marcado arriba es de tipo \"Recogida local\" de WooCommerce (si lo es, se detecta solo)."
 msgstr "Goian markatutako bidalketa-metodoetako bat ere WooCommerceren \"Tokiko bilketa\" motakoa ez bada bakarrik erabiltzen da (hala bada, automatikoki detektatzen da)."
 
-#: admin/views/tab-woocommerce.php:255
-msgid "Plazo de entrega"
-msgstr "Entrega-epea"
-
-#: admin/views/tab-woocommerce.php:258
+#: admin/views/tab-woocommerce.php:259
 msgid "WooCommerce no expone un plazo de entrega real; escríbelo en texto libre (ej. \"2-4 días laborables en Península\")."
 msgstr "WooCommerce-k ez du benetako entrega-eperik ematen; idatzi testu librean (adib. \"2-4 lanegun Penintsulan\")."
 
-#: admin/views/tab-woocommerce.php:262
+#: admin/views/tab-woocommerce.php:263
 msgid "Contacto y horario de la tienda online"
 msgstr "Online dendaren kontaktua eta ordutegia"
 
 #. translators: %s: enlace a la pestaña Negocio
-#: admin/views/tab-woocommerce.php:269
+#: admin/views/tab-woocommerce.php:270
 msgid "Solo si el contacto/horario de la tienda online es distinto del general del negocio (pestaña %s). Vacío = se usa el de Negocio."
 msgstr "Online dendaren kontaktua/ordutegia negozioaren orokorretik desberdina bada bakarrik (fitxa %s). Hutsik = Negozioa atalekoa erabiltzen da."
 
-#: admin/views/tab-woocommerce.php:277
+#: admin/views/tab-woocommerce.php:278
 msgid "Actualmente se usa (de Negocio):"
 msgstr "Une honetan erabiltzen da (Negozioa ataletik):"
 
-#: admin/views/tab-woocommerce.php:279
+#: admin/views/tab-woocommerce.php:280
 msgid "[pendiente] Tampoco hay contacto general en Negocio todavía."
 msgstr "[zain] Negozioa atalean ere oraindik ez dago kontaktu orokorrik."
 
-#: admin/views/tab-woocommerce.php:286
+#: admin/views/tab-woocommerce.php:287
 msgid "Notas legales adicionales"
 msgstr "Lege-ohar gehigarriak"
 
-#: admin/views/tab-woocommerce.php:289
+#: admin/views/tab-woocommerce.php:290
 msgid "Opcional. Cualquier aviso legal adicional que quieras incluir en el documento de información de tienda."
 msgstr "Aukerakoa. Dendaren informazio-dokumentuan sartu nahi duzun lege-ohar gehigarria."
 
-#: admin/views/tab-woocommerce.php:298
+#: admin/views/tab-woocommerce.php:299
 msgid "Generar documentos de tienda"
 msgstr "Sortu dendaren dokumentuak"
 
-#: admin/views/tab-woocommerce.php:300
-msgid "Genera (o regenera) los documentos compuestos de \"cómo comprar / condiciones de venta / envío y pago\" y \"catálogo de tienda\", uno por idioma activo, a partir de la configuración real de WooCommerce (incluida esta pestaña). No dependen de ningún post concreto, así que se generan a mano con este botón — no se disparan solos al cambiar los ajustes de WooCommerce."
-msgstr "Sortu (edo birsortu) \"nola erosi / salmenta-baldintzak / bidalketa eta ordainketa\" eta \"dendaren katalogoa\" dokumentu konposatuak, bana hizkuntza aktibo bakoitzeko, WooCommerceren benetako konfiguraziotik abiatuta (fitxa hau barne). Ez daude argitalpen jakin baten mende, beraz botoi honekin eskuz sortzen dira — ez dira automatikoki abiarazten WooCommerceren ezarpenak aldatzean."
+#: admin/views/tab-woocommerce.php:301
+msgid "Genera (o regenera) los documentos compuestos de \"cómo comprar / condiciones de venta / envío y pago\" y \"catálogo de tienda\", en el idioma principal, a partir de la configuración real de WooCommerce (incluida esta pestaña). No dependen de ningún post concreto, así que se generan a mano con este botón — no se disparan solos al cambiar los ajustes de WooCommerce."
+msgstr "Sortzen (edo berriro sortzen) ditu «nola erosi / salmenta-baldintzak / bidalketa eta ordainketa» eta «dendaren katalogoa» dokumentu konposatuak, hizkuntza nagusian, WooCommerceren benetako konfiguraziotik abiatuta (fitxa hau barne). Ez daude ezein sarreratan oinarrituta; horregatik, eskuz sortzen dira botoi honekin — ez dira automatikoki abiarazten WooCommerceren ezarpenak aldatzean."
 
-#: admin/views/tab-woocommerce.php:308
+#: admin/views/tab-woocommerce.php:309
 msgid "Generar/actualizar ahora"
 msgstr "Sortu/eguneratu orain"
 
-#: admin/views/tab-woocommerce.php:313
+#: admin/views/tab-woocommerce.php:314
 msgid "Cada bloque muestra el Markdown publicado. Puedes pulir su formato con IA usando solo los datos que ya contiene; para sustituirlo por un texto completo externo, usa el modo manual de la pestaña Registro."
 msgstr "Bloke bakoitzak argitaratutako Markdowna erakusten du. Haren formatua AArekin hobetu dezakezu, dagoeneko dauzkan datuak bakarrik erabiliz; kanpoko testu oso batekin ordezkatzeko, erabili Erregistroa fitxako eskuzko modua."
 
-#: admin/views/tab-woocommerce.php:321
+#: admin/views/tab-woocommerce.php:322
 msgid "Información de tienda"
 msgstr "Dendaren informazioa"
 
-#: admin/views/tab-woocommerce.php:322
+#: admin/views/tab-woocommerce.php:323
 msgid "Pule la estructura y la redacción del documento de compra, condiciones, envío y pago. Las instrucciones prevalecen sobre el formato predeterminado, pero no pueden añadir ni cambiar datos."
 msgstr "Hobetu erosketa, baldintza, bidalketa eta ordainketa dokumentuaren egitura eta idazkera. Jarraibideek lehenetsitako formatuaren gainetik dute lehentasuna, baina ezin dute daturik gehitu edo aldatu."
 
-#: admin/views/tab-woocommerce.php:329
-#: admin/views/tab-woocommerce.php:348
+#: admin/views/tab-woocommerce.php:330
+#: admin/views/tab-woocommerce.php:349
 msgid "Instrucciones para pulir el texto (opcional)"
 msgstr "Testua hobetzeko jarraibideak (aukerakoa)"
 
-#: admin/views/tab-woocommerce.php:330
-#: admin/views/tab-woocommerce.php:349
+#: admin/views/tab-woocommerce.php:331
+#: admin/views/tab-woocommerce.php:350
 msgid "Indica solo el tono, la estructura o el estilo. La IA no consulta ni añade datos de WooCommerce desde este campo."
 msgstr "Adierazi tonua, egitura edo estiloa bakarrik. AAk ez ditu WooCommerceko datuak kontsultatzen edo gehitzen eremu honetatik."
 
-#: admin/views/tab-woocommerce.php:331
-#: admin/views/tab-woocommerce.php:350
+#: admin/views/tab-woocommerce.php:332
+#: admin/views/tab-woocommerce.php:351
 msgid "Puedes escribir una indicación breve o pegar un prompt completo. Estas instrucciones prevalecen sobre el formato predeterminado, pero solo pueden usar los datos presentes en el documento. Si ya tienes un texto final generado con otra IA, pégalo manualmente desde la pestaña Registro."
 msgstr "Jarraibide labur bat idatz dezakezu edo prompt oso bat itsatsi. Jarraibide hauek lehenetsitako formatuaren gainetik daude, baina dokumentuan dauden datuak bakarrik erabil ditzakete. Beste AA batekin sortutako amaierako testua baduzu, itsatsi eskuz Erregistroa fitxatik."
 
-#: admin/views/tab-woocommerce.php:337
-#: admin/views/tab-woocommerce.php:356
+#: admin/views/tab-woocommerce.php:338
+#: admin/views/tab-woocommerce.php:357
 msgid "Todavía no se ha generado."
 msgstr "Oraindik ez da sortu."
 
-#: admin/views/tab-woocommerce.php:340
+#: admin/views/tab-woocommerce.php:341
 msgid "Catálogo de tienda"
 msgstr "Dendaren katalogoa"
 
-#: admin/views/tab-woocommerce.php:341
+#: admin/views/tab-woocommerce.php:342
 msgid "Pule la estructura y la redacción del catálogo publicado. Las instrucciones prevalecen sobre el formato predeterminado, pero no pueden añadir productos ni datos que no aparezcan en el documento."
 msgstr "Hobetu argitaratutako katalogoaren egitura eta idazkera. Jarraibideek lehenetsitako formatuaren gainetik dute lehentasuna, baina ezin dute dokumentuan agertzen ez den produkturik edo daturik gehitu."
 
@@ -1448,103 +2030,95 @@ msgid "Ej: tipo de cliente habitual — ayuda al chatbot a calibrar tono y nivel
 msgstr "Adib.: ohiko bezero mota — chatbotari tonua eta xehetasun-maila doitzen laguntzen dio."
 
 #: includes/class-chatbot-prompt-builder.php:76
-msgid "Idioma principal del negocio"
-msgstr "Negozioaren hizkuntza nagusia"
-
-#: includes/class-chatbot-prompt-builder.php:77
-msgid "Ej: español, aunque la web está también en inglés y alemán."
-msgstr "Adib.: euskara, nahiz eta webgunea gaztelaniaz eta ingelesez ere egon."
-
-#: includes/class-chatbot-prompt-builder.php:82
 msgid "Horario de atención humana"
 msgstr "Giza arretaren ordutegia"
 
-#: includes/class-chatbot-prompt-builder.php:83
+#: includes/class-chatbot-prompt-builder.php:77
 msgid "Cuándo hay alguien real disponible, aparte del chatbot (que suele estar activo 24/7)."
 msgstr "Noiz dagoen benetako pertsona bat eskuragarri, chatbotaz gain (normalean 24/7 aktibo egoten da)."
 
-#: includes/class-chatbot-prompt-builder.php:88
+#: includes/class-chatbot-prompt-builder.php:82
 msgid "Datos de contacto directo"
 msgstr "Zuzeneko kontaktu-datuak"
 
-#: includes/class-chatbot-prompt-builder.php:89
+#: includes/class-chatbot-prompt-builder.php:83
 msgid "Teléfono, WhatsApp, email... deja vacío para mantener los que ya haya en el prompt actual."
 msgstr "Telefonoa, WhatsApp, posta elektronikoa... utzi hutsik uneko promptean dagoeneko daudenak mantentzeko."
 
-#: includes/class-chatbot-prompt-builder.php:95
+#: includes/class-chatbot-prompt-builder.php:89
 msgid "Tono de la marca"
 msgstr "Markaren tonua"
 
-#: includes/class-chatbot-prompt-builder.php:96
+#: includes/class-chatbot-prompt-builder.php:90
 msgid "Ej: cercano, profesional, cálido, sin lenguaje robótico."
 msgstr "Adib.: hurbila, profesionala, beroa, hizkera robotikorik gabe."
 
-#: includes/class-chatbot-prompt-builder.php:101
+#: includes/class-chatbot-prompt-builder.php:95
 msgid "Qué hacer cuando no hay información"
 msgstr "Zer egin informaziorik ez dagoenean"
 
-#: includes/class-chatbot-prompt-builder.php:102
+#: includes/class-chatbot-prompt-builder.php:96
 msgid "Ej: no inventar ni dar largas, decir que no se tiene esa información y dar el contacto directo."
 msgstr "Adib.: ez asmatu eta ez luzatu alferrik; esan informazio hori ez dagoela eta eman zuzeneko kontaktua."
 
-#: includes/class-chatbot-prompt-builder.php:107
+#: includes/class-chatbot-prompt-builder.php:101
 msgid "Qué NO debe hacer nunca el chatbot"
 msgstr "Chatbotak zer EZ duen inoiz egin behar"
 
-#: includes/class-chatbot-prompt-builder.php:108
+#: includes/class-chatbot-prompt-builder.php:102
 msgid "Ej: no gestionar pagos ni reclamaciones directamente, no prometer descuentos, no inventar precios ni stock."
 msgstr "Adib.: ordainketak edo erreklamazioak zuzenean ez kudeatzea, deskonturik ez agintzea, preziorik edo stockik ez asmatzea."
 
-#: includes/class-chatbot-prompt-builder.php:113
+#: includes/class-chatbot-prompt-builder.php:107
 msgid "Cómo cerrar una conversación"
 msgstr "Nola amaitu elkarrizketa bat"
 
-#: includes/class-chatbot-prompt-builder.php:114
+#: includes/class-chatbot-prompt-builder.php:108
 msgid "Ej: despedirse con cordialidad e invitar a seguir preguntando si hace falta."
 msgstr "Adib.: adeitasunez agurtu eta behar izanez gero galdera gehiago egitera gonbidatu."
 
-#: includes/class-chatbot-prompt-builder.php:119
+#: includes/class-chatbot-prompt-builder.php:113
 msgid "Longitud de respuesta preferida"
 msgstr "Erantzunaren luzera hobetsia"
 
-#: includes/class-chatbot-prompt-builder.php:120
+#: includes/class-chatbot-prompt-builder.php:114
 msgid "Ej: respuestas cortas y directas, o explicadas con más detalle."
 msgstr "Adib.: erantzun labur eta zuzenak, edo xehetasun gehiagorekin azalduak."
 
-#: includes/class-chatbot-prompt-builder.php:125
+#: includes/class-chatbot-prompt-builder.php:119
 msgid "Uso de emojis"
 msgstr "Emoji-en erabilera"
 
-#: includes/class-chatbot-prompt-builder.php:126
+#: includes/class-chatbot-prompt-builder.php:120
 msgid "Ej: sin emojis, o alguno puntual con moderación."
 msgstr "Adib.: emojirik gabe, edo noizean behin eta neurriz."
 
-#: includes/class-chatbot-prompt-builder.php:241
-#: includes/class-chatbot-prompt-builder.php:295
-#: includes/class-chatbot-prompt-builder.php:339
-#: includes/class-chatbot-prompt-builder.php:463
-#: includes/class-chatbot-prompt-builder.php:529
-#: includes/class-generator.php:43
+#: includes/class-chatbot-prompt-builder.php:242
+#: includes/class-chatbot-prompt-builder.php:297
+#: includes/class-chatbot-prompt-builder.php:342
+#: includes/class-chatbot-prompt-builder.php:466
+#: includes/class-chatbot-prompt-builder.php:533
+#: includes/class-generator.php:49
 msgid "El origen de IA seleccionado no está conectado."
 msgstr "Hautatutako AA jatorria ez dago konektatuta."
 
-#: includes/class-chatbot-prompt-builder.php:334
+#: includes/class-chatbot-prompt-builder.php:337
 msgid "No hay texto que pulir."
 msgstr "Ez dago hobetzeko testurik."
 
-#: includes/class-chatbot-prompt-builder.php:409
+#: includes/class-chatbot-prompt-builder.php:412
 msgid "La IA devolvió instrucciones internas dentro del contenido. No se ha publicado el resultado."
 msgstr "AAk barne-jarraibideak itzuli ditu edukiaren barruan. Emaitza ez da argitaratu."
 
-#: includes/class-chatbot-prompt-builder.php:415
+#: includes/class-chatbot-prompt-builder.php:418
 msgid "La IA copió las instrucciones de redacción dentro del contenido. No se ha publicado el resultado."
 msgstr "AAk idazketa-jarraibideak kopiatu ditu edukiaren barruan. Emaitza ez da argitaratu."
 
-#: includes/class-chatbot-prompt-builder.php:524
+#: includes/class-chatbot-prompt-builder.php:528
 msgid "No hay texto que normalizar."
 msgstr "Ez dago normalizatzeko testurik."
 
-#: includes/class-chatbot-prompt-builder.php:581
+#: includes/class-chatbot-prompt-builder.php:585
 #: includes/class-genix-hooks-guard.php:78
 #: includes/class-genix-hooks-guard.php:86
 #: includes/class-genix-hooks-guard.php:183
@@ -1552,31 +2126,31 @@ msgid "WOO Knowledge Base Generator:"
 msgstr "WOO Knowledge Base Generator:"
 
 #. translators: 1: longitud actual en caracteres, 2: mínimo recomendado, 3: enlace a la pestaña Negocio
-#: includes/class-chatbot-prompt-builder.php:584
+#: includes/class-chatbot-prompt-builder.php:588
 msgid "El resumen público del negocio tiene %1$d caracteres. Se usa como cita de apertura en /llms.txt: ampliarlo a al menos %2$d caracteres da más contexto útil a los crawlers de IA. %3$s"
 msgstr "Negozioaren laburpen publikoak %1$d karaktere ditu. /llms.txt-en hasierako aipamen gisa erabiltzen da: gutxienez %2$d karakterera zabaltzeak testuinguru erabilgarri gehiago ematen die AA crawler-ei. %3$s"
 
-#: includes/class-chatbot-prompt-builder.php:587
+#: includes/class-chatbot-prompt-builder.php:591
 msgid "Ir a la pestaña Negocio"
 msgstr "Joan Negozioa fitxara"
 
-#: includes/class-chatbot-prompt.php:90
+#: includes/class-chatbot-prompt.php:107
 msgid "chatbot-system-prompt.md está vacío o no existe."
 msgstr "chatbot-system-prompt.md hutsik dago edo ez da existitzen."
 
-#: includes/class-chatbot-prompt.php:94
+#: includes/class-chatbot-prompt.php:112
 msgid "Support Genix no está activo o su módulo de Knowledge Base aún no se ha cargado."
 msgstr "Support Genix ez dago aktibo edo haren Knowledge Base modulua oraindik ez da kargatu."
 
-#: includes/class-chatbot-prompt.php:106
+#: includes/class-chatbot-prompt.php:124
 msgid "Ya estaba sincronizado."
 msgstr "Dagoeneko sinkronizatuta zegoen."
 
-#: includes/class-chatbot-prompt.php:112
+#: includes/class-chatbot-prompt.php:130
 msgid "Genix rechazó guardar la opción (AddOption devolvió false)."
 msgstr "Genixek aukera gordetzeari uko egin dio (AddOption-ek false itzuli du)."
 
-#: includes/class-chatbot-prompt.php:117
+#: includes/class-chatbot-prompt.php:135
 msgid "Prompt sincronizado con Support Genix."
 msgstr "Prompta Support Genixekin sinkronizatuta."
 
@@ -1706,29 +2280,49 @@ msgstr "Hemen esplizituki blokeatzeko konfiguratuta dagoen bilatzaile tradiziona
 msgid "Crawler de archivado, control de originalidad o creación de datasets."
 msgstr "Artxibatze, originaltasun-kontrol edo datasetak sortzeko crawlerra."
 
-#: includes/class-document-pipeline.php:47
+#: includes/class-document-pipeline.php:37
+msgid "Este contenido no tiene versión en ese idioma."
+msgstr "Eduki honek ez du bertsiorik hizkuntza horretan."
+
+#: includes/class-document-pipeline.php:46
+msgid "Esta traducción no tiene documento propio: su contenido va en el .md del original (opción «Crear por idioma» desmarcada)."
+msgstr "Itzulpen honek ez du dokumentu propiorik: bere edukia jatorrizkoaren .md-an doa («Sortu hizkuntza bakoitzeko» aukera markatu gabe)."
+
+#: includes/class-document-pipeline.php:51
 msgid "No se pudo extraer el origen."
 msgstr "Ezin izan da jatorria atera."
 
-#: includes/class-editor-metabox.php:72
+#: includes/class-editor-metabox.php:56
+msgid "Añadiendo…"
+msgstr "Gehitzen…"
+
+#: includes/class-editor-metabox.php:57
+msgid "No se pudo añadir. Recarga la página y vuelve a intentarlo."
+msgstr "Ezin izan da gehitu. Birkargatu orria eta saiatu berriro."
+
+#: includes/class-editor-metabox.php:94
 msgid "Modo: manual"
 msgstr "Modua: eskuz"
 
-#: includes/class-editor-metabox.php:75
+#: includes/class-editor-metabox.php:99
 msgid "Ver en el Registro"
 msgstr "Ikusi Erregistroan"
 
-#: includes/class-editor-metabox.php:79
+#: includes/class-editor-metabox.php:103
 msgid "Este contenido todavía no está en la base de conocimiento."
 msgstr "Eduki hau oraindik ez dago ezagutza-basean."
 
-#: includes/class-editor-metabox.php:86
+#: includes/class-editor-metabox.php:107
 msgid "Añadir a la base de conocimiento"
 msgstr "Gehitu ezagutza-basera"
 
-#: includes/class-editor-metabox.php:107
+#: includes/class-editor-metabox.php:129
 msgid "Contenido no encontrado."
 msgstr "Edukia ez da aurkitu."
+
+#: includes/class-editor-metabox.php:153
+msgid "Añadido a la base de conocimiento."
+msgstr "Ezagutza-basera gehitu da."
 
 #: includes/class-genix-bridge.php:41
 msgid "Support Genix no está activo o no expone sgkb-docs."
@@ -1787,9 +2381,22 @@ msgstr "PHP sintaxiaren egiaztapenak huts egin du iragazkiak txertatu ondoren. E
 msgid "No autorizado."
 msgstr "Baimenik gabe."
 
-#: includes/class-llms-faq.php:109
-msgid "Preguntas frecuentes"
-msgstr "Ohiko galderak"
+#: includes/class-genix-publish.php:52
+#: includes/class-genix-publish.php:115
+msgid "Genix no está activo."
+msgstr "Genix ez dago aktibo."
+
+#: includes/class-genix-publish.php:57
+msgid "No se encontró el artículo de Genix."
+msgstr "Ez da Genix-eko artikulua aurkitu."
+
+#: includes/class-genix-publish.php:61
+msgid "Este artículo está marcado en Genix como \"solo para el chatbot\": no es público ni siquiera dentro de Genix, así que no puede publicarse aquí."
+msgstr "Artikulu hau Genix-en \"chatbotarentzat bakarrik\" gisa markatuta dago: ez da publikoa Genixen barruan ere, hortaz ezin da hemen argitaratu."
+
+#: includes/class-languages.php:317
+msgid "principal"
+msgstr "nagusia"
 
 #: includes/class-llms-faq.php:113
 msgid "Preguntas frecuentes públicas del negocio."
@@ -1799,32 +2406,32 @@ msgstr "Negozioaren ohiko galdera publikoak."
 msgid "FAQ"
 msgstr "FAQ"
 
-#: includes/class-llms-txt.php:45
+#: includes/class-llms-txt.php:64
 msgid "Última actualización:"
 msgstr "Azken eguneraketa:"
 
-#: includes/class-llms-txt.php:73
+#: includes/class-llms-txt.php:92
 msgid "Documentación técnica de la API (OpenAPI)"
 msgstr "APIaren dokumentazio teknikoa (OpenAPI)"
 
-#: includes/class-llms-txt.php:73
+#: includes/class-llms-txt.php:92
 msgid "para desarrolladores e integraciones."
 msgstr "garatzaile eta integrazioetarako."
 
-#: includes/class-llms-txt.php:81
+#: includes/class-llms-txt.php:100
 #: includes/class-rest-content.php:49
 msgid "Feed de productos (Google Merchant)"
 msgstr "Produktuen feed-a (Google Merchant)"
 
-#: includes/class-llms-txt.php:81
+#: includes/class-llms-txt.php:100
 msgid "para comparadores y plataformas de shopping."
 msgstr "konparatzaile eta shopping plataformetarako."
 
-#: includes/class-llms-txt.php:83
+#: includes/class-llms-txt.php:102
 msgid "Feed de contenido (JSON)"
 msgstr "Eduki-feed-a (JSON)"
 
-#: includes/class-llms-txt.php:83
+#: includes/class-llms-txt.php:102
 msgid "el resto del contenido del alcance, sin paginar."
 msgstr "irismeneko gainerako edukia, orrialdekatzerik gabe."
 
@@ -1876,11 +2483,11 @@ msgstr "Adib. \"product\" (WooCommerce) edo irismenaren barruko beste edozein po
 msgid "Listado paginado (cabeceras X-WP-Total/X-WP-TotalPages)."
 msgstr "Zerrenda orrialdekatua (X-WP-Total/X-WP-TotalPages goiburuak)."
 
-#: includes/class-rest-content.php:409
+#: includes/class-rest-content.php:416
 msgid "Catálogo de productos"
 msgstr "Produktuen katalogoa"
 
-#: includes/class-rest-content.php:481
+#: includes/class-rest-content.php:488
 msgid "No encontrado."
 msgstr "Ez da aurkitu."
 
@@ -1888,598 +2495,7 @@ msgstr "Ez da aurkitu."
 msgid "Invalid post ID."
 msgstr "Argitalpen-ID baliogabea."
 
-#: includes/class-store-info-doc.php:97
-#: includes/class-store-info-doc.php:123
+#: includes/class-store-info-doc.php:103
+#: includes/class-store-info-doc.php:130
 msgid "WooCommerce no está activo."
 msgstr "WooCommerce ez dago aktibo."
-
-#: admin/class-admin.php:168
-#: admin/class-admin.php:276
-msgid "Asistente de configuración"
-msgstr "Konfigurazio-laguntzailea"
-
-#: admin/class-admin.php:169
-msgid "Asistente"
-msgstr "Laguntzailea"
-
-#: admin/class-admin.php:179
-msgid "Abrir asistente"
-msgstr "Ireki laguntzailea"
-
-#: admin/class-admin.php:227
-#: admin/class-admin.php:512
-msgid "Guardado correctamente."
-msgstr "Ondo gorde da."
-
-#: admin/class-admin.php:256
-msgid "Versión %s"
-msgstr "Bertsioa %s"
-
-#: admin/class-admin.php:256
-msgid "Salir"
-msgstr "Irten"
-
-#: admin/class-admin.php:257
-msgid "Progreso del asistente"
-msgstr "Laguntzailearen aurrerapena"
-
-#: admin/class-admin.php:300
-msgid "Atrás"
-msgstr "Atzera"
-
-#: admin/class-admin.php:301
-msgid "Salir del asistente"
-msgstr "Irten laguntzailetik"
-
-#: admin/class-admin.php:303
-msgid "Guardar configuración"
-msgstr "Gorde konfigurazioa"
-
-#: admin/class-admin.php:304
-msgid "Continuar"
-msgstr "Jarraitu"
-
-#: admin/class-admin.php:327
-msgid "Bienvenida"
-msgstr "Ongi etorri"
-
-#: admin/class-admin.php:327
-msgid "AI Knowledge convierte el contenido de tu sitio en documentos preparados para buscadores, asistentes y sistemas de inteligencia artificial. Este recorrido revisará contigo las decisiones principales sin borrar una configuración existente. Puedes saltar cualquier paso, salir cuando quieras y continuar más adelante desde el mismo punto."
-msgstr "AI Knowledge-k zure gunearen edukia bilatzaileentzat, laguntzaileentzat eta adimen artifizialeko sistementzat prestatutako dokumentu bihurtzen du. Ibilbide honek zurekin batera erabaki nagusiak berrikusiko ditu, dagoen konfiguraziorik ezabatu gabe. Edozein pausu saltatu, nahi duzunean irten eta geroago puntu beretik jarraitu dezakezu."
-
-#: admin/class-admin.php:328
-msgid "Elige el servicio que ayudará a redactar y mejorar los documentos. AI Knowledge utiliza las conexiones ya configuradas mediante los Conectores de WordPress o Support Genix y nunca guarda aquí sus claves. Si todavía no existe una conexión, puedes continuar sin IA y configurarla después: cada paso siguiente que genere contenido avisará si no hay conexión, sin bloquearte."
-msgstr "Aukeratu dokumentuak idazten eta hobetzen lagunduko duen zerbitzua. AI Knowledge-k WordPress Konektoreen edo Support Genix-en bidez jadanik konfiguratutako konexioak erabiltzen ditu, eta ez du inoiz zure gakorik hemen gordetzen. Konexiorik ez badago oraindik, AA gabe jarrai dezakezu eta geroago konfiguratu: eduki sortzen duen hurrengo pausu bakoitzak abisatuko dizu konexiorik ez badago, blokeatu gabe."
-
-#: admin/class-admin.php:329
-msgid "Límites de generación"
-msgstr "Sortze-mugak"
-
-#: admin/class-admin.php:329
-msgid "Comprueba el largo máximo del texto y los límites de generación antes de continuar: a partir de aquí, cada paso puede generar contenido real con IA en cuanto lo guardes."
-msgstr "Egiaztatu testuaren gehienezko luzera eta sortze-mugak jarraitu aurretik: hemendik aurrera, pausu bakoitzak AArekin eduki erreala sor dezake gordetzen duzun bezain laster."
-
-#: admin/class-admin.php:330
-msgid "Contenido y alcance"
-msgstr "Edukia eta irismena"
-
-#: admin/class-admin.php:330
-msgid "Selecciona los tipos de contenido público que deben formar parte de la base de conocimiento. La selección determina qué entradas, páginas, productos u otros contenidos podrán generar documentos. Al guardar, se encola la generación de todo lo que entre en el alcance. Las taxonomías, términos, identificadores y campos personalizados pueden configurarse después desde la pantalla Contenido del plugin."
-msgstr "Hautatu ezagutza-basean egon behar duten eduki mota publikoak. Hautaketa honek zehazten du zer sarrera, orrialde, produktu edo bestelako eduki dokumentu sor dezakeen. Gordetzean, irismenean sartzen den guztiaren sorkuntza ilaran jartzen da. Taxonomiak, terminoak, IDak eta eremu pertsonalizatuak geroago konfigura daitezke pluginaren Edukia pantailatik."
-
-#: admin/class-admin.php:331
-msgid "Añade la información estable que una IA necesita para comprender correctamente tu negocio: identidad, ubicación, público, contacto, horario y enfoque. Estos datos complementan el contenido del sitio y ayudan a producir respuestas coherentes sin inventar información."
-msgstr "Gehitu AA batek zure negozioa ondo ulertzeko behar duen informazio egonkorra: identitatea, kokapena, publikoa, kontaktua, ordutegia eta ikuspegia. Datu horiek gunearen edukia osatzen dute eta informazioa asmatu gabe erantzun koherenteak sortzen laguntzen dute."
-
-#: admin/class-admin.php:332
-msgid "Revisa los datos generales de la tienda, el país, la moneda, las condiciones de compra, la recogida, los plazos y el contacto. Al guardar, se generan los documentos de información de tienda si hay conexión de IA disponible. Los envíos, impuestos, pagos, categorías y otras opciones avanzadas pueden completarse después en una ventana nueva sin perder el progreso."
-msgstr "Berrikusi dendaren datu orokorrak, herrialdea, moneta, erosketa-baldintzak, jasotzea, epeak eta kontaktua. Gordetzean, dendaren informazio-dokumentuak sortzen dira AA konexioa eskuragarri badago. Bidalketak, zergak, ordainketak, kategoriak eta beste aukera aurreratu batzuk geroago leiho berri batean bete daitezke aurrerapena galdu gabe."
-
-#: admin/class-admin.php:333
-msgid "Genera con IA las preguntas frecuentes públicas de tu negocio a partir de los datos ya introducidos, y las publica directamente en llms.txt. Este paso solo aparece si hay una conexión de IA disponible."
-msgstr "Sortu AArekin zure negozioaren galdera publiko maiztuak jadanik sartutako datuetatik, eta zuzenean argitaratu llms.txt-en. Pausu hau AA konexioa eskuragarri dagoenean bakarrik agertzen da."
-
-#: admin/class-admin.php:334
-msgid "Configura cómo Support Genix utilizará la base de conocimiento, cuántos documentos relacionados podrá consultar y qué información adicional debe tener en cuenta. Al guardar, se sincroniza con Genix si hay conexión disponible. Este paso solo aparece cuando la integración está disponible."
-msgstr "Konfiguratu Support Genix-ek ezagutza-basea nola erabiliko duen, zenbat dokumentu erlazionatu kontsulta ahal izango dituen eta zer informazio gehigarri kontuan hartu behar duen. Gordetzean, Genixekin sinkronizatzen da konexioa eskuragarri badago. Pausu hau integrazioa eskuragarri dagoenean bakarrik agertzen da."
-
-#: admin/class-admin.php:335
-msgid "Decide qué familias de crawlers pueden acceder al sitio y cómo se gestiona su acceso a llms.txt. Al guardar, esta selección queda conservada para utilizarla en las reglas de visibilidad del plugin."
-msgstr "Erabaki zer crawler-familiak sartu ahal izango diren gunean eta nola kudeatzen den haien sarbidea llms.txt-era. Gordetzean, hautaketa hori gorde egiten da pluginaren ikusgarritasun-arauetan erabiltzeko."
-
-#: admin/class-admin.php:336
-msgid "Archivos del servidor"
-msgstr "Zerbitzariaren fitxategiak"
-
-#: admin/class-admin.php:336
-msgid "Comprueba si robots.txt y .htaccess difieren de la configuración guardada. Descarga las copias y las versiones preparadas; el asistente no muestra el código completo ni modifica .htaccess automáticamente."
-msgstr "Egiaztatu robots.txt eta .htaccess gordetako konfiguraziotik desberdinak diren. Deskargatu uneko kopiak eta prestatutako bertsioak; laguntzaileak ez du kode osoa erakusten ez du .htaccess automatikoki aldatzen."
-
-#: admin/class-admin.php:337
-msgid "Resumen"
-msgstr "Laburpena"
-
-#: admin/class-admin.php:337
-msgid "Revisa el estado real de cada paso: qué se ha generado ya y qué queda pendiente. Puedes generar ahora los documentos que aún falten, o dejarlo para más tarde desde Generación masiva."
-msgstr "Berrikusi pausu bakoitzaren benetako egoera: zer sortu den jada eta zer dagoen zain. Falta diren dokumentuak orain sor ditzakezu, edo geroagorako utzi Sorkuntza masibotik."
-
-#: admin/class-admin.php:338
-msgid "Resumen final"
-msgstr "Amaierako laburpena"
-
-#: admin/class-admin.php:338
-msgid "La configuración del asistente ha terminado. Revisa el estado real de los documentos y accede directamente a las áreas principales del plugin."
-msgstr "Laguntzailearen konfigurazioa amaitu da. Berrikusi zure dokumentuen benetako egoera eta joan zuzenean pluginaren area nagusietara."
-
-#: admin/class-admin.php:359
-msgid "Las reglas de AI Knowledge en robots.txt son diferentes de la configuración guardada."
-msgstr "AI Knowledge-ren robots.txt-eko arauak gordetako konfiguraziotik desberdinak dira."
-
-#: admin/class-admin.php:359
-msgid "Las reglas de AI Knowledge en robots.txt coinciden con la configuración guardada."
-msgstr "AI Knowledge-ren robots.txt-eko arauak gordetako konfigurazioarekin bat datoz."
-
-#: admin/class-admin.php:360
-msgid "Descarga una copia actual antes de actualizar robots.txt con la versión preparada."
-msgstr "Deskargatu uneko kopia bat robots.txt prestatutako bertsioarekin eguneratu aurretik."
-
-#: admin/class-admin.php:361
-msgid "Actualizar robots.txt"
-msgstr "Eguneratu robots.txt"
-
-#: admin/class-admin.php:362
-msgid "Las reglas de AI Knowledge en .htaccess son diferentes de la configuración guardada."
-msgstr "AI Knowledge-ren .htaccess-eko arauak gordetako konfiguraziotik desberdinak dira."
-
-#: admin/class-admin.php:362
-msgid "Las reglas de AI Knowledge en .htaccess coinciden con la configuración guardada."
-msgstr "AI Knowledge-ren .htaccess-eko arauak gordetako konfigurazioarekin bat datoz."
-
-#: admin/class-admin.php:363
-msgid "El plugin no modifica .htaccess desde el asistente. Descarga la versión preparada y sustitúyela manualmente; conserva siempre una copia por seguridad."
-msgstr "Pluginak ez du .htaccess aldatzen laguntzailetik. Deskargatu prestatutako bertsioa eta ordeztu eskuz; gorde beti segurtasun-kopia bat."
-
-#: admin/class-admin.php:364
-msgid "Comprobar cambios"
-msgstr "Egiaztatu aldaketak"
-
-#: admin/class-admin.php:368
-msgid "Comprueba tu sitio en un agente externo antes de configurar el plugin. Después de completar la configuración, repite la comprobación con este mismo prompt para comparar el resultado."
-msgstr "Egiaztatu zure gunea kanpoko agente batean plugina konfiguratu aurretik. Konfigurazioa amaitu ondoren, errepikatu egiaztapena prompt berarekin emaitza alderatzeko."
-
-#: admin/class-admin.php:368
-#: admin/class-admin.php:432
-msgid "Copiar Prompt"
-msgstr "Kopiatu prompta"
-
-#: admin/class-admin.php:369
-msgid "Qué revisaremos"
-msgstr "Zer berrikusiko dugun"
-
-#: admin/class-admin.php:369
-msgid "El origen de IA y el contenido que formará la base de conocimiento."
-msgstr "AAren jatorria eta ezagutza-basea osatuko duen edukia."
-
-#: admin/class-admin.php:369
-msgid "Los datos del negocio y las integraciones disponibles."
-msgstr "Negozioaren datuak eta eskuragarri dauden integrazioak."
-
-#: admin/class-admin.php:369
-msgid "La visibilidad para IA y los límites de generación."
-msgstr "AArako ikusgarritasuna eta sortze-mugak."
-
-#: admin/class-admin.php:372
-msgid "Conexión de IA disponible: los pasos siguientes podrán generar contenido real."
-msgstr "AA konexioa eskuragarri: hurrengo pausuek benetako edukia sortu ahal izango dute."
-
-#: admin/class-admin.php:374
-msgid "No se detecta ninguna conexión de IA activa todavía."
-msgstr "Oraindik ez da AA konexio aktiborik detektatu."
-
-#: admin/class-admin.php:374
-msgid "Puedes continuar sin problema: los pasos siguientes guardarán tus datos igual, pero no generarán contenido con IA hasta que conectes un origen (aquí, en Conectores de WordPress, o activando Support Genix) y vuelvas a guardar ese paso."
-msgstr "Arazorik gabe jarraitu dezakezu: hurrengo pausuek zure datuak gorde egingo dituzte hala ere, baina ez dute AArekin edukirik sortuko jatorri bat konektatu (hemen, WordPress Konektoreetan, edo Support Genix aktibatuz) eta pausu hori berriro gorde arte."
-
-#: admin/class-admin.php:376
-msgid "Modelo"
-msgstr "Modeloa"
-
-#: admin/class-admin.php:376
-msgid "Configurar Conectores de WordPress"
-msgstr "Konfiguratu WordPress Konektoreak"
-
-#: admin/class-admin.php:376
-msgid "Abrir Support Genix"
-msgstr "Ireki Support Genix"
-
-#: admin/class-admin.php:377
-msgid "Largo máximo del texto"
-msgstr "Testuaren gehienezko luzera"
-
-#: admin/class-admin.php:377
-msgid "Tokens de salida"
-msgstr "Irteerako tokenak"
-
-#: admin/class-admin.php:377
-msgid "Límite diario"
-msgstr "Eguneroko muga"
-
-#: admin/class-admin.php:377
-msgid "Sin límite diario"
-msgstr "Eguneroko mugarik gabe"
-
-#: admin/class-admin.php:377
-msgid "Avisar a IndexNow"
-msgstr "Abisatu IndexNow"
-
-#: admin/class-admin.php:379
-msgid "Tipos de contenido que quieres incluir"
-msgstr "Sartu nahi dituzun eduki motak"
-
-#: admin/class-admin.php:382
-msgid "Contacto y horario de la tienda"
-msgstr "Dendaren kontaktua eta ordutegia"
-
-#: admin/class-admin.php:382
-msgid "Recogida en tienda disponible"
-msgstr "Dendan jasotzea eskuragarri"
-
-#: admin/class-admin.php:383
-msgid "Límite de documentos relacionados"
-msgstr "Dokumentu erlazionatuen muga"
-
-#: admin/class-admin.php:387
-msgid "Al guardar este paso, se genera con IA y se publica de inmediato en llms.txt (excepción explícita de este paso del asistente a la norma habitual de revisar antes de publicar)."
-msgstr "Pausu hau gordetzean, AArekin sortzen da eta berehala argitaratzen llms.txt-en (salbuespen esplizitua, laguntzailearen pausu honetarako bakarrik, argitaratu aurretik berrikusteko ohiko arauari)."
-
-#: admin/class-admin.php:396
-msgid "Ya hay un FAQ publicado para este idioma. Al guardar de nuevo, se amplía/mejora, no se sustituye desde cero."
-msgstr "Hizkuntza honetarako FAQ bat dagoeneko argitaratuta dago. Berriro gordetzean, zabaldu/hobetu egiten da, ez hutsetik ordeztu."
-
-#: admin/class-admin.php:399
-msgid "Todavía no hay FAQ generado para este idioma."
-msgstr "Hizkuntza honetarako ez dago oraindik FAQrik sortuta."
-
-#: admin/class-admin.php:408
-msgid "Categorías de crawlers"
-msgstr "Crawler kategoriak"
-
-#: admin/class-admin.php:409
-msgid "Permitir todos"
-msgstr "Baimendu guztiak"
-
-#: admin/class-admin.php:409
-msgid "Bloquear todos"
-msgstr "Blokeatu guztiak"
-
-#: admin/class-admin.php:411
-msgid "Acceso de crawlers bloqueados a llms.txt"
-msgstr "Blokeatutako crawlerren sarbidea llms.txt-era"
-
-#: admin/class-admin.php:411
-msgid "Decide si un crawler bloqueado puede leer únicamente el archivo llms.txt o si también debe quedar bloqueado en todo el sitio."
-msgstr "Erabaki blokeatutako crawler batek llms.txt fitxategia bakarrik irakur dezakeen, edo gune osoan ere blokeatuta egon behar duen."
-
-#: admin/class-admin.php:411
-msgid "Aplicar la misma política a todo el sitio"
-msgstr "Aplikatu politika bera gune osoan"
-
-#: admin/class-admin.php:411
-msgid "Permitir solo llms.txt"
-msgstr "Baimendu llms.txt bakarrik"
-
-#: admin/class-admin.php:411
-msgid "Robots.txt y .htaccess"
-msgstr "Robots.txt eta .htaccess"
-
-#: admin/class-admin.php:411
-msgid "La política que guardes aquí sirve como base para preparar las reglas de robots.txt y .htaccess. Esos archivos se gestionan después desde la pantalla Visibilidad IA, donde puedes revisar el contenido antes de aplicarlo."
-msgstr "Hemen gordetzen duzun politikak robots.txt eta .htaccess arauak prestatzeko oinarri gisa balio du. Fitxategi horiek gero AA Ikusgarritasuna pantailatik kudeatzen dira, non edukia aplikatu aurretik berrikusi ahal izango duzun."
-
-#: admin/class-admin.php:432
-#: admin/class-admin.php:1292
-msgid "Documentos registrados:"
-msgstr "Erregistratutako dokumentuak:"
-
-#: admin/class-admin.php:432
-#: admin/class-admin.php:1293
-msgid "Documentos pendientes:"
-msgstr "Zain dauden dokumentuak:"
-
-#: admin/class-admin.php:432
-msgid "Pasos omitidos:"
-msgstr "Saltatutako pausuak:"
-
-#: admin/class-admin.php:432
-msgid "Ninguno"
-msgstr "Bat ere ez"
-
-#: admin/class-admin.php:432
-msgid "Recomendamos comprobar este prompt en un agente externo para verificar el funcionamiento del plugin y la visibilidad de tu web."
-msgstr "Prompt hau kanpoko agente batean egiaztatzea gomendatzen dugu, pluginaren funtzionamendua eta zure gunearen ikusgarritasuna egiaztatzeko."
-
-#: admin/class-admin.php:491
-msgid "Paso no válido."
-msgstr "Pausu baliogabea."
-
-#: admin/class-admin.php:802
-msgid "Genix"
-msgstr "Genix"
-
-#: admin/class-admin.php:1276
-msgid "Negocio:"
-msgstr "Negozioa:"
-
-#: admin/class-admin.php:1276
-msgid "Datos guardados."
-msgstr "Datuak gordeta."
-
-#: admin/class-admin.php:1276
-msgid "Todavía sin datos."
-msgstr "Oraindik datu gabe."
-
-#. translators: %s: idioma
-#: admin/class-admin.php:1283
-msgid "WooCommerce (%s):"
-msgstr "WooCommerce (%s):"
-
-#. translators: %s: idioma
-#: admin/class-admin.php:1283
-#: admin/class-admin.php:1287
-msgid "general"
-msgstr "orokorra"
-
-#. translators: %s: idioma
-#: admin/class-admin.php:1283
-msgid "Documentos generados."
-msgstr "Dokumentuak sortuta."
-
-#. translators: %s: idioma
-#: admin/class-admin.php:1283
-#: admin/class-admin.php:1287
-msgid "Todavía sin generar."
-msgstr "Oraindik sortu gabe."
-
-#. translators: %s: idioma
-#: admin/class-admin.php:1287
-msgid "FAQ (%s):"
-msgstr "FAQ (%s):"
-
-#. translators: %s: idioma
-#: admin/class-admin.php:1287
-msgid "Publicado."
-msgstr "Argitaratuta."
-
-#: admin/class-admin.php:1290
-msgid "Chatbot:"
-msgstr "Chatbota:"
-
-#: admin/class-admin.php:1290
-msgid "Sincronizado con Genix."
-msgstr "Genixekin sinkronizatuta."
-
-#: admin/class-admin.php:1290
-msgid "Todavía sin sincronizar."
-msgstr "Oraindik sinkronizatu gabe."
-
-#: admin/class-admin.php:1475
-#: admin/class-admin.php:1477
-msgid "El origen de este documento ya no está publicado."
-msgstr "Dokumentu honen jatorria ez dago jada argitaratuta."
-
-#: admin/class-admin.php:1495
-msgid "Generado."
-msgstr "Sortuta."
-
-#: admin/class-admin.php:1563
-msgid "Ese contenido no está publicado."
-msgstr "Eduki hori ez dago argitaratuta."
-
-#: admin/class-admin.php:2616
-msgid "No se pudo verificar la actualización de robots.txt. Comprueba los permisos de escritura de la raíz del sitio y vuelve a intentarlo."
-msgstr "Ezin izan da robots.txt-en eguneraketa egiaztatu. Egiaztatu gunearen erroaren idazteko baimenak eta saiatu berriro."
-
-#: admin/class-registry-table.php:376
-msgid "Este documento está en modo Manual."
-msgstr "Dokumentu hau modu Eskuzkoan dago."
-
-#: admin/class-registry-table.php:377
-msgid "El texto está fijado a mano y nunca se regenera con IA, así que el prompt no tiene ningún efecto mientras esté en Manual. Pulsa \"Volver a Auto\" si quieres que vuelva a generarse con IA y usar el prompt."
-msgstr "Testua eskuz finkatuta dago eta ez da inoiz AArekin birsortzen, hortaz promptak ez du eraginik Eskuzkoan dagoen bitartean. Sakatu \"Itzuli Automatikora\" AArekin berriro sortzea eta prompta erabiltzea nahi baduzu."
-
-#: admin/class-registry-table.php:385
-msgid "Prompt para este documento"
-msgstr "Dokumentu honetarako prompta"
-
-#: admin/class-registry-table.php:387
-msgid "Instrucciones propias de este documento (estilo, enfoque). No sustituyen los datos reales del contenido: si está vacío, se usa el prompt genérico de siempre."
-msgstr "Dokumentu honi berari dagozkion jarraibideak (estiloa, ikuspegia). Ez dituzte edukiaren benetako datuak ordezten: hutsik utziz gero, betiko prompt generikoa erabiltzen da."
-
-#: admin/class-registry-table.php:391
-msgid "Guardar prompt"
-msgstr "Gorde prompta"
-
-#. translators: 1: "X elemento(s)" ya pluralizado, 2: "X idioma(s)" ya pluralizado, 3: total documentos
-#: admin/views/tab-carga-inicial.php:22
-msgid "Alcance actual: %1$s × %2$s = %3$d documentos posibles."
-msgstr "Uneko irismena: %1$s × %2$s = %3$d dokumentu posible."
-
-#. translators: %d: número de elementos
-#: admin/views/tab-carga-inicial.php:23
-msgid "%d elemento"
-msgid_plural "%d elementos"
-msgstr[0] "%d elementu"
-msgstr[1] "%d elementu"
-
-#. translators: %d: número de idiomas activos
-#: admin/views/tab-carga-inicial.php:24
-msgid "%d idioma"
-msgid_plural "%d idiomas"
-msgstr[0] "%d hizkuntza"
-msgstr[1] "%d hizkuntza"
-
-#: admin/views/tab-prompt.php:119
-msgid "Artículos exclusivos de Genix"
-msgstr "Genix-eko artikulu esklusiboak"
-
-#: admin/views/tab-prompt.php:121
-msgid "Artículos escritos directamente en Support Genix, sin producto ni página de este sitio detrás. Puedes copiarlos tal cual (sin IA) a un documento propio y hacerlos públicos, para que entren en llms.txt."
-msgstr "Support Genix-en zuzenean idatzitako artikuluak, atzean gune honen produktu edo orriak izan gabe. Bere hartara (AA gabe) dokumentu propio batean kopiatu eta publiko egin ditzakezu, llms.txt-en sar daitezen."
-
-#: admin/views/tab-prompt.php:124
-msgid "No hay artículos exclusivos de Genix (o todos los que existen ya tienen su propio documento generado por este plugin)."
-msgstr "Ez dago Genix-eko artikulu esklusiborik (edo daudenak jadanik dute plugin honek sortutako beren dokumentua)."
-
-#: admin/views/tab-prompt.php:129
-msgid "Artículo"
-msgstr "Artikulua"
-
-#: admin/views/tab-prompt.php:147
-msgid "Publicado"
-msgstr "Argitaratuta"
-
-#: admin/views/tab-prompt.php:147
-msgid "No publicado"
-msgstr "Argitaratu gabe"
-
-#: admin/views/tab-prompt.php:154
-msgid "Actualizar contenido"
-msgstr "Eguneratu edukia"
-
-#: admin/views/tab-prompt.php:154
-msgid "Generar contenido"
-msgstr "Sortu edukia"
-
-#: admin/views/tab-prompt.php:161
-msgid "Quitar"
-msgstr "Kendu"
-
-#: admin/views/tab-visibilidad-ia.php:302
-msgid "Permitir todos (visibles)"
-msgstr "Baimendu guztiak (ikusgarriak)"
-
-#: admin/views/tab-visibilidad-ia.php:303
-msgid "Bloquear todos (visibles)"
-msgstr "Blokeatu guztiak (ikusgarriak)"
-
-#: admin/views/tab-visibilidad-ia.php:359
-#: admin/views/tab-visibilidad-ia.php:400
-msgid "Las reglas de AI Knowledge coinciden con la configuración guardada."
-msgstr "AI Knowledge-ren arauak gordetako konfigurazioarekin bat datoz."
-
-#: admin/views/tab-visibilidad-ia.php:359
-#: admin/views/tab-visibilidad-ia.php:400
-msgid "Las reglas de AI Knowledge son diferentes de la configuración guardada."
-msgstr "AI Knowledge-ren arauak gordetako konfiguraziotik desberdinak dira."
-
-#: includes/class-genix-publish.php:52
-#: includes/class-genix-publish.php:115
-msgid "Genix no está activo."
-msgstr "Genix ez dago aktibo."
-
-#: includes/class-genix-publish.php:57
-msgid "No se encontró el artículo de Genix."
-msgstr "Ez da Genix-eko artikulua aurkitu."
-
-#: includes/class-genix-publish.php:61
-msgid "Este artículo está marcado en Genix como \"solo para el chatbot\": no es público ni siquiera dentro de Genix, así que no puede publicarse aquí."
-msgstr "Artikulu hau Genix-en \"chatbotarentzat bakarrik\" gisa markatuta dago: ez da publikoa Genixen barruan ere, hortaz ezin da hemen argitaratu."
-
-#: admin/class-admin.php:1358
-msgid "ACTIVADO"
-msgstr "GAITUTA"
-
-#: admin/class-admin.php:1364
-msgid "Activado:"
-msgstr "Gaituta:"
-
-#: admin/views/tab-visibilidad-ia.php:402
-msgid "Archivo completo preparado. Puedes copiarlo y pegarlo manualmente en tu servidor o descargarlo. También puedes reemplazarlo desde aquí con el botón de más abajo."
-msgstr "Fitxategi osoa prest. Kopiatu eta eskuz zure zerbitzarian txerta dezakezu, edo deskargatu. Hemendik ere ordezka dezakezu beheko botoiarekin."
-
-#: admin/class-admin.php:367
-#: admin/views/tab-visibilidad-ia.php:440
-msgid "Asumo toda la responsabilidad y sé lo que estoy haciendo."
-msgstr "Ardura osoa hartzen dut eta badakit zer ari naizen egiten."
-
-#: admin/class-admin.php:332
-msgid "Comprueba si robots.txt y .htaccess difieren de la configuración guardada. Descarga las copias y las versiones preparadas; el asistente no muestra el código completo; reemplazar .htaccess exige copia descargada y una casilla de responsabilidad."
-msgstr "Egiaztatzen du robots.txt eta .htaccess gordetako konfiguraziotik desberdinak diren. Deskargatu kopiak eta prestatutako bertsioak; laguntzaileak ez du kode osoa erakusten; .htaccess ordezkatzeko deskargatutako kopia bat eta erantzukizun-laukia behar dira."
-
-#: admin/class-admin.php:1359
-msgid "DESACTIVADO"
-msgstr "GAITUGABETUTA"
-
-#: admin/class-admin.php:1365
-msgid "Desactivado:"
-msgstr "Gaitugabetuta:"
-
-#: admin/class-admin.php:366
-#: admin/views/tab-visibilidad-ia.php:435
-msgid "Descargar copia actual de .htaccess"
-msgstr "Deskargatu .htaccess-en uneko kopia"
-
-#: admin/class-admin.php:1367
-msgid "Este ajuste solo cambia las reglas propuestas para robots.txt y .htaccess. Nada se modifica en tu servidor hasta que tú lo apliques."
-msgstr "Doikuntza honek robots.txt eta .htaccess-erako proposatutako arauak soilik aldatzen ditu. Ez da ezer aldatzen zure zerbitzarian zuk aplikatu arte."
-
-#: admin/class-admin.php:1407
-msgid "FAQ:"
-msgstr "FAQ:"
-
-#: admin/class-admin.php:1355
-msgid "Incluir llms.txt para los modelos desactivados"
-msgstr "Sartu llms.txt desgaitutako ereduentzat"
-
-#: admin/class-admin.php:2788
-msgid "Marca la casilla de responsabilidad antes de reemplazar el .htaccess."
-msgstr "Markatu erantzukizun-laukia .htaccess ordezkatu aurretik."
-
-#: admin/class-admin.php:1362
-msgid "Modelos desactivados = los bots que has marcado como Bloquear en la tabla de crawlers."
-msgstr "Desgaitutako ereduak = crawler-en taulan Blokeatu gisa markatu dituzun botak."
-
-#: admin/class-admin.php:2800
-msgid "No se pudo verificar la actualización del .htaccess. Comprueba los permisos y restaura tu copia si hace falta."
-msgstr "Ezin izan da .htaccess-en eguneratzea egiaztatu. Egiaztatu baimenak eta leheneratu zure kopia beharrezkoa bada."
-
-#: admin/class-admin.php:2792
-msgid "No se puede modificar el .htaccess: no existe o el servidor no permite escribirlo. No se ha cambiado nada; usa el archivo preparado a mano."
-msgstr "Ezin da .htaccess aldatu: ez dago edo zerbitzariak ez du idaztea onartzen. Ez da ezer aldatu; erabili prestatutako fitxategia eskuz."
-
-#: admin/views/tab-visibilidad-ia.php:428
-msgid "No se puede reemplazar el .htaccess: no existe o el servidor no permite escribirlo (por ejemplo, nginx no lo usa, o los permisos del archivo lo impiden). No se ha intentado modificar nada. Copia el archivo preparado y pégalo a mano, o corrige los permisos."
-msgstr "Ezin da .htaccess ordezkatu: ez dago edo zerbitzariak ez du idaztea onartzen (adibidez, nginx-ek ez du erabiltzen, edo fitxategiaren baimenek galarazten dute). Ez da ezer aldatzen saiatu. Kopiatu prestatutako fitxategia eta itsatsi eskuz, edo zuzendu baimenak."
-
-#: admin/class-admin.php:365
-msgid "No se puede reemplazar el .htaccess: no existe o el servidor no permite escribirlo. No se ha intentado modificar nada; usa el archivo preparado a mano."
-msgstr "Ezin da .htaccess ordezkatu: ez dago edo zerbitzariak ez du idaztea onartzen. Ez da ezer aldatzen saiatu; erabili prestatutako fitxategia eskuz."
-
-#: admin/class-admin.php:363
-msgid "Puedes reemplazar el .htaccess desde aquí: solo se cambia el bloque de AI Knowledge y tus reglas que choquen se comentan, no se borran. Descarga primero la copia actual y marca la casilla."
-msgstr ".htaccess hemendik ordezka dezakezu: AI Knowledge-ren blokea soilik aldatzen da eta talka egiten duten zure arauak iruzkin bihurtzen dira, ez dira ezabatzen. Deskargatu lehenik uneko kopia eta markatu laukia."
-
-#: admin/class-admin.php:368
-#: admin/views/tab-visibilidad-ia.php:441
-msgid "Reemplazar .htaccess"
-msgstr "Ordezkatu .htaccess"
-
-#: admin/views/tab-visibilidad-ia.php:431
-msgid "Reemplazar solo cambia el bloque de AI Knowledge; el resto del archivo se conserva. Si una regla tuya contradice un bot permitido, se comenta, no se borra. Para activar el botón: descarga la copia actual y marca la casilla."
-msgstr "Ordezkatzeak AI Knowledge-ren blokea soilik aldatzen du; fitxategiaren gainerakoa mantentzen da. Zure arau batek baimendutako bot bati kontra egiten badio, iruzkin bihurtzen da, ez da ezabatzen. Botoia gaitzeko: deskargatu uneko kopia eta markatu laukia."
-
-#: admin/views/tab-visibilidad-ia.php:437
-msgid "Vas a modificar el .htaccess real del sitio. ¿Confirmas que ya descargaste la copia y quieres continuar?"
-msgstr "Guneko benetako .htaccess aldatuko duzu. Berretsi kopia deskargatu duzula eta jarraitu nahi duzula?"
-
-#: admin/class-admin.php:1405
-msgid "WooCommerce:"
-msgstr "WooCommerce:"
-
-#: admin/class-admin.php:1365
-msgid "los bots bloqueados no pueden acceder a nada, ni siquiera a /llms.txt. Es un bloqueo total del sitio."
-msgstr "blokeatutako botek ezin dute ezer atzitu, ezta /llms.txt ere. Guneko blokeo osoa da."
-
-#: admin/class-admin.php:1364
-msgid "los bots bloqueados no pueden entrar en tu web, pero sí leen /llms.txt, el resumen que has preparado para ellos. Cualquier otra página les responde 404."
-msgstr "blokeatutako botek ezin dute zure webgunean sartu, baina /llms.txt irakurtzen dute, haientzat prestatu duzun laburpena. Beste edozein orrik 404 erantzuten die."

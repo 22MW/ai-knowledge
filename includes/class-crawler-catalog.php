@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * piezas de lectura de robots.txt, generador de bloque, .htaccess y logs.
  *
  * Contenido y recomendaciones por defecto tomados literalmente de
- * `_dev/catalogo-crawlers-ia.md` (tabla resumen final) -- no reinterpretados.
+ * `_dev/temp/catalogo-crawlers-ia.md` (tabla resumen final) -- no reinterpretados.
  * `user_agent` es el token real a buscar por substring (case-insensitive)
  * en la cabecera User-Agent, NUNCA la cadena completa del navegador/bot.
  */

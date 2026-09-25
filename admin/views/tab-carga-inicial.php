@@ -16,7 +16,7 @@ $counted   = Registry::count( array( 'status' => 'synced' ) );
 	<?php esc_html_e( 'Genera de golpe los documentos de todo el contenido dentro del alcance, y ajusta aquí el límite diario, el tamaño de lote y el debounce de la cola.', 'ai-knowledge' ); ?>
 </p>
 <?php Admin::documentation_link( 'carga-inicial' ); ?>
-<?php Admin::render_language_regen_notice(); ?>
+<?php if ( ! Languages::creates_post_per_language() ) { Admin::render_language_regen_notice(); } ?>
 <p>
 	<?php
 	printf(
@@ -46,6 +46,8 @@ echo Admin::render_assistant_summary(); // phpcs:ignore WordPress.Security.Escap
 // el paso "finish" del asistente de configuracion -- misma logica, mismo
 // marcado, un solo sitio de mantenimiento.
 echo Admin::render_seed_controls(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado campo a campo dentro del propio metodo.
+// «Crear por idioma» (solo WPML/Polylang): modo de generación, junto a «Reiniciar todo».
+echo Admin::render_per_language_block(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo.
 ?>
 
 <p class="description">

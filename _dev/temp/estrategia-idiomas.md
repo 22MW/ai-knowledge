@@ -1,9 +1,12 @@
 # Estrategia de idiomas
 
-Estado: plan fijo acordado el 2026-09-25. **Fases 0 a 6 implementadas el
-2026-09-25 en la rama `knowBaseDev`, sin commitear y sin probar** (ver «Estado
-por fase»). Falta ejecutar la matriz de pruebas. Sustituye a la versión del
-2026-09-24 (un `.md` por idioma siempre que hubiera WPML).
+Estado (2026-09-25): plan implementado y **probado en una web real con WPML**
+(docthinks: es principal, en, ca; con el check «Crear por idioma» desmarcado y
+marcado). Rama `knowBaseDev`, versión de desarrollo 1.3.1.1. Sin probar todavía
+en otros entornos: sin plugin de idiomas, instalación antigua (migración),
+Polylang y TranslatePress, ni el chatbot de Genix (incidencia de Genix aparte);
+ver `roadmap.md`. Sustituye a la versión del 2026-09-24 (un `.md` por idioma
+siempre que hubiera WPML).
 
 ## Objetivo
 
@@ -128,7 +131,7 @@ Se descarta «traducir texto»: el plugin no extrae texto traducido.
 
 ## Estado por fase (2026-09-25)
 
-Implementadas en un solo pase, en orden, sin commit ni prueba real. Servicio en
+Implementadas en orden el 2026-09-25 (tres tandas). Probadas solo con WPML real, salvo lo indicado. Servicio en
 `includes/class-languages.php` (`AIKB\Languages`); proveedores
 `class-wpml.php` (ahora es el proveedor WPML), `class-polylang.php`,
 `class-translatepress.php` y `class-no-language-plugin.php`, sobre la base
@@ -136,11 +139,11 @@ abstracta `class-language-provider.php`.
 
 | Fase | Estado | Qué cambia |
 |---|---|---|
-| 0 | Hecha, sin probar | Servicio + proveedor WPML (código de hoy) + «ninguno». Todas las llamadas (`Wpml::`, `wpml_*`, `SitePress`) pasan por `Languages`. |
-| 1 | Hecha, sin probar | Sección «3. Idiomas» en Negocio (idioma principal, idiomas de la web, check). Orden Negocio, plugin, WordPress. Fuera el `es` fijo (pipeline, prompt, `Doc_Redirect`, guard del chatbot). |
-| 2 | Hecha, sin probar | Un `.md` por contenido (el del original); `<head>` de las traducciones apunta a él; apartado «Idiomas» en todos los `.md`; Genix sigue el check; nota de idiomas en el mensaje de sistema. |
-| 3 | Hecha, sin probar | Check «Crear por idioma» solo con la capacidad 6; sin puentes; aviso persistente; «Reiniciar todo» borra lo que sobra. |
-| 4 | Hecha, sin probar | `Languages::maybe_migrate()`: una sola vez, marca el check si ya había documentos de contenido en un idioma distinto del principal. |
+| 0 | Hecha y probada con WPML | Servicio + proveedor WPML (código de hoy) + «ninguno». Todas las llamadas (`Wpml::`, `wpml_*`, `SitePress`) pasan por `Languages`. |
+| 1 | Hecha y probada con WPML | Sección «3. Idiomas» en Negocio (idioma principal, idiomas de la web, check). Orden Negocio, plugin, WordPress. Fuera el `es` fijo (pipeline, prompt, `Doc_Redirect`, guard del chatbot). |
+| 2 | Hecha y probada con WPML (Genix sin concluir) | Un `.md` por contenido (el del original); `<head>` de las traducciones apunta a él; apartado «Idiomas» en todos los `.md`; Genix sigue el check; nota de idiomas en el mensaje de sistema. |
+| 3 | Hecha y probada con WPML | Check «Crear por idioma» solo con la capacidad 6; sin puentes; aviso persistente; «Reiniciar todo» borra lo que sobra. |
+| 4 | Hecha, sin probar en una instalación antigua | `Languages::maybe_migrate()`: una sola vez, marca el check si ya había documentos de contenido en un idioma distinto del principal. |
 | 5 | Hecha, sin probar ni instalar | Proveedor Polylang (API `pll_*`); `Scope::resolve_ids()` pide `lang => ''`. |
 | 6 | Hecha, sin probar ni instalar | Proveedor TranslatePress: lista de idiomas y URL traducida; sin check. La API se ha escrito de memoria de su documentación: comprobar en una instalación real. |
 
@@ -172,9 +175,9 @@ Decisiones menores tomadas al implementar (reversibles):
 - Textos del apartado «Idiomas» del `.md` en es, en, de, ca, fr, eu (inglés
   para otros).
 
-### Ajustes tras la prueba en docthinks (2026-09-25, sin probar)
+### Ajustes tras la prueba en docthinks (2026-09-25, probados con WPML)
 
-Detalle en [`ajustes-idiomas-docthinks.md`](ajustes-idiomas-docthinks.md).
+Detalle en `ajustes-idiomas-docthinks.md`.
 Esto sustituye a lo dicho antes cuando lo contradice:
 
 - La pregunta libre `idioma_principal` ya no existe: el idioma principal y los
@@ -190,6 +193,15 @@ Esto sustituye a lo dicho antes cuando lo contradice:
 - Nombres de idioma: tabla propia primero.
 - «Reiniciar todo» borra también los documentos de tipos fuera del alcance.
 
+### Tercera tanda (2026-09-25, probada con WPML)
+
+- Selector sin lista fija: principal entre los detectados (o idioma de WordPress
+  sin plugin); otros idiomas a mano («código Nombre»), guardados en `extra`.
+- «Crear por idioma» vive en Carga inicial (y en el paso Negocio del
+  asistente), con su aviso y «Reiniciar todo».
+- Botón del editor por AJAX: incluye el ID del original (y el propio con el
+  check), no el tipo; el Registro se busca por el documento real.
+
 Riesgos abiertos (para las pruebas):
 
 - Con un solo `.md` por contenido y WPML, la búsqueda nativa de Genix filtra
@@ -200,9 +212,18 @@ Riesgos abiertos (para las pruebas):
   Polylang.
 - TranslatePress: API no verificada contra una instalación.
 
-## Pruebas (al final)
+## Pruebas
 
-Se ejecutan cuando estén las fases 0 a 6. Matriz:
+Resultado de la prueba real (docthinks, WPML, 2026-09-25): OK las URLs y
+nombres por idioma, el apartado «Disponible en», el `<head>` en los dos modos,
+`llms.txt` único y sin prefijo, el conteo del alcance, «Reiniciar todo» con
+confirmación y limpieza, el check en Carga inicial y en el asistente, el
+selector de idiomas y el botón del editor. **Sin concluir:** el chatbot de
+Genix (responde «no tengo información» incluso en español con los documentos
+correctos; incidencia de Genix). **Sin probar:** sitio sin plugin de idiomas,
+instalación antigua, Polylang y TranslatePress (pendientes en `roadmap.md`).
+
+Matriz:
 
 | Escenario | Check | Genix | Qué comprobar |
 |---|---|---|---|

@@ -85,8 +85,8 @@ aquí — tienes que pulsar **"Generar/actualizar ahora"** cuando quieras
 que reflejen los datos más recientes.
 
 Los documentos de tienda se generan en el **idioma principal** del sitio. Si tu
-web es multiidioma, llevan al final una nota con los demás idiomas en los que
-está disponible. Cada documento generado se puede pulir con IA (solo redacción
+web es multiidioma, llevan al final «Disponible en», con la portada de cada
+idioma. Cada documento generado se puede pulir con IA (solo redacción
 y formato, sin cambiar ni inventar datos) directamente desde esta pantalla.
 
 ## Preguntas frecuentes

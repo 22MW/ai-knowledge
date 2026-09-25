@@ -69,13 +69,44 @@ Además, sin decisión que tomar (corrección directa): nombres de idioma comple
 
 «Genera automáticamente `/es/llms.txt` aunque exista un `/llms.txt` personalizado; la versión localizada ignora el contenido manual y genera una descripción antigua.» Tiene sentido: con TranslatePress, `/es/llms.txt` no es el archivo físico (que solo se sirve en la raíz) sino la ruta dinámica del plugin (`maybe_serve` → `build()`), que ignora el archivo manual. No reproducido aquí (docthinks usa WPML). **Decisión de diseño (coherente con «una única fuente de verdad»):** no existe `llms.txt` localizado; cualquier `/xx/llms.txt` sirve el mismo contenido que `/llms.txt` (el archivo físico si existe, y si no el dinámico). Entra en la fase de TranslatePress.
 
+## Prueba 3 en docthinks — versión 1.3.1.1 instalada (2026-09-25)
+
+OK: 1 (URLs y nombres por idioma correctos), 4 (tras «Reiniciar todo»: 30 documentos, todos ES), 5 (el `/es/` de `ai-knowledge-doc/es/…` es la carpeta del `.md`, no un prefijo de idioma; correcto), 6, 7, 10 (80 documentos: ES 30 = 27 + 3 propios, EN 26, CA 24; cola 77), 11, 12, 13 (con check, `<head>` de `/en/newsletter/` → `en/newsletter-10264.md`), 14, 15, 16.
+Pruebas 2 (Negocio/info.md) y 3 (conteo de Carga inicial): OK (usuario, 2026-09-25).
+
+Ajustes nuevos (pendientes de decidir/hacer):
+- **Selector de idiomas (Negocio y asistente):** ofrece una **lista fija de 10 idiomas** (`native_names()`), aunque el sitio tenga WPML. Es arbitraria: un idioma extra que no esté en la lista no se puede poner. Propuesta: con plugin de idiomas, «Idioma principal» solo entre los idiomas detectados y «Idiomas de la web» = los detectados (no editable o solo para quitar); sin plugin, principal = idioma de WordPress (desplegable con el locale) y otros idiomas escritos a mano (texto libre), sin lista fija. Mismo comportamiento en Negocio y en el asistente.
+- **Check «Crear por idioma»:** en Negocio «se quedó mal». Propuesta (usuario): moverlo a **Carga inicial / generación masiva**, junto al botón «Reiniciar todo», porque es un modo de generación y su consecuencia es reiniciar. Solo visible con WPML/Polylang. Revisar también el asistente.
+- **Botón «Añadir a la base de conocimiento» del editor** (`class-editor-metabox.php::handle_add`): al pulsarlo en una traducción (EN) de un CPT fuera de alcance, el usuario acaba en otro CPT (interview) y el contenido no aparece en la base de conocimiento. Hipótesis (sin verificar): se añaden al alcance el tipo entero y el **id de la traducción**, pero se encola el documento del **original** (`document_target`); y «Ver en el Registro» busca por el título de la traducción, que no coincide con el del original. Reproducir con pasos exactos antes de corregir.
+
+### Decisiones del usuario sobre los ajustes nuevos (2026-09-25)
+
+- **Selector de idiomas:** con plugin de idiomas se ofrecen **los idiomas detectados** y, además, el usuario puede **añadir a mano** otros. Sin plugin: idioma de WordPress + los que escriba a mano. Sin lista fija de 10. Igual en Negocio y en el asistente.
+- **Check «Crear por idioma»:** **se mueve a Carga inicial** (generación masiva), junto a «Reiniciar todo». Solo con WPML/Polylang. Quitarlo de la pestaña Negocio. **En el asistente, el check SÍ se muestra en su paso de Negocio** (decisión del usuario, 2026-09-25; hoy el asistente no lo tiene): mismo control y mismo aviso con «Reiniciar todo», solo con WPML/Polylang.
+- **Carpeta del idioma principal (`llm/es/…`):** el usuario pregunta si se puede no crear la carpeta para el idioma principal. Técnicamente sí (`Markdown_Store::relative_path()` construye siempre `{idioma}/{slug}.md`), pero cambia las URL ya publicadas y exige migración y redirecciones. Recomendación: mantener la carpeta. **Decidido (usuario): se mantiene `llm/{idioma}/`.**
+
+### Botón del editor: investigado
+
+Posts probados: 11762 (es) y 11739 (en), ambos `community-member` de «Seleme Aydin» (grupo WPML 120442, con ca 11760). En el estado actual de docthinks: el tipo no está en el alcance (`post_types` = page, product, project), `id_actions` vacío y no hay documentos de esos posts.
+Causas en el código (`class-editor-metabox.php::handle_add`, `class-scope.php::is_included`):
+1. Un «ID a incluir» ya fuerza el contenido **sin importar su tipo** (`is_included`), pero `handle_add` añade además **el tipo entero** al alcance: pulsar el botón en un solo contenido mete todos los `community-member` (259) en el alcance.
+2. Se incluye el **ID del post donde se pulsa** (la traducción EN), pero el documento que se encola es el del **original** (`document_target`). Si el original no está incluido por sí mismo, no se genera o no aparece.
+3. La redirección final usa `get_edit_post_link($post_id)` sin el parámetro `lang`, así que WPML puede devolver al usuario a otro idioma o contexto.
+4. «Ver en el Registro» busca por el título del post actual, que puede no coincidir con el del documento del original.
+Corrección propuesta: no añadir el tipo; incluir el ID del **original** (y el actual si el check está marcado); volver a la misma pantalla de edición con su `lang`; buscar en el Registro por el ID/título del documento real.
+**Causa confirmada del botón (2026-09-25):** el metabox pinta un `<form>` **dentro** del formulario del editor (`post.php`). Los formularios anidados no existen en HTML: el navegador ignora el interior y el botón envía el formulario del editor con `action=wookb_editor_add_to_kb`. `post.php` no conoce esa acción y cae en su `default:`, que hace `wp_redirect( admin_url( 'edit.php' ) )` (comprobado en `wp-admin/post.php` del sitio). Por eso el usuario acaba en `/wp-admin/edit.php`. La BD lo confirma: el clic no cambió el alcance (`id_actions` vacío) ni encoló nada (última acción de 11762: 14:03 GMT, anterior al clic). `handle_add` nunca se ejecuta. Corrección: **no usar `<form>` en el metabox**; botón `type="button"` con AJAX (el plugin ya tiene `ajaxActions` en `assets/admin.js`) o equivalente, con nonce y capability. Las cuatro causas anteriores siguen siendo válidas para cuando el handler sí se ejecute.
+
+Verificar tras corregir: pulsar en 11762 y en 11739 con el check desmarcado y marcado.
+
+## Prueba 4 en docthinks — tanda 3 (2026-09-25)
+
+OK: 1 a 11, 13 (Registro), 14 (con check marcado se generan el documento del original y el de la traducción: 11536 es y 11530 en) y 15 (consola).
+Prueba 12 («los documentos salen en inglés desde es y desde en»): **no es un fallo del botón.** En la BD `wookb_language_settings` tiene `main = en` (guardado explícitamente; WPML por defecto es `es`) y `per_language = 1`, así que el «original» de cada contenido es la versión inglesa: desde 12347 (es) se generó `rainbowg-12346` (en) y desde 12503 (en) `eduardo-gutierrez-12503` (en). Es lo previsto con idioma principal English. Pendiente de confirmar con el usuario si el principal en inglés fue una prueba del selector; si no, volver a Español en Negocio. Estado de prueba dejado en docthinks: `id_actions` con 5 IDs incluidos (11739, 12503, 12346, 11530, 11536) y `extra` = ja, ru.
+
 ## Estado
 
-**Aplicado el 2026-09-25** por el `desarrollador` (todos los ajustes de este
-documento), sin commitear y sin probar. Solo `php -l` y `git diff --check`.
-Fuera de alcance: Genix responde mal (incidencia aparte), `.po` y `docs/`.
-Falta repetir la prueba en docthinks (check desmarcado y marcado).
-
-## Siguiente
-
-Rehacer con el check marcado en docthinks (Negocio → «Crear por idioma» → «Reiniciar todo») y comparar el apartado «Idiomas» de los .md por idioma. Después se corrige todo junto.
+**Cerrado el 2026-09-25.** Las tres tandas de ajustes están aplicadas y
+probadas con WPML en docthinks (todo OK; la prueba 12 del botón del editor era
+el idioma principal en inglés, no un fallo). Lo que sigue pendiente (Genix y
+otros plugins de idiomas) está en `roadmap.md`. El plan y su estado están en
+`estrategia-idiomas.md`.

@@ -1,3 +1,5 @@
+<img src="../logo/ai%20knowldge%20bw.svg" alt="AI Knowledge & Visibility" width="90" align="right">
+
 # AI Knowledge & Visibility
 
 **Que las inteligencias artificiales entiendan tu negocio tan bien como tú.**
@@ -69,6 +71,9 @@ ya tienes en WordPress.
   los mismos documentos, no un texto que alguien tenga que mantener a mano.
 - **Sin mantenimiento.** Si publicas o cambias un producto, el plugin lo
   detecta y actualiza su documento. Si pasas algo a borrador, lo retira.
+- **Vale para webs en varios idiomas.** Con WPML, la IA recibe un solo documento
+  por página, en tu idioma principal, que le dice en qué otros idiomas está y
+  con qué enlace.
 - **Tú mandas.** Decides qué entra, qué se deja fuera y puedes fijar a mano el
   texto de cualquier documento para que no se regenere.
 
@@ -116,12 +121,14 @@ y comprueba los permisos. Si no hay permisos, no toca nada.
 - **Seguro de instalar en sitios ajenos.** No recrea productos, pedidos ni
   pagos: solo lee lo que ya existe con las APIs oficiales de WooCommerce. Los
   cambios en archivos del servidor exigen copia y confirmación.
-- **Multiidioma con WPML.** Un documento por idioma cuando existe traducción
-  real; FAQ, tienda y Negocio salen en el idioma principal con una nota de los
-  demás.
+- **Webs en varios idiomas.** Funciona con WPML (probado en una web real) y
+  también sin plugin de idiomas. Cada página o producto tiene un solo documento,
+  en el idioma principal, que indica en qué otros idiomas existe y con qué
+  enlace; si prefieres uno por idioma, es una casilla. FAQ, tienda y Negocio
+  salen en el idioma principal. El `llms.txt` es único.
 - **Interfaz en español, catalán, alemán, inglés y francés.**
-- **Sin dependencias duras.** WooCommerce, WPML y Support Genix se detectan
-  solos; si no están, esas funciones no se activan y el resto sigue.
+- **Sin dependencias duras.** WooCommerce, tu plugin de idiomas y Support Genix se
+  detectan solos; si no están, esas funciones no se activan y el resto sigue.
 - **Actualizaciones automáticas** desde el propio panel de WordPress.
 
 ## Un entregable que se ve
@@ -153,7 +160,7 @@ configuración, y comparar.
 - **Una conexión de IA** para redactar: los Conectores de WordPress 7.0 o
   superior (Anthropic, OpenAI o Google) o Support Genix. El consumo de IA lo
   cobra tu proveedor, no el plugin; el límite diario ayuda a controlarlo.
-- WooCommerce, WPML y Support Genix son opcionales.
+- WooCommerce, un plugin de idiomas (hoy, WPML) y Support Genix son opcionales.
 
 ## Lo que no hace (y conviene decirlo)
 
@@ -189,6 +196,12 @@ diario y puedes empezar con pocos.
 **¿Y si cambio un precio o un envío?**
 El documento del producto se regenera. Una venta que solo cambia el stock, no.
 
+**¿Y si mi web está en varios idiomas?**
+Funciona con WPML y también sin plugin de idiomas. Por defecto genera un
+documento por contenido, en tu idioma principal, con enlaces a sus
+traducciones. Con Polylang o TranslatePress todavía no lo ofrecemos como
+funcionalidad probada (ver más abajo).
+
 **¿Y si quiero quitar el plugin?**
 Tus datos se quedan guardados. Si lo desinstalas del todo, se eliminan, con
 un aviso previo.
@@ -201,17 +214,19 @@ Estas líneas están pensadas pero **no se ofrecen como funciones**:
 
 - Un modo para generar los documentos **sin IA**, copiando el contenido de
   WordPress tal cual.
-- Compatibilidad de idiomas con Polylang y TranslatePress (hoy, WPML).
+- Compatibilidad con **Polylang** y **TranslatePress**: ya está programada,
+  pero solo se ha probado con WPML en una web real. Hasta comprobarla en una
+  instalación de cada uno, no se ofrece como función.
 
 ---
 
 # E. Precio
 
-| Plan | Qué incluye | Precio |
-|---|---|---|
-| **Sitio** | 1 web, actualizaciones y soporte | **49 €/año por web** |
-| **Sin límite de webs** | Todas las webs que quieras, actualizaciones y soporte | **99 €/año** |
-| **Lifetime** | Sin límite de webs, para siempre | **222 € (pago único)** |
+| Plan                   | Qué incluye                                           | Precio                 |
+| ---------------------- | ----------------------------------------------------- | ---------------------- |
+| **Sitio**              | 1 web, actualizaciones y soporte                      | **49 €/año por web**   |
+| **Sin límite de webs** | Todas las webs que quieras, actualizaciones y soporte | **99 €/año**           |
+| **Lifetime**           | Sin límite de webs, para siempre                      | **222 € (pago único)** |
 
 **Servicio opcional de configuración:** si prefieres que lo dejemos todo
 configurado por ti, unos **50 €** aparte.
@@ -335,6 +350,7 @@ Para cada recurso:
 IMPORTANTE:
 No marques un archivo como "no verificado" sin intentar acceder primero.
 Si no puedes leerlo indica exactamente:
+
 - motivo del fallo;
 - bloqueo encontrado;
 - error HTTP;
@@ -363,20 +379,20 @@ Máximo 50 líneas.
 
 Entrega una tabla:
 
-| Elemento | Estado | Resultado observado | Impacto para IA |
-|---|---|---|---|
-| robots.txt | | | |
-| llms.txt | | | |
-| sitemap | | | |
-| Markdown IA | | | |
-| JSON | | | |
-| Feeds | | | |
-| APIs | | | |
-| Schema.org | | | |
-| Product | | | |
-| Organization | | | |
-| FAQ | | | |
-| Otros recursos GEO | | | |
+| Elemento           | Estado | Resultado observado | Impacto para IA |
+| ------------------ | ------ | ------------------- | --------------- |
+| robots.txt         |        |                     |                 |
+| llms.txt           |        |                     |                 |
+| sitemap            |        |                     |                 |
+| Markdown IA        |        |                     |                 |
+| JSON               |        |                     |                 |
+| Feeds              |        |                     |                 |
+| APIs               |        |                     |                 |
+| Schema.org         |        |                     |                 |
+| Product            |        |                     |                 |
+| Organization       |        |                     |                 |
+| FAQ                |        |                     |                 |
+| Otros recursos GEO |        |                     |                 |
 
 ---
 
@@ -385,6 +401,7 @@ Entrega una tabla:
 Evalúa únicamente la calidad técnica de cada archivo:
 
 ### llms.txt
+
 Analiza:
 
 - existencia;
@@ -396,6 +413,7 @@ Analiza:
 - relación con otros recursos.
 
 ### robots.txt
+
 Analiza:
 
 - acceso permitido/bloqueado para bots IA;
@@ -403,6 +421,7 @@ Analiza:
 - coherencia con llms.txt.
 
 ### JSON / APIs / Feeds
+
 Analiza:
 
 - existencia;
@@ -457,3 +476,9 @@ No incluyas recomendaciones generales.
 No expliques qué se podría hacer.
 Entrega únicamente el estado actual de la web.
 ```
+
+---
+
+###
+
+<img src="../logo/ai%20knowldge%20bw.svg" alt="AI Knowledge & Visibility" width="222">

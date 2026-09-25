@@ -288,6 +288,11 @@ class Admin
 			if ('finish' === $step) {
 				echo self::assistant_screen_content($step); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
+			// «Crear por idioma» lleva su propio formulario (y el aviso su botón
+			// «Reiniciar todo»): va fuera del <form> del asistente, por lo mismo.
+			if ('business' === $step) {
+				echo self::render_per_language_block(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo.
+			}
 			?>
 			<form method="post" data-assistant-form>
 				<?php wp_nonce_field('aikb_assistant', 'aikb_assistant_nonce'); ?>
@@ -1438,10 +1443,12 @@ GEO;
 	 */
 	public static function render_language_fields($variant = 'table')
 	{
-		$options  = Languages::selectable_languages();
+		$options  = Languages::main_options();
 		$main     = Languages::main_language();
-		$selected = Languages::codes();
-		ob_start();
+		$detected = array();
+		foreach (Languages::detected_languages() as $code => $info) {
+			$detected[] = Languages::name($code);
+		}
 
 		$select = '<select id="wookb-main-language" name="main_language">';
 		foreach ($options as $code => $name) {
@@ -1449,22 +1456,62 @@ GEO;
 		}
 		$select .= '</select>';
 
-		$checks = '<fieldset class="wookb-chip-group">';
-		foreach ($options as $code => $name) {
-			$checks .= '<label class="wookb-chip"><input type="checkbox" name="site_languages[]" value="' . esc_attr($code) . '"' . checked(in_array($code, $selected, true), true, false) . ' /> ' . esc_html($name) . '</label>';
-		}
-		$checks .= '</fieldset>';
+		$extra = '<textarea id="wookb-extra-languages" name="extra_languages" rows="3" class="large-text" placeholder="' . esc_attr__('fr Français', 'ai-knowledge') . '">' . esc_textarea(Languages::extra_languages_text()) . '</textarea>';
+		$found = $detected
+			? '<p>' . esc_html(sprintf(/* translators: %s: idiomas detectados */ __('Detectados por tu plugin de idiomas: %s.', 'ai-knowledge'), implode(', ', $detected))) . '</p>'
+			: '';
 
-		$main_help  = __('Es el idioma de los documentos que genera el plugin (llms.txt, FAQ, tienda, Negocio y el .md de cada contenido). Si hay un plugin de idiomas se detecta solo.', 'ai-knowledge');
-		$langs_help = __('Idiomas en los que está disponible la web. Si hay un plugin de idiomas se detectan solos. Se usan para el prompt del chatbot, llms.txt y el resumen.', 'ai-knowledge');
+		$main_help  = Languages::detected_languages()
+			? __('Es el idioma de los documentos que genera el plugin (llms.txt, FAQ, tienda, Negocio y el .md de cada contenido). Se elige entre los idiomas que detecta tu plugin de idiomas.', 'ai-knowledge')
+			: __('Es el idioma de los documentos que genera el plugin (llms.txt, FAQ, tienda, Negocio y el .md de cada contenido). Sin plugin de idiomas es el idioma de WordPress.', 'ai-knowledge');
+		$langs_help = __('Otros idiomas de la web que quieras añadir a mano: uno por línea, con el código y el nombre (por ejemplo «fr Français»). Se usan para el prompt del chatbot, llms.txt y el resumen.', 'ai-knowledge');
 
 		if ('assistant' === $variant) {
-			echo '<label class="wookb-assistant-field"><span>' . esc_html__('Idioma principal', 'ai-knowledge') . '</span>' . $select . '<small>' . esc_html($main_help) . '</small></label>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapado arriba.
-			echo '<div class="wookb-assistant-field"><span>' . esc_html__('Idiomas de la web', 'ai-knowledge') . '</span>' . $checks . '<small>' . esc_html($langs_help) . '</small></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapado arriba.
-		} else {
-			echo '<tr><th><label for="wookb-main-language">' . esc_html__('Idioma principal', 'ai-knowledge') . '</label></th><td>' . $select . '<p class="description">' . esc_html($main_help) . '</p></td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapado arriba.
-			echo '<tr><th>' . esc_html__('Idiomas de la web', 'ai-knowledge') . '</th><td>' . $checks . '<p class="description">' . esc_html($langs_help) . '</p></td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapado arriba.
+			return '<label class="wookb-assistant-field"><span>' . esc_html__('Idioma principal', 'ai-knowledge') . '</span>' . $select . '<small>' . esc_html($main_help) . '</small></label>'
+				. '<div class="wookb-assistant-field"><span>' . esc_html__('Idiomas de la web', 'ai-knowledge') . '</span>' . $found . $extra . '<small>' . esc_html($langs_help) . '</small></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapado arriba.
 		}
+		return '<tr><th><label for="wookb-main-language">' . esc_html__('Idioma principal', 'ai-knowledge') . '</label></th><td>' . $select . '<p class="description">' . esc_html($main_help) . '</p></td></tr>'
+			. '<tr><th><label for="wookb-extra-languages">' . esc_html__('Idiomas de la web', 'ai-knowledge') . '</label></th><td>' . $found . $extra . '<p class="description">' . esc_html($langs_help) . '</p></td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapado arriba.
+	}
+
+	/**
+	 * Bloque «Crear por idioma»: formulario propio (AJAX) con el aviso y el botón
+	 * «Reiniciar todo». Solo con un plugin de idiomas que crea un post por
+	 * idioma (WPML/Polylang). Se pinta en Carga inicial y, fuera del formulario
+	 * del asistente, en su paso Negocio.
+	 */
+	public static function render_per_language_block()
+	{
+		if (! Languages::creates_post_per_language()) {
+			return '';
+		}
+		ob_start();
+		?>
+		<div class="wookb-per-language" id="wookb-per-language">
+			<h3><?php esc_html_e('Crear por idioma', 'ai-knowledge'); ?></h3>
+			<p class="description">
+				<?php
+				printf(
+					/* translators: %s: nombre del plugin de idiomas, p. ej. WPML */
+					esc_html__('Tu plugin de idiomas (%s) crea un contenido distinto por idioma. Desmarcado (recomendado): un solo .md por contenido, en el idioma principal, y todas las traducciones lo enlazan. Marcado: además se crea un .md por cada traducción que exista (sin documentos puente). Genix sigue este ajuste. Al cambiarlo, pulsa «Reiniciar todo» para borrar y regenerar lo que ya no corresponda.', 'ai-knowledge'),
+					esc_html(Languages::provider_label())
+				);
+				?>
+			</p>
+			<?php self::render_language_regen_notice(); ?>
+			<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+				<input type="hidden" name="action" value="wookb_save_per_language" />
+				<?php wp_nonce_field('wookb_save_per_language'); ?>
+				<p>
+					<label>
+						<input type="checkbox" name="per_language" value="1" <?php checked(Languages::per_language_enabled()); ?> />
+						<?php esc_html_e('Crear un .md por cada traducción que exista', 'ai-knowledge'); ?>
+					</label>
+				</p>
+				<?php submit_button(__('Guardar', 'ai-knowledge'), 'secondary', 'submit', false); ?>
+			</form>
+		</div>
+		<?php
 		return ob_get_clean();
 	}
 
@@ -2031,8 +2078,8 @@ GEO;
 			return;
 		}
 		$main  = sanitize_key(wp_unslash($_POST['main_language'])); // phpcs:ignore
-		$codes = isset($_POST['site_languages']) && is_array($_POST['site_languages']) ? array_map('sanitize_key', wp_unslash($_POST['site_languages'])) : array(); // phpcs:ignore
-		Languages::save_language_fields($main, $codes);
+		$extra = isset($_POST['extra_languages']) ? sanitize_textarea_field(wp_unslash($_POST['extra_languages'])) : ''; // phpcs:ignore
+		Languages::save_language_fields($main, $extra);
 	}
 
 	/**
@@ -2058,7 +2105,7 @@ GEO;
 				)
 			);
 		}
-		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=negocio&wookb_notice=1#wookb-per-language'));
+		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=carga-inicial&wookb_notice=1#wookb-per-language'));
 		exit;
 	}
 

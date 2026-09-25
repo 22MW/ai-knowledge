@@ -209,14 +209,62 @@ Escrituras reales en disco (fuera de la carpeta del plugin, en
 
 ## Idiomas
 
-- `Wpml::default_language()` (filtro `wpml_default_language`, con fallback
-  a `active_languages()[0]`) es el idioma principal.
-- FAQ, documentos de tienda y Negocio se generan solo en ese idioma y llevan
-  al final `Wpml::languages_note()` («Esta web también está disponible
-  en…», con nombres nativos). Páginas y productos siguen con un documento por
-  traducción real.
-- El diseño de una capa de idiomas común (WPML/Polylang/TranslatePress) está
-  en `_dev/estrategia-idiomas.md`; no está implementado.
+Plan y estado: `_dev/temp/estrategia-idiomas.md`. El resto del plugin pregunta
+siempre al servicio `AIKB\Languages` (`includes/class-languages.php`), nunca a
+un plugin de idiomas concreto.
+
+- **Proveedores** (base `Language_Provider`, `includes/class-language-provider.php`):
+  `Wpml` (`class-wpml.php`), `Polylang` (`class-polylang.php`),
+  `TranslatePress` (`class-translatepress.php`) y `No_Language_Plugin`
+  (`class-no-language-plugin.php`). Se elige por detección (`detect()`).
+  `creates_post_per_language()` decide si existe el check «Crear por idioma»
+  (WPML y Polylang sí; TranslatePress y ninguno, no).
+- **Contrato** (métodos de `Languages`): `main_language()`, `languages()` y
+  `codes()`, `name()`, `post_language()`, `original_id()`,
+  `translation_id()`, `post_url()` y `permalink()`, `versions()`,
+  `document_target()` y `targets()`, `current_language()`,
+  `documents_language()`, `term_id_in_language()`, `trid()`,
+  `all_languages_query_args()`, `in_main_language()`.
+- **Ajustes:** opción `wookb_language_settings` con `main` (vacío = se detecta),
+  `per_language` (el check) y `extra` (idiomas añadidos a mano, código =>
+  nombre). Orden del idioma principal: ajuste de Negocio, plugin de idiomas,
+  idioma de WordPress. Nombres completos por una tabla propia (`native_names()`);
+  el nombre del plugin solo se acepta si no es el código.
+- **Un `.md` por contenido:** `document_target()` devuelve el original (la
+  traducción en el idioma principal si existe; si no, la que exista). Con el
+  check, `targets()` devuelve una por cada traducción existente, sin
+  documentos puente. `Scope::resolve_ids()` reduce a un id por contenido sin el
+  check. Ruta: `wp-content/llm/{idioma}/{slug}.md` (`Markdown_Store`).
+- **URLs:** `Languages::permalink()` obtiene la URL en el idioma del post (el
+  proveedor cambia de idioma solo alrededor de `get_permalink()`); la URL
+  pública del `.md` y `llms.txt` se construyen sin prefijo de idioma
+  (`Markdown_Store::root_url()`). `Llms_Txt::build()` se ejecuta bajo el idioma
+  principal (`in_main_language()`); no hay `llms.txt` localizado.
+- **Apartado «Idiomas» de los `.md`:** `Languages::build_section()`; solo
+  «Disponible en: …» con las versiones que existen, y se omite con una sola.
+  FAQ, tienda e info.md usan `site_section()`. FAQ, tienda y Negocio se generan
+  solo en el idioma principal.
+- **Check y «Reiniciar todo»:** `Languages::save_per_language()`,
+  `regen_pending()`; el bloque vive en Carga inicial y en el paso Negocio del
+  asistente (`Admin::render_per_language_block()`, acción admin-post
+  `wookb_save_per_language` con variante AJAX). `Queue::start_seed(true)` llama
+  a `cleanup_obsolete_documents()`: borra puentes, traducciones sin el check y
+  documentos de tipos fuera del alcance (`obsolete_rows()`/`obsolete_count()`);
+  no toca FAQ, tienda, Negocio, `sgkb-docs` ni filas en modo manual. La
+  confirmación del botón indica cuántos borra.
+- **Migración:** `maybe_migrate()` marca el check una sola vez si ya había
+  documentos de contenido en un idioma distinto del principal;
+  `maybe_migrate_language_answer()` pasa la antigua pregunta libre
+  `idioma_principal` al campo estructurado.
+- **Chatbot:** `Languages::chatbot_note()` añade la nota de idiomas al mensaje
+  de sistema al sincronizar con Genix (si cabe en 2000 caracteres).
+- **Botón del editor:** `Editor_Metabox` con AJAX (`wp_ajax_wookb_editor_add_to_kb`,
+  `assets/editor-metabox.js`). Incluye en el alcance el ID del original (y el
+  del post pulsado con el check), no el tipo entero, y encola
+  `document_target()`.
+- **Sin verificar:** Polylang (los `sgkb-docs` solo reciben idioma si el CPT
+  es traducible) y TranslatePress (API escrita de la documentación, sin
+  instalación real).
 
 ## Asistente de configuración
 

@@ -15,9 +15,12 @@ Necesitas:
   WordPress es 7.0 o superior, con Anthropic, OpenAI o Google configurado)
   o **Support Genix** instalado y activo.
 
-Esto es todo. WooCommerce y WPML son opcionales: si los tienes, el plugin
-los detecta solo y activa pantallas extra; si no los tienes, todo lo demás
-funciona igual.
+Esto es todo. WooCommerce y un plugin de idiomas son opcionales: si los
+tienes, el plugin los detecta solo y activa pantallas extra; si no los tienes,
+todo lo demás funciona igual. Con plugin de idiomas funciona **WPML** (probado en
+una web real), **Polylang** y **TranslatePress** (compatibles según su
+documentación, todavía sin probar en una instalación real). Ver
+[Webs con varios idiomas](index.md#webs-con-varios-idiomas).
 
 ## Paso 1 — Instalar y activar
 

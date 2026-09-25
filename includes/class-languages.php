@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * de idiomas concreto: solo este servicio (y sus proveedores) conocen WPML,
  * Polylang o TranslatePress.
  *
- * Contrato mínimo (estrategia-idiomas.md):
+ * Contrato mínimo (_dev/temp/estrategia-idiomas.md):
  *  1. main_language()               idioma principal.
  *  2. languages()                   código, nombre nativo y URL de portada.
  *  3. post_language( $id )          idioma de un contenido.
@@ -182,33 +182,6 @@ class Languages {
 	}
 
 	/**
-	 * Guarda los ajustes de idioma de Negocio. $per_language null = no tocar
-	 * el check (p. ej. sin la capacidad 6). Marca el aviso «usa Reiniciar
-	 * todo» si cambia el check o el idioma principal. Devuelve true si el
-	 * aviso queda pendiente.
-	 */
-	public static function save_settings( $main, array $codes, $per_language ) {
-		$prev_main = self::main_language();
-		$prev_per  = self::per_language_enabled();
-
-		$saved              = self::saved();
-		$saved['main']      = (string) $main;
-		$saved['languages'] = array_values( $codes );
-		if ( null !== $per_language && self::creates_post_per_language() ) {
-			$saved['per_language'] = $per_language ? 1 : 0;
-		} elseif ( ! array_key_exists( 'per_language', $saved ) ) {
-			$saved['per_language'] = self::legacy_generates_per_language() ? 1 : 0;
-		}
-		update_option( self::OPTION, $saved, false );
-		self::flush_cache();
-
-		if ( self::main_language() !== $prev_main || self::per_language_enabled() !== $prev_per ) {
-			update_option( self::REGEN_FLAG, 1, false );
-		}
-		return self::regen_pending();
-	}
-
-	/**
 	 * Guarda solo el check «Crear por idioma» (formulario propio, por AJAX).
 	 * Marca el aviso «Reiniciar todo» si cambia. Devuelve true si el aviso
 	 * queda pendiente.
@@ -231,59 +204,107 @@ class Languages {
 	}
 
 	/**
-	 * Normaliza el idioma principal y los idiomas de la web elegidos en
-	 * Negocio: lo que coincide con la detección automática (plugin de idiomas
-	 * o idioma de WordPress) se guarda vacío para seguir detectando solo.
-	 * Devuelve array( principal|'', códigos ).
+	 * Interpreta el texto de «otros idiomas»: uno por línea (o separados por
+	 * comas/punto y coma), «código Nombre», p. ej. «fr Français». Sin nombre se
+	 * usa la tabla propia o el código. Devuelve código => nombre.
 	 */
-	protected static function normalize_language_fields( $main, array $codes ) {
+	public static function parse_extra_languages( $raw ) {
+		$out = array();
+		foreach ( (array) preg_split( '/[\r\n;,]+/', (string) $raw, -1, PREG_SPLIT_NO_EMPTY ) as $line ) {
+			$parts = preg_split( '/[\s:=]+/', trim( $line ), 2 );
+			$code  = sanitize_key( isset( $parts[0] ) ? $parts[0] : '' );
+			if ( '' === $code || strlen( $code ) > 8 ) {
+				continue;
+			}
+			$name        = isset( $parts[1] ) ? sanitize_text_field( $parts[1] ) : '';
+			$out[ $code ] = '' !== $name ? $name : self::native_name( $code );
+		}
+		return $out;
+	}
+
+	/** Otros idiomas añadidos a mano (código => nombre), sin los que ya detecta el plugin. */
+	public static function extra_languages() {
+		$saved    = self::saved();
+		$detected = self::detected_languages();
+		$extra    = array();
+		if ( ! empty( $saved['extra'] ) && is_array( $saved['extra'] ) ) {
+			foreach ( $saved['extra'] as $code => $name ) {
+				$code = sanitize_key( $code );
+				if ( '' !== $code && ! isset( $detected[ $code ] ) ) {
+					$extra[ $code ] = (string) $name;
+				}
+			}
+		}
+		return $extra;
+	}
+
+	/** Texto editable de los otros idiomas: una línea «código Nombre» por idioma. */
+	public static function extra_languages_text() {
+		$lines = array();
+		foreach ( self::extra_languages() as $code => $name ) {
+			$lines[] = $code . ' ' . $name;
+		}
+		return implode( "\n", $lines );
+	}
+
+	/**
+	 * Idiomas entre los que se elige el principal: los detectados por el plugin
+	 * de idiomas o, sin plugin, el idioma de WordPress; más el ya guardado.
+	 * código => nombre completo.
+	 */
+	public static function main_options() {
+		$out = array();
+		foreach ( self::detected_languages() as $code => $info ) {
+			$out[ $code ] = self::native_name( $code, isset( $info['name'] ) ? $info['name'] : '' );
+		}
+		if ( ! $out ) {
+			$wp           = self::wordpress_language();
+			$known        = self::native_names();
+			$out[ $wp ]   = isset( $known[ $wp ] ) ? $known[ $wp ] : get_locale();
+		}
+		$saved = self::saved();
+		if ( ! empty( $saved['main'] ) && ! isset( $out[ $saved['main'] ] ) ) {
+			$out[ $saved['main'] ] = self::name( $saved['main'] );
+		}
+		return $out;
+	}
+
+	/**
+	 * Guarda el idioma principal (entre main_options()) y los otros idiomas
+	 * escritos a mano (Negocio y asistente, mismo método). Lo que coincide con
+	 * la detección automática se guarda vacío. Deja el check como está. Marca
+	 * el aviso «Reiniciar todo» si cambia el principal.
+	 */
+	public static function save_language_fields( $main, $extra_raw ) {
+		$prev_main = self::main_language();
+
 		$main = sanitize_key( $main );
-		if ( '' === $main || $main === self::auto_main_language() ) {
+		if ( ! isset( self::main_options()[ $main ] ) || $main === self::auto_main_language() ) {
 			$main = '';
 		}
 
-		$codes    = array_values( array_unique( array_filter( array_map( 'sanitize_key', $codes ) ) ) );
-		$detected = array_keys( self::detected_languages() );
-		$a        = $codes;
-		$b        = $detected;
-		sort( $a );
-		sort( $b );
-		if ( $detected && $a === $b ) {
-			$codes = array();
-		}
-		return array( $main, $codes );
-	}
-
-	/**
-	 * Guarda el idioma principal y los idiomas de la web (campo estructurado de
-	 * Negocio y del asistente). Deja el check «Crear por idioma» como está.
-	 */
-	public static function save_language_fields( $main, array $codes ) {
-		$valid = array_keys( self::selectable_languages() );
-		$main  = in_array( $main, $valid, true ) ? $main : '';
-		$codes = array_values( array_intersect( array_map( 'sanitize_key', $codes ), $valid ) );
-
-		list( $main, $codes ) = self::normalize_language_fields( $main, $codes );
-		return self::save_settings( $main, $codes, null );
-	}
-
-	/**
-	 * Opciones de idioma para el selector: primero los de la web, después el
-	 * resto de la tabla propia de nombres. código => nombre completo.
-	 */
-	public static function selectable_languages() {
-		$out = array();
-		foreach ( self::languages() as $code => $language ) {
-			$out[ $code ] = $language['name'];
-		}
-		$rest = array();
-		foreach ( self::native_names() as $code => $name ) {
-			if ( ! isset( $out[ $code ] ) ) {
-				$rest[ $code ] = $name;
+		$detected = self::detected_languages();
+		$extra    = array();
+		foreach ( self::parse_extra_languages( $extra_raw ) as $code => $name ) {
+			if ( ! isset( $detected[ $code ] ) ) {
+				$extra[ $code ] = $name;
 			}
 		}
-		asort( $rest );
-		return $out + $rest;
+
+		$saved          = self::saved();
+		$saved['main']  = $main;
+		$saved['extra'] = $extra;
+		unset( $saved['languages'] );
+		if ( ! array_key_exists( 'per_language', $saved ) ) {
+			$saved['per_language'] = self::legacy_generates_per_language() ? 1 : 0;
+		}
+		update_option( self::OPTION, $saved, false );
+		self::flush_cache();
+
+		if ( self::main_language() !== $prev_main ) {
+			update_option( self::REGEN_FLAG, 1, false );
+		}
+		return self::regen_pending();
 	}
 
 	/** «Español (principal), English, Català» (nombres, nunca códigos). Un solo idioma: solo su nombre. */
@@ -342,10 +363,17 @@ class Languages {
 		}
 
 		$saved = self::saved();
-		if ( empty( $saved['main'] ) && empty( $saved['languages'] ) ) {
-			list( $main, $codes ) = self::normalize_language_fields( $found[0], $found );
-			$saved['main']        = $main;
-			$saved['languages']   = $codes;
+		if ( empty( $saved['main'] ) && empty( $saved['extra'] ) ) {
+			$detected = self::detected_languages();
+			$saved['main'] = ( $found[0] !== self::auto_main_language() ) ? $found[0] : '';
+			$extra         = array();
+			foreach ( $found as $code ) {
+				if ( ! isset( $detected[ $code ] ) && $code !== $found[0] ) {
+					$extra[ $code ] = self::native_name( $code );
+				}
+			}
+			$saved['extra'] = $extra;
+			unset( $saved['languages'] );
 			update_option( self::OPTION, $saved, false );
 			self::flush_cache();
 		}
@@ -432,15 +460,27 @@ class Languages {
 		$detected = self::detected_languages();
 		$saved    = self::saved();
 
-		$codes = ( ! empty( $saved['languages'] ) && is_array( $saved['languages'] ) ) ? $saved['languages'] : array_keys( $detected );
-		$codes = array_values( array_diff( array_map( 'strval', $codes ), array( $main ) ) );
+		// Detectados por el plugin de idiomas + los añadidos a mano (código y
+		// nombre); sin plugin, el principal y los añadidos. Los guardados con la
+		// versión anterior (lista de códigos) se conservan como añadidos.
+		$extra = self::extra_languages();
+		if ( ! empty( $saved['languages'] ) && is_array( $saved['languages'] ) ) {
+			foreach ( $saved['languages'] as $legacy ) {
+				$legacy = sanitize_key( $legacy );
+				if ( '' !== $legacy && ! isset( $detected[ $legacy ] ) && ! isset( $extra[ $legacy ] ) ) {
+					$extra[ $legacy ] = '';
+				}
+			}
+		}
+		$codes = array_values( array_diff( array_merge( array_keys( $detected ), array_keys( $extra ) ), array( $main ) ) );
 		array_unshift( $codes, $main );
 
 		$out = array();
 		foreach ( $codes as $code ) {
-			$out[ $code ] = array(
+			$provider_name = isset( $detected[ $code ]['name'] ) ? $detected[ $code ]['name'] : '';
+			$out[ $code ]  = array(
 				'code' => $code,
-				'name' => self::native_name( $code, isset( $detected[ $code ]['name'] ) ? $detected[ $code ]['name'] : '' ),
+				'name' => ( ! empty( $extra[ $code ] ) ) ? $extra[ $code ] : self::native_name( $code, $provider_name ),
 				'url'  => isset( $detected[ $code ]['url'] ) ? $detected[ $code ]['url'] : ( $code === $main ? home_url( '/' ) : '' ),
 			);
 		}

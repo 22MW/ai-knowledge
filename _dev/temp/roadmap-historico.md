@@ -1,11 +1,11 @@
 # Histórico de roadmap — AI Knowledge & Visibility
 
-Archivo de consulta: recoge trabajo cerrado y su evidencia ya registrada. No es una lista de trabajo activa; para pendientes, ver [`roadmap.md`](roadmap.md).
+Archivo de consulta: recoge trabajo cerrado y su evidencia ya registrada. No es una lista de trabajo activa; para pendientes, ver [`roadmap.md`](../roadmap.md).
 
 ## Fases cerradas
 
 - **Fase 0 y 0.1 — Identidad:** renombrado a AI Knowledge & Visibility, archivo principal `ai-knowledge.php`, namespace `AIKB` y slug de menú `ai-knowledge`. Se conservaron tabla, opciones y nombres `wookb_*` que requerían compatibilidad.
-- **Fase 0.2 — Documentación:** creados el índice, instalación y guías de las nueve pestañas en [`docs/`](docs/index.md), además de documentación técnica interna. Los medios marcados como pendientes permanecen en el roadmap activo.
+- **Fase 0.2 — Documentación:** creados el índice, instalación y guías de las nueve pestañas en [`docs/`](../../docs/index.md), además de documentación técnica interna. Los medios marcados como pendientes permanecen en el roadmap activo.
 - **Fase 1 — Control manual:** modo Auto/Manual, texto fijado, límite por documento, detección de origen actualizado y acceso desde el editor.
 - **Fase 2 — WooCommerce:** pestaña específica de tienda, envíos, impuestos, pagos, condiciones y vistas previas; ampliada posteriormente con selección editable y pulido factual por IA.
 - **Fases 3 a 5 — Exposición pública:** API JSON de contenido, Markdown público descubrible y JSON-LD Schema.org.
@@ -55,10 +55,42 @@ Archivo de consulta: recoge trabajo cerrado y su evidencia ya registrada. No es 
 
 - `Scope::resolve_ids()` aplica relación `OR` entre taxonomías incluidas; los feeds dejaron de devolver alcance vacío y se verificó en real.
 
+### Estrategia de idiomas (2026-09-25)
+
+- Servicio común de idiomas (`AIKB\Languages`) con proveedores WPML, Polylang,
+  TranslatePress y «ninguno»; el resto del plugin ya no llama a WPML
+  directamente. Se acabó el español fijo.
+- Idioma principal e idiomas de la web en Negocio y en el asistente (detectados
+  por el plugin de idiomas, con idiomas añadidos a mano). La pregunta libre
+  «Idioma principal del negocio» se sustituyó por el campo estructurado, con
+  migración de lo ya guardado.
+- Un solo `.md` por contenido, en el idioma principal; las traducciones lo
+  enlazan en el `<head>`. Apartado «Disponible en» con las URL de cada idioma.
+- Casilla «Crear por idioma» (solo WPML y Polylang), en Carga inicial y en el
+  asistente, con aviso y «Reiniciar todo» (confirmación con el número de
+  documentos que se borran, incluidos los de tipos fuera del alcance).
+- URL por idioma correctas (`Languages::permalink()`), `.md` y `llms.txt` sin
+  prefijo de idioma, `llms.txt` único bajo el idioma principal.
+- Botón «Añadir a la base de conocimiento» del editor por AJAX (antes un
+  formulario anidado que redirigía a `edit.php`).
+- Textos nuevos traducidos en el `.pot` y los `.po` de `ca`, `de_DE`, `en_US`, `eu`
+  y `fr_FR` (2026-09-25).
+- Probado con WPML real (docthinks: es principal, en, ca), con el check
+  desmarcado y marcado. Detalle en `estrategia-idiomas.md` y
+  `ajustes-idiomas-docthinks.md` (ambos en esta carpeta).
+
+### Otros cierres recogidos al limpiar el roadmap (2026-09-25)
+
+- «Reemplazar .htaccess» probado en un servidor real (según el usuario).
+- Internacionalización del plugin: catálogos `ca`, `de_DE`, `en_US`, `eu` y
+  `fr_FR` al día con la 1.3.0; selección de `docs/{locale}/` implementada.
+- Releases 1.2.0 a 1.3.0 fusionadas en `main` con el script sin conflictos; el
+  script ya no sube un tag local.
+
 ## Decisiones históricas relevantes
 
 - El núcleo del producto continúa siendo generación por IA y Support Genix; las capas JSON, Markdown, Schema y feeds lo complementan.
 - Los documentos legales o de pago se construyen de forma determinista: la IA solo puede pulir redacción sin cambiar datos.
 - Los contenidos reales generados viven en `wp-content/llm/`, fuera del repo.
 - No se escribe `robots.txt` ni `.htaccess` sin el flujo de seguridad y copia obligatoria aprobado para esa función.
-- El detalle completo de decisiones estables está en [`decisiones.md`](decisiones.md).
+- El detalle completo de decisiones estables está en [`decisiones.md`](../decisiones.md).
