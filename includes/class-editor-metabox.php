@@ -62,8 +62,8 @@ class Editor_Metabox {
 			return;
 		}
 
-		$lang = Wpml::element_language( $post->ID );
-		$row  = Registry::find( $post->ID, $lang );
+		$target = Languages::document_target( $post->ID );
+		$row    = Registry::find( $target['id'], $target['lang'] );
 
 		if ( $row ) {
 			require_once AIKB_DIR . 'admin/class-registry-table.php';
@@ -124,8 +124,8 @@ class Editor_Metabox {
 			)
 		);
 
-		$lang = Wpml::element_language( $post_id );
-		Queue::enqueue( $post_id, $lang );
+		$target = Languages::document_target( $post_id );
+		Queue::enqueue( $target['id'], $target['lang'] );
 
 		$redirect = get_edit_post_link( $post_id, 'raw' );
 		wp_safe_redirect( $redirect ? $redirect : admin_url() );

@@ -118,6 +118,9 @@ Sí. En **Visibilidad IA** selecciona el modo que permite únicamente `/llms.txt
 
 Ver `CHANGELOG.md` para el historial completo y detallado de cambios.
 
+= 1.3.1.1 (dev) =
+Estrategia de idiomas: servicio común para WPML, Polylang y TranslatePress, un solo .md por contenido, casilla «Crear por idioma», idioma principal e idiomas en Negocio y en el asistente, URLs por idioma corregidas y «Reiniciar todo» con limpieza de documentos fuera de alcance. Versión de desarrollo: Stable tag sin cambios.
+
 = 1.3.1 =
 Traducciones (catalán, alemán, inglés, euskera y francés) al día con las novedades de la 1.3.0 y guía de usuario actualizada.
 

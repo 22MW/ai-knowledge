@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Orquesta un ciclo completo: extraer -> comprobar hash -> generar (o puente) -> .md -> sgkb-docs -> registro -> llms.txt.
+ * Orquesta un ciclo completo: extraer -> comprobar hash -> generar -> .md -> sgkb-docs -> registro -> llms.txt.
  */
 class Document_Pipeline {
 
@@ -30,27 +30,35 @@ class Document_Pipeline {
 		$post_type = get_post_type( $source_id );
 		$extractor = Extractors\Extractor_Base::for_post_type( $post_type );
 
-		// Traducción real en ese idioma, si existe.
-		$translated_id = Wpml::get_translation_id( $source_id, $lang );
-		$is_bridge      = false;
-		$data           = null;
-
-		if ( $translated_id ) {
-			$data = $extractor->extract( $translated_id );
+		// Versión real del contenido en ese idioma. Sin ella no se genera nada:
+		// ya no hay documentos puente (solo se crean .md para lo que existe).
+		$translated_id = Languages::translation_id( $source_id, $lang );
+		if ( ! $translated_id ) {
+			return new \WP_Error( 'wookb_no_translation', __( 'Este contenido no tiene versión en ese idioma.', 'ai-knowledge' ) );
 		}
 
+		// Sin "Crear por idioma", una traduccion no tiene documento propio: el
+		// documento es el del original (todas las traducciones lo enlazan). Cubre
+		// trabajos ya en cola o filas antiguas de antes de cambiar el ajuste; lo
+		// que sobra lo borra "Reiniciar todo" (Languages::cleanup_obsolete_documents()).
+		$target = Languages::document_target( $translated_id );
+		if ( (int) $target['id'] !== (int) $translated_id ) {
+			return new \WP_Error( 'wookb_translation_no_own_doc', __( 'Esta traducción no tiene documento propio: su contenido va en el .md del original (opción «Crear por idioma» desmarcada).', 'ai-knowledge' ) );
+		}
+
+		$data = $extractor->extract( $translated_id );
 		if ( ! $data ) {
-			// No hay traducción -> documento puente factual con enlaces es/en.
-			$is_bridge = true;
-			$data      = $extractor->extract( $source_id );
-			if ( ! $data ) {
-				return new \WP_Error( 'wookb_no_source', __( 'No se pudo extraer el origen.', 'ai-knowledge' ) );
-			}
+			return new \WP_Error( 'wookb_no_source', __( 'No se pudo extraer el origen.', 'ai-knowledge' ) );
 		}
 
-		$hash = self::compute_hash( $data );
+		// Versiones del contenido en cada idioma (idioma => URL): alimentan el
+		// apartado "Idiomas" del .md y, si hay más de una, el hash (para que
+		// añadir o quitar una traducción regenere el apartado).
+		$versions = Languages::versions( $translated_id );
 
-		$existing = Registry::find( $translated_id ? $translated_id : $source_id, $lang );
+		$hash = self::compute_hash( $data, $versions );
+
+		$existing = Registry::find( $translated_id, $lang );
 
 		// Modo manual (Fase 1): el texto lo fija el admin a mano, nunca se
 		// regenera con IA. Solo se comprueba si el origen cambio desde que se
@@ -64,7 +72,10 @@ class Document_Pipeline {
 				array(
 					'source_id' => $existing->source_id,
 					'lang'      => $existing->lang,
-					'stale'     => ( $existing->source_hash === $hash ) ? 0 : 1,
+					// Igual con el hash sin versiones: un texto manual fijado antes
+					// de existir el apartado "Idiomas" no debe marcarse como
+					// obsoleto solo por eso.
+					'stale'     => ( $existing->source_hash === $hash || $existing->source_hash === self::compute_hash( $data ) ) ? 0 : 1,
 				)
 			);
 			return true;
@@ -76,7 +87,7 @@ class Document_Pipeline {
 			return true;
 		}
 
-		$real_source_id = $translated_id ? $translated_id : $source_id;
+		$real_source_id = $translated_id;
 
 		// char_limit propio de la fila (Fase 1): si no se paso uno explicito
 		// para esta llamada, usa el guardado en la fila; si tampoco hay,
@@ -98,30 +109,20 @@ class Document_Pipeline {
 			'generating'
 		);
 
-		// Enlaces a las versiones de este mismo producto en los demas idiomas activos
-		// (si existen). Se usan tanto en el documento puente como en el flujo normal,
-		// para que un visitante que aterrice en el documento de un idioma pueda
-		// encontrar las fichas reales de los otros idiomas.
-		$cross_language_links = self::build_cross_language_links( $source_id, $lang );
-
 		// Pieza 2: prompt propio de esta fila, si el admin escribio uno. isset()
 		// por seguridad: la columna custom_prompt puede no existir aun en la
 		// tabla si el sitio no ha pasado por la migracion de version que la
 		// añade (dbDelta via wookb_db_version, ver ai-knowledge.php).
 		$custom_prompt = ( $existing && isset( $existing->custom_prompt ) ) ? $existing->custom_prompt : '';
 
-		if ( $is_bridge ) {
-			$markdown = Generator::build_bridge_markdown( $data, $cross_language_links );
-		} else {
-			$markdown = Generator::generate( $data, $cross_language_links, $char_limit, $custom_prompt );
-			if ( is_wp_error( $markdown ) ) {
-				Registry::update_status(
-					Registry::find( $real_source_id, $lang )->id,
-					'error',
-					array( 'last_error' => $markdown->get_error_message() )
-				);
-				return $markdown;
-			}
+		$markdown = Generator::generate( $data, $versions, $char_limit, $custom_prompt );
+		if ( is_wp_error( $markdown ) ) {
+			Registry::update_status(
+				Registry::find( $real_source_id, $lang )->id,
+				'error',
+				array( 'last_error' => $markdown->get_error_message() )
+			);
+			return $markdown;
 		}
 
 		$slug = Markdown_Store::slug_for( $real_source_id, $lang );
@@ -136,7 +137,7 @@ class Document_Pipeline {
 				'source_hash'  => $hash,
 				'generated_at' => current_time( 'mysql' ),
 				'product_url'  => $data['url'],
-				'bridge'       => $is_bridge,
+				'bridge'       => false,
 			)
 		);
 
@@ -152,7 +153,7 @@ class Document_Pipeline {
 			// documento queda sin fila en icl_translations y el chatbot lo excluye
 			// de cualquier busqueda por idioma). Los documentos necesitan su PROPIO
 			// grupo de traduccion, independiente del trid del producto.
-			$product_trid = Wpml::get_trid( $real_source_id );
+			$product_trid = Languages::trid( $real_source_id );
 			$doc_trid     = Registry::find_doc_trid_by_product_trid( $product_trid );
 
 			$existing_row = Registry::find( $real_source_id, $lang );
@@ -176,7 +177,7 @@ class Document_Pipeline {
 			if ( ! $doc_trid ) {
 				// Primer documento del grupo: recupera el trid que WPML acaba de asignar
 				// para que los siguientes idiomas del mismo producto lo reutilicen.
-				$doc_trid = Wpml::get_trid( $doc_post_id );
+				$doc_trid = Languages::trid( $doc_post_id );
 			}
 		}
 
@@ -189,7 +190,7 @@ class Document_Pipeline {
 				'doc_post_id'  => $doc_post_id,
 				'source_hash'  => $hash,
 				'status'       => 'synced',
-				'is_bridge'    => $is_bridge ? 1 : 0,
+				'is_bridge'    => 0,
 				'product_trid' => $product_trid,
 				'doc_trid'     => $doc_trid,
 				'generated_at' => current_time( 'mysql' ),
@@ -202,27 +203,7 @@ class Document_Pipeline {
 		return true;
 	}
 
-	/**
-	 * Enlaces a las traducciones reales de $source_id en los demas idiomas activos
-	 * (excluyendo $current_lang). Usado tanto por el documento puente como por el
-	 * flujo normal, para que cualquier documento generado enlace a las versiones
-	 * del mismo producto en otros idiomas cuando existan.
-	 */
-	protected static function build_cross_language_links( $source_id, $current_lang ) {
-		$links = array();
-		foreach ( Wpml::active_languages() as $target_lang ) {
-			if ( $target_lang === $current_lang ) {
-				continue;
-			}
-			$id = Wpml::get_translation_id( $source_id, $target_lang );
-			if ( $id ) {
-				$links[ $target_lang ] = get_permalink( $id );
-			}
-		}
-		return $links;
-	}
-
-	protected static function compute_hash( array $data ) {
+	protected static function compute_hash( array $data, array $versions = array() ) {
 		$normalized = array(
 			$data['title'],
 			$data['content'],
@@ -242,6 +223,14 @@ class Document_Pipeline {
 		// Sin cantidades de stock (ver purchase_hash_subset()).
 		if ( isset( $data['purchase'] ) && is_array( $data['purchase'] ) ) {
 			$normalized[] = wp_json_encode( self::purchase_hash_subset( $data['purchase'] ) );
+		}
+
+		// Versiones por idioma (apartado "Idiomas" del .md): solo si hay mas de
+		// una, por la misma razon que "Datos de compra" -- un elemento extra en
+		// sitios de un solo idioma cambiaria el hash de TODOS los documentos y
+		// forzaria una regeneracion con IA que no hace falta.
+		if ( count( $versions ) > 1 ) {
+			$normalized[] = wp_json_encode( $versions );
 		}
 
 		return hash( 'sha256', implode( '|', $normalized ) );

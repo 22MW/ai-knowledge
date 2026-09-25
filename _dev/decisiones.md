@@ -229,7 +229,8 @@ contenido) — no se forzó una invalidación especial para este cambio de códi
 - No se borran las filas antiguas de otros idiomas: es una limpieza con efecto
   en `/llms.txt` y la decide el usuario.
 - Estrategia global de idiomas (Negocio manda, apartado «Idiomas» en los `.md`,
-  check «Separar por idioma»): `_dev/estrategia-idiomas.md`, sin implementar.
+  check «Crear por idioma»): `_dev/estrategia-idiomas.md`. Implementada el
+  2026-09-25, sin probar.
 
 ## 2026-09-24 — Datos de compra en productos
 - Precio, descuento, envío, impuestos, variaciones (tope 100) y campos
@@ -273,3 +274,40 @@ contenido) — no se forzó una invalidación especial para este cambio de códi
 - No se prometen resultados de posicionamiento en IA ni funciones «en
   estudio» (modo WP, Polylang, TranslatePress).
 - Resultado comprobado por el usuario en más de una web: el prompt de auditoría GEO suele dar BAJO o MEDIO antes y ALTO después de configurar el plugin. Se puede afirmar así en el material comercial, sin cifras ni garantías.
+
+## 2026-09-25 — Servicio de idiomas
+- Solo `AIKB\Languages` (y sus proveedores WPML, Polylang, TranslatePress y
+  «ninguno») conocen un plugin de idiomas. El resto del plugin pregunta al
+  servicio; no se llama a `wpml_*` ni a `pll_*` fuera de los proveedores.
+- Un `.md` por contenido, en el idioma del original. «Crear por idioma»
+  (solo con plugins que crean un post por idioma) añade un `.md` por cada
+  traducción que existe. No hay documentos puente.
+- Idioma principal: Negocio, después el plugin de idiomas, después el idioma
+  de WordPress. Sin `es` fijo.
+- Cambiar el check o el idioma principal deja un aviso hasta usar «Reiniciar
+  todo», que borra los `.md` por idioma y los puentes que sobran.
+- Detalle y decisiones menores en `_dev/estrategia-idiomas.md`.
+
+## 2026-09-25 — Ajustes tras la prueba en docthinks (WPML)
+- Una sola función por proveedor da la URL de un contenido en SU idioma
+  (`Languages::permalink()`); WPML cambia de idioma solo alrededor de
+  `get_permalink()`. La URL del `.md` y `llms.txt` se construyen sin prefijo de
+  idioma (`Markdown_Store::root_url()`).
+- `llms.txt` se genera siempre bajo el idioma principal. No existe `llms.txt`
+  localizado: `/xx/llms.txt` sirve el mismo archivo (físico si existe, si no el
+  dinámico).
+- Apartado «Idiomas» de los `.md`: solo «Disponible en: …»; con una versión, sin
+  apartado. Nombres completos desde tabla propia; el del plugin de idiomas solo
+  si no parece el código.
+- Sin «Crear por idioma», `Scope::resolve_ids()` devuelve un id por contenido
+  (el original o, si no existe, la versión que quede en orden de idiomas); con
+  el check, todos. El conteo de Carga inicial no multiplica por idiomas.
+- El idioma principal y los idiomas de la web son un campo estructurado
+  (Negocio y asistente); sustituye a la pregunta libre. El texto de prompt,
+  `llms.txt` y resumen se derivan de él. Lo que coincide con la detección
+  automática se guarda vacío (sigue detectando solo).
+- «Reiniciar todo», en cada ejecución, borra también los documentos cuyo tipo
+  ya no está en el alcance (con confirmación que indica cuántos). No toca FAQ,
+  tienda, Negocio, artículos de Genix ni filas en modo manual.
+- Guardar de nuevo el paso FAQ del asistente regenera con IA (con el FAQ actual
+  como referencia) y sustituye el publicado.

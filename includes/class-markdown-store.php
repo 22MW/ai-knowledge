@@ -34,7 +34,16 @@ class Markdown_Store {
 	 */
 	public static function public_url( $relative ) {
 		$without_extension = preg_replace( '/\.md$/', '', $relative );
-		return home_url( '/ai-knowledge-doc/' . $without_extension . '.md' );
+		return self::root_url( '/ai-knowledge-doc/' . $without_extension . '.md' );
+	}
+
+	/**
+	 * URL bajo la raíz del sitio, sin prefijo de idioma (home_url() lo añade con
+	 * WPML/Polylang según la petición): una sola URL canónica para los .md y
+	 * llms.txt.
+	 */
+	public static function root_url( $path ) {
+		return trailingslashit( (string) get_option( 'home' ) ) . ltrim( $path, '/' );
 	}
 
 	/**

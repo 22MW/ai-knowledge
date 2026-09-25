@@ -25,8 +25,17 @@ class Llms_Txt {
 			return;
 		}
 
+		// No existe un llms.txt localizado: cualquier /xx/llms.txt sirve lo mismo
+		// que /llms.txt (el físico si existe -- puede ser manual --, y si no el
+		// dinámico). Con un prefijo de idioma el archivo físico de la raíz no lo
+		// sirve el servidor, así que se lee aquí.
 		header( 'Content-Type: text/plain; charset=utf-8' );
-		echo self::build(); // phpcs:ignore
+		$path = self::physical_path();
+		if ( is_readable( $path ) ) {
+			echo file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents,WordPress.Security.EscapeOutput.OutputNotEscaped
+		} else {
+			echo self::build(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
 		exit;
 	}
 
@@ -36,6 +45,16 @@ class Llms_Txt {
 			return $cached;
 		}
 
+		// Siempre bajo el idioma principal: las URLs de API y feeds no deben
+		// salir con el prefijo del idioma de la petición que lo regenera.
+		$output = Languages::in_main_language( array( __CLASS__, 'render' ) );
+		set_transient( 'wookb_llms_txt', $output, DAY_IN_SECONDS );
+
+		return $output;
+	}
+
+	/** Contenido de llms.txt (se llama bajo el idioma principal desde build()). */
+	public static function render() {
 		$rows = Registry::get_synced_public_urls();
 
 		$lines   = array();
@@ -87,11 +106,10 @@ class Llms_Txt {
 		// "## Enoturismo (EN)", etc. -- mas cercano al formato de la spec de
 		// llms.txt (secciones tematicas con descripcion corta por enlace) que
 		// la lista plana anterior, solo agrupada por idioma sin contexto.
-		// Sufijo "(ES)"/"(EN)" solo en sitios multiidioma de verdad: en un
-		// sitio de un solo idioma no aporta nada y es ruido en cada
-		// encabezado -- Wpml::active_languages() ya cae a array('es') sin
-		// WPML activo, así que basta con contar cuántos hay.
-		$show_lang_suffix = count( Wpml::active_languages() ) > 1;
+		// Sufijo "(ES)"/"(EN)" solo si los documentos publicados estan de
+		// verdad en mas de un idioma (con "Crear por idioma"): con un unico
+		// documento por contenido no aporta nada y es ruido en cada encabezado.
+		$show_lang_suffix = count( array_unique( wp_list_pluck( $rows, 'lang' ) ) ) > 1;
 
 		$groups = array();
 		foreach ( $rows as $row ) {
@@ -112,10 +130,7 @@ class Llms_Txt {
 		}
 
 
-		$output = implode( "\n", $lines );
-		set_transient( 'wookb_llms_txt', $output, DAY_IN_SECONDS );
-
-		return $output;
+		return implode( "\n", $lines );
 	}
 
 	public static function invalidate() {
@@ -131,8 +146,8 @@ class Llms_Txt {
 	 * del post_type crudo porque "product" agruparia vinos y experiencias de
 	 * enoturismo juntos, que es justo la distincion que se pidio separar.
 	 *
-	 * SIEMPRE se devuelve el nombre del termino en el idioma por defecto de
-	 * WPML (via wpml_object_id), nunca el del idioma de $row -- confirmado
+	 * SIEMPRE se devuelve el nombre del termino en el idioma principal (via
+	 * Languages::term_id_in_language()), nunca el del idioma de $row -- confirmado
 	 * en real: agrupar "por idioma del row" dejaba categorias mezcladas
 	 * (ej. "Weinprobe (ES)": el termino de esa fila ES no tenia traduccion
 	 * WPML propia y WPML devolvia el nombre en aleman tal cual). La seccion
@@ -171,13 +186,13 @@ class Llms_Txt {
 		}
 
 		$term = $terms[0];
-		if ( class_exists( 'SitePress' ) ) {
-			$canonical_id = apply_filters( 'wpml_object_id', $term->term_id, 'product_cat', false, 'es' );
-			if ( $canonical_id ) {
-				$canonical_term = get_term( $canonical_id, 'product_cat' );
-				if ( $canonical_term && ! is_wp_error( $canonical_term ) ) {
-					return $canonical_term->name;
-				}
+		// Nombre de la categoria en el idioma principal (via el servicio de
+		// idiomas); sin plugin de idiomas devuelve el mismo termino.
+		$canonical_id = Languages::term_id_in_language( $term->term_id, 'product_cat', Languages::main_language() );
+		if ( $canonical_id && (int) $canonical_id !== (int) $term->term_id ) {
+			$canonical_term = get_term( $canonical_id, 'product_cat' );
+			if ( $canonical_term && ! is_wp_error( $canonical_term ) ) {
+				return $canonical_term->name;
 			}
 		}
 

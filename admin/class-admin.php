@@ -29,6 +29,7 @@ class Admin
 			'wookb_save_chatbot_settings' => 'save_chatbot_settings',
 			'wookb_save_queue_settings' => 'save_queue_settings',
 			'wookb_save_business_answers' => 'save_business_answers',
+			'wookb_save_per_language' => 'save_per_language',
 			'wookb_save_business_summary' => 'save_business_summary',
 			'wookb_save_woocommerce_settings' => 'save_woocommerce_settings',
 			'wookb_save_llms_faq' => 'save_llms_faq',
@@ -69,6 +70,7 @@ class Admin
 		add_action('admin_post_wookb_regenerate_single', array(__CLASS__, 'regenerate_single'));
 		add_action('admin_post_wookb_sync_chatbot_prompt', array(__CLASS__, 'sync_chatbot_prompt'));
 		add_action('admin_post_wookb_save_business_answers', array(__CLASS__, 'save_business_answers'));
+		add_action('admin_post_wookb_save_per_language', array(__CLASS__, 'save_per_language'));
 		add_action('admin_post_wookb_generate_business_summary_draft', array(__CLASS__, 'generate_business_summary_draft'));
 		add_action('admin_post_wookb_save_business_summary', array(__CLASS__, 'save_business_summary'));
 		add_action('admin_post_wookb_generate_prompt_draft', array(__CLASS__, 'generate_prompt_draft'));
@@ -382,7 +384,7 @@ class Admin
 		<?php elseif ('limits' === $step) : ?><div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Largo máximo del texto', 'ai-knowledge'); ?></span><input type="number" min="100" max="10000" name="body_char_limit" value="<?php echo esc_attr($settings['body_char_limit']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Tokens de salida', 'ai-knowledge'); ?></span><input type="number" min="200" name="output_tokens" value="<?php echo esc_attr($settings['output_tokens']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Límite diario', 'ai-knowledge'); ?></span><input type="number" min="1" name="daily_limit" value="<?php echo esc_attr($settings['daily_limit']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Tamaño de lote', 'ai-knowledge'); ?></span><input type="number" min="1" name="batch_size" value="<?php echo esc_attr($settings['batch_size']); ?>" /></label><label class="wookb-assistant-toggle"><input type="checkbox" name="no_limit" value="1" <?php checked(!empty($settings['no_limit'])); ?> /><span><?php esc_html_e('Sin límite diario', 'ai-knowledge'); ?></span></label><label class="wookb-assistant-toggle"><input type="checkbox" name="indexnow_enabled" value="1" <?php checked(!empty($settings['indexnow_enabled'])); ?> /><span><?php esc_html_e('Avisar a IndexNow', 'ai-knowledge'); ?></span></label></div>
 		<?php elseif ('content' === $step) : $post_types = get_post_types(array('public' => true), 'objects'); ?>
 			<input type="hidden" name="post_types_mode" value="explicit" /><div class="wookb-assistant-field"><span><?php esc_html_e('Tipos de contenido que quieres incluir', 'ai-knowledge'); ?></span><div class="wookb-chip-group"><?php foreach ($post_types as $post_type) : if ('attachment' === $post_type->name) continue; ?><label class="wookb-chip"><input type="checkbox" name="post_types[]" value="<?php echo esc_attr($post_type->name); ?>" <?php checked(in_array($post_type->name, (array) $settings['post_types'], true)); ?> /> <?php echo esc_html($post_type->labels->name); ?></label><?php endforeach; ?></div></div>
-		<?php elseif ('business' === $step) : $answers = Chatbot_Prompt_Builder::get_saved_answers(); ?><div class="wookb-assistant-fields"><?php foreach (Chatbot_Prompt_Builder::questions_by_group('negocio') as $key => $question) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($question['label']); ?></span><?php if ('textarea' === $question['type']) : ?><textarea name="answers[<?php echo esc_attr($key); ?>]" rows="3"><?php echo esc_textarea($answers[$key]); ?></textarea><?php else : ?><input type="text" name="answers[<?php echo esc_attr($key); ?>]" value="<?php echo esc_attr($answers[$key]); ?>" /><?php endif; ?><small><?php echo esc_html($question['placeholder']); ?></small></label><?php endforeach; ?></div>
+		<?php elseif ('business' === $step) : $answers = Chatbot_Prompt_Builder::get_saved_answers(); ?><div class="wookb-assistant-fields"><?php foreach (Chatbot_Prompt_Builder::questions_by_group('negocio') as $key => $question) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($question['label']); ?></span><?php if ('textarea' === $question['type']) : ?><textarea name="answers[<?php echo esc_attr($key); ?>]" rows="3"><?php echo esc_textarea($answers[$key]); ?></textarea><?php else : ?><input type="text" name="answers[<?php echo esc_attr($key); ?>]" value="<?php echo esc_attr($answers[$key]); ?>" /><?php endif; ?><small><?php echo esc_html($question['placeholder']); ?></small></label><?php endforeach; ?><?php echo self::render_language_fields('assistant'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?></div>
 		<?php elseif ('woocommerce' === $step) : ?>
 			<div class="wookb-assistant-fields"><?php foreach (array('wc_store_name' => __('Nombre de la tienda', 'ai-knowledge'), 'wc_currency' => __('Moneda', 'ai-knowledge'), 'wc_base_country' => __('País base', 'ai-knowledge')) as $key => $label) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($label); ?></span><input type="text" name="<?php echo esc_attr($key); ?>" value="<?php echo esc_attr($settings[$key]); ?>" /></label><?php endforeach; ?><label class="wookb-assistant-field"><span><?php esc_html_e('Condiciones de venta', 'ai-knowledge'); ?></span><textarea name="wc_terms_text" rows="3"><?php echo esc_textarea($settings['wc_terms_text']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Política de devoluciones', 'ai-knowledge'); ?></span><textarea name="wc_returns_text" rows="3"><?php echo esc_textarea($settings['wc_returns_text']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Plazo de entrega', 'ai-knowledge'); ?></span><textarea name="delivery_time_note" rows="3"><?php echo esc_textarea($settings['delivery_time_note']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Contacto y horario de la tienda', 'ai-knowledge'); ?></span><textarea name="wc_contact_hours" rows="3"><?php echo esc_textarea($settings['wc_contact_hours']); ?></textarea></label><label class="wookb-assistant-toggle"><input type="checkbox" name="wc_pickup_available" value="1" <?php checked(!empty($settings['wc_pickup_available'])); ?> /><span><?php esc_html_e('Recogida en tienda disponible', 'ai-knowledge'); ?></span></label></div>
 		<?php elseif ('chatbot' === $step) : $answers = Chatbot_Prompt_Builder::get_saved_answers(); ?><div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Límite de documentos relacionados', 'ai-knowledge'); ?></span><input type="number" min="0" name="chatbot_docs_list_limit" value="<?php echo esc_attr($settings['chatbot_docs_list_limit']); ?>" /></label><?php foreach (Chatbot_Prompt_Builder::questions_by_group('chatbot') as $key => $question) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($question['label']); ?></span><?php if ('textarea' === $question['type']) : ?><textarea name="answers[<?php echo esc_attr($key); ?>]" rows="3"><?php echo esc_textarea($answers[$key]); ?></textarea><?php else : ?><input type="text" name="answers[<?php echo esc_attr($key); ?>]" value="<?php echo esc_attr($answers[$key]); ?>" /><?php endif; ?></label><?php endforeach; ?></div>
@@ -390,7 +392,7 @@ class Admin
 			// Cambio de comportamiento (2026-09-24): el FAQ ya solo se genera
 			// en el idioma principal (ver assistant_save_step('faqs')), no en
 			// cada idioma activo -- un solo bloque, no un foreach por idioma.
-			$faq_lang = Wpml::default_language();
+			$faq_lang = Languages::main_language();
 			$faq_error = get_transient('wookb_assistant_faqs_error_' . $faq_lang);
 			$faq_current = Llms_Faq::read($faq_lang);
 			?>
@@ -399,7 +401,11 @@ class Admin
 			<?php if ($faq_error) : ?>
 				<p class="notice notice-warning inline"><?php echo esc_html($faq_error); ?></p>
 			<?php elseif ('' !== $faq_current) : ?>
-				<p class="notice notice-success inline"><?php esc_html_e('Ya hay un FAQ publicado para este idioma. Al guardar de nuevo, se amplía/mejora, no se sustituye desde cero.', 'ai-knowledge'); ?></p>
+				<?php $faq_row = Llms_Faq::registry_row($faq_lang); $faq_date = ($faq_row && !empty($faq_row->generated_at)) ? mysql2date(get_option('date_format') . ' ' . get_option('time_format'), $faq_row->generated_at) : ''; ?>
+				<p class="notice notice-success inline"><?php echo esc_html('' !== $faq_date
+					/* translators: %s: fecha y hora de generación */
+					? sprintf(__('Ya hay un FAQ publicado en llms.txt (generado el %s). Al guardar este paso otra vez (con «Guardar configuración» o «Continuar»), la IA vuelve a redactarlo tomando este texto como referencia y el resultado sustituye al publicado: puede cambiar. Para conservar el actual, sal del paso con «Atrás» o desde el progreso, sin guardar.', 'ai-knowledge'), $faq_date)
+					: __('Ya hay un FAQ publicado en llms.txt. Al guardar este paso otra vez (con «Guardar configuración» o «Continuar»), la IA vuelve a redactarlo tomando este texto como referencia y el resultado sustituye al publicado: puede cambiar. Para conservar el actual, sal del paso con «Atrás» o desde el progreso, sin guardar.', 'ai-knowledge')); ?></p>
 				<textarea readonly rows="8" style="width:100%;max-width:100%;font-size:13px;"><?php echo esc_textarea($faq_current); ?></textarea>
 			<?php else : ?>
 				<p class="description"><?php esc_html_e('Todavía no hay FAQ generado para este idioma.', 'ai-knowledge'); ?></p>
@@ -573,6 +579,7 @@ class Admin
 			$raw = isset($_POST['answers']) && is_array($_POST['answers']) ? wp_unslash($_POST['answers']) : array(); // phpcs:ignore
 			Chatbot_Prompt_Builder::save_answers(array_intersect_key($raw, array_flip($allowed)));
 			if ('business' === $step) {
+				self::save_language_fields_from_post();
 				// Ya era inmediato antes de este rediseño: no depende de IA,
 				// solo guarda las respuestas en wp-content/llm/info.md.
 				Chatbot_Prompt_Builder::write_info_doc();
@@ -619,10 +626,10 @@ class Admin
 			// igual que un producto/pagina con traduccion real. El FAQ no
 			// tiene traduccion real detras -- lo redacta el propio plugin, no
 			// hay contenido distinto que traducir por idioma. Ahora se genera
-			// SOLO en el idioma PRINCIPAL del sitio (Wpml::default_language()).
+			// SOLO en el idioma PRINCIPAL del sitio (Languages::main_language()).
 			if (self::assistant_ai_available()) {
 				$answers = Chatbot_Prompt_Builder::get_saved_answers();
-				$faq_lang = Wpml::default_language();
+				$faq_lang = Languages::main_language();
 				$current_faq = Llms_Faq::read($faq_lang);
 				$draft = Chatbot_Prompt_Builder::generate_faqs($answers, $current_faq, '');
 				if (is_wp_error($draft)) {
@@ -1390,7 +1397,7 @@ GEO;
 		// generan en el idioma principal (Store_Info_Doc::generate_all(),
 		// Llms_Faq vía assistant_save_step('faqs')), no por cada idioma
 		// activo -- un solo bloque cada uno, sin foreach por idioma.
-		$default_lang = Wpml::default_language();
+		$default_lang = Languages::main_language();
 		$chatbot_synced = '' !== Chatbot_Prompt::read() && Chatbot_Prompt::is_genix_ready();
 		$doc_summary = Registry::summary();
 		ob_start();
@@ -1424,6 +1431,100 @@ GEO;
 	 * marcado), pedido explicito del usuario: "déjalo con la misma lógica
 	 * como en la tab normal" en los dos sitios.
 	 */
+	/**
+	 * Campo estructurado «Idioma principal» + «Idiomas de la web» (Negocio y
+	 * paso «Negocio» del asistente). Solo nombres de idioma, nunca códigos en
+	 * pantalla. Variante 'table' (filas de form-table) o 'assistant'.
+	 */
+	public static function render_language_fields($variant = 'table')
+	{
+		$options  = Languages::selectable_languages();
+		$main     = Languages::main_language();
+		$selected = Languages::codes();
+		ob_start();
+
+		$select = '<select id="wookb-main-language" name="main_language">';
+		foreach ($options as $code => $name) {
+			$select .= '<option value="' . esc_attr($code) . '"' . selected($main, $code, false) . '>' . esc_html($name) . '</option>';
+		}
+		$select .= '</select>';
+
+		$checks = '<fieldset class="wookb-chip-group">';
+		foreach ($options as $code => $name) {
+			$checks .= '<label class="wookb-chip"><input type="checkbox" name="site_languages[]" value="' . esc_attr($code) . '"' . checked(in_array($code, $selected, true), true, false) . ' /> ' . esc_html($name) . '</label>';
+		}
+		$checks .= '</fieldset>';
+
+		$main_help  = __('Es el idioma de los documentos que genera el plugin (llms.txt, FAQ, tienda, Negocio y el .md de cada contenido). Si hay un plugin de idiomas se detecta solo.', 'ai-knowledge');
+		$langs_help = __('Idiomas en los que está disponible la web. Si hay un plugin de idiomas se detectan solos. Se usan para el prompt del chatbot, llms.txt y el resumen.', 'ai-knowledge');
+
+		if ('assistant' === $variant) {
+			echo '<label class="wookb-assistant-field"><span>' . esc_html__('Idioma principal', 'ai-knowledge') . '</span>' . $select . '<small>' . esc_html($main_help) . '</small></label>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapado arriba.
+			echo '<div class="wookb-assistant-field"><span>' . esc_html__('Idiomas de la web', 'ai-knowledge') . '</span>' . $checks . '<small>' . esc_html($langs_help) . '</small></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapado arriba.
+		} else {
+			echo '<tr><th><label for="wookb-main-language">' . esc_html__('Idioma principal', 'ai-knowledge') . '</label></th><td>' . $select . '<p class="description">' . esc_html($main_help) . '</p></td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapado arriba.
+			echo '<tr><th>' . esc_html__('Idiomas de la web', 'ai-knowledge') . '</th><td>' . $checks . '<p class="description">' . esc_html($langs_help) . '</p></td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapado arriba.
+		}
+		return ob_get_clean();
+	}
+
+	/**
+	 * Aviso tras cambiar el check «Crear por idioma» o el idioma principal
+	 * (Languages::regen_pending()), con el botón «Reiniciar todo» al lado. Se
+	 * pinta en Negocio y en Carga inicial, dentro de un contenedor que el JS
+	 * rellena tras guardar el check por AJAX. Desaparece al lanzar «Reiniciar
+	 * todo» (Queue::start_seed()). Devuelve el HTML (vacío si no hay aviso).
+	 */
+	public static function language_regen_notice_html()
+	{
+		if (! Languages::regen_pending()) {
+			return '';
+		}
+		ob_start();
+		?>
+		<div class="notice notice-warning inline">
+			<p><?php esc_html_e('Has cambiado la configuración de idiomas. Para que los documentos ya generados se ajusten, pulsa «Reiniciar todo»: se borran los que ya no corresponden y se regenera el resto.', 'ai-knowledge'); ?></p>
+			<?php echo self::render_force_seed_form(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
+	public static function render_language_regen_notice()
+	{
+		echo '<div data-wookb-regen-slot>' . self::language_regen_notice_html() . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo.
+	}
+
+	/**
+	 * Formulario del botón «Reiniciar todo». La confirmación indica cuántos
+	 * documentos se borran (Languages::obsolete_count()): además de regenerar,
+	 * «Reiniciar todo» borra los documentos de tipos fuera del alcance, los
+	 * puente y las traducciones que ya no tienen documento propio.
+	 */
+	protected static function render_force_seed_form()
+	{
+		$count   = Languages::obsolete_count();
+		$message = sprintf(
+			/* translators: %d: número de documentos que se borrarán */
+			_n(
+				'Esto va a REGENERAR también el contenido que ya está sincronizado y va a BORRAR %d documento que ya no corresponde (tipo de contenido fuera del alcance, documento puente o traducción sin «Crear por idioma»). No toca el FAQ, la tienda, Negocio, los artículos de Genix ni los documentos en modo manual. Gasta IA de más y no se puede deshacer. ¿Seguro que quieres continuar?',
+				'Esto va a REGENERAR también el contenido que ya está sincronizado y va a BORRAR %d documentos que ya no corresponden (tipos de contenido fuera del alcance, documentos puente o traducciones sin «Crear por idioma»). No toca el FAQ, la tienda, Negocio, los artículos de Genix ni los documentos en modo manual. Gasta IA de más y no se puede deshacer. ¿Seguro que quieres continuar?',
+				$count,
+				'ai-knowledge'
+			),
+			$count
+		);
+		ob_start();
+		?>
+		<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="wookb-toolbar-form" onsubmit="return confirm('<?php echo esc_js($message); ?>');">
+			<input type="hidden" name="action" value="wookb_start_seed_force" />
+			<?php wp_nonce_field('wookb_start_seed_force'); ?>
+			<?php submit_button(__('Reiniciar todo', 'ai-knowledge'), 'secondary', 'submit', false); ?>
+		</form>
+		<?php
+		return ob_get_clean();
+	}
+
 	public static function render_seed_controls()
 	{
 		$running = (bool) get_option('wookb_seed_running');
@@ -1446,11 +1547,7 @@ GEO;
 					<?php wp_nonce_field('wookb_start_seed'); ?>
 					<?php submit_button(__('Generar pendientes', 'ai-knowledge'), 'primary', 'submit', false); ?>
 				</form>
-				<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="wookb-toolbar-form" onsubmit="return confirm('<?php echo esc_js(__('Esto va a REGENERAR también el contenido que ya está sincronizado, no solo lo pendiente. Gasta IA de más y no se puede deshacer. ¿Seguro que quieres continuar?', 'ai-knowledge')); ?>');">
-					<input type="hidden" name="action" value="wookb_start_seed_force" />
-					<?php wp_nonce_field('wookb_start_seed_force'); ?>
-					<?php submit_button(__('Reiniciar todo', 'ai-knowledge'), 'secondary', 'submit', false); ?>
-				</form>
+				<?php echo self::render_force_seed_form(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?>
 			</div>
 			<?php
 		}
@@ -1689,10 +1786,12 @@ GEO;
 		}
 
 		$errors = array();
-		foreach (Wpml::active_languages() as $lang) {
-			$result = Document_Pipeline::process($post_id, $lang, null, true);
+		// Documentos de este contenido segun el servicio de idiomas (uno por
+		// defecto; con "Crear por idioma", uno por traduccion existente).
+		foreach (Languages::targets($post_id) as $target) {
+			$result = Document_Pipeline::process($target['id'], $target['lang'], null, true);
 			if (is_wp_error($result)) {
-				$errors[] = $lang . ': ' . $result->get_error_message();
+				$errors[] = $target['lang'] . ': ' . $result->get_error_message();
 			}
 		}
 
@@ -1913,9 +2012,54 @@ GEO;
 
 		$raw_answers = isset($_POST['answers']) && is_array($_POST['answers']) ? wp_unslash($_POST['answers']) : array(); // phpcs:ignore
 		Chatbot_Prompt_Builder::save_answers($raw_answers);
+		self::save_language_fields_from_post();
 		Chatbot_Prompt_Builder::write_info_doc();
 
 		self::redirect('negocio');
+	}
+
+	/**
+	 * Guarda el idioma principal y los idiomas de la web (campo estructurado
+	 * de Negocio y del paso «Negocio» del asistente) si vienen en el envío.
+	 * Los códigos se sanean y se validan contra la lista de idiomas
+	 * seleccionables (Languages::save_language_fields()). Cambiar el idioma
+	 * principal deja pendiente el aviso «Reiniciar todo».
+	 */
+	protected static function save_language_fields_from_post()
+	{
+		if (! isset($_POST['main_language'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce ya verificado por el llamador.
+			return;
+		}
+		$main  = sanitize_key(wp_unslash($_POST['main_language'])); // phpcs:ignore
+		$codes = isset($_POST['site_languages']) && is_array($_POST['site_languages']) ? array_map('sanitize_key', wp_unslash($_POST['site_languages'])) : array(); // phpcs:ignore
+		Languages::save_language_fields($main, $codes);
+	}
+
+	/**
+	 * Guarda SOLO el check «Crear por idioma» (formulario propio de Negocio,
+	 * por AJAX). Solo si el plugin de idiomas crea un post por idioma. Si el
+	 * cambio deja documentos por ajustar, responde con el aviso ya montado
+	 * (con el botón «Reiniciar todo») para pintarlo ahí mismo.
+	 */
+	public static function save_per_language()
+	{
+		self::verify('wookb_save_per_language');
+
+		if (Languages::creates_post_per_language()) {
+			Languages::save_per_language(! empty($_POST['per_language'])); // phpcs:ignore
+			Chatbot_Prompt_Builder::write_info_doc();
+		}
+
+		if (wp_doing_ajax()) {
+			wp_send_json_success(
+				array(
+					'message'     => __('Guardado.', 'ai-knowledge'),
+					'notice_html' => self::language_regen_notice_html(),
+				)
+			);
+		}
+		wp_safe_redirect(admin_url('admin.php?page=ai-knowledge&tab=negocio&wookb_notice=1#wookb-per-language'));
+		exit;
 	}
 
 	/**
@@ -2182,20 +2326,14 @@ GEO;
 	 * porqué de un archivo propio, distinto de chatbot-system-prompt.md).
 	 */
 	/**
-	 * Idioma de trabajo de la pestaña FAQs: el que venga en la peticion
-	 * (selector de idioma, solo visible si hay mas de uno activo), validado
-	 * contra los idiomas activos de verdad -- si no coincide con ninguno,
-	 * cae al primero. Mismo criterio en los 2 handlers de FAQs, para que
-	 * generar y guardar operen siempre sobre el mismo idioma.
+	 * Idioma de trabajo de la pestaña FAQs: siempre el idioma principal (ver
+	 * Languages::main_language()). Mismo criterio en los 2 handlers de FAQs,
+	 * para que generar y guardar operen siempre sobre el mismo idioma.
 	 */
 	protected static function faqs_lang()
 	{
-		$requested = isset($_POST['lang']) ? sanitize_key(wp_unslash($_POST['lang'])) : ''; // phpcs:ignore
-		$active    = Wpml::active_languages();
-		if ($requested && in_array($requested, $active, true)) {
-			return $requested;
-		}
-		return $active ? $active[0] : 'es';
+		// La FAQ es contenido del propio plugin: solo se genera en el idioma principal.
+		return Languages::main_language();
 	}
 
 	public static function save_llms_faq()
@@ -2300,7 +2438,7 @@ GEO;
 	protected static function publish_manual_text($row, $text)
 	{
 		$post        = get_post($row->source_id);
-		$product_url = $post ? get_permalink($row->source_id) : '';
+		$product_url = $post ? Languages::permalink($row->source_id) : '';
 
 		// Fallback si el origen ya no resuelve a un post real (source_id
 		// centinela de documentos compuestos, o post borrado): reutiliza la

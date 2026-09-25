@@ -21,6 +21,26 @@
 - Documentación de usuario (`docs/`) y técnica (`documentacion-tecnica.md`)
   al día con la 1.3.0.
 
+## Estrategia de idiomas (2026-09-25)
+
+Fases 0 a 6 implementadas en el árbol, sin commitear y sin probar (detalle en
+`estrategia-idiomas.md`, «Estado por fase»). `php -l` y `git diff --check`
+pasados. QA pendiente: la matriz de pruebas del plan (sin plugin, WPML con el
+check marcado/desmarcado y cambio de check, instalación antigua, Polylang,
+TranslatePress, chatbot con un único documento). Riesgo abierto: Genix filtra
+por idioma actual con WPML.
+
+## Ajustes de idiomas tras la prueba en docthinks (2026-09-25)
+
+Aplicados en el árbol por el `desarrollador`, sin commitear y sin probar
+(`php -l` y `git diff --check` pasados). Fuente:
+`ajustes-idiomas-docthinks.md`. QA pendiente: repetir en docthinks con el check
+desmarcado y marcado (URLs por idioma, apartado «Idiomas», conteo de Carga
+inicial, `/xx/llms.txt`, campo de idiomas en Negocio y asistente, botón
+«Reiniciar todo» tras guardar el check y su confirmación con el número de
+documentos). Tras cambiar `llms.txt`/rutas, guardar Ajustes → Enlaces
+permanentes no hace falta (no hay reglas nuevas).
+
 ## Pendiente
 
 Ver `roadmap.md`: QA real de la 1.3.0, modo WP sin IA, estrategia de idiomas,
@@ -28,8 +48,8 @@ lado páginas del informe de incidencias y traducciones de textos fijos.
 
 ## Siguiente paso
 
-Decidir el próximo foco: modo WP sin IA (`modo-wp-sin-ia.md`) o estrategia de
-idiomas (`estrategia-idiomas.md`, sin versionar todavía).
+Probar la estrategia de idiomas y decidir el commit; después, el modo WP sin IA
+(`modo-wp-sin-ia.md`).
 
 ## Notas de proceso
 

@@ -19,8 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *   reales) y NO se redacta vía IA: parafrasear con un modelo introduce
  *   riesgo de alucinación sobre datos que el cliente puede tomar como
  *   vinculantes. Se compone de forma determinista a partir de la
- *   configuración real de WooCommerce, igual que Generator::build_bridge_markdown()
- *   ya hace para el documento puente (factual, sin pasar por IA).
+ *   configuración real de WooCommerce (factual, sin pasar por IA).
  * - Aun así reutiliza el resto del pipeline: Markdown_Store para el .md,
  *   Genix_Bridge para subir a sgkb-docs, y Registry para aparecer en
  *   llms.txt -- solo el paso de "generar contenido" es propio.
@@ -67,14 +66,14 @@ class Store_Info_Doc {
 	 * traducción real detrás -- lo redacta el propio plugin a partir de los
 	 * ajustes de WooCommerce, no hay contenido distinto por idioma que
 	 * traducir. Ahora se genera SOLO en el idioma principal del sitio
-	 * (Wpml::default_language()), no en todos los activos.
+	 * (Languages::main_language()), no en todos los activos.
 	 *
 	 * Devuelve un resumen array( 'ok' => int, 'errores' => array ).
 	 */
 	public static function generate_all() {
 		$ok      = 0;
 		$errores = array();
-		$lang    = Wpml::default_language();
+		$lang    = Languages::main_language();
 
 		$result = self::generate_store_info( $lang );
 		if ( is_wp_error( $result ) ) {
@@ -197,7 +196,7 @@ class Store_Info_Doc {
 			// Cada documento compuesto es independiente por idioma: no forma parte
 			// de un trid de producto, así que no hay doc_trid que reutilizar entre
 			// idiomas (a diferencia de Document_Pipeline::process()). Cada fila
-			// mantiene su propio post sgkb-docs, enlazado por idioma vía Wpml::set_language()
+			// mantiene su propio post sgkb-docs, enlazado por idioma vía Languages::set_document_language()
 			// sin trid compartido -- Genix no necesita agruparlos para el chatbot.
 			$result = Genix_Bridge::upsert_document( $doc_post_id, $data, $markdown, $lang, null );
 			if ( is_wp_error( $result ) ) {
@@ -241,7 +240,7 @@ class Store_Info_Doc {
 
 		// Páginas reales de WooCommerce (Ajustes > Páginas de WooCommerce), traducidas
 		// al idioma solicitado vía WPML si existe traducción (mismo mecanismo que
-		// Wpml::get_translation_id() usa para productos: funciona igual para 'page').
+		// Languages::translation_id() usa para productos: funciona igual para 'page').
 		$cart_id     = function_exists( 'wc_get_page_id' ) ? wc_get_page_id( 'cart' ) : 0;
 		$checkout_id = function_exists( 'wc_get_page_id' ) ? wc_get_page_id( 'checkout' ) : 0;
 		$account_id  = function_exists( 'wc_get_page_id' ) ? wc_get_page_id( 'myaccount' ) : 0;
@@ -266,7 +265,7 @@ class Store_Info_Doc {
 		$terms_id = (int) get_option( 'woocommerce_terms_page_id' );
 		$lines[]  = '## ' . self::label( $lang, 'heading_terms' );
 		if ( $terms_id > 0 ) {
-			$translated_terms_id = Wpml::get_translation_id( $terms_id, $lang );
+			$translated_terms_id = Languages::translation_id( $terms_id, $lang );
 			$translated_terms_id = $translated_terms_id ? $translated_terms_id : $terms_id;
 			$terms_post = get_post( $translated_terms_id );
 			if ( $terms_post && 'publish' === $terms_post->post_status ) {
@@ -274,7 +273,7 @@ class Store_Info_Doc {
 				$excerpt = preg_replace( '/\s+/', ' ', trim( $excerpt ) );
 				$lines[] = mb_substr( $excerpt, 0, 800 );
 				$lines[] = '';
-				$lines[] = self::label( $lang, 'terms_link' ) . ': ' . get_permalink( $translated_terms_id );
+				$lines[] = self::label( $lang, 'terms_link' ) . ': ' . Languages::permalink( $translated_terms_id );
 			} else {
 				$lines[] = self::label( $lang, 'terms_pending' );
 			}
@@ -294,7 +293,7 @@ class Store_Info_Doc {
 		$refund_id = function_exists( 'wc_get_page_id' ) ? wc_get_page_id( 'refund_returns' ) : 0;
 		$lines[]   = '## ' . self::label( $lang, 'heading_returns' );
 		if ( $refund_id > 0 ) {
-			$translated_refund_id = Wpml::get_translation_id( $refund_id, $lang );
+			$translated_refund_id = Languages::translation_id( $refund_id, $lang );
 			$translated_refund_id = $translated_refund_id ? $translated_refund_id : $refund_id;
 			$refund_post = get_post( $translated_refund_id );
 			if ( $refund_post && 'publish' === $refund_post->post_status ) {
@@ -302,7 +301,7 @@ class Store_Info_Doc {
 				$excerpt = preg_replace( '/\s+/', ' ', trim( $excerpt ) );
 				$lines[] = mb_substr( $excerpt, 0, 800 );
 				$lines[] = '';
-				$lines[] = self::label( $lang, 'returns_link' ) . ': ' . get_permalink( $translated_refund_id );
+				$lines[] = self::label( $lang, 'returns_link' ) . ': ' . Languages::permalink( $translated_refund_id );
 			} else {
 				$lines[] = self::label( $lang, 'returns_pending' );
 			}
@@ -436,7 +435,7 @@ class Store_Info_Doc {
 		$lines[] = '';
 
 		// Categorías reales con productos, en el idioma de destino: usa
-		// wpml_object_id sobre product_cat igual que Llms_Txt::category_label()
+		// Languages::term_id_in_language() igual que Llms_Txt::category_label()
 		// hace para no mezclar nombres de categoría de idiomas distintos.
 		$terms = get_terms(
 			array(
@@ -457,13 +456,9 @@ class Store_Info_Doc {
 			if ( ! self::is_selected( $selection, $term->term_id ) ) {
 				continue;
 			}
-			$term_id = $term->term_id;
-			if ( class_exists( 'SitePress' ) ) {
-				$translated_term_id = apply_filters( 'wpml_object_id', $term_id, 'product_cat', false, $lang );
-				if ( $translated_term_id ) {
-					$term_id = $translated_term_id;
-				}
-			}
+			// Termino en el idioma de destino (via el servicio de idiomas; sin
+			// plugin de idiomas devuelve el mismo termino).
+			$term_id = Languages::term_id_in_language( $term->term_id, 'product_cat', $lang );
 			$term_obj = get_term( $term_id, 'product_cat' );
 			if ( ! $term_obj || is_wp_error( $term_obj ) ) {
 				continue;
@@ -490,13 +485,13 @@ class Store_Info_Doc {
 
 			$lines[] = '### ' . $term_obj->name;
 			foreach ( $products as $product_id ) {
-				$translated_id = Wpml::get_translation_id( $product_id, $lang );
+				$translated_id = Languages::translation_id( $product_id, $lang );
 				$translated_id = $translated_id ? $translated_id : $product_id;
 				if ( 'publish' !== get_post_status( $translated_id ) ) {
 					continue;
 				}
 				$title   = wp_strip_all_tags( get_the_title( $translated_id ) );
-				$link    = get_permalink( $translated_id );
+				$link    = Languages::permalink( $translated_id );
 				$lines[] = '- [' . $title . '](' . $link . ')';
 			}
 			$lines[] = '';
@@ -649,9 +644,9 @@ class Store_Info_Doc {
 	}
 
 	protected static function translated_url( $post_id, $lang ) {
-		$translated_id = Wpml::get_translation_id( $post_id, $lang );
+		$translated_id = Languages::translation_id( $post_id, $lang );
 		$translated_id = $translated_id ? $translated_id : $post_id;
-		return get_permalink( $translated_id );
+		return Languages::permalink( $translated_id );
 	}
 
 	/**
@@ -897,20 +892,14 @@ class Store_Info_Doc {
 	}
 
 	/**
-	 * Añade la nota "Esta web también está disponible en: ..." (Wpml::
-	 * languages_note()) al final del cuerpo -- DESPUÉS de enforce_char_limit()
-	 * a propósito, para que nunca se recorte junto con el resto del texto.
-	 * Cambio de comportamiento confirmado por el usuario (2026-09-24): estos
-	 * documentos ahora solo se generan en el idioma principal (ver
-	 * generate_all()), así que sin esta nota una IA que los lea no tendría
-	 * forma de saber que el sitio existe en otros idiomas. Vacía (sin
-	 * cambios en el body) si el sitio es monoidioma.
+	 * Añade el apartado "Idiomas" (Languages::site_section()) al final del
+	 * cuerpo -- DESPUÉS de enforce_char_limit() a propósito, para que nunca se
+	 * recorte junto con el resto del texto. Estos documentos solo se generan en
+	 * el idioma principal (ver generate_all()); el apartado dice en qué idioma
+	 * está el documento y, si la web tiene varios, dónde encontrar los demás.
 	 */
 	protected static function append_languages_note( $body, $lang ) {
-		$note = Wpml::languages_note( $lang );
-		if ( '' === $note ) {
-			return $body;
-		}
-		return rtrim( $body ) . "\n\n" . $note;
+		$section = Languages::site_section( $lang );
+		return '' === $section ? rtrim( $body ) : rtrim( $body ) . "\n\n" . $section;
 	}
 }

@@ -110,8 +110,13 @@ opción A/B para ediciones, valor `auto_wp` en `override_mode` y badge
 
 Plan en [`estrategia-idiomas.md`](estrategia-idiomas.md): capa común para
 WPML, Polylang y TranslatePress, idioma principal desde Negocio y check
-«Separar contenido por idioma». Sin implementar. Incluye el problema de
-TranslatePress del informe de supershippingwoo.com (problema 1).
+«Crear por idioma». **Fases 0 a 6 implementadas (2026-09-25), sin commitear y
+sin probar.** Pendiente: ejecutar la matriz de pruebas, actualizar la guía de
+usuario (`docs/`) y decidir el commit. **Ajustes de la prueba en docthinks
+(`ajustes-idiomas-docthinks.md`) aplicados el 2026-09-25, sin probar**
+(pendiente: repetir la prueba con el check desmarcado y marcado). Sigue fuera de alcance el problema de
+TranslatePress del informe de supershippingwoo.com (problema 1) y los `.po`
+de los textos nuevos.
 
 ### Lado páginas del informe de incidencias
 

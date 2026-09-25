@@ -17,6 +17,9 @@ if ( false === $summary_draft ) {
 	<?php esc_html_e( 'Datos del negocio en sí: válidos con o sin WooCommerce (lo específico de WooCommerce vive en su propia pestaña). Se usan para el prompt del chatbot (pestaña Chatbot, si Genix está activo) y para llms.txt/llm/info.md.', 'ai-knowledge' ); ?>
 </p>
 <?php Admin::documentation_link( 'negocio' ); ?>
+<?php if ( Languages::creates_post_per_language() ) : ?>
+	<p class="description"><a href="#wookb-per-language"><?php esc_html_e( 'Ir a «Crear por idioma»', 'ai-knowledge' ); ?></a></p>
+<?php endif; ?>
 
 <h2><?php esc_html_e( '1. Datos', 'ai-knowledge' ); ?></h2>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
@@ -37,6 +40,7 @@ if ( false === $summary_draft ) {
 				</td>
 			</tr>
 		<?php endforeach; ?>
+		<?php echo Admin::render_language_fields( 'table' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?>
 	</table>
 	<?php submit_button( __( 'Guardar', 'ai-knowledge' ) ); ?>
 </form>
@@ -69,3 +73,30 @@ if ( false === $summary_draft ) {
 	<textarea name="summary_draft" rows="6" class="large-text"><?php echo esc_textarea( $summary_draft ); ?></textarea>
 	<?php submit_button( __( 'Guardar resumen', 'ai-knowledge' ) ); ?>
 </form>
+
+<hr />
+
+<?php if ( Languages::creates_post_per_language() ) : ?>
+<h2 id="wookb-per-language"><?php esc_html_e( '3. Crear por idioma', 'ai-knowledge' ); ?></h2>
+<p class="description">
+	<?php
+	printf(
+		/* translators: %s: nombre del plugin de idiomas, p. ej. WPML */
+		esc_html__( 'Tu plugin de idiomas (%s) crea un contenido distinto por idioma. Desmarcado (recomendado): un solo .md por contenido, en el idioma principal, y todas las traducciones lo enlazan. Marcado: además se crea un .md por cada traducción que exista (sin documentos puente). Genix sigue este ajuste. Al cambiarlo, pulsa «Reiniciar todo» para borrar y regenerar lo que ya no corresponda.', 'ai-knowledge' ),
+		esc_html( Languages::provider_label() )
+	);
+	?>
+</p>
+<?php Admin::render_language_regen_notice(); ?>
+<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+	<input type="hidden" name="action" value="wookb_save_per_language" />
+	<?php wp_nonce_field( 'wookb_save_per_language' ); ?>
+	<p>
+		<label>
+			<input type="checkbox" name="per_language" value="1" <?php checked( Languages::per_language_enabled() ); ?> />
+			<?php esc_html_e( 'Crear un .md por cada traducción que exista', 'ai-knowledge' ); ?>
+		</label>
+	</p>
+	<?php submit_button( __( 'Guardar', 'ai-knowledge' ) ); ?>
+</form>
+<?php endif; ?>

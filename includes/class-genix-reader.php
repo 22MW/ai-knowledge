@@ -71,7 +71,7 @@ class Genix_Reader {
 				'id'        => (int) $post_id,
 				'title'     => get_the_title( $post_id ),
 				'permalink' => get_permalink( $post_id ),
-				'lang'      => Wpml::element_language( $post_id ),
+				'lang'      => Languages::post_language( $post_id ),
 			);
 		}
 

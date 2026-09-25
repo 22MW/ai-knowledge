@@ -61,7 +61,7 @@ class Registry_Table extends \WP_List_Table {
 		// sitio de un solo idioma, todas las filas dirían lo mismo, es
 		// ruido. Mismo criterio que el sufijo "(ES)"/"(EN)" de llms.txt
 		// (Llms_Txt::build()).
-		if ( count( Wpml::active_languages() ) > 1 ) {
+		if ( count( Languages::codes() ) > 1 ) {
 			$columns['lang'] = __( 'Idioma', 'ai-knowledge' );
 		}
 		$columns['status']  = __( 'Estado', 'ai-knowledge' );

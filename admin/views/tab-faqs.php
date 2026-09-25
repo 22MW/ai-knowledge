@@ -5,11 +5,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$active_langs = Wpml::active_languages();
-$lang         = isset( $_GET['lang'] ) ? sanitize_key( wp_unslash( $_GET['lang'] ) ) : ''; // phpcs:ignore
-if ( ! $lang || ! in_array( $lang, $active_langs, true ) ) {
-	$lang = $active_langs ? $active_langs[0] : 'es';
-}
+// La FAQ es contenido del propio plugin: solo se genera en el idioma principal.
+$active_langs = array( Languages::main_language() );
+$lang         = $active_langs[0];
 
 $faq_error = get_transient( 'wookb_faqs_error_' . $lang );
 delete_transient( 'wookb_faqs_error_' . $lang );
@@ -22,20 +20,6 @@ if ( false === $faq_content ) {
 	<?php esc_html_e( 'Contenido en Markdown que se publica como documento propio (enlazado desde /llms.txt, igual que el resto de documentos) y aparece en la pestaña Registro. Distinto del prompt del chatbot: esto es contenido público, no instrucciones internas.', 'ai-knowledge' ); ?>
 </p>
 <?php Admin::documentation_link( 'faqs' ); ?>
-
-<?php if ( count( $active_langs ) > 1 ) : ?>
-	<form method="get" class="wookb-toolbar-form">
-		<input type="hidden" name="page" value="ai-knowledge" />
-		<input type="hidden" name="tab" value="faqs" />
-		<select name="lang" onchange="this.form.submit()">
-			<?php foreach ( $active_langs as $l ) : ?>
-				<option value="<?php echo esc_attr( $l ); ?>" <?php selected( $l, $lang ); ?>><?php echo esc_html( strtoupper( $l ) ); ?></option>
-			<?php endforeach; ?>
-		</select>
-		<noscript><?php submit_button( __( 'Cambiar', 'ai-knowledge' ), '', '', false ); ?></noscript>
-	</form>
-	<p class="description"><?php esc_html_e( 'Sitio multiidioma: una FAQ (y un documento) por idioma, igual que el resto del contenido.', 'ai-knowledge' ); ?></p>
-<?php endif; ?>
 
 <?php if ( $faq_error ) : ?>
 	<div class="notice notice-error"><p><?php echo esc_html( $faq_error ); ?></p></div>

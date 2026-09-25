@@ -115,27 +115,20 @@ class Queue {
 			return; // fin de la carga inicial
 		}
 
+		$seen = array();
 		foreach ( $batch as $source_id ) {
-			// Mismo patron que Sync::enqueue_all_languages(): resolver la
-			// traduccion real de cada idioma antes de encolar. Bug real
-			// detectado hoy (2026-08-22): esto encolaba $source_id (el ID en
-			// SU idioma original) etiquetado con cada idioma activo sin
-			// comprobar si ese ID era la traduccion real -- generaba filas
-			// "huerfanas" en cola para siempre (source_id/lang no correspondian
-			// a ningun documento real, la generacion real se hacia sobre otro
-			// ID resuelto en caliente, dejando la fila original sin tocar).
-			$own_lang = Wpml::element_language( $source_id );
-			foreach ( Wpml::active_languages() as $lang ) {
-				if ( $lang === $own_lang ) {
-					self::enqueue( $source_id, $lang, $force );
+			// Documentos de este contenido segun el servicio de idiomas: uno (el
+			// original) por defecto; con "Crear por idioma", uno por traduccion
+			// real que exista. Nunca se encola un ID etiquetado con un idioma
+			// que no le corresponde (bug real de 2026-08-22: filas huerfanas en
+			// cola para siempre) ni un idioma sin traduccion (sin puentes).
+			foreach ( Languages::targets( $source_id ) as $target ) {
+				$key = $target['id'] . ':' . $target['lang'];
+				if ( isset( $seen[ $key ] ) ) {
 					continue;
 				}
-				$translated_id = Wpml::get_translation_id( $source_id, $lang );
-				if ( $translated_id && (int) $translated_id !== (int) $source_id ) {
-					self::enqueue( $translated_id, $lang, $force );
-				}
-				// Sin traduccion real a ese idioma: no se encola nada (antes
-				// se encolaba $source_id igualmente, mal etiquetado).
+				$seen[ $key ] = true;
+				self::enqueue( $target['id'], $target['lang'], $force );
 			}
 		}
 
@@ -153,6 +146,13 @@ class Queue {
 	 * start_seed_force()), fuerza regenerar también lo ya sincronizado.
 	 */
 	public static function start_seed( $force = false ) {
+		if ( $force ) {
+			// "Reiniciar todo" es el paso de "Regenerar todo" que pide el aviso
+			// de idiomas: borra antes los documentos que ya no corresponden al
+			// modo actual (puentes y, sin "Crear por idioma", los por idioma).
+			Languages::cleanup_obsolete_documents();
+			Languages::clear_regen_pending();
+		}
 		update_option( 'wookb_seed_running', 1, false );
 		self::run_seed_batch( 0, $force );
 	}

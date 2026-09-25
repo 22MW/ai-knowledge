@@ -72,12 +72,6 @@ class Chatbot_Prompt_Builder {
 				'type'        => 'textarea',
 				'group'       => 'negocio',
 			),
-			'idioma_principal'  => array(
-				'label'       => __( 'Idioma principal del negocio', 'ai-knowledge' ),
-				'placeholder' => __( 'Ej: español, aunque la web está también en inglés y alemán.', 'ai-knowledge' ),
-				'type'        => 'text',
-				'group'       => 'negocio',
-			),
 			'horario_atencion'  => array(
 				'label'       => __( 'Horario de atención humana', 'ai-knowledge' ),
 				'placeholder' => __( 'Cuándo hay alguien real disponible, aparte del chatbot (que suele estar activo 24/7).', 'ai-knowledge' ),
@@ -201,9 +195,7 @@ class Chatbot_Prompt_Builder {
 		if ( ! empty( $answers['publico_objetivo'] ) ) {
 			$lines[] = 'Público objetivo: ' . $answers['publico_objetivo'];
 		}
-		if ( ! empty( $answers['idioma_principal'] ) ) {
-			$lines[] = 'Idiomas: ' . $answers['idioma_principal'];
-		}
+		$lines[] = ( count( Languages::languages() ) > 1 ? 'Idiomas: ' : 'Idioma: ' ) . Languages::summary_text();
 		if ( ! empty( $answers['horario_atencion'] ) ) {
 			$lines[] = 'Horario de atención humana: ' . $answers['horario_atencion'];
 		}
@@ -211,14 +203,13 @@ class Chatbot_Prompt_Builder {
 			$lines[] = 'Contacto: ' . $answers['contacto'];
 		}
 
-		// Pedido explícito del usuario (2026-09-24): este documento no tiene
-		// versión por idioma (siempre es el mismo, en el idioma principal
-		// del sitio) -- sin esta nota, una IA que lo lea no sabría que el
-		// sitio existe también en otros idiomas.
-		$lang_note = class_exists( '\AIKB\Wpml' ) ? Wpml::languages_note( Wpml::default_language() ) : '';
-		if ( '' !== $lang_note ) {
+		// Este documento no tiene version por idioma (siempre es el mismo, en el
+		// idioma principal del sitio): el apartado "Idiomas" dice en que idioma
+		// esta y, si la web tiene varios, donde encontrar los demas.
+		$section = Languages::site_section( Languages::main_language() );
+		if ( '' !== $section ) {
 			$lines[] = '';
-			$lines[] = $lang_note;
+			$lines[] = $section;
 		}
 
 		$content = implode( "\n", $lines ) . "\n";
@@ -260,6 +251,7 @@ class Chatbot_Prompt_Builder {
 			}
 			$prompt .= '- ' . $q['label'] . ': ' . $answers[ $key ] . "\n";
 		}
+		$prompt .= '- ' . __( 'Idiomas de la web', 'ai-knowledge' ) . ': ' . Languages::summary_text() . "\n";
 		if ( ! empty( $answers['negocio'] ) ) {
 			$prompt .= "\n- Enfoque del negocio (dato fuente obligatorio; conserva todos sus hechos): " . $answers['negocio'] . "\n";
 		}
@@ -313,6 +305,7 @@ class Chatbot_Prompt_Builder {
 				$prompt .= '- ' . $q['label'] . ': ' . $answers[ $key ] . "\n";
 			}
 		}
+		$prompt .= '- ' . __( 'Idiomas de la web', 'ai-knowledge' ) . ': ' . Languages::summary_text() . "\n";
 		$prompt .= "<<<FIN_DATOS_REALES_NEGOCIO>>>\n";
 		if ( '' !== trim( (string) $current_faq ) ) {
 			$prompt .= "\n<<<FAQ_ACTUAL>>>\n" . $current_faq . "\n<<<FIN_FAQ_ACTUAL>>>\n";
@@ -479,6 +472,7 @@ class Chatbot_Prompt_Builder {
 				$prompt .= '- ' . $q['label'] . ': ' . $answers[ $key ] . "\n";
 			}
 		}
+		$prompt .= '- ' . __( 'Idiomas de la web', 'ai-knowledge' ) . ': ' . Languages::summary_text() . "\n";
 
 		if ( ! empty( $reference_pages ) ) {
 			$prompt .= "\nContenido real de páginas del sitio para tono y datos adicionales (no copiar literal, usar como referencia):\n\n";

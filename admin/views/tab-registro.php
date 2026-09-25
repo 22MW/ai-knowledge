@@ -81,10 +81,10 @@ $table->prepare_items();
 				<option value="<?php echo esc_attr( $s ); ?>" <?php selected( isset( $_GET['status'] ) && $_GET['status'] === $s ); // phpcs:ignore ?>><?php echo esc_html( Registry_Table::status_label( $s ) ); ?></option>
 			<?php endforeach; ?>
 		</select>
-		<?php if ( count( Wpml::active_languages() ) > 1 ) : ?>
+		<?php if ( count( Languages::codes() ) > 1 ) : ?>
 			<select name="lang">
 				<option value=""><?php esc_html_e( 'Todos los idiomas', 'ai-knowledge' ); ?></option>
-				<?php foreach ( Wpml::active_languages() as $l ) : ?>
+				<?php foreach ( Languages::codes() as $l ) : ?>
 					<option value="<?php echo esc_attr( $l ); ?>" <?php selected( isset( $_GET['lang'] ) && $_GET['lang'] === $l ); // phpcs:ignore ?>><?php echo esc_html( strtoupper( $l ) ); ?></option>
 				<?php endforeach; ?>
 			</select>

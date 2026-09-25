@@ -55,12 +55,12 @@ class Markdown_Discovery {
 			return;
 		}
 
-		// Idioma REAL de este post concreto (no el idioma por defecto del
-		// sitio): con WPML activo, cada traducción es un post_id distinto con
-		// su propia fila en Registry -- Wpml::element_language() ya resuelve
-		// esto con fallback monolingüe 'es' si WPML no está activo.
-		$lang = Wpml::element_language( $post_id );
-		$row  = Registry::find( $post_id, $lang );
+		// Documento .md que le corresponde a este contenido segun el servicio de
+		// idiomas: por defecto uno por contenido, el del original -- todas las
+		// traducciones apuntan a ese mismo .md --; con "Crear por idioma", el de
+		// esta traduccion (cada una tiene su propia fila en Registry).
+		$target = Languages::document_target( $post_id );
+		$row    = Registry::find( $target['id'], $target['lang'] );
 
 		if ( ! $row || 'synced' !== $row->status || empty( $row->md_path ) ) {
 			// Sin fila sincronizada para este post+idioma (no generado aún, en
@@ -83,7 +83,7 @@ class Markdown_Discovery {
 		// solo se afirma cobertura por llms.txt para lo que realmente aparece ahi.
 		printf(
 			'<link rel="describedby" href="%s" />' . "\n",
-			esc_url( home_url( '/llms.txt' ) )
+			esc_url( Markdown_Store::root_url( '/llms.txt' ) )
 		);
 	}
 

@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * apply_filters('wpml_current_language', ...), a diferencia del caso del
  * chatbot (ver Chatbot_Language_Fix). Se detecta el idioma real en que el
  * visitante esta navegando en este momento y, si el producto tiene traduccion
- * real a ese idioma, se redirige ahi. Si no, cae a espanol; si tampoco existe,
+ * real a ese idioma, se redirige ahi. Si no, cae al idioma principal; si tampoco existe,
  * usa la wookb_source_url original guardada en el documento.
  */
 class Doc_Redirect {
@@ -28,7 +28,6 @@ class Doc_Redirect {
 	const CPT           = 'sgkb-docs';
 	const META_URL      = 'wookb_source_url';
 	const META_SOURCE_ID = 'wookb_source_id';
-	const FALLBACK_LANG = 'es';
 
 	public static function init() {
 		// Prioridad muy temprana (0): con el fix WPML de hoy, los documentos
@@ -71,36 +70,32 @@ class Doc_Redirect {
 
 	/**
 	 * Decide a que URL redirigir segun el idioma real de navegacion del
-	 * visitante en este momento (no el idioma en que se genero el documento).
+	 * visitante en este momento (no el idioma en que se genero el documento),
+	 * preguntando al servicio de idiomas. Si el contenido no existe en ese
+	 * idioma, cae al idioma principal; si tampoco, a la URL guardada.
 	 */
 	protected static function resolve_target_url( $post_id, $fallback_url ) {
 		$source_id = (int) get_post_meta( $post_id, self::META_SOURCE_ID, true );
-		if ( ! $source_id || ! Wpml::is_active() ) {
+		if ( ! $source_id ) {
 			return $fallback_url;
 		}
 
-		$visitor_lang = apply_filters( 'wpml_current_language', null );
-		if ( ! $visitor_lang || ! is_string( $visitor_lang ) ) {
-			$visitor_lang = self::FALLBACK_LANG;
+		$visitor_lang = Languages::current_language();
+		if ( ! $visitor_lang ) {
+			$visitor_lang = Languages::main_language();
 		}
 
-		$translated_id = Wpml::get_translation_id( $source_id, $visitor_lang );
-		if ( $translated_id ) {
-			$url = get_permalink( $translated_id );
+		$url = Languages::post_url( $source_id, $visitor_lang );
+		if ( $url ) {
+			return $url;
+		}
+
+		// El contenido no tiene version en el idioma de navegacion actual:
+		// caer al idioma principal si existe ahi.
+		if ( Languages::main_language() !== $visitor_lang ) {
+			$url = Languages::post_url( $source_id, Languages::main_language() );
 			if ( $url ) {
 				return $url;
-			}
-		}
-
-		// El producto no tiene traduccion real al idioma de navegacion actual:
-		// caer a espanol si existe traduccion ahi.
-		if ( self::FALLBACK_LANG !== $visitor_lang ) {
-			$es_id = Wpml::get_translation_id( $source_id, self::FALLBACK_LANG );
-			if ( $es_id ) {
-				$url = get_permalink( $es_id );
-				if ( $url ) {
-					return $url;
-				}
 			}
 		}
 
