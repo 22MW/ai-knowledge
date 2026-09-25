@@ -64,8 +64,6 @@ Falta:
 
 ## Pendiente de revisión Git
 
-- La versión 1.3.2 (estrategia de idiomas) está preparada en `knowBaseDev` pero sin
-  commitear ni publicar. El commit, el push y la release los decide el usuario.
 - Revisar el diff pendiente de `Scope::is_included()` junto al fix publicado de `tax_query` (`v1.1.0.1`) y decidir si se confirma commit y push. No se ha propuesto ni autorizado ninguna operación Git en este roadmap.
 
 ## Próximas mejoras, sin empezar

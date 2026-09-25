@@ -84,6 +84,8 @@ Archivo de consulta: recoge trabajo cerrado y su evidencia ya registrada. No es 
 - «Reemplazar .htaccess» probado en un servidor real (según el usuario).
 - Internacionalización del plugin: catálogos `ca`, `de_DE`, `en_US`, `eu` y
   `fr_FR` al día con la 1.3.0; selección de `docs/{locale}/` implementada.
+- Release **1.3.2** publicada (2026-09-25): estrategia de idiomas, tag `v1.3.2` y
+  fusión en `main`.
 - Releases 1.2.0 a 1.3.0 fusionadas en `main` con el script sin conflictos; el
   script ya no sube un tag local.
 
