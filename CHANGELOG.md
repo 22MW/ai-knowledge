@@ -2,7 +2,60 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
-## [Sin publicar]
+## [1.3.2] - 2026-09-25
+
+Estrategia de idiomas: el plugin funciona con WPML (probado en una web real),
+Polylang y TranslatePress (soportados, aún sin probar en una instalación real)
+y también sin plugin de idiomas.
+
+### Idiomas
+
+- Servicio de idiomas común para WPML, Polylang y TranslatePress; también
+  funciona sin plugin de idiomas. Se acabó el español fijo.
+- Idioma principal e idiomas de la web en Negocio y en el paso Negocio del
+  asistente. El idioma principal se elige entre los detectados por el plugin de
+  idiomas (o es el idioma de WordPress sin plugin) y los demás idiomas se
+  añaden a mano con código y nombre (por ejemplo «fr Français»). Sustituye a la
+  pregunta libre «Idioma principal del negocio» (lo ya guardado se migra).
+- Un solo `.md` por contenido, en el idioma principal; todas las traducciones
+  lo enlazan en el `<head>`. Los `.md` acaban con «Disponible en: …» con
+  nombres de idioma completos y solo las versiones que existen; con una sola
+  versión no se escribe.
+- Casilla «Crear por idioma» (solo con WPML y Polylang): un `.md` por cada
+  traducción que existe, sin documentos puente. Vive en Carga inicial, junto a
+  «Reiniciar todo», y también en el paso Negocio del asistente. Las
+  instalaciones que ya generaban por idioma la conservan marcada al actualizar.
+- «Reiniciar todo» pide confirmación indicando cuántos documentos va a borrar y
+  borra también los de tipos de contenido fuera del alcance, las traducciones
+  sin la casilla y los documentos puente. No toca FAQ, tienda, Negocio,
+  artículos de Genix ni documentos en modo manual.
+- Las URL de cada contenido (`product_url`, enlace «Más información» y
+  «Disponible en») salen siempre en el idioma del propio contenido.
+- La URL del `.md` en el `<head>` y `llms.txt` no llevan prefijo de idioma.
+  `llms.txt` se genera siempre bajo el idioma principal; cualquier
+  `/xx/llms.txt` sirve lo mismo que `/llms.txt`.
+- El alcance y el conteo de Carga inicial cuentan un documento por contenido
+  (ya no multiplican por idiomas). Un contenido sin original en el idioma
+  principal se documenta en el idioma que exista.
+- El mensaje de sistema del chatbot indica los idiomas de la web y pide
+  responder en el idioma del usuario.
+- El aviso del FAQ en el asistente indica cuándo se generó y que guardar de
+  nuevo la redacta otra vez y sustituye a la publicada.
+
+### Correcciones
+
+- Botón «Añadir a la base de conocimiento» del editor: ahora funciona por AJAX
+  (antes el formulario anidado llevaba a la lista de entradas sin hacer nada).
+  Añade el contenido original al alcance (no el tipo entero), encola el
+  documento correcto y vuelve a la misma pantalla con su idioma.
+
+### Traducciones y documentación
+
+- Textos nuevos traducidos al catalán, alemán, inglés, euskera y francés
+  (`.pot` y `.po` actualizados).
+- Guía de usuario (`docs/`): nueva sección «Webs con varios idiomas» y las
+  pestañas Negocio, Generación masiva, FAQs, WooCommerce, Registro y Ajustes al
+  día con lo anterior.
 
 ## [1.3.1] - 2026-09-25
 

@@ -63,6 +63,23 @@ class Chatbot_Prompt {
 	}
 
 	/**
+	 * Añade al mensaje de sistema la nota de idiomas (responder en el idioma
+	 * del usuario y disponibilidad de cada documento en otros idiomas). Solo
+	 * con varios idiomas, y solo si el resultado cabe en el limite de
+	 * Chatbot_Prompt_Builder::MAX_LENGTH (limite duro del sistema que lo
+	 * recibe): si no cabe, el mensaje se envia tal cual, sin la nota. No se
+	 * escribe en el .md editable, solo en lo que se sincroniza con Genix.
+	 */
+	protected static function with_languages_note( $content ) {
+		$note = Languages::chatbot_note();
+		if ( '' === $note ) {
+			return $content;
+		}
+		$combined = $content . "\n" . $note;
+		return mb_strlen( $combined ) <= Chatbot_Prompt_Builder::MAX_LENGTH ? $combined : $content;
+	}
+
+	/**
 	 * ¿Existe el modulo de Genix y hay una instancia viva cargada?
 	 */
 	public static function is_genix_ready() {
@@ -89,6 +106,7 @@ class Chatbot_Prompt {
 		if ( '' === $content ) {
 			return array( 'status' => 'empty', 'message' => __( 'chatbot-system-prompt.md está vacío o no existe.', 'ai-knowledge' ) );
 		}
+		$content = self::with_languages_note( $content );
 
 		if ( ! self::is_genix_ready() ) {
 			return array( 'status' => 'unavailable', 'message' => __( 'Support Genix no está activo o su módulo de Knowledge Base aún no se ha cargado.', 'ai-knowledge' ) );

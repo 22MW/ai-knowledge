@@ -43,7 +43,7 @@ class Generator {
 	 * reales de $data: ver build_prompt(), que lo añade como instrucciones
 	 * adicionales con el límite explícito de no inventar ni sustituir datos.
 	 */
-	public static function generate( array $data, array $links = array(), $char_limit = null, $custom_prompt = '' ) {
+	public static function generate( array $data, array $versions = array(), $char_limit = null, $custom_prompt = '' ) {
 		$config = self::ai_config();
 		if ( ! $config ) {
 			return new \WP_Error( 'wookb_no_ai_connection', __( 'El origen de IA seleccionado no está conectado.', 'ai-knowledge' ) );
@@ -51,12 +51,12 @@ class Generator {
 
 		$char_limit = self::resolve_char_limit( $char_limit );
 
-		// El bloque de enlaces cruzados de idioma NO se pide a la IA: se anexa
-		// aqui de forma deterministica tras la respuesta, para garantizar el
-		// formato exacto (Tarea 3) sin depender de que el modelo lo reproduzca
-		// bien. El prompt le pide explicitamente que NO genere esa seccion el
-		// mismo, para no duplicarla.
-		$prompt = self::build_prompt( $data, $links, $char_limit, $custom_prompt );
+		// El apartado "Idiomas" (idioma del documento y versiones en otros
+		// idiomas) NO se pide a la IA: se anexa aqui de forma deterministica
+		// tras la respuesta, para garantizar el formato exacto sin depender de
+		// que el modelo lo reproduzca bien. El prompt le pide explicitamente que
+		// NO genere esa seccion el mismo, para no duplicarla.
+		$prompt = self::build_prompt( $data, $versions, $char_limit, $custom_prompt );
 
 		$response = AI_Client::generate(
 			'Eres un redactor técnico que genera documentos de base de conocimiento en Markdown para un chatbot de atención al cliente de un negocio o tienda online.',
@@ -83,10 +83,11 @@ class Generator {
 			$response .= "\n\n" . $purchase_block;
 		}
 
-		$link_block = self::build_language_links_block( $data['title'], $links );
-		if ( $link_block ) {
-			$response .= "\n\n## Disponible también en\n\n" . $link_block . "\n";
+		$section = Languages::build_section( $data['lang'], $versions );
+		if ( '' !== $section ) {
+			$response .= "\n\n" . $section;
 		}
+		$response .= "\n";
 
 		return $response;
 	}
@@ -139,7 +140,7 @@ class Generator {
 		return $title_line . "\n\n" . implode( "\n", $kept );
 	}
 
-	public static function build_prompt( array $data, array $links = array(), $char_limit = null, $custom_prompt = '' ) {
+	public static function build_prompt( array $data, array $versions = array(), $char_limit = null, $custom_prompt = '' ) {
 		$char_limit = self::resolve_char_limit( $char_limit );
 		$settings = Scope::settings();
 
@@ -192,7 +193,7 @@ class Generator {
 		$prompt .= "- Incluye solo los datos que existan de verdad en \"Datos del producto\" más abajo. No inventes variedad, temperatura, maridaje, horarios ni notas de cata si no aparecen ahí.\n";
 		$prompt .= '- El cuerpo completo (sin contar el título) no debe superar los ' . $char_limit . " caracteres. Si hay que recortar, quita primero adjetivos y frases de ambiente, nunca horarios, días, precios por tramo o duración.\n\n";
 		$prompt .= "Reglas obligatorias:\n";
-		$prompt .= '- Enlaza siempre a la URL del producto: ' . $data['url'] . ". No generes ni menciones ningún otro enlace. No añadas tú mismo ninguna sección de \"disponible en otros idiomas\": se añade automáticamente después de tu respuesta, no la dupliques. Nunca enlaces al propio documento.\n";
+		$prompt .= '- Enlaza siempre a la URL del producto: ' . $data['url'] . ". No generes ni menciones ningún otro enlace. No añadas tú mismo ninguna sección de idiomas ni de \"disponible en otros idiomas\": se añade automáticamente después de tu respuesta, no la dupliques. Nunca enlaces al propio documento.\n";
 		$prompt .= "- NO incluyas avisos genéricos tipo \"precio orientativo\" o \"confirma la disponibilidad\": esos avisos los añade el propio chatbot en su respuesta cuando corresponde, no deben estar guardados en este documento.\n";
 		if ( $has_purchase ) {
 			$prompt .= "- Tu texto es SOLO la descripción del producto. NO menciones el precio de la tienda, descuentos ni ofertas, stock o disponibilidad, envío, impuestos ni variaciones/formatos: todo eso se añade automáticamente después, en un bloque \"Datos de compra\" generado desde la base de datos. Sí conserva los precios por tramo o condiciones (ej. adultos/niños, con/sin visita guiada) que aparezcan en la descripción o en los campos de \"Datos del producto\".\n";
@@ -210,7 +211,7 @@ class Generator {
 			$prompt .= "Instrucciones adicionales específicas para este documento (aplícalas solo como estilo o énfasis; NUNCA sustituyen, contradicen ni inventan los datos reales de \"Datos del producto\" de arriba, que siempre tienen prioridad):\n" . trim( $custom_prompt ) . "\n\n";
 		}
 
-		$prompt .= 'Idioma de salida: ' . strtoupper( $data['lang'] ) . ". Responde solo con el documento Markdown, sin explicaciones adicionales.";
+		$prompt .= 'Idioma de salida: ' . Languages::name( $data['lang'] ) . ' (' . strtoupper( $data['lang'] ) . "). Responde solo con el documento Markdown, sin explicaciones adicionales.";
 
 		return $prompt;
 	}
@@ -265,7 +266,7 @@ class Generator {
 		if ( ! class_exists( '\AIKB\Store_Info_Doc' ) ) {
 			return '';
 		}
-		$row = Registry::find( Store_Info_Doc::SOURCE_ID_STORE_INFO, Wpml::default_language() );
+		$row = Registry::find( Store_Info_Doc::SOURCE_ID_STORE_INFO, Languages::main_language() );
 		return ( $row && $row->md_path ) ? Markdown_Store::public_url( $row->md_path ) : '';
 	}
 
@@ -430,68 +431,5 @@ class Generator {
 		}
 
 		return '## ' . $l['heading'] . "\n\n" . implode( "\n\n", $sections );
-	}
-
-	/**
-	 * Documento puente (sin IA): datos factuales breves + bloque de enlaces
-	 * de idioma en el mismo formato determinista que el flujo normal. Sin
-	 * avisos de precio/stock: esos los añade el chatbot en su respuesta.
-	 */
-	public static function build_bridge_markdown( array $data, array $links ) {
-		$md  = "# {$data['title']}\n\n";
-		if ( ! empty( $data['purchase'] ) ) {
-			// Producto WooCommerce: el bloque "Datos de compra" sustituye a
-			// las lineas sueltas Precio/Estado (sin duplicar).
-			$data['store_info_url'] = self::store_info_url();
-			$md .= self::build_purchase_data_block( $data ) . "\n";
-		} else {
-			if ( ! empty( $data['price'] ) ) {
-				$md .= "Precio: {$data['price']}.  \n";
-			}
-			if ( ! empty( $data['stock'] ) ) {
-				$md .= 'Estado: ' . ( 'in_stock' === $data['stock'] ? 'disponible' : 'agotado' ) . ".  \n";
-			}
-			// Otros tipos de contenido: solo los campos personalizados, si los hay.
-			$custom_block = self::build_purchase_data_block( $data );
-			if ( '' !== $custom_block ) {
-				$md .= "\n" . $custom_block . "\n";
-			}
-		}
-
-		$link_block = self::build_language_links_block( $data['title'], $links );
-		if ( $link_block ) {
-			$md .= "\n## Disponible también en\n\n" . $link_block . "\n";
-		}
-
-		return $md;
-	}
-
-	/**
-	 * Nombre legible del idioma para el bloque de enlaces cruzados (Tarea 3).
-	 */
-	protected static function lang_label( $code ) {
-		$labels = array(
-			'es' => 'Español',
-			'en' => 'English',
-			'de' => 'Deutsch',
-		);
-		return isset( $labels[ $code ] ) ? $labels[ $code ] : strtoupper( $code );
-	}
-
-	/**
-	 * Bloque "[Título]\n[Idioma](url) · [Idioma](url)..." en Markdown, formato
-	 * que renderiza bien vía el Parsedown de Genix. Solo incluye idiomas con
-	 * traducción real (el array $links ya viene filtrado por quien lo llama).
-	 * Vacio si no hay ningun enlace cruzado.
-	 */
-	public static function build_language_links_block( $title, array $links ) {
-		if ( empty( $links ) ) {
-			return '';
-		}
-		$parts = array();
-		foreach ( $links as $lang => $url ) {
-			$parts[] = '[' . self::lang_label( $lang ) . '](' . $url . ')';
-		}
-		return '[' . $title . ']' . "\n" . implode( ' · ', $parts );
 	}
 }

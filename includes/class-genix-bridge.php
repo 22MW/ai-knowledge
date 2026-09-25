@@ -65,7 +65,7 @@ class Genix_Bridge {
 		update_post_meta( $post_id, 'wookb_source_id', $data['id'] );
 		update_post_meta( $post_id, 'wookb_source_url', $data['url'] );
 
-		Wpml::set_language( $post_id, $lang, $trid );
+		Languages::set_document_language( $post_id, $lang, $trid );
 
 		return $post_id;
 	}

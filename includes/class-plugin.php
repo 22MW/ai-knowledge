@@ -23,7 +23,12 @@ class Plugin {
 		require_once AIKB_DIR . 'includes/class-scope.php';
 		require_once AIKB_DIR . 'includes/class-ai-client.php';
 		require_once AIKB_DIR . 'includes/class-registry.php';
+		require_once AIKB_DIR . 'includes/class-language-provider.php';
+		require_once AIKB_DIR . 'includes/class-no-language-plugin.php';
 		require_once AIKB_DIR . 'includes/class-wpml.php';
+		require_once AIKB_DIR . 'includes/class-polylang.php';
+		require_once AIKB_DIR . 'includes/class-translatepress.php';
+		require_once AIKB_DIR . 'includes/class-languages.php';
 		require_once AIKB_DIR . 'includes/extractors/class-extractor-base.php';
 		require_once AIKB_DIR . 'includes/extractors/class-extractor-woo.php';
 		require_once AIKB_DIR . 'includes/class-generator.php';
@@ -59,6 +64,11 @@ class Plugin {
 		require_once AIKB_DIR . 'includes/class-genix-reader.php';
 		require_once AIKB_DIR . 'includes/class-genix-markdown.php';
 		require_once AIKB_DIR . 'includes/class-genix-publish.php';
+
+		// Idiomas: fija una sola vez el check «Crear por idioma» según lo que la
+		// instalación ya generaba (ver Languages::maybe_migrate()).
+		Languages::maybe_migrate();
+		Languages::maybe_migrate_language_answer();
 
 		Queue::init();
 		Sync::init();

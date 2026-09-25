@@ -36,7 +36,7 @@ class Chatbot_Language_Fix {
 	}
 
 	/**
-	 * Idioma de navegacion real del visitante (WPML/cookie), sin fallback al
+	 * Idioma de navegacion real del visitante (plugin de idiomas/cookie), sin fallback al
 	 * valor de Genix. Null si no se pudo determinar. Reutilizado por
 	 * Chatbot_Relevance_Guard (Fase 2, pieza 2) para decidir si el idioma de
 	 * navegacion esta entre los idiomas activos del sitio.
@@ -46,27 +46,16 @@ class Chatbot_Language_Fix {
 	}
 
 	public static function resolve_language( $current ) {
-		// 1) Pregunta directa a WPML en el momento de esta peticion concreta.
-		if ( function_exists( 'apply_filters' ) && ( defined( 'ICL_SITEPRESS_VERSION' ) || function_exists( 'wpml_get_active_languages_filter' ) ) ) {
-			$lang = apply_filters( 'wpml_current_language', null );
-			if ( $lang && is_string( $lang ) ) {
-				return sanitize_text_field( $lang );
-			}
+		// Idioma de navegacion del visitante: el servicio de idiomas pregunta al
+		// plugin de idiomas activo en el momento de esta peticion concreta y, si
+		// no resuelve, a la cookie de idioma de ese plugin (que SI viaja en la
+		// peticion REST del chat, mismo origen).
+		$lang = Languages::current_language();
+		if ( $lang ) {
+			return $lang;
 		}
 
-		// 2) Cookie de idioma de WPML (la que fija el visitante al navegar y que
-		// SI viaja en la peticion REST del chat, mismo origen).
-		$cookie_names = array( '_icl_current_language', 'wp-wpml_current_language' );
-		foreach ( $cookie_names as $cookie_name ) {
-			if ( ! empty( $_COOKIE[ $cookie_name ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-				$lang = sanitize_text_field( wp_unslash( $_COOKIE[ $cookie_name ] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-				if ( $lang ) {
-					return $lang;
-				}
-			}
-		}
-
-		// 3) Nada resuelto: no imponer un idioma inventado, dejar que Genix
+		// Nada resuelto: no imponer un idioma inventado, dejar que Genix
 		// use su propio valor por defecto tal cual.
 		return $current;
 	}

@@ -17,6 +17,7 @@ if ( false === $summary_draft ) {
 	<?php esc_html_e( 'Datos del negocio en sí: válidos con o sin WooCommerce (lo específico de WooCommerce vive en su propia pestaña). Se usan para el prompt del chatbot (pestaña Chatbot, si Genix está activo) y para llms.txt/llm/info.md.', 'ai-knowledge' ); ?>
 </p>
 <?php Admin::documentation_link( 'negocio' ); ?>
+<?php Admin::render_language_regen_notice(); ?>
 
 <h2><?php esc_html_e( '1. Datos', 'ai-knowledge' ); ?></h2>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
@@ -37,6 +38,7 @@ if ( false === $summary_draft ) {
 				</td>
 			</tr>
 		<?php endforeach; ?>
+		<?php echo Admin::render_language_fields( 'table' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?>
 	</table>
 	<?php submit_button( __( 'Guardar', 'ai-knowledge' ) ); ?>
 </form>
@@ -69,3 +71,5 @@ if ( false === $summary_draft ) {
 	<textarea name="summary_draft" rows="6" class="large-text"><?php echo esc_textarea( $summary_draft ); ?></textarea>
 	<?php submit_button( __( 'Guardar resumen', 'ai-knowledge' ) ); ?>
 </form>
+
+<hr />

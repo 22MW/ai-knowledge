@@ -17,7 +17,8 @@ if ( ! class_exists( 'WooCommerce' ) ) {
 
 $settings     = Scope::settings();
 $store_docs_err = get_transient( 'wookb_store_docs_error' );
-$langs        = Wpml::active_languages();
+// Los documentos de tienda solo se generan en el idioma principal (ver Store_Info_Doc::generate_all()).
+$langs        = array( Languages::main_language() );
 
 $base_country_code = WC()->countries ? WC()->countries->get_base_country() : '';
 $countries_list     = WC()->countries ? WC()->countries->get_countries() : array();
@@ -297,7 +298,7 @@ $returns_value     = '' !== $settings['wc_returns_text'] ? $settings['wc_returns
 
 <h2><?php esc_html_e( 'Generar documentos de tienda', 'ai-knowledge' ); ?></h2>
 <p class="description">
-	<?php esc_html_e( 'Genera (o regenera) los documentos compuestos de "cómo comprar / condiciones de venta / envío y pago" y "catálogo de tienda", uno por idioma activo, a partir de la configuración real de WooCommerce (incluida esta pestaña). No dependen de ningún post concreto, así que se generan a mano con este botón — no se disparan solos al cambiar los ajustes de WooCommerce.', 'ai-knowledge' ); ?>
+	<?php esc_html_e( 'Genera (o regenera) los documentos compuestos de "cómo comprar / condiciones de venta / envío y pago" y "catálogo de tienda", en el idioma principal, a partir de la configuración real de WooCommerce (incluida esta pestaña). No dependen de ningún post concreto, así que se generan a mano con este botón — no se disparan solos al cambiar los ajustes de WooCommerce.', 'ai-knowledge' ); ?>
 </p>
 <?php if ( $store_docs_err ) : ?>
 	<div class="notice notice-error inline"><p><?php echo esc_html( $store_docs_err ); ?></p></div>

@@ -77,7 +77,7 @@ class Llms_Faq {
 			return trim( (string) file_get_contents( self::legacy_file_path( $lang ) ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		}
 
-		$langs = Wpml::active_languages();
+		$langs = Languages::codes();
 		if ( $langs && $lang === $langs[0] && file_exists( self::legacy_global_file_path() ) ) {
 			return trim( (string) file_get_contents( self::legacy_global_file_path() ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		}
@@ -152,14 +152,11 @@ class Llms_Faq {
 
 		// Cambio de comportamiento confirmado por el usuario (2026-09-24): el
 		// FAQ ya solo se publica en el idioma principal (ver los llamadores
-		// de este metodo), no en cada idioma activo -- sin nota, una IA que
-		// lea este documento no sabria que el sitio existe en otros idiomas.
+		// de este metodo), no en cada idioma activo -- el apartado "Idiomas" dice
+		// en que idioma esta y donde encontrar los demas.
 		$title      = self::title();
-		$lang_note  = Wpml::languages_note( $lang );
-		$markdown   = "# {$title}\n\n" . $content;
-		if ( '' !== $lang_note ) {
-			$markdown .= "\n\n" . $lang_note;
-		}
+		$section    = Languages::site_section( $lang );
+		$markdown   = "# {$title}\n\n" . $content . ( '' === $section ? '' : "\n\n" . $section );
 		$relative = Markdown_Store::write(
 			$lang,
 			'preguntas-frecuentes',

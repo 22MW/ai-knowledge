@@ -79,19 +79,12 @@ class Sync {
 	}
 
 	protected static function enqueue_all_languages( $post_id ) {
-		$lang = Wpml::element_language( $post_id );
-		Queue::enqueue( $post_id, $lang );
-
-		// Encola también las traducciones existentes del mismo trid (guardado dispara varias veces con WPML,
-		// pero cada idioma tiene su propio source_id real).
-		foreach ( Wpml::active_languages() as $target_lang ) {
-			if ( $target_lang === $lang ) {
-				continue;
-			}
-			$translated_id = Wpml::get_translation_id( $post_id, $target_lang );
-			if ( $translated_id && $translated_id !== $post_id ) {
-				Queue::enqueue( $translated_id, $target_lang );
-			}
+		// Documentos de este contenido segun el servicio de idiomas: uno (el
+		// original) por defecto -- guardar una traduccion refresca el documento
+		// del original --; con "Crear por idioma", uno por cada traduccion que
+		// existe (cada idioma tiene su propio source_id real).
+		foreach ( Languages::targets( $post_id ) as $target ) {
+			Queue::enqueue( $target['id'], $target['lang'] );
 		}
 	}
 

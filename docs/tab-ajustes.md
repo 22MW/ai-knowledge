@@ -46,6 +46,11 @@ recuadro (meta box) en el editor con un botón para generar su documento
 sin salir de ahí. Aquí eliges en qué tipos de contenido aparece ese
 recuadro — por defecto, en todos.
 
+Al pulsarlo se incluye ese contenido en tu alcance (solo ese, no el tipo de
+contenido entero) y se encola su documento. En webs con varios idiomas, el
+documento es el del contenido original, o el de la traducción si tienes marcado
+«Crear por idioma».
+
 ## Aviso a buscadores (IndexNow)
 
 Si lo activas, el plugin avisa automáticamente a los buscadores

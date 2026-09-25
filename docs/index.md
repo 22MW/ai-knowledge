@@ -48,6 +48,28 @@ adicional pensada para que la IA la entienda.
 > No hace falta que sepas nada de IA ni de SEO técnico para usar este
 > plugin. Cada pantalla te explica qué hace y qué pasa si activas algo.
 
+## Webs con varios idiomas
+
+El plugin funciona con **WPML** (probado en una web real), **Polylang** y
+**TranslatePress** (compatibles, todavía sin probar en una instalación real), y
+también sin ningún plugin de idiomas. Lo que debes saber:
+
+- **Un solo documento por contenido.** Por defecto, cada página o producto
+  tiene un único documento, en el **idioma principal** de tu web, y todas sus
+  traducciones lo enlazan. Cada documento acaba con «Disponible en», con el
+  enlace a cada versión que existe.
+- **Idioma principal e idiomas de la web** se configuran en
+  [Negocio](tab-negocio.md) (y en el paso Negocio del asistente). Si tienes un
+  plugin de idiomas se detectan solos; puedes añadir otros idiomas a mano.
+- **«Crear por idioma»** (solo con WPML y Polylang): si lo marcas, además se crea
+  un documento por cada traducción que exista. Se activa en
+  [Generación masiva](tab-generacion-masiva.md). Al cambiarlo, pulsa **Reiniciar
+  todo** para que los documentos se ajusten.
+- **`/llms.txt` es único**, en el idioma principal. No hay un `llms.txt` distinto
+  por idioma: cualquier `/idioma/llms.txt` muestra el mismo archivo.
+- Las preguntas frecuentes, los documentos de tienda y el resumen de Negocio
+  se generan solo en el idioma principal.
+
 ## Idiomas de la interfaz
 
 La interfaz del plugin está preparada para estos idiomas:

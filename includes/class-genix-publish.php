@@ -61,7 +61,7 @@ class Genix_Publish {
 			return new \WP_Error( 'wookb_genix_chatbot_only', __( 'Este artículo está marcado en Genix como "solo para el chatbot": no es público ni siquiera dentro de Genix, así que no puede publicarse aquí.', 'ai-knowledge' ) );
 		}
 
-		$lang = Wpml::element_language( $post_id );
+		$lang = Languages::post_language( $post_id );
 
 		$markdown_body = Genix_Markdown::convert( $post->post_content );
 		$markdown      = '# ' . $post->post_title . "\n\n" . $markdown_body;
@@ -77,7 +77,7 @@ class Genix_Publish {
 				'lang'         => $lang,
 				'source_hash'  => hash( 'sha256', $post->post_content ),
 				'generated_at' => current_time( 'mysql' ),
-				'product_url'  => get_permalink( $post->ID ),
+				'product_url'  => Languages::permalink( $post->ID ),
 				'bridge'       => false,
 			)
 		);
@@ -115,7 +115,7 @@ class Genix_Publish {
 			return new \WP_Error( 'wookb_genix_unavailable', __( 'Genix no está activo.', 'ai-knowledge' ) );
 		}
 
-		$lang = Wpml::element_language( $post_id );
+		$lang = Languages::post_language( $post_id );
 		$row  = Registry::find( $post_id, $lang );
 		if ( $row ) {
 			if ( $row->md_path ) {

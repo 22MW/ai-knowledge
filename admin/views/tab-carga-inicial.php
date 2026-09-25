@@ -6,8 +6,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $ids       = Scope::resolve_ids();
-$langs     = Wpml::active_languages();
-$total     = count( $ids ) * count( $langs );
+// Cada id es ya un contenido concreto (sin el check, uno por contenido; con el
+// check, uno por version existente): el total es el numero de ids, sin multiplicar.
+$total     = count( $ids );
 $settings  = Scope::settings();
 $counted   = Registry::count( array( 'status' => 'synced' ) );
 ?>
@@ -15,13 +16,12 @@ $counted   = Registry::count( array( 'status' => 'synced' ) );
 	<?php esc_html_e( 'Genera de golpe los documentos de todo el contenido dentro del alcance, y ajusta aquí el límite diario, el tamaño de lote y el debounce de la cola.', 'ai-knowledge' ); ?>
 </p>
 <?php Admin::documentation_link( 'carga-inicial' ); ?>
+<?php if ( ! Languages::creates_post_per_language() ) { Admin::render_language_regen_notice(); } ?>
 <p>
 	<?php
 	printf(
-		/* translators: 1: "X elemento(s)" ya pluralizado, 2: "X idioma(s)" ya pluralizado, 3: total documentos */
-		esc_html__( 'Alcance actual: %1$s × %2$s = %3$d documentos posibles.', 'ai-knowledge' ),
-		esc_html( sprintf( /* translators: %d: número de elementos */ _n( '%d elemento', '%d elementos', count( $ids ), 'ai-knowledge' ), count( $ids ) ) ),
-		esc_html( sprintf( /* translators: %d: número de idiomas activos */ _n( '%d idioma', '%d idiomas', count( $langs ), 'ai-knowledge' ), count( $langs ) ) ),
+		/* translators: %d: total de documentos posibles */
+		esc_html( _n( 'Alcance actual: %d documento posible.', 'Alcance actual: %d documentos posibles.', $total, 'ai-knowledge' ) ),
 		$total
 	);
 	?>
@@ -46,6 +46,8 @@ echo Admin::render_assistant_summary(); // phpcs:ignore WordPress.Security.Escap
 // el paso "finish" del asistente de configuracion -- misma logica, mismo
 // marcado, un solo sitio de mantenimiento.
 echo Admin::render_seed_controls(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado campo a campo dentro del propio metodo.
+// «Crear por idioma» (solo WPML/Polylang): modo de generación, junto a «Reiniciar todo».
+echo Admin::render_per_language_block(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo.
 ?>
 
 <p class="description">

@@ -10,13 +10,14 @@ generan para no disparar tu gasto de IA.
 
 Antes de generar nada, esta pantalla te dice:
 
-- Cuántos elementos y en cuántos idiomas entran en tu alcance actual
-  (elementos × idiomas = documentos posibles).
+- Cuántos documentos posibles entran en tu alcance actual. Por defecto es
+  uno por contenido; si marcas «Crear por idioma» (ver más abajo), uno por cada
+  versión que existe.
 - Cuántos ya están sincronizados.
 - Tu límite diario actual (o un aviso bien visible si lo tienes
   desactivado).
 
-[SCREENSHOT: resumen de alcance con el contador de elementos x idiomas]
+[SCREENSHOT: resumen de alcance con el contador de documentos posibles]
 
 ## Generar pendientes
 
@@ -28,11 +29,31 @@ falló anteriormente.
 > generados se regenerarán una sola vez al pulsar este botón, para incluir el
 > bloque «Datos de compra» (ver [WooCommerce](tab-woocommerce.md)).
 
+## Crear por idioma (webs con varios idiomas)
+
+Solo aparece si tu plugin de idiomas crea un contenido distinto por idioma
+(WPML y Polylang), y también en el paso Negocio del asistente.
+
+- **Desmarcado (recomendado):** un único documento por contenido, en el idioma
+  principal. Todas las traducciones lo enlazan.
+- **Marcado:** además, un documento por cada traducción que exista (sin
+  documentos puente). Salen en `/llms.txt` y se anuncian en la página de su
+  traducción.
+
+Al guardar el cambio aparece, en el mismo sitio, un aviso con el botón
+**Reiniciar todo**: púlsalo para borrar y regenerar lo que ya no corresponde.
+
 ## Reiniciar todo
 
 Este botón sí **regenera absolutamente todo**, incluido lo que ya estaba
 sincronizado. Gasta IA de más y no se puede deshacer — por eso el plugin
-te pide confirmación explícita antes de lanzarlo. Úsalo solo si quieres
+te pide confirmación explícita antes de lanzarlo, indicándote **cuántos
+documentos va a borrar**. Además de regenerar, borra los documentos que ya no
+corresponden: los de tipos de contenido que has sacado del alcance, los de
+traducciones si no tienes marcado «Crear por idioma» y los documentos puente
+antiguos. No toca las preguntas frecuentes, los documentos de tienda, el
+de Negocio, los artículos exclusivos de Genix ni los documentos que has
+fijado en modo manual. Úsalo solo si quieres
 forzar una regeneración completa (por ejemplo, tras cambiar el largo del
 texto en [Ajustes](tab-ajustes.md) y querer que todo el catálogo se
 adapte al nuevo tamaño).

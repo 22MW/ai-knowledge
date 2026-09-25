@@ -17,7 +17,8 @@ class Editor_Metabox {
 
 	public static function init() {
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_box' ) );
-		add_action( 'admin_post_wookb_editor_add_to_kb', array( __CLASS__, 'handle_add' ) );
+		add_action( 'wp_ajax_wookb_editor_add_to_kb', array( __CLASS__, 'handle_add' ) );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
 	}
 
 	/**
@@ -35,6 +36,27 @@ class Editor_Metabox {
 		$types = get_post_types( array( 'public' => true ), 'names' );
 		unset( $types['attachment'], $types['sgkb-docs'] );
 		return array_values( $types );
+	}
+
+	/** Script del botón (solo en la pantalla de edición de un tipo con metabox). */
+	public static function enqueue( $hook ) {
+		if ( ! in_array( $hook, array( 'post.php', 'post-new.php' ), true ) || ! current_user_can( Admin::capability() ) ) {
+			return;
+		}
+		$screen = get_current_screen();
+		if ( ! $screen || ! in_array( $screen->post_type, self::allowed_post_types(), true ) ) {
+			return;
+		}
+		wp_enqueue_script( 'wookb-editor-metabox', AIKB_URL . 'assets/editor-metabox.js', array(), AIKB_VERSION, true );
+		wp_localize_script(
+			'wookb-editor-metabox',
+			'wookbEditorMetabox',
+			array(
+				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+				'working' => __( 'Añadiendo…', 'ai-knowledge' ),
+				'error'   => __( 'No se pudo añadir. Recarga la página y vuelve a intentarlo.', 'ai-knowledge' ),
+			)
+		);
 	}
 
 	public static function add_meta_box() {
@@ -62,8 +84,8 @@ class Editor_Metabox {
 			return;
 		}
 
-		$lang = Wpml::element_language( $post->ID );
-		$row  = Registry::find( $post->ID, $lang );
+		$target = Languages::document_target( $post->ID );
+		$row    = Registry::find( $target['id'], $target['lang'] );
 
 		if ( $row ) {
 			require_once AIKB_DIR . 'admin/class-registry-table.php';
@@ -71,64 +93,66 @@ class Editor_Metabox {
 			if ( 'manual' === $row->override_mode ) {
 				echo '<p>' . esc_html__( 'Modo: manual', 'ai-knowledge' ) . '</p>';
 			}
-			$url = admin_url( 'admin.php?page=ai-knowledge&tab=registro&s=' . rawurlencode( $post->post_title ) );
+			// Se busca por el documento real (el del original, o el propio con «Crear
+			// por idioma»), no por el título de la traducción.
+			$url = admin_url( 'admin.php?page=ai-knowledge&tab=registro&s=' . rawurlencode( get_the_title( $target['id'] ) ) );
 			echo '<p><a href="' . esc_url( $url ) . '" target="_blank">' . esc_html__( 'Ver en el Registro', 'ai-knowledge' ) . '</a></p>';
 			return;
 		}
 
 		echo '<p>' . esc_html__( 'Este contenido todavía no está en la base de conocimiento.', 'ai-knowledge' ) . '</p>';
 		?>
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-			<input type="hidden" name="action" value="wookb_editor_add_to_kb" />
-			<input type="hidden" name="post_id" value="<?php echo esc_attr( $post->ID ); ?>" />
-			<?php wp_nonce_field( 'wookb_editor_add_to_kb_' . $post->ID, 'wookb_editor_nonce' ); ?>
-			<button type="submit" class="button button-primary">
-				<?php esc_html_e( 'Añadir a la base de conocimiento', 'ai-knowledge' ); ?>
-			</button>
-		</form>
+		<?php // Sin <form>: el metabox vive dentro del formulario del editor y los formularios anidados no existen en HTML. ?>
+		<button type="button" class="button button-primary" data-wookb-editor-add data-post-id="<?php echo esc_attr( $post->ID ); ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( 'wookb_editor_add_to_kb_' . $post->ID ) ); ?>">
+			<?php esc_html_e( 'Añadir a la base de conocimiento', 'ai-knowledge' ); ?>
+		</button>
+		<p class="description" data-wookb-editor-msg role="status" aria-live="polite"></p>
 		<?php
 	}
 
 	/**
-	 * Añade el post_type (si falta) y el ID de este post concreto al alcance
-	 * (mismo patron que Admin::save_content()), y encola su generación en modo
-	 * auto. No quita nada del alcance existente: solo suma.
+	 * AJAX. Suma al alcance el ID del contenido ORIGINAL (un «ID a incluir» ya
+	 * lo fuerza sin importar su tipo: no se añade el tipo entero) y, con «Crear
+	 * por idioma», también el de este post; encola el documento del target.
+	 * Devuelve la URL de edición con su idioma para volver a la misma pantalla.
 	 */
 	public static function handle_add() {
-		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0; // phpcs:ignore
-		check_admin_referer( 'wookb_editor_add_to_kb_' . $post_id, 'wookb_editor_nonce' );
+		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		check_ajax_referer( 'wookb_editor_add_to_kb_' . $post_id, 'nonce' );
 
 		if ( ! current_user_can( Admin::capability() ) ) {
-			wp_die( esc_html__( 'No tienes permisos suficientes.', 'ai-knowledge' ) );
+			wp_send_json_error( array( 'message' => __( 'No tienes permisos suficientes.', 'ai-knowledge' ) ), 403 );
 		}
 
 		$post = get_post( $post_id );
 		if ( ! $post ) {
-			wp_die( esc_html__( 'Contenido no encontrado.', 'ai-knowledge' ) );
+			wp_send_json_error( array( 'message' => __( 'Contenido no encontrado.', 'ai-knowledge' ) ), 404 );
 		}
 
-		$settings   = Scope::settings();
-		$post_types = (array) $settings['post_types'];
-		if ( ! in_array( $post->post_type, $post_types, true ) ) {
-			$post_types[] = $post->post_type;
+		$ids = array( (int) Languages::original_id( $post_id ) );
+		if ( Languages::per_language_enabled() ) {
+			$ids[] = (int) $post_id;
 		}
 
 		// Fase 10, pieza 2: extra_ids fue sustituido por id_actions.
-		$id_actions = (array) $settings['id_actions'];
-		$id_actions[ (int) $post_id ] = 'include';
+		$id_actions = (array) Scope::settings()['id_actions'];
+		foreach ( array_unique( $ids ) as $id ) {
+			$id_actions[ $id ] = 'include';
+		}
+		Scope::update_settings( array( 'id_actions' => $id_actions ) );
 
-		Scope::update_settings(
-			array(
-				'post_types'  => $post_types,
-				'id_actions'  => $id_actions,
-			)
-		);
-
-		$lang = Wpml::element_language( $post_id );
-		Queue::enqueue( $post_id, $lang );
+		$target = Languages::document_target( $post_id );
+		Queue::enqueue( $target['id'], $target['lang'] );
 
 		$redirect = get_edit_post_link( $post_id, 'raw' );
-		wp_safe_redirect( $redirect ? $redirect : admin_url() );
-		exit;
+		if ( $redirect && Languages::creates_post_per_language() ) {
+			$redirect = add_query_arg( 'lang', Languages::post_language( $post_id ), $redirect );
+		}
+		wp_send_json_success(
+			array(
+				'message'  => __( 'Añadido a la base de conocimiento.', 'ai-knowledge' ),
+				'redirect' => $redirect ? $redirect : admin_url(),
+			)
+		);
 	}
 }

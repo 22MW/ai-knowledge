@@ -123,7 +123,7 @@ class Chatbot_Relevance_Guard {
 				$docs = self::sort_by_title_relevance( $docs, $translated_query );
 			}
 
-			$docs[] = self::synthetic_language_instruction_doc( $unsupported_lang );
+			$docs[] = self::synthetic_language_instruction_doc( $unsupported_lang, $target_lang );
 		}
 
 		// Pieza 1: si NINGUN documento real (excluyendo el sintetico de arriba)
@@ -445,21 +445,15 @@ class Chatbot_Relevance_Guard {
 	}
 
 	/**
-	 * Idioma de navegacion ACTUAL del visitante segun WPML (no el idioma en
+	 * Idioma en el que estan los documentos que busca el chatbot
+	 * (Languages::documents_language()): el de navegacion del visitante si hay
+	 * un documento por idioma; si no, el idioma principal. No es el idioma en
 	 * que escribe su pregunta -- son cosas distintas, ver
-	 * detect_unsupported_query_language). Los documentos sgkb-docs existen
-	 * traducidos en es/en/de via WPML, asi que traducir y buscar en ESE
-	 * idioma (no siempre español) es lo que realmente coincide con lo que el
-	 * visitante tiene delante -- y con lo que la busqueda nativa de Genix va
-	 * a filtrar de todos modos (usa 'suppress_filters' => false). 'es' como
-	 * fallback si WPML no esta activo o no se puede determinar.
+	 * detect_unsupported_query_language(). Traducir y buscar en ESE idioma es
+	 * lo que realmente coincide con los documentos disponibles.
 	 */
 	protected static function current_navigation_language() {
-		if ( ! class_exists( 'SitePress' ) ) {
-			return 'es';
-		}
-		$lang = apply_filters( 'wpml_current_language', null );
-		return $lang ? $lang : 'es';
+		return Languages::documents_language();
 	}
 
 	/**
@@ -474,15 +468,10 @@ class Chatbot_Relevance_Guard {
 			return null;
 		}
 
-		$lang_names = array(
-			'es' => 'español',
-			'en' => 'inglés',
-			'de' => 'alemán',
-		);
-		$target_name = isset( $lang_names[ $target_lang ] ) ? $lang_names[ $target_lang ] : 'español';
+		$target_name = Languages::name( $target_lang ) . ' (' . $target_lang . ')';
 
 		$translated = AI_Client::generate(
-			'Traduce el siguiente texto al ' . $target_name . '. Responde solo con la traducción, sin comillas ni explicaciones.',
+			'Traduce el siguiente texto al idioma ' . $target_name . '. Responde solo con la traducción, sin comillas ni explicaciones.',
 			(string) $text,
 			80,
 			0.2,
@@ -530,10 +519,12 @@ class Chatbot_Relevance_Guard {
 		}
 	}
 
-	protected static function synthetic_language_instruction_doc( $lang_name ) {
-		$content = sprintf(
-			'INSTRUCCIÓN DEL SISTEMA: el visitante escribe en %s. Traduce tu respuesta completa a ese idioma usando el contexto en español disponible más abajo. No respondas en español.',
-			$lang_name
+	protected static function synthetic_language_instruction_doc( $lang_name, $docs_lang ) {
+		$docs_lang_name = Languages::name( $docs_lang );
+		$content        = sprintf(
+			'INSTRUCCIÓN DEL SISTEMA: el visitante escribe en %1$s. Traduce tu respuesta completa a ese idioma usando el contexto en %2$s disponible más abajo. No respondas en %2$s.',
+			$lang_name,
+			$docs_lang_name
 		);
 
 		return array(

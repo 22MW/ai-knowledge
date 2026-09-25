@@ -153,7 +153,7 @@ class Scope {
 	}
 
 	/**
-	 * Devuelve el listado de IDs de post (idioma por defecto / todos si WPML) dentro del alcance.
+	 * Devuelve el listado de IDs de post (en todos los idiomas) dentro del alcance.
 	 */
 	/**
 	 * Post types efectivos segun post_types_mode: la lista explicita guardada,
@@ -207,6 +207,9 @@ class Scope {
 				'posts_per_page' => -1,
 				'fields'         => 'ids',
 			);
+			// Polylang filtra las consultas por idioma actual: se pide en todos
+			// (el servicio de idiomas devuelve vacio con el resto de proveedores).
+			$args = array_merge( $args, Languages::all_languages_query_args() );
 
 			$tax_query = array();
 			foreach ( (array) $settings['term_actions'] as $taxonomy => $terms ) {
@@ -245,9 +248,16 @@ class Scope {
 			}
 		}
 
-		$ids = array_unique( $ids );
+		$ids = array_values( array_filter( array_unique( $ids ), array( __CLASS__, 'is_included' ) ) );
 
-		return array_values( array_filter( $ids, array( __CLASS__, 'is_included' ) ) );
+		// Sin «Crear por idioma» hay un documento por contenido: un id por
+		// contenido (el original o, si no existe, la versión que quede). Con el
+		// check, todas las versiones existentes.
+		if ( ! Languages::per_language_enabled() ) {
+			$ids = array_values( array_unique( array_map( array( 'AIKB\\Languages', 'original_id' ), $ids ) ) );
+		}
+
+		return $ids;
 	}
 
 	/**

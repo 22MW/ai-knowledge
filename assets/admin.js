@@ -208,6 +208,7 @@
 			'wookb_save_chatbot_settings',
 			'wookb_save_queue_settings',
 			'wookb_save_business_answers',
+			'wookb_save_per_language',
 			'wookb_save_business_summary',
 			'wookb_save_woocommerce_settings',
 			'wookb_save_llms_faq',
@@ -290,6 +291,11 @@
 					throw new Error( result.data && result.data.message ? result.data.message : __( 'No se pudo guardar.', 'ai-knowledge' ) );
 				}
 				var message = result.data && result.data.message ? result.data.message : __( 'Guardado.', 'ai-knowledge' );
+				// «Crear por idioma»: el aviso con el botón «Reiniciar todo» aparece
+				// ahí mismo (el HTML ya viene montado y escapado desde PHP).
+				if ( 'wookb_save_per_language' === action && result.data && 'string' === typeof result.data.notice_html ) {
+					$( '[data-wookb-regen-slot]' ).html( result.data.notice_html );
+				}
 				var value = result.data && (result.data.draft || result.data.polished);
 				if ( value ) {
 					if ( 'wookb_generate_business_summary_draft' === action ) {

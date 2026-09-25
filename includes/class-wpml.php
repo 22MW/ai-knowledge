@@ -6,111 +6,139 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Integración WPML: idioma del elemento, traducciones disponibles, idiomas activos.
- * Todos los métodos tienen fallback monolingüe (es) si WPML no está activo.
+ * Proveedor WPML: un post por idioma. Solo `Languages` usa esta clase; el
+ * resto del plugin pregunta al servicio, nunca a WPML.
  */
-class Wpml {
+class Wpml extends Language_Provider {
 
-	public static function is_active() {
+	public static function detect() {
 		return defined( 'ICL_SITEPRESS_VERSION' ) || function_exists( 'wpml_get_active_languages_filter' );
 	}
 
-	public static function active_languages() {
-		if ( ! self::is_active() ) {
-			return array( 'es' );
-		}
-		$langs = apply_filters( 'wpml_active_languages', null, array( 'skip_missing' => 0 ) );
-		return $langs ? array_keys( $langs ) : array( 'es' );
+	public function id() {
+		return 'wpml';
 	}
 
-	/**
-	 * Idioma PRINCIPAL real del sitio (distinto de "idiomas activos"): el que
-	 * WPML tiene configurado como idioma por defecto, vía el filtro estándar
-	 * 'wpml_default_language'. Usado por los documentos "compuestos" del
-	 * propio plugin (FAQ, información de tienda) que no tienen una
-	 * traducción real por idioma como un producto/página -- no tiene sentido
-	 * generarlos en todos los idiomas activos, solo en el principal.
-	 *
-	 * Fallback sin WPML (o si el filtro no devuelve nada, caso no esperado
-	 * pero posible si el modulo de idiomas de WPML no está inicializado
-	 * todavía): primer idioma de active_languages(), que ya cae a 'es' en
-	 * ese caso -- mismo patrón de fallback monolingüe que el resto de la clase.
-	 */
-	public static function default_language() {
-		if ( self::is_active() ) {
-			$default = apply_filters( 'wpml_default_language', null );
-			if ( $default && is_string( $default ) ) {
-				return $default;
+	public function label() {
+		return 'WPML';
+	}
+
+	public function creates_post_per_language() {
+		return true;
+	}
+
+	public function languages() {
+		$active = apply_filters( 'wpml_active_languages', null, array( 'skip_missing' => 0 ) );
+		if ( ! is_array( $active ) ) {
+			return array();
+		}
+		$out = array();
+		foreach ( $active as $code => $info ) {
+			$name = ( is_array( $info ) && ! empty( $info['native_name'] ) ) ? $info['native_name'] : strtoupper( $code );
+			$url  = apply_filters( 'wpml_permalink', home_url( '/' ), $code );
+			$out[ $code ] = array(
+				'name' => $name,
+				'url'  => is_string( $url ) ? $url : '',
+			);
+		}
+		return $out;
+	}
+
+	/** Idioma por defecto vía el filtro estándar 'wpml_default_language'. */
+	public function default_language() {
+		$default = apply_filters( 'wpml_default_language', null );
+		return ( $default && is_string( $default ) ) ? $default : null;
+	}
+
+	public function post_language( $post_id ) {
+		$lang = apply_filters(
+			'wpml_element_language_code',
+			null,
+			array(
+				'element_id'   => $post_id,
+				'element_type' => get_post_type( $post_id ),
+			)
+		);
+		return $lang ? $lang : null;
+	}
+
+	/** Post original del grupo de traducción (el que no tiene idioma de origen). */
+	public function original_id( $post_id ) {
+		$type = 'post_' . get_post_type( $post_id );
+		$trid = apply_filters( 'wpml_element_trid', null, $post_id, $type );
+		if ( $trid ) {
+			$translations = apply_filters( 'wpml_get_element_translations', null, $trid, $type );
+			if ( is_array( $translations ) ) {
+				foreach ( $translations as $translation ) {
+					if ( ! is_object( $translation ) || empty( $translation->element_id ) ) {
+						continue;
+					}
+					$flagged = ! empty( $translation->original );
+					$no_src  = property_exists( $translation, 'source_language_code' ) && empty( $translation->source_language_code );
+					if ( $flagged || $no_src ) {
+						return (int) $translation->element_id;
+					}
+				}
 			}
 		}
-		$active = self::active_languages();
-		return $active ? $active[0] : 'es';
+		return (int) $post_id;
 	}
 
-	/** Nombre nativo de un idioma (para listarlo dentro de otro idioma sin tener que traducirlo). */
-	protected static function native_language_name( $code ) {
-		$names = array(
-			'es' => 'español',
-			'ca' => 'català',
-			'en' => 'English',
-			'de' => 'Deutsch',
-			'eu' => 'euskara',
-			'fr' => 'français',
-		);
-		return isset( $names[ $code ] ) ? $names[ $code ] : strtoupper( $code );
+	public function translation_id( $post_id, $lang ) {
+		$translated_id = apply_filters( 'wpml_object_id', $post_id, get_post_type( $post_id ), false, $lang );
+		return $translated_id ? (int) $translated_id : null;
 	}
 
 	/**
-	 * Frase "Esta web está disponible también en: ..." (Markdown, una línea),
-	 * redactada en $doc_lang -- el idioma real del documento que la incluye.
-	 * Usada por los documentos "compuestos" del propio plugin (FAQ,
-	 * información de tienda, Negocio) que ahora solo se generan en el idioma
-	 * principal del sitio: sin esta nota, una IA que lea ese documento no
-	 * tendría forma de saber que existen otras versiones del sitio en otros
-	 * idiomas, ya que este documento en concreto no está traducido.
-	 *
-	 * Vacío si el sitio es monoidioma (ruido innecesario) o si $doc_lang es
-	 * el único idioma activo.
+	 * get_permalink() devuelve la URL del idioma de la petición (WPML la
+	 * reescribe), no la del idioma del post: se cambia de idioma solo alrededor
+	 * de la llamada. Un único sitio para todas las URLs de contenido.
 	 */
-	public static function languages_note( $doc_lang ) {
-		$active = self::active_languages();
-		$others = array_values( array_diff( $active, array( $doc_lang ) ) );
-		if ( empty( $others ) ) {
-			return '';
+	public function permalink( $post_id ) {
+		$lang = $this->post_language( $post_id );
+		if ( ! $lang ) {
+			$url = get_permalink( $post_id );
+			return $url ? $url : '';
 		}
-
-		$templates = array(
-			'es' => 'Esta web también está disponible en: %s.',
-			'ca' => 'Aquest lloc també està disponible en: %s.',
-			'en' => 'This website is also available in: %s.',
-			'de' => 'Diese Website ist auch verfügbar auf: %s.',
-			'eu' => 'Webgune hau eskuragarri dago ere: %s.',
-			'fr' => 'Ce site est également disponible en : %s.',
+		$url = $this->with_language(
+			$lang,
+			function () use ( $post_id ) {
+				return get_permalink( $post_id );
+			}
 		);
-		$template = isset( $templates[ $doc_lang ] ) ? $templates[ $doc_lang ] : $templates['es'];
-
-		$names = array_map( array( __CLASS__, 'native_language_name' ), $others );
-		return sprintf( $template, implode( ', ', $names ) );
+		return $url ? $url : '';
 	}
 
-	public static function element_language( $post_id ) {
-		if ( ! self::is_active() ) {
-			return 'es';
+	/** Cambia el idioma de WPML alrededor del callback y lo restaura siempre. */
+	public function with_language( $lang, $callback ) {
+		$current = $this->current_language();
+		if ( ! $lang || $current === $lang ) {
+			return call_user_func( $callback );
 		}
-		$lang = apply_filters( 'wpml_element_language_code', null, array(
-			'element_id'   => $post_id,
-			'element_type' => get_post_type( $post_id ),
-		) );
-		return $lang ? $lang : 'es';
+		do_action( 'wpml_switch_language', $lang );
+		try {
+			return call_user_func( $callback );
+		} finally {
+			do_action( 'wpml_switch_language', $current ? $current : null );
+		}
 	}
 
-	/**
-	 * Devuelve trid del elemento.
-	 */
-	public static function get_trid( $post_id ) {
-		if ( ! self::is_active() ) {
-			return null;
-		}
+	public function current_language() {
+		$lang = apply_filters( 'wpml_current_language', null );
+		return ( $lang && is_string( $lang ) ) ? $lang : null;
+	}
+
+	public function cookie_names() {
+		return array( '_icl_current_language', 'wp-wpml_current_language' );
+	}
+
+	public function term_id_in_language( $term_id, $taxonomy, $lang ) {
+		$translated = apply_filters( 'wpml_object_id', $term_id, $taxonomy, false, $lang );
+		return $translated ? (int) $translated : (int) $term_id;
+	}
+
+	/** trid del elemento (solo con $sitepress cargado). */
+	public function trid( $post_id ) {
 		global $sitepress;
 		if ( ! $sitepress ) {
 			return null;
@@ -118,31 +146,8 @@ class Wpml {
 		return apply_filters( 'wpml_element_trid', null, $post_id, 'post_' . get_post_type( $post_id ) );
 	}
 
-	/**
-	 * Traducción real del post en un idioma dado, o null si no existe/no está completa.
-	 */
-	public static function get_translation_id( $post_id, $lang ) {
-		if ( ! self::is_active() ) {
-			return 'es' === $lang ? $post_id : null;
-		}
-
-		// Si el elemento ya está en el idioma solicitado, no hace falta preguntar a WPML:
-		// wpml_object_id puede devolver false para una autoconsulta en el propio idioma.
-		if ( self::element_language( $post_id ) === $lang ) {
-			return (int) $post_id;
-		}
-
-		$translated_id = apply_filters( 'wpml_object_id', $post_id, get_post_type( $post_id ), false, $lang );
-		return $translated_id ? (int) $translated_id : null;
-	}
-
-	/**
-	 * Asigna idioma y trid a un post (usado para posts sgkb-docs generados).
-	 */
-	public static function set_language( $post_id, $lang, $trid = null ) {
-		if ( ! self::is_active() ) {
-			return;
-		}
+	/** Asigna idioma y trid a un post sgkb-docs generado. */
+	public function set_document_language( $post_id, $lang, $trid = null ) {
 		do_action(
 			'wpml_set_element_language_details',
 			array(
