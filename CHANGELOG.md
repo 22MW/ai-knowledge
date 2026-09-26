@@ -2,6 +2,145 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [1.4.2] - 2026-09-26
+
+### Correcciones
+
+- **Idioma mezclado en el asistente (WPML).** Causa localizada en el código de
+  WordPress: para un usuario en español el plugin no tiene catálogo (el español
+  es el idioma base) y WordPress reintenta cargar las traducciones «al vuelo»
+  con el idioma de cada momento; si WPML cambia de idioma a mitad de la
+  petición, el catálogo inglés se cargaba de golpe y el resto de la pantalla
+  salía en inglés. El dominio de traducción se fija ahora para toda la petición.
+- `/llms.txt`: los encabezados del idioma principal ya no llevan el sufijo
+  «(ES)»; solo lo llevan los demás idiomas («(EN)»).
+- Último paso del asistente: «Salir» pasa a la fila de acciones, a la derecha y
+  con el mismo estilo que «Atrás».
+- «Crear por idioma» se muestra en un recuadro con borde del color primario y
+  separado del contenido que le sigue (antes se solapaba con los campos).
+
+## [1.4.1] - 2026-09-26
+
+Correcciones a partir de las pruebas de la 1.4.0 en una web real y revisión
+completa de la integración con Support Genix.
+
+### Carpeta de documentos
+
+- La carpeta `wp-content/llm/` pasa a llamarse `wp-content/ai-knowledge/`. Al
+  actualizar se renombra sola (los datos guardados no cambian) y, si no hay
+  permisos, el plugin sigue usando la antigua sin romper nada.
+- Las URLs antiguas `/wp-content/llm/...` redirigen con un 301 a la nueva
+  ubicación cuando el archivo antiguo ya no existe. Las rutas no válidas dan 404.
+- La desinstalación con «Borrar archivos generados» elimina la carpeta nueva y
+  también la antigua si todavía existe.
+- Al borrar un documento sin archivo (en cola) ya no se intenta borrar la propia
+  carpeta (warning `unlink` en el log) y se elimina la carpeta de idioma que
+  queda vacía.
+
+### Asistente
+
+- El paso Negocio genera el resumen público con IA cuando hay conexión y no
+  existe uno propio; si ya existe no se pisa. Con él desaparece el aviso del
+  resumen corto y el texto aparece en la pestaña Negocio.
+- Último paso: los accesos son botones, con un botón «Salir» que lleva al
+  Registro; el título de la caja ahora es traducible.
+- Las respuestas AJAX del asistente usan el idioma de la pantalla (hipótesis
+  pendiente de confirmar con WPML: antes podían salir mezcladas en otro idioma).
+
+### Support Genix
+
+- «Reinstalar filtros ahora» funciona aunque el servidor no tenga `php` en el
+  PATH: la sintaxis se comprueba dentro de PHP. La copia de seguridad se hace
+  solo tras pasar las comprobaciones y justo antes de escribir.
+- El filtro de relevancia que vaciaba los documentos cuando ninguna palabra de la
+  pregunta coincidía con un título queda desactivado por defecto, con una
+  casilla en la pestaña Genix para reactivarlo. Idioma no soportado, límite de
+  documentos relacionados y contacto siguen activos.
+- Guardar de nuevo el mismo prompt ya no muestra «Genix rechazó guardar la
+  opción».
+- El plugin acepta también la clave de Claude de Genix (según el proveedor que
+  use su chatbot). Sin probar contra la API real de Anthropic.
+
+### Traducciones
+
+- 12 textos nuevos o cambiados en catalán, alemán, inglés, euskera y francés;
+  `.mo` recompilados (pendiente regenerar los JSON de JavaScript y revisión
+  lingüística).
+
+## [1.4.0] - 2026-09-25
+
+Revisión del asistente y de las pantallas de servidor, cola y desinstalación,
+a partir de un informe verificado con el código real.
+
+### Asistente y Ajustes
+
+- **Conexión de IA.** El aviso usa la misma comprobación que el generador
+  (origen elegido, modelo y clave) y dice el motivo cuando falla. Con conexión
+  se muestra la lista de modelos (Conectores de WordPress) o, con Genix, el
+  modelo que usa en solo lectura. Nuevo botón «Probar conexión», solo bajo
+  demanda. Mismo estado en el paso «Origen de IA» y en Ajustes, que se
+  refresca al guardar.
+- **WooCommerce.** El asistente precarga como la pestaña (nombre, moneda, país,
+  condiciones, devoluciones, recogida local y dirección). La dirección de la
+  tienda se guarda en «Dirección» de Negocio solo si estaba vacía. Los
+  documentos de tienda ya no dependen de la IA para generarse.
+- **Chatbot.** Si no existe el prompt, el paso lo crea a partir de los campos
+  rellenados (con IA o con una plantilla) y lo sincroniza con Genix; si existe,
+  lo sincroniza. El resumen final comprueba la sincronización real.
+- **Límites.** «Sin límite diario» viene marcado la primera vez, con aviso del
+  gasto de IA.
+- Pantalla final y Generación masiva con desglose por estado (en cola,
+  generando, listo, error), enlace al Registro y «Procesar ahora».
+
+### robots.txt
+
+- El robots.txt actual se lee sin peticiones HTTP (físico o el virtual de
+  WordPress), con la misma función en la pestaña, el asistente y la descarga de
+  copia. El asistente muestra el contenido actual y su origen.
+- Sin archivo físico: «Crear robots.txt», con casilla y confirmación que
+  explican los riesgos, y sin exigir copia. Se crea con el robots virtual
+  actual más el bloque de AI Knowledge.
+- Errores de lectura o descarga visibles en el propio paso, sin pantalla de
+  error.
+
+### Cola
+
+- Cargas masivas más rápidas: 50 documentos por lote (nuevas instalaciones),
+  15 s entre lotes y sin espera inicial.
+- «Generación en curso» ya no se queda para siempre y el texto indica si se usa
+  Action Scheduler o WP-Cron. «Cancelar generación» también cancela con
+  WP-Cron. Aviso si WP-Cron está desactivado.
+
+### Avisos
+
+- Aviso del resumen público: solo si no existe resumen propio, con descarte
+  por usuario y con el nombre correcto del plugin.
+- Aviso de Support Genix: solo en las pantallas del plugin y en Plugins, lista
+  qué filtros faltan, se puede silenciar 24 horas y «Reinstalar filtros» no
+  escribe si no puede comprobar la sintaxis.
+
+### Desinstalación
+
+- Dos opciones en Ajustes, desmarcadas por defecto: borrar los datos de la base
+  de datos y borrar los archivos generados (carpeta `llm/` y el `llms.txt`
+  creado por el plugin). `robots.txt` y `.htaccess` no se tocan.
+- El `llms.txt` físico lleva ahora al final un comentario que lo identifica
+  como generado por el plugin.
+
+### Visibilidad IA
+
+- Los estados de cada bot pasan a «Permitido» y «Bloqueado»; los botones
+  masivos siguen como acción.
+
+### Rendimiento
+
+- El asistente ya no precalcula todas sus pantallas en cada carga.
+
+### Traducciones y documentación
+
+- 75 textos nuevos en catalán, alemán, inglés, euskera y francés (pendiente de
+  revisión lingüística y de compilar los `.mo` y JSON). Guía de usuario al día.
+
 ## [1.3.2] - 2026-09-25
 
 Estrategia de idiomas: el plugin funciona con WPML (probado en una web real),

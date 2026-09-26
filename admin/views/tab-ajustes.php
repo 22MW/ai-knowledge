@@ -6,7 +6,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $settings        = Scope::settings();
-$ai_cfg          = AI_Client::config();
 $wp_ai_available = AI_Client::wordpress_available();
 $wp_ai_models    = $wp_ai_available ? AI_Client::available_models() : array();
 ?>
@@ -49,20 +48,7 @@ $wp_ai_models    = $wp_ai_available ? AI_Client::available_models() : array();
 					<label><input type="radio" name="ai_key_source" value="wp_connectors" <?php checked( 'wp_connectors' === $settings['ai_key_source'] ); ?> /> <?php esc_html_e( 'Conectores de WordPress', 'ai-knowledge' ); ?></label><br />
 				<?php endif; ?>
 				<label><input type="radio" name="ai_key_source" value="genix" <?php checked( 'wp_connectors' !== $settings['ai_key_source'] || ! $wp_ai_available ); ?> /> <?php esc_html_e( 'Support Genix', 'ai-knowledge' ); ?></label>
-				<p class="description">
-					<?php
-					if ( $ai_cfg ) {
-						printf(
-							/* translators: %1$s modelo, %2$s origen */
-							esc_html__( 'Configuración activa: modelo %1$s, origen %2$s.', 'ai-knowledge' ),
-							esc_html( AI_Client::MODEL_AUTO === $ai_cfg['model'] ? __( 'Automático', 'ai-knowledge' ) : $ai_cfg['model'] ),
-							esc_html( 'wp_connectors' === $ai_cfg['source'] ? __( 'Conectores de WordPress', 'ai-knowledge' ) : __( 'Support Genix', 'ai-knowledge' ) )
-						);
-					} else {
-						esc_html_e( 'El origen seleccionado no está conectado.', 'ai-knowledge' );
-					}
-					?>
-				</p>
+				<div data-wookb-ai-status-slot><?php echo Admin::ai_status_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?></div>
 			</td>
 		</tr>
 		<?php if ( $wp_ai_available ) : ?>
@@ -133,6 +119,26 @@ $wp_ai_models    = $wp_ai_available ? AI_Client::available_models() : array();
 					);
 					?>
 				</p>
+			</td>
+		</tr>
+		<tr>
+			<th><?php esc_html_e( 'Al eliminar el plugin', 'ai-knowledge' ); ?></th>
+			<td>
+				<p class="description"><?php esc_html_e( 'Por defecto, al eliminar el plugin se conserva todo salvo la tabla de documentos y los ajustes principales. Puedes marcar cualquiera de estas dos opciones (ambas desmarcadas por defecto). Son irreversibles: haz una copia de seguridad antes.', 'ai-knowledge' ); ?></p>
+				<p>
+					<label>
+						<input type="checkbox" name="uninstall_delete_data" value="1" <?php checked( ! empty( $settings['uninstall_delete_data'] ) ); ?> />
+						<?php esc_html_e( 'Borrar datos de la base de datos', 'ai-knowledge' ); ?>
+					</label>
+				</p>
+				<p class="description"><?php esc_html_e( 'Borra las tablas de documentos y de registro de crawlers, todos los ajustes y opciones del plugin (respuestas de Negocio y chatbot, resumen público, idiomas, estado del asistente…), los datos temporales, las acciones pendientes de la cola y los eventos programados, y las copias «sgkb-docs» de Support Genix que tengan una fila en el Registro. No borra los artículos exclusivos de Genix ni el ajuste «chatbot_custom_instructions» de Genix.', 'ai-knowledge' ); ?></p>
+				<p>
+					<label>
+						<input type="checkbox" name="uninstall_delete_files" value="1" <?php checked( ! empty( $settings['uninstall_delete_files'] ) ); ?> />
+						<?php esc_html_e( 'Borrar archivos generados', 'ai-knowledge' ); ?>
+					</label>
+				</p>
+				<p class="description"><?php esc_html_e( 'Borra la carpeta wp-content/ai-knowledge/ (y la antigua wp-content/llm/ si aún existe) (documentos .md, FAQ, info.md y el prompt del chatbot) y el llms.txt de la raíz solo si lo creó este plugin (uno propio tuyo se respeta). NO toca robots.txt ni .htaccess: las reglas de bloqueo de AI Knowledge seguirán activas tras desinstalar, hasta que las quites a mano.', 'ai-knowledge' ); ?></p>
 			</td>
 		</tr>
 	</table>

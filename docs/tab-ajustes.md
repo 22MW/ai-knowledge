@@ -31,11 +31,23 @@ De dónde saca el plugin la inteligencia artificial para redactar:
   alguno configurado en `Ajustes → Conectores`): Anthropic, OpenAI o
   Google.
 - **Support Genix**: usa la conexión de IA de tu chatbot, si lo tienes
-  instalado.
+  instalado. Sirve la clave de **OpenAI** o la de **Claude** que tengas en
+  Genix (se respeta el proveedor elegido en el chatbot de Genix; si ese no
+  tiene clave, se usa el otro). El uso de Claude no está probado contra la API
+  real.
+
+Debajo del selector verás el **estado de la conexión**: si funciona, con el
+origen y el modelo; si no, el motivo (WordPress inferior a 7.0, sin modelos en
+Conectores, Genix sin clave de OpenAI o el modelo elegido ya no disponible). Se
+recalcula al guardar y no hace ninguna llamada a la IA.
 
 Si eliges Conectores de WordPress, puedes elegir el modelo concreto o
 dejarlo en **"Automático"** (recomendado), que elige entre los modelos de
-texto que tengas conectados.
+texto que tengas conectados. Con Support Genix, el modelo se muestra en solo
+lectura: para cambiarlo, hazlo en los ajustes de Genix.
+
+El botón **«Probar conexión»** hace una llamada mínima a la IA (consume unos
+pocos tokens), solo cuando lo pulsas, y muestra el resultado real.
 
 [SCREENSHOT: selector de origen de IA con el modelo activo mostrado abajo]
 
@@ -58,6 +70,29 @@ compatibles con **IndexNow** (Bing y otros — Google no lo soporta
 todavía) cada vez que se crea, actualiza o borra contenido dentro de tu
 alcance. Así se enteran del cambio casi al instante, en lugar de esperar
 a su próximo rastreo habitual.
+
+## Al eliminar el plugin
+
+Dos casillas **desmarcadas por defecto** que deciden qué se borra si eliminas
+el plugin desde la lista de plugins. Son irreversibles: haz una copia antes.
+
+- **Borrar datos de la base de datos** — las tablas de documentos y de
+  registro de crawlers, todos los ajustes y opciones del plugin (respuestas de
+  Negocio y chatbot, resumen público, idiomas, estado del asistente…), los
+  datos temporales, las acciones pendientes de la cola y los eventos
+  programados, y las copias «sgkb-docs» de Genix que tengan una fila en el
+  Registro. No borra los artículos exclusivos de Genix ni el ajuste
+  `chatbot_custom_instructions` de Genix.
+- **Borrar archivos generados** — la carpeta `wp-content/ai-knowledge/` (y la antigua `wp-content/llm/` si aún existe) (documentos
+  `.md`, FAQ, `info.md` y el prompt del chatbot) y el `llms.txt` de la raíz,
+  solo si lo creó este plugin (uno propio tuyo se respeta). **No toca
+  `robots.txt` ni `.htaccess`:** las reglas de bloqueo de AI Knowledge siguen
+  activas tras desinstalar hasta que las quites a mano.
+
+Sin ninguna casilla marcada, al eliminar el plugin solo se borran la tabla de
+documentos y los ajustes principales; el resto se conserva. En multisitio, los
+datos se borran sitio a sitio y los archivos solo si todos los sitios tienen
+marcada la casilla de archivos.
 
 ## Preguntas frecuentes
 

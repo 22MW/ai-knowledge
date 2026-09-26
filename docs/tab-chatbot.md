@@ -25,6 +25,12 @@ respuestas al cuestionario y volver a generar para mejorarlo.
 Un único ajuste por ahora: cuántos "Documentos relacionados" muestra el
 chatbot como máximo bajo cada respuesta (0 = sin límite).
 
+Además, la casilla **«Filtro de relevancia por título»** (desactivada por
+defecto) oculta los documentos cuando ninguna palabra de la pregunta coincide
+con un título. Puede ocultar documentos cuyo contenido responde a la pregunta
+pero cuyo título no coincide, así que solo conviene activarla si ves resultados
+poco relacionados; Genix ya filtra por su cuenta.
+
 ## 2. Cuestionario
 
 Responde a un pequeño cuestionario sobre cómo quieres que hable tu
@@ -40,6 +46,13 @@ chatbot. Opcionalmente puedes:
 [SCREENSHOT: cuestionario del chatbot con el campo de páginas de referencia]
 
 Pulsa **"Generar borrador con IA"** para obtener un primer texto.
+
+> En el **asistente de configuración**, el paso Chatbot hace algo parecido al
+> guardar: si ya existe un prompt lo sincroniza tal cual con Genix; si no, crea
+> uno predeterminado con tus respuestas (con IA si hay conexión; si no, con una
+> plantilla de hasta 2000 caracteres) y lo sincroniza. Después puedes afinarlo
+> aquí. Recuerda que en Genix Lite el prompt solo se aplica con el parche de
+> filtros instalado (ver el aviso de Genix más abajo).
 
 ## 3. Borrador editable
 
@@ -85,6 +98,19 @@ Dos artículos que **no aparecen nunca** en esta lista, a propósito:
   hace falta duplicarlos aquí.
 
 [SCREENSHOT: tabla de artículos exclusivos de Genix con los botones Generar/Actualizar y Quitar]
+
+## Aviso «Support Genix ha perdido los filtros»
+
+Algunas mejoras del chatbot (relevancia de las búsquedas, idiomas no
+soportados, límite de documentos relacionados y el prompt personalizado del
+sitio) dependen de unos pequeños parches que el plugin inserta en un archivo de
+Support Genix. Una actualización de Genix puede borrarlos. Cuando faltan, el
+aviso lista **qué falta en cada archivo** (Genix Lite y/o Pro) y ofrece
+**«Reinstalar filtros ahora»**. Solo aparece en las pantallas del plugin y en
+Plugins, y puedes silenciarlo 24 horas. Si el servidor no permite comprobar la
+sintaxis PHP, el plugin **no escribe nada** en Genix y te lo dice: en ese caso,
+aplica el parche a mano. Sin el parche, en Genix Lite el prompt se guarda pero
+el chatbot no lo usa.
 
 ## Preguntas frecuentes
 

@@ -7,16 +7,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Sincroniza chatbot-system-prompt.md con el ajuste NATIVO de Support Genix
- * 'chatbot_custom_instructions'. NO toca ningun archivo de Genix: usa su
- * propia API publica.
+ * 'chatbot_custom_instructions'. Esta clase NO toca ningun archivo de Genix:
+ * escribe la opcion con su propia API publica. Ojo: Genix Lite no trae de
+ * fabrica el bloque que LEE esa opcion (Pro si); por eso, en Lite, el prompt
+ * solo se aplica si Genix_Hooks_Guard ha parcheado el archivo del trait de
+ * Genix (ver ese guard: avisa cuando el parche falta y permite reinstalarlo).
  *
  * Genix arma el system prompt del chatbot en Apbd_wps_knowledge_base_chatquery_trait.php,
  * metodo build_chatbot_system_prompt(): tiene un bloque fijo de reglas anti-alucinacion
  * que no se puede tocar (y no queremos tocarlo), y bajo el encabezado "## Additional
  * instructions" anexa textualmente la opcion 'chatbot_custom_instructions' si no esta vacia
  * (linea ~1133: $custom_instructions = trim($this->GetOption('chatbot_custom_instructions', ''))).
- * Esa opcion es un ajuste nativo del propio Genix pensado exactamente para esto -- no hace
- * falta ningun filtro ni parche.
+ * Esa opcion es un ajuste nativo del propio Genix pensado exactamente para esto. Sin embargo,
+ * Genix Lite no incluye el bloque que la lee: sin el parche de Genix_Hooks_Guard el prompt se
+ * guarda pero el chatbot de Lite no lo usa. Los filtros de Chatbot_Relevance_Guard tambien
+ * dependen de ese parche.
  *
  * Persistencia: Apbd_wps_knowledge_base extiende ApbdWpsBaseModule, que expone
  * el metodo publico y estatico GetModuleInstance() (linea ~145 de ApbdWpsBaseModule.php)
@@ -33,7 +38,7 @@ class Chatbot_Prompt {
 
 	/**
 	 * Origen editable (no publico, nunca servido por URL): guardado del
-	 * textarea de la pestaña Chatbot. Vive en wp-content/llm/ junto al
+	 * textarea de la pestaña Chatbot. Vive en wp-content/ai-knowledge/ junto al
 	 * resto de contenido del plugin (documentos publicos, info.md, FAQ),
 	 * en vez de suelto en la carpeta del plugin -- consolidado a partir
 	 * del 2026-09-16 (antes: AIKB_DIR . 'chatbot-system-prompt.md').
@@ -93,6 +98,19 @@ class Chatbot_Prompt {
 		return ! empty( $instance );
 	}
 
+	/**
+	 * ¿El .md actual está sincronizado con Genix? Se basa en el hash guardado
+	 * al sincronizar (SYNCED_HASH_OPTION), no en que el archivo exista.
+	 */
+	public static function is_synced() {
+		$content = self::read();
+		if ( '' === $content || ! self::is_genix_ready() ) {
+			return false;
+		}
+		$content = self::with_languages_note( $content );
+		return hash_equals( (string) get_option( self::SYNCED_HASH_OPTION, '' ), md5( $content ) );
+	}
+
 	protected static function instance() {
 		return call_user_func( array( self::GENIX_CLASS, 'GetModuleInstance' ) );
 	}
@@ -127,7 +145,14 @@ class Chatbot_Prompt {
 		$ok = $instance->AddOption( self::GENIX_OPTION, $content );
 
 		if ( false === $ok ) {
-			return array( 'status' => 'error', 'message' => __( 'Genix rechazó guardar la opción (AddOption devolvió false).', 'ai-knowledge' ) );
+			// update_option() devuelve false tambien cuando el valor NO cambia:
+			// se relee y solo es error si de verdad no coincide.
+			$after = trim( (string) $instance->GetOption( self::GENIX_OPTION, '' ) );
+			if ( $after !== $content ) {
+				return array( 'status' => 'error', 'message' => __( 'Genix rechazó guardar la opción (AddOption devolvió false).', 'ai-knowledge' ) );
+			}
+			update_option( self::SYNCED_HASH_OPTION, $hash, false );
+			return array( 'status' => $force ? 'synced' : 'skipped', 'message' => $force ? __( 'Prompt sincronizado con Support Genix.', 'ai-knowledge' ) : __( 'Ya estaba sincronizado.', 'ai-knowledge' ) );
 		}
 
 		update_option( self::SYNCED_HASH_OPTION, $hash, false );

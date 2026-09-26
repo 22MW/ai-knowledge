@@ -22,15 +22,6 @@ class Chatbot_Prompt_Builder {
 
 	const MAX_LENGTH = 2000;
 
-	// Umbral orientativo (no un límite técnico) para animar a ampliar el
-	// resumen de negocio: Llms_Txt::summary() lo usa tal cual como cita
-	// inicial de llms.txt sin ningún mínimo hoy, así que un resumen de una
-	// frase deja la cabecera del documento pública muy pobre. 1000 caracteres
-	// iguala, a ojo, el tope de cuerpo de una ficha de producto normal
-	// (Generator::BODY_CHAR_LIMIT) -- ni exacto ni forzado, solo una
-	// referencia razonable para el aviso.
-	const SUMMARY_MIN_LENGTH_RECOMMENDED = 1000;
-
 	/**
 	 * Preguntas del cuestionario. 'key' => [label, placeholder, type, group].
 	 * 'group' separa qué pregunta vive en qué pestaña del admin: 'negocio'
@@ -174,7 +165,7 @@ class Chatbot_Prompt_Builder {
 	}
 
 	/**
-	 * Escribe wp-content/llm/info.md con la info general del negocio (mismo
+	 * Escribe wp-content/ai-knowledge/info.md con la info general del negocio (mismo
 	 * cuestionario que arma el prompt: nombre, resumen, contacto, horario,
 	 * idiomas) -- una sola fuente para el prompt del chatbot Y para el
 	 * resumen de llms.txt, en vez de mantener el dato en tres sitios. Se
@@ -214,7 +205,7 @@ class Chatbot_Prompt_Builder {
 
 		$content = implode( "\n", $lines ) . "\n";
 
-		$dir = WP_CONTENT_DIR . '/llm';
+		$dir = Markdown_Store::base_dir();
 		wp_mkdir_p( $dir );
 		file_put_contents( $dir . '/info.md', $content ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_put_contents
 
@@ -226,7 +217,7 @@ class Chatbot_Prompt_Builder {
 	}
 
 	public static function info_doc_url() {
-		return content_url( '/llm/info.md' );
+		return trailingslashit( Markdown_Store::base_url() ) . 'info.md';
 	}
 
 	/**
@@ -497,6 +488,40 @@ class Chatbot_Prompt_Builder {
 		return self::enforce_length( self::call_ai( $config, $prompt ) );
 	}
 
+	/**
+	 * Borrador determinista (sin IA) a partir de las respuestas del cuestionario:
+	 * una línea «Etiqueta: valor» por cada campo rellenado, con un máximo de
+	 * MAX_LENGTH caracteres. Lo usa el asistente cuando no hay IA y aún no
+	 * existe chatbot-system-prompt.md; el ajuste fino se hace después en la
+	 * pestaña Genix. Devuelve '' si no hay ninguna respuesta rellenada.
+	 */
+	public static function build_template_draft( array $answers ) {
+		$filled = array();
+		foreach ( self::questions() as $key => $q ) {
+			if ( 'nombre_negocio' === $key ) {
+				continue;
+			}
+			$value = isset( $answers[ $key ] ) ? trim( preg_replace( '/\s+/', ' ', (string) $answers[ $key ] ) ) : '';
+			if ( '' !== $value ) {
+				$filled[] = $q['label'] . ': ' . $value;
+			}
+		}
+		if ( empty( $filled ) ) {
+			return '';
+		}
+
+		$name    = ! empty( $answers['nombre_negocio'] ) ? trim( (string) $answers['nombre_negocio'] ) : get_bloginfo( 'name' );
+		$lines   = array();
+		/* translators: %s: nombre del negocio */
+		$lines[] = sprintf( __( 'Identidad: eres el asistente virtual de %s. Responde solo con la información de su base de conocimiento.', 'ai-knowledge' ), $name );
+		$lines[] = __( 'Precisión: no inventes datos, precios ni políticas que no estén en la información disponible.', 'ai-knowledge' );
+		$lines   = array_merge( $lines, $filled );
+		$lines[] = __( 'Idiomas de la web', 'ai-knowledge' ) . ': ' . Languages::summary_text();
+
+		$text = self::enforce_length( implode( "\n", $lines ) );
+		return mb_substr( $text, 0, self::MAX_LENGTH );
+	}
+
 	protected static function enforce_length( $text ) {
 		if ( is_wp_error( $text ) ) {
 			return $text;
@@ -552,19 +577,34 @@ class Chatbot_Prompt_Builder {
 	}
 
 	/**
-	 * Aviso (no bloqueante) cuando la respuesta "negocio" del cuestionario es
-	 * corta: esa respuesta es la cita de resumen que abre llms.txt
-	 * (Llms_Txt::summary()) y hoy no tiene ningún mínimo forzado, así que un
-	 * resumen de una frase deja pobre la cabecera pública del documento que
-	 * leen los crawlers de IA.
+	 * Aviso (no bloqueante) cuando no existe un resumen público propio
+	 * (opción BUSINESS_SUMMARY_OPTION). Ese resumen es la cita de apertura
+	 * pública de /llms.txt (Llms_Txt::summary()); sin él se usa como sustituto
+	 * el campo «Enfoque del negocio», que puede ser una sola frase. No cuenta
+	 * ese sustituto ni aplica ningún umbral de longitud.
 	 *
 	 * Restringido a la propia pantalla del plugin (no admin_notices global):
-	 * es un recordatorio de contenido, no una alerta de algo roto (a
-	 * diferencia de Genix_Hooks_Guard::maybe_notice(), que sí avisa en todo
-	 * wp-admin porque ahí el chatbot ha perdido funcionalidad real). Molestar
-	 * en cada pantalla de admin por un campo de texto mejorable no se
-	 * justifica.
+	 * es un recordatorio de contenido, no una alerta de algo roto. Descarte
+	 * persistente por usuario (user meta), con un formulario POST propio.
 	 */
+	const DISMISS_ACTION = 'wookb_dismiss_summary_notice';
+	const DISMISS_META   = 'wookb_dismissed_summary_notice';
+
+	public static function init_notice() {
+		add_action( 'admin_post_' . self::DISMISS_ACTION, array( __CLASS__, 'handle_dismiss' ) );
+	}
+
+	public static function handle_dismiss() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'No autorizado.', 'ai-knowledge' ) );
+		}
+		check_admin_referer( self::DISMISS_ACTION );
+		update_user_meta( get_current_user_id(), self::DISMISS_META, 1 );
+		$back = wp_get_referer();
+		wp_safe_redirect( $back ? $back : admin_url( 'admin.php?page=ai-knowledge' ) );
+		exit;
+	}
+
 	public static function maybe_short_summary_notice() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
@@ -572,24 +612,30 @@ class Chatbot_Prompt_Builder {
 		if ( ! isset( $_GET['page'] ) || 'ai-knowledge' !== $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			return;
 		}
+		if ( get_user_meta( get_current_user_id(), self::DISMISS_META, true ) ) {
+			return;
+		}
 
-		$length = mb_strlen( trim( self::get_business_summary() ) );
-		if ( $length >= self::SUMMARY_MIN_LENGTH_RECOMMENDED ) {
+		// Solo el resumen público propio cuenta, no el sustituto «Enfoque del negocio».
+		$own_summary = get_option( self::BUSINESS_SUMMARY_OPTION, null );
+		if ( null !== $own_summary && '' !== trim( (string) $own_summary ) ) {
 			return;
 		}
 
 		$negocio_tab_url = admin_url( 'admin.php?page=ai-knowledge&tab=negocio' );
 
 		printf(
-			'<div class="notice notice-info is-dismissible"><p><strong>%1$s</strong> %2$s</p></div>',
-			esc_html__( 'WOO Knowledge Base Generator:', 'ai-knowledge' ),
+			'<div class="notice notice-info"><p><strong>%1$s</strong> %2$s</p><form method="post" action="%3$s" class="wookb-toolbar-form"><input type="hidden" name="action" value="%4$s" />%5$s<button type="submit" class="button">%6$s</button></form></div>',
+			esc_html__( 'AI Knowledge & Visibility:', 'ai-knowledge' ),
 			sprintf(
-				/* translators: 1: longitud actual en caracteres, 2: mínimo recomendado, 3: enlace a la pestaña Negocio */
-				esc_html__( 'El resumen público del negocio tiene %1$d caracteres. Se usa como cita de apertura en /llms.txt: ampliarlo a al menos %2$d caracteres da más contexto útil a los crawlers de IA. %3$s', 'ai-knowledge' ),
-				(int) $length,
-				(int) self::SUMMARY_MIN_LENGTH_RECOMMENDED,
+				/* translators: %s: enlace a la pestaña Negocio */
+				esc_html__( 'Todavía no has escrito el resumen público de tu negocio. Es la cita de apertura pública de /llms.txt: lo primero que leen las IA sobre ti. Mientras no lo escribas se usa el campo «Enfoque del negocio», que puede ser muy breve. Es solo una sugerencia: no rompe nada si lo ignoras. %s', 'ai-knowledge' ),
 				'<a href="' . esc_url( $negocio_tab_url ) . '">' . esc_html__( 'Ir a la pestaña Negocio', 'ai-knowledge' ) . '</a>'
-			)
+			),
+			esc_url( admin_url( 'admin-post.php' ) ),
+			esc_attr( self::DISMISS_ACTION ),
+			wp_nonce_field( self::DISMISS_ACTION, '_wpnonce', true, false ),
+			esc_html__( 'No volver a mostrar', 'ai-knowledge' )
 		);
 	}
 }

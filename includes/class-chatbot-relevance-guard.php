@@ -16,12 +16,17 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Toda la logica real vive aqui, no en Genix.
  *
  * Piezas implementadas:
- *  1. Filtro de relevancia: si NINGUN documento encontrado tiene relacion
+ *  1. Filtro de relevancia (DESACTIVADO por defecto, ajuste
+ *     `chatbot_relevance_filter`): si NINGUN documento encontrado tiene relacion
  *     real con la pregunta (por titulo, tras quitar palabras vacias), se
  *     devuelve un array vacio -- esto hace que Genix crea que "no encontro
  *     nada" y dispare su propio mecanismo de recuperacion por historial de
  *     conversacion (is_chatbot_followup_query/build_chatbot_followup_query,
- *     ya existente en Genix, no se reimplementa aqui).
+ *     ya existente en Genix, no se reimplementa aqui). Desactivado porque
+ *     compara solo con el TITULO: vaciaba los documentos de preguntas cuya
+ *     respuesta esta en el contenido («envios a Canarias», «devoluciones»)
+ *     aunque el titulo no coincidiera. Genix ya exige por su cuenta que
+ *     coincida al menos el 50 % de los terminos, asi que era redundante.
  *  2. Idioma no soportado: si el texto de la pregunta parece estar escrito
  *     en un idioma fuera de los activos del sitio (es/en/de), se inyecta un
  *     documento sintetico con una instruccion directa de traduccion en el
@@ -136,7 +141,8 @@ class Chatbot_Relevance_Guard {
 		// palabras de la pregunta (ruso, p.ej.) contra titulos en español
 		// nunca puede coincidir por diseño -- vaciaria siempre los documentos
 		// en español que acabamos de encontrar traduciendo la pregunta arriba.
-		if ( ! $unsupported_lang ) {
+		$relevance_filter = ! empty( Scope::settings()['chatbot_relevance_filter'] );
+		if ( $relevance_filter && ! $unsupported_lang ) {
 			$real_docs = array_filter( $docs, array( __CLASS__, 'is_not_synthetic' ) );
 			if ( ! self::any_doc_relevant( $query, $real_docs ) ) {
 				$docs = array();

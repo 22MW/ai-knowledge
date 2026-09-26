@@ -38,6 +38,7 @@ class Admin
 			'wookb_generate_prompt_draft' => 'generate_prompt_draft',
 			'wookb_normalize_prompt' => 'normalize_prompt',
 			'wookb_polish_store_doc' => 'polish_store_doc',
+			'wookb_test_ai_connection' => 'test_ai_connection',
 			// Pieza 1: boton "Generar" del Registro por AJAX, mismo callback
 			// que admin_post_wookb_regenerate_single (ver regenerate_single(),
 			// que ya distingue wp_doing_ajax() para responder JSON en vez de
@@ -217,11 +218,7 @@ class Admin
 			}
 			if (in_array($action, array('save', 'continue'), true) && 'welcome' !== $current) {
 				self::assistant_save_step($current);
-				// Releer: assistant_save_step('ai') escribe su propio
-				// get_option()/update_option() de 'aikb_setup_assistant'
-				// (ai_connection) -- sin releer aqui, el update_option() de
-				// mas abajo (con el $state capturado ANTES de esta llamada)
-				// lo sobrescribiria y lo perderia.
+				// Releer el estado por si assistant_save_step() lo ha modificado.
 				$state = get_option('aikb_setup_assistant', $state);
 				if ('save' === $action) $notice = __('Guardado correctamente.', 'ai-knowledge');
 			}
@@ -305,6 +302,7 @@ class Admin
 					<span class="wookb-assistant-actions-main">
 						<?php if (!in_array($step, array('welcome', 'success', 'finish'), true)) : ?><button type="submit" class="button" name="assistant_action" value="save"><?php esc_html_e('Guardar configuración', 'ai-knowledge'); ?></button><?php endif; ?>
 						<?php if ('success' !== $step) : ?><button type="submit" class="button button-primary" name="assistant_action" value="continue"><?php esc_html_e('Continuar', 'ai-knowledge'); ?></button><?php endif; ?>
+						<?php if ('success' === $step) : ?><a class="button" href="<?php echo esc_url(admin_url('admin.php?page=ai-knowledge')); ?>"><?php esc_html_e('Salir', 'ai-knowledge'); ?></a><?php endif; ?>
 					</span>
 				</div>
 				<div class="wookb-assistant-feedback<?php echo $notice ? ' is-visible' : ''; ?>" data-assistant-feedback role="status" aria-live="polite"><?php echo esc_html($notice); ?></div>
@@ -332,11 +330,11 @@ class Admin
 			'limits' => array('number' => 3, 'title' => __('Límites de generación', 'ai-knowledge'), 'description' => __('Comprueba el largo máximo del texto y los límites de generación antes de continuar: a partir de aquí, cada paso puede generar contenido real con IA en cuanto lo guardes.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=ajustes')),
 			'content' => array('number' => 4, 'title' => __('Contenido y alcance', 'ai-knowledge'), 'description' => __('Selecciona los tipos de contenido público que deben formar parte de la base de conocimiento. La selección determina qué entradas, páginas, productos u otros contenidos podrán generar documentos. Al guardar, se encola la generación de todo lo que entre en el alcance. Las taxonomías, términos, identificadores y campos personalizados pueden configurarse después desde la pantalla Contenido del plugin.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=contenido')),
 			'business' => array('number' => 5, 'title' => __('Negocio', 'ai-knowledge'), 'description' => __('Añade la información estable que una IA necesita para comprender correctamente tu negocio: identidad, ubicación, público, contacto, horario y enfoque. Estos datos complementan el contenido del sitio y ayudan a producir respuestas coherentes sin inventar información.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=negocio')),
-			'woocommerce' => array('number' => 6, 'title' => __('WooCommerce', 'ai-knowledge'), 'description' => __('Revisa los datos generales de la tienda, el país, la moneda, las condiciones de compra, la recogida, los plazos y el contacto. Al guardar, se generan los documentos de información de tienda si hay conexión de IA disponible. Los envíos, impuestos, pagos, categorías y otras opciones avanzadas pueden completarse después en una ventana nueva sin perder el progreso.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=woocommerce')),
+			'woocommerce' => array('number' => 6, 'title' => __('WooCommerce', 'ai-knowledge'), 'description' => __('Revisa los datos generales de la tienda, el país, la moneda, las condiciones de compra, la recogida, los plazos y el contacto. Los datos se precargan con lo que ya tiene WooCommerce. Al guardar, se generan los documentos de información de tienda (se componen sin IA). Los envíos, impuestos, pagos, categorías y otras opciones avanzadas pueden completarse después en una ventana nueva sin perder el progreso.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=woocommerce')),
 			'faqs' => array('number' => 7, 'title' => __('FAQs', 'ai-knowledge'), 'description' => __('Genera con IA las preguntas frecuentes públicas de tu negocio a partir de los datos ya introducidos, y las publica directamente en llms.txt. Este paso solo aparece si hay una conexión de IA disponible.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=faqs')),
-			'chatbot' => array('number' => 8, 'title' => __('Chatbot', 'ai-knowledge'), 'description' => __('Configura cómo Support Genix utilizará la base de conocimiento, cuántos documentos relacionados podrá consultar y qué información adicional debe tener en cuenta. Al guardar, se sincroniza con Genix si hay conexión disponible. Este paso solo aparece cuando la integración está disponible.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=prompt')),
+			'chatbot' => array('number' => 8, 'title' => __('Chatbot', 'ai-knowledge'), 'description' => __('Configura cómo Support Genix utilizará la base de conocimiento, cuántos documentos relacionados podrá consultar y qué información adicional debe tener en cuenta. Al guardar, si todavía no existe el prompt del chatbot se crea uno predeterminado a partir de tus respuestas (con IA si hay conexión; si no, con una plantilla), y se sincroniza con Genix. Este paso solo aparece cuando la integración está disponible.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=prompt')),
 			'visibility' => array('number' => 9, 'title' => __('Visibilidad IA', 'ai-knowledge'), 'description' => __('Decide qué familias de crawlers pueden acceder al sitio y cómo se gestiona su acceso a llms.txt. Al guardar, esta selección queda conservada para utilizarla en las reglas de visibilidad del plugin.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=visibilidad-ia')),
-			'server' => array('number' => 10, 'title' => __('Archivos del servidor', 'ai-knowledge'), 'description' => __('Comprueba si robots.txt y .htaccess difieren de la configuración guardada. Descarga las copias y las versiones preparadas; el asistente no muestra el código completo; reemplazar .htaccess exige copia descargada y una casilla de responsabilidad.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=visibilidad-ia')),
+			'server' => array('number' => 10, 'title' => __('Archivos del servidor', 'ai-knowledge'), 'description' => __('Comprueba si robots.txt y .htaccess difieren de la configuración guardada. Muestra el robots.txt actual (archivo físico o el generado por WordPress). Con un robots.txt físico exige descargar antes una copia; sin él puedes crearlo tras aceptar los riesgos. Reemplazar .htaccess exige copia descargada y una casilla de responsabilidad.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=visibilidad-ia')),
 			'finish' => array('number' => 11, 'title' => __('Resumen', 'ai-knowledge'), 'description' => __('Revisa el estado real de cada paso: qué se ha generado ya y qué queda pendiente. Puedes generar ahora los documentos que aún falten, o dejarlo para más tarde desde Generación masiva.', 'ai-knowledge'), 'link' => admin_url('admin.php?page=ai-knowledge&tab=carga-inicial')),
 			'success' => array('number' => 12, 'title' => __('Resumen final', 'ai-knowledge'), 'description' => __('La configuración del asistente ha terminado. Revisa el estado real de los documentos y accede directamente a las áreas principales del plugin.', 'ai-knowledge')),
 		);
@@ -347,27 +345,41 @@ class Admin
 		$settings = Scope::settings();
 		ob_start();
 		if ('server' === $step) {
-			$crawler_actions = Crawler_Catalog::effective_actions();
-			$mode = $settings['crawler_visibility_mode'];
-			if (file_exists(Robots_Txt_Guard::path())) {
-				$robots_current = (string) file_get_contents(Robots_Txt_Guard::path()); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-			} else {
-				$robots_response = wp_remote_get(home_url('/robots.txt'));
-				$robots_current = is_wp_error($robots_response) ? '' : wp_remote_retrieve_body($robots_response);
-			}
-			$robots_generated = Robots_Txt_Guard::generate_full_file($crawler_actions, $mode);
-			$htaccess_current = Htaccess_Guard::is_available() ? (string) file_get_contents(Htaccess_Guard::path()) : '';
-			$htaccess_generated = Htaccess_Guard::generate_full_file($crawler_actions, $mode);
-			// Cada carga del paso invalida la copia descargada antes: hay que
-			// volver a descargarla (vale 10 minutos).
-			Robots_Txt_Guard::clear_backup_confirmation();
-			Htaccess_Guard::clear_backup_confirmation();
-			$robots_backup_ready = Robots_Txt_Guard::backup_confirmed();
-			if (!Robots_Txt_Guard::managed_block_matches($robots_current, $crawler_actions, $mode)) : ?><p class="notice notice-warning inline"><strong><?php esc_html_e('Las reglas de AI Knowledge en robots.txt son diferentes de la configuración guardada.', 'ai-knowledge'); ?></strong></p><?php else : ?><p class="notice notice-success inline"><?php esc_html_e('Las reglas de AI Knowledge en robots.txt coinciden con la configuración guardada.', 'ai-knowledge'); ?></p><?php endif; ?>
-			<p><?php esc_html_e('Descarga una copia actual antes de actualizar robots.txt con la versión preparada.', 'ai-knowledge'); ?></p>
-			<p><button type="button" class="button" data-server-action="wookb_download_robots_backup" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_download_robots_backup')); ?>"><?php esc_html_e('Descargar copia actual de robots.txt', 'ai-knowledge'); ?></button> <button type="button" class="button button-primary" data-server-action="wookb_apply_robots_block" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_apply_robots_block')); ?>" data-return-assistant="1" <?php disabled(!$robots_backup_ready); ?>><?php esc_html_e('Actualizar robots.txt', 'ai-knowledge'); ?></button></p>
-			<?php if (!Htaccess_Guard::managed_block_matches($htaccess_current, $crawler_actions, $mode)) : ?><p class="notice notice-warning inline"><strong><?php esc_html_e('Las reglas de AI Knowledge en .htaccess son diferentes de la configuración guardada.', 'ai-knowledge'); ?></strong></p><?php else : ?><p class="notice notice-success inline"><?php esc_html_e('Las reglas de AI Knowledge en .htaccess coinciden con la configuración guardada.', 'ai-knowledge'); ?></p><?php endif; ?>
-			<p><?php esc_html_e('Puedes reemplazar el .htaccess desde aquí: solo se cambia el bloque de AI Knowledge y tus reglas que choquen se comentan, no se borran. Descarga primero la copia actual y marca la casilla.', 'ai-knowledge'); ?></p>
+				$crawler_actions = Crawler_Catalog::effective_actions();
+				$mode = $settings['crawler_visibility_mode'];
+				// Misma lectura que la pestaña Visibilidad IA y la descarga de copia: archivo físico o, si no existe, el virtual de WordPress (sin petición HTTP).
+				$robots = Robots_Txt_Guard::read_current();
+				$robots_current = $robots['content'];
+				$robots_is_physical = 'physical' === $robots['source'];
+				$robots_apply_error = get_transient('wookb_robots_apply_error_' . get_current_user_id());
+				delete_transient('wookb_robots_apply_error_' . get_current_user_id());
+				$htaccess_current = Htaccess_Guard::is_available() ? (string) file_get_contents(Htaccess_Guard::path()) : '';
+				$htaccess_generated = Htaccess_Guard::generate_full_file($crawler_actions, $mode);
+				// Cada carga del paso invalida la copia descargada antes: hay que
+				// volver a descargarla (vale 10 minutos).
+				Robots_Txt_Guard::clear_backup_confirmation();
+				Htaccess_Guard::clear_backup_confirmation();
+				$robots_backup_ready = Robots_Txt_Guard::backup_confirmed();
+				if ($robots_apply_error) : ?><p class="notice notice-error inline"><?php echo esc_html($robots_apply_error); ?></p><?php endif;
+				if ('error' === $robots['source']) : ?><p class="notice notice-error inline"><?php echo esc_html($robots['error']); ?></p><?php else : ?>
+				<h3><?php esc_html_e('robots.txt actual', 'ai-knowledge'); ?></h3>
+				<p class="description"><?php echo esc_html(Robots_Txt_Guard::source_label($robots['source'])); ?></p>
+				<textarea readonly rows="8" style="width:100%;max-width:100%;font-size:13px;"><?php echo esc_textarea($robots_current); ?></textarea>
+				<?php endif;
+				if (!Robots_Txt_Guard::managed_block_matches($robots_current, $crawler_actions, $mode)) : ?><p class="notice notice-warning inline"><strong><?php esc_html_e('Las reglas de AI Knowledge en robots.txt son diferentes de la configuración guardada.', 'ai-knowledge'); ?></strong></p><?php else : ?><p class="notice notice-success inline"><?php esc_html_e('Las reglas de AI Knowledge en robots.txt coinciden con la configuración guardada.', 'ai-knowledge'); ?></p><?php endif; ?>
+				<?php if (!Robots_Txt_Guard::is_available()) : ?>
+					<p class="notice notice-warning inline"><?php esc_html_e('robots.txt no es escribible en este servidor (permisos de la carpeta raíz).', 'ai-knowledge'); ?></p>
+				<?php elseif (!$robots_is_physical) : ?>
+					<p class="notice notice-warning inline"><strong><?php esc_html_e('No hay un robots.txt físico: WordPress genera uno virtual.', 'ai-knowledge'); ?></strong> <?php esc_html_e('No hace falta copia de seguridad. Al crearlo se guarda un archivo real en la raíz del sitio con el contenido actual de WordPress más el bloque de AI Knowledge. Ese archivo sustituye al que genera WordPress: las reglas que añadan en el futuro plugins SEO o WooCommerce dejarán de aplicarse salvo que las edites a mano en el archivo. Se puede deshacer borrando el archivo. Es recomendable probarlo antes en un entorno de pruebas (staging) o tener una copia del sitio.', 'ai-knowledge'); ?></p>
+					<p><label><input type="checkbox" data-wookb-robots-ack /> <?php esc_html_e('He leído los riesgos y quiero crear el robots.txt físico.', 'ai-knowledge'); ?></label></p>
+					<p><button type="button" class="button button-primary" data-server-action="wookb_apply_robots_block" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_apply_robots_block')); ?>" data-return-assistant="1" data-robots-create="1" disabled><?php esc_html_e('Crear robots.txt', 'ai-knowledge'); ?></button></p>
+				<?php else : ?>
+					<p><?php esc_html_e('Descarga una copia actual antes de actualizar robots.txt con la versión preparada.', 'ai-knowledge'); ?></p>
+					<p><button type="button" class="button" data-server-action="wookb_download_robots_backup" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_download_robots_backup')); ?>"><?php esc_html_e('Descargar copia actual de robots.txt', 'ai-knowledge'); ?></button> <button type="button" class="button button-primary" data-server-action="wookb_apply_robots_block" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_apply_robots_block')); ?>" data-return-assistant="1" <?php disabled(!$robots_backup_ready); ?>><?php esc_html_e('Actualizar robots.txt', 'ai-knowledge'); ?></button></p>
+					<p class="description" data-wookb-server-feedback role="status" aria-live="polite"></p>
+				<?php endif; ?>
+				<?php if (!Htaccess_Guard::managed_block_matches($htaccess_current, $crawler_actions, $mode)) : ?><p class="notice notice-warning inline"><strong><?php esc_html_e('Las reglas de AI Knowledge en .htaccess son diferentes de la configuración guardada.', 'ai-knowledge'); ?></strong></p><?php else : ?><p class="notice notice-success inline"><?php esc_html_e('Las reglas de AI Knowledge en .htaccess coinciden con la configuración guardada.', 'ai-knowledge'); ?></p><?php endif; ?>
+				<p><?php esc_html_e('Puedes reemplazar el .htaccess desde aquí: solo se cambia el bloque de AI Knowledge y tus reglas que choquen se comentan, no se borran. Descarga primero la copia actual y marca la casilla.', 'ai-knowledge'); ?></p>
 			<p><button type="button" class="button" data-server-action="wookb_download_htaccess_generated" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_download_htaccess_generated')); ?>"><?php esc_html_e('Descargar .htaccess preparado', 'ai-knowledge'); ?></button></p>
 			<?php if (!Htaccess_Guard::is_available()) : ?><p class="notice notice-warning inline"><?php esc_html_e('No se puede reemplazar el .htaccess: no existe o el servidor no permite escribirlo. No se ha intentado modificar nada; usa el archivo preparado a mano.', 'ai-knowledge'); ?></p><?php else : ?>
 			<p><button type="button" class="button" data-server-action="wookb_download_htaccess_backup" data-server-nonce="<?php echo esc_attr(wp_create_nonce('wookb_download_htaccess_backup')); ?>"><?php esc_html_e('Descargar copia actual de .htaccess', 'ai-knowledge'); ?></button></p>
@@ -379,20 +391,22 @@ class Admin
 		if ('welcome' === $step) : $geo_prompt = self::build_geo_prompt(); ?>
 			<p><?php esc_html_e('Comprueba tu sitio en un agente externo antes de configurar el plugin. Después de completar la configuración, repite la comprobación con este mismo prompt para comparar el resultado.', 'ai-knowledge'); ?></p><textarea id="wookb-welcome-geo-prompt" readonly rows="8" style="width:100%;max-width:100%;font-size:13px;"><?php echo esc_textarea($geo_prompt); ?></textarea><p><button type="button" class="button" data-wookb-copy-target="wookb-welcome-geo-prompt"><?php esc_html_e('Copiar Prompt', 'ai-knowledge'); ?></button></p>
 			<div class="wookb-assistant-welcome-copy"><h3><?php esc_html_e('Qué revisaremos', 'ai-knowledge'); ?></h3><ul><li><?php esc_html_e('El origen de IA y el contenido que formará la base de conocimiento.', 'ai-knowledge'); ?></li><li><?php esc_html_e('Los datos del negocio y las integraciones disponibles.', 'ai-knowledge'); ?></li><li><?php esc_html_e('La visibilidad para IA y los límites de generación.', 'ai-knowledge'); ?></li></ul></div>
-		<?php elseif ('ai' === $step) : $available = AI_Client::wordpress_available(); $models = $available ? AI_Client::available_models() : array(); $ai_ready = self::assistant_ai_available(); ?>
-			<?php if ($ai_ready) : ?>
-				<p class="notice notice-success inline"><?php esc_html_e('Conexión de IA disponible: los pasos siguientes podrán generar contenido real.', 'ai-knowledge'); ?></p>
-			<?php else : ?>
-				<p class="notice notice-warning inline"><strong><?php esc_html_e('No se detecta ninguna conexión de IA activa todavía.', 'ai-knowledge'); ?></strong> <?php esc_html_e('Puedes continuar sin problema: los pasos siguientes guardarán tus datos igual, pero no generarán contenido con IA hasta que conectes un origen (aquí, en Conectores de WordPress, o activando Support Genix) y vuelvas a guardar ese paso.', 'ai-knowledge'); ?></p>
-			<?php endif; ?>
-			<div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Origen de IA', 'ai-knowledge'); ?></span><select name="ai_key_source"><option value="genix" <?php selected('genix', $settings['ai_key_source']); ?>><?php esc_html_e('Support Genix', 'ai-knowledge'); ?></option><?php if ($available) : ?><option value="wp_connectors" <?php selected('wp_connectors', $settings['ai_key_source']); ?>><?php esc_html_e('Conectores de WordPress', 'ai-knowledge'); ?></option><?php endif; ?></select></label><label class="wookb-assistant-field"><span><?php esc_html_e('Modelo', 'ai-knowledge'); ?></span><select name="wp_ai_model"><option value="<?php echo esc_attr(AI_Client::MODEL_AUTO); ?>" <?php selected(AI_Client::MODEL_AUTO, $settings['wp_ai_model']); ?>><?php esc_html_e('Automático (recomendado)', 'ai-knowledge'); ?></option><?php foreach ($models as $key => $model) : ?><option value="<?php echo esc_attr($key); ?>" <?php selected($key, $settings['wp_ai_model']); ?>><?php echo esc_html($model['name'] . ' (' . $model['model'] . ')'); ?></option><?php endforeach; ?></select></label></div><div class="wookb-assistant-external-links"><a class="button" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(admin_url('options-connectors.php')); ?>"><?php esc_html_e('Configurar Conectores de WordPress', 'ai-knowledge'); ?></a> <a class="button" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(admin_url('plugins.php')); ?>"><?php esc_html_e('Abrir Support Genix', 'ai-knowledge'); ?></a></div>
-		<?php elseif ('limits' === $step) : ?><div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Largo máximo del texto', 'ai-knowledge'); ?></span><input type="number" min="100" max="10000" name="body_char_limit" value="<?php echo esc_attr($settings['body_char_limit']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Tokens de salida', 'ai-knowledge'); ?></span><input type="number" min="200" name="output_tokens" value="<?php echo esc_attr($settings['output_tokens']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Límite diario', 'ai-knowledge'); ?></span><input type="number" min="1" name="daily_limit" value="<?php echo esc_attr($settings['daily_limit']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Tamaño de lote', 'ai-knowledge'); ?></span><input type="number" min="1" name="batch_size" value="<?php echo esc_attr($settings['batch_size']); ?>" /></label><label class="wookb-assistant-toggle"><input type="checkbox" name="no_limit" value="1" <?php checked(!empty($settings['no_limit'])); ?> /><span><?php esc_html_e('Sin límite diario', 'ai-knowledge'); ?></span></label><label class="wookb-assistant-toggle"><input type="checkbox" name="indexnow_enabled" value="1" <?php checked(!empty($settings['indexnow_enabled'])); ?> /><span><?php esc_html_e('Avisar a IndexNow', 'ai-knowledge'); ?></span></label></div>
+		<?php elseif ('ai' === $step) : $available = AI_Client::wordpress_available(); $models = $available ? AI_Client::available_models() : array(); ?>
+			<div data-wookb-ai-status-slot><?php echo self::ai_status_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?></div>
+			<div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Origen de IA', 'ai-knowledge'); ?></span><select name="ai_key_source"><option value="genix" <?php selected('genix', $settings['ai_key_source']); ?>><?php esc_html_e('Support Genix', 'ai-knowledge'); ?></option><?php if ($available) : ?><option value="wp_connectors" <?php selected('wp_connectors', $settings['ai_key_source']); ?>><?php esc_html_e('Conectores de WordPress', 'ai-knowledge'); ?></option><?php endif; ?></select></label>
+			<?php if (!empty($models)) : ?><label class="wookb-assistant-field"><span><?php esc_html_e('Modelo (Conectores de WordPress)', 'ai-knowledge'); ?></span><select name="wp_ai_model"><option value="<?php echo esc_attr(AI_Client::MODEL_AUTO); ?>" <?php selected(AI_Client::MODEL_AUTO, $settings['wp_ai_model']); ?>><?php esc_html_e('Automático (recomendado)', 'ai-knowledge'); ?></option><?php foreach ($models as $key => $model) : ?><option value="<?php echo esc_attr($key); ?>" <?php selected($key, $settings['wp_ai_model']); ?>><?php echo esc_html($model['name'] . ' (' . $model['model'] . ')'); ?></option><?php endforeach; ?></select><small><?php esc_html_e('Solo se usa con el origen «Conectores de WordPress». Con Support Genix el modelo se elige en Genix.', 'ai-knowledge'); ?></small></label><?php else : ?><input type="hidden" name="wp_ai_model" value="<?php echo esc_attr($settings['wp_ai_model']); ?>" /><?php endif; ?></div><div class="wookb-assistant-external-links"><a class="button" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(admin_url('options-connectors.php')); ?>"><?php esc_html_e('Configurar Conectores de WordPress', 'ai-knowledge'); ?></a> <a class="button" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(admin_url('plugins.php')); ?>"><?php esc_html_e('Abrir Support Genix', 'ai-knowledge'); ?></a></div>
+		<?php elseif ('limits' === $step) :
+			// «Sin límite diario» viene marcado mientras no se haya completado este paso; después manda lo guardado.
+			$assistant_state = get_option('aikb_setup_assistant', array());
+			$limits_no_limit = in_array('limits', (array) ($assistant_state['completed'] ?? array()), true) ? !empty($settings['no_limit']) : true;
+			?><p class="notice notice-warning inline"><strong><?php esc_html_e('Aviso: con «Sin límite diario» marcado, el gasto de IA no tiene tope.', 'ai-knowledge'); ?></strong> <?php esc_html_e('La generación masiva puede hacer muchas llamadas a tu proveedor de IA y costar dinero. Desmárcalo y fija un límite diario si quieres controlar el gasto.', 'ai-knowledge'); ?></p><div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Largo máximo del texto', 'ai-knowledge'); ?></span><input type="number" min="100" max="10000" name="body_char_limit" value="<?php echo esc_attr($settings['body_char_limit']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Tokens de salida', 'ai-knowledge'); ?></span><input type="number" min="200" name="output_tokens" value="<?php echo esc_attr($settings['output_tokens']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Límite diario', 'ai-knowledge'); ?></span><input type="number" min="1" name="daily_limit" value="<?php echo esc_attr($settings['daily_limit']); ?>" /></label><label class="wookb-assistant-field"><span><?php esc_html_e('Tamaño de lote', 'ai-knowledge'); ?></span><input type="number" min="1" name="batch_size" value="<?php echo esc_attr($settings['batch_size']); ?>" /></label><label class="wookb-assistant-toggle"><input type="checkbox" name="no_limit" value="1" <?php checked($limits_no_limit); ?> /><span><?php esc_html_e('Sin límite diario', 'ai-knowledge'); ?></span></label><label class="wookb-assistant-toggle"><input type="checkbox" name="indexnow_enabled" value="1" <?php checked(!empty($settings['indexnow_enabled'])); ?> /><span><?php esc_html_e('Avisar a IndexNow', 'ai-knowledge'); ?></span></label></div>
 		<?php elseif ('content' === $step) : $post_types = get_post_types(array('public' => true), 'objects'); ?>
 			<input type="hidden" name="post_types_mode" value="explicit" /><div class="wookb-assistant-field"><span><?php esc_html_e('Tipos de contenido que quieres incluir', 'ai-knowledge'); ?></span><div class="wookb-chip-group"><?php foreach ($post_types as $post_type) : if ('attachment' === $post_type->name) continue; ?><label class="wookb-chip"><input type="checkbox" name="post_types[]" value="<?php echo esc_attr($post_type->name); ?>" <?php checked(in_array($post_type->name, (array) $settings['post_types'], true)); ?> /> <?php echo esc_html($post_type->labels->name); ?></label><?php endforeach; ?></div></div>
-		<?php elseif ('business' === $step) : $answers = Chatbot_Prompt_Builder::get_saved_answers(); ?><div class="wookb-assistant-fields"><?php foreach (Chatbot_Prompt_Builder::questions_by_group('negocio') as $key => $question) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($question['label']); ?></span><?php if ('textarea' === $question['type']) : ?><textarea name="answers[<?php echo esc_attr($key); ?>]" rows="3"><?php echo esc_textarea($answers[$key]); ?></textarea><?php else : ?><input type="text" name="answers[<?php echo esc_attr($key); ?>]" value="<?php echo esc_attr($answers[$key]); ?>" /><?php endif; ?><small><?php echo esc_html($question['placeholder']); ?></small></label><?php endforeach; ?><?php echo self::render_language_fields('assistant'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?></div>
-		<?php elseif ('woocommerce' === $step) : ?>
-			<div class="wookb-assistant-fields"><?php foreach (array('wc_store_name' => __('Nombre de la tienda', 'ai-knowledge'), 'wc_currency' => __('Moneda', 'ai-knowledge'), 'wc_base_country' => __('País base', 'ai-knowledge')) as $key => $label) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($label); ?></span><input type="text" name="<?php echo esc_attr($key); ?>" value="<?php echo esc_attr($settings[$key]); ?>" /></label><?php endforeach; ?><label class="wookb-assistant-field"><span><?php esc_html_e('Condiciones de venta', 'ai-knowledge'); ?></span><textarea name="wc_terms_text" rows="3"><?php echo esc_textarea($settings['wc_terms_text']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Política de devoluciones', 'ai-knowledge'); ?></span><textarea name="wc_returns_text" rows="3"><?php echo esc_textarea($settings['wc_returns_text']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Plazo de entrega', 'ai-knowledge'); ?></span><textarea name="delivery_time_note" rows="3"><?php echo esc_textarea($settings['delivery_time_note']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Contacto y horario de la tienda', 'ai-knowledge'); ?></span><textarea name="wc_contact_hours" rows="3"><?php echo esc_textarea($settings['wc_contact_hours']); ?></textarea></label><label class="wookb-assistant-toggle"><input type="checkbox" name="wc_pickup_available" value="1" <?php checked(!empty($settings['wc_pickup_available'])); ?> /><span><?php esc_html_e('Recogida en tienda disponible', 'ai-knowledge'); ?></span></label></div>
-		<?php elseif ('chatbot' === $step) : $answers = Chatbot_Prompt_Builder::get_saved_answers(); ?><div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Límite de documentos relacionados', 'ai-knowledge'); ?></span><input type="number" min="0" name="chatbot_docs_list_limit" value="<?php echo esc_attr($settings['chatbot_docs_list_limit']); ?>" /></label><?php foreach (Chatbot_Prompt_Builder::questions_by_group('chatbot') as $key => $question) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($question['label']); ?></span><?php if ('textarea' === $question['type']) : ?><textarea name="answers[<?php echo esc_attr($key); ?>]" rows="3"><?php echo esc_textarea($answers[$key]); ?></textarea><?php else : ?><input type="text" name="answers[<?php echo esc_attr($key); ?>]" value="<?php echo esc_attr($answers[$key]); ?>" /><?php endif; ?></label><?php endforeach; ?></div>
+		<?php elseif ('business' === $step) : $answers = Chatbot_Prompt_Builder::get_saved_answers(); echo self::assistant_summary_result_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?><div class="wookb-assistant-fields"><?php foreach (Chatbot_Prompt_Builder::questions_by_group('negocio') as $key => $question) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($question['label']); ?></span><?php if ('textarea' === $question['type']) : ?><textarea name="answers[<?php echo esc_attr($key); ?>]" rows="3"><?php echo esc_textarea($answers[$key]); ?></textarea><?php else : ?><input type="text" name="answers[<?php echo esc_attr($key); ?>]" value="<?php echo esc_attr($answers[$key]); ?>" /><?php endif; ?><small><?php echo esc_html($question['placeholder']); ?></small></label><?php endforeach; ?><?php echo self::render_language_fields('assistant'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?></div>
+		<?php elseif ('woocommerce' === $step) : $wc = self::woocommerce_values(); ?>
+			<p class="description"><?php esc_html_e('Los campos se precargan con lo que ya tiene WooCommerce. Al guardar quedan como datos propios del plugin y a partir de entonces se muestra lo guardado. Si el campo «Dirección» de Negocio está vacío, se rellena con la dirección de la tienda.', 'ai-knowledge'); ?></p>
+			<div class="wookb-assistant-fields"><?php foreach (array('wc_store_name' => __('Nombre de la tienda', 'ai-knowledge'), 'wc_currency' => __('Moneda', 'ai-knowledge'), 'wc_base_country' => __('País base', 'ai-knowledge')) as $key => $label) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($label); ?></span><input type="text" name="<?php echo esc_attr($key); ?>" value="<?php echo esc_attr($wc[$key]); ?>" /></label><?php endforeach; ?><label class="wookb-assistant-field"><span><?php esc_html_e('Condiciones de venta', 'ai-knowledge'); ?></span><textarea name="wc_terms_text" rows="3"><?php echo esc_textarea($wc['wc_terms_text']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Política de devoluciones', 'ai-knowledge'); ?></span><textarea name="wc_returns_text" rows="3"><?php echo esc_textarea($wc['wc_returns_text']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Plazo de entrega', 'ai-knowledge'); ?></span><textarea name="delivery_time_note" rows="3"><?php echo esc_textarea($settings['delivery_time_note']); ?></textarea></label><label class="wookb-assistant-field"><span><?php esc_html_e('Contacto y horario de la tienda', 'ai-knowledge'); ?></span><textarea name="wc_contact_hours" rows="3"><?php echo esc_textarea($settings['wc_contact_hours']); ?></textarea></label><label class="wookb-assistant-toggle"><input type="checkbox" name="wc_pickup_available" value="1" <?php checked(!empty($wc['wc_pickup_available'])); ?> /><span><?php esc_html_e('Recogida en tienda disponible', 'ai-knowledge'); ?></span></label></div>
+		<?php elseif ('chatbot' === $step) : $answers = Chatbot_Prompt_Builder::get_saved_answers(); echo self::assistant_chatbot_result_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?><div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Límite de documentos relacionados', 'ai-knowledge'); ?></span><input type="number" min="0" name="chatbot_docs_list_limit" value="<?php echo esc_attr($settings['chatbot_docs_list_limit']); ?>" /></label><?php foreach (Chatbot_Prompt_Builder::questions_by_group('chatbot') as $key => $question) : ?><label class="wookb-assistant-field"><span><?php echo esc_html($question['label']); ?></span><?php if ('textarea' === $question['type']) : ?><textarea name="answers[<?php echo esc_attr($key); ?>]" rows="3"><?php echo esc_textarea($answers[$key]); ?></textarea><?php else : ?><input type="text" name="answers[<?php echo esc_attr($key); ?>]" value="<?php echo esc_attr($answers[$key]); ?>" /><?php endif; ?></label><?php endforeach; ?></div>
 		<?php elseif ('faqs' === $step) :
 			// Cambio de comportamiento (2026-09-24): el FAQ ya solo se genera
 			// en el idioma principal (ver assistant_save_step('faqs')), no en
@@ -423,14 +437,12 @@ class Admin
 			<input type="hidden" name="assistant_category" value="<?php echo esc_attr($category); ?>" />
 			<nav class="wookb-assistant-subnav" aria-label="<?php esc_attr_e('Categorías de crawlers', 'ai-knowledge'); ?>"><?php foreach ($categories as $key => $item) : ?><button type="button" class="button<?php echo $key === $category ? ' button-primary' : ''; ?>" data-assistant-category="<?php echo esc_attr($key); ?>"><?php echo esc_html($item['title']); ?></button><?php endforeach; ?></nav>
 			<h3><?php echo esc_html($categories[$category]['title']); ?></h3><?php if (!empty($categories[$category]['description'])) : ?><p><?php echo esc_html($categories[$category]['description']); ?></p><?php endif; ?><div class="wookb-assistant-crawler-bulk"><button type="button" class="button" data-crawler-bulk="allow"><?php esc_html_e('Permitir todos', 'ai-knowledge'); ?></button> <button type="button" class="button" data-crawler-bulk="block"><?php esc_html_e('Bloquear todos', 'ai-knowledge'); ?></button></div>
-			<div class="wookb-assistant-crawlers"><?php foreach (Crawler_Catalog::all() as $crawler) : if ($crawler['category'] !== $category) continue; ?><div class="wookb-assistant-crawler"><div><strong><?php echo esc_html($crawler['user_agent']); ?></strong><span><?php echo esc_html($crawler['operator']); ?></span><?php if ($crawler['description'] !== $categories[$category]['description']) : ?><p><?php echo esc_html($crawler['description']); ?></p><?php endif; ?></div><select name="crawler_action[<?php echo esc_attr($crawler['user_agent']); ?>]"><option value="allow" <?php selected('allow', $actions[$crawler['user_agent']]); ?>><?php esc_html_e('Permitir', 'ai-knowledge'); ?></option><option value="block" <?php selected('block', $actions[$crawler['user_agent']]); ?>><?php esc_html_e('Bloquear', 'ai-knowledge'); ?></option></select></div><?php endforeach; ?></div>
+			<div class="wookb-assistant-crawlers"><?php foreach (Crawler_Catalog::all() as $crawler) : if ($crawler['category'] !== $category) continue; ?><div class="wookb-assistant-crawler"><div><strong><?php echo esc_html($crawler['user_agent']); ?></strong><span><?php echo esc_html($crawler['operator']); ?></span><?php if ($crawler['description'] !== $categories[$category]['description']) : ?><p><?php echo esc_html($crawler['description']); ?></p><?php endif; ?></div><select name="crawler_action[<?php echo esc_attr($crawler['user_agent']); ?>]"><option value="allow" <?php selected('allow', $actions[$crawler['user_agent']]); ?>><?php esc_html_e('Permitido', 'ai-knowledge'); ?></option><option value="block" <?php selected('block', $actions[$crawler['user_agent']]); ?>><?php esc_html_e('Bloqueado', 'ai-knowledge'); ?></option></select></div><?php endforeach; ?></div>
 			<h3><?php esc_html_e('Acceso de crawlers bloqueados a llms.txt', 'ai-knowledge'); ?></h3><?php echo self::render_visibility_switch($settings['crawler_visibility_mode']); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado campo a campo dentro del propio metodo. ?><h3><?php esc_html_e('Robots.txt y .htaccess', 'ai-knowledge'); ?></h3><p><?php esc_html_e('La política que guardes aquí sirve como base para preparar las reglas de robots.txt y .htaccess. Esos archivos se gestionan después desde la pantalla Visibilidad IA, donde puedes revisar el contenido antes de aplicarlo.', 'ai-knowledge'); ?></p>
 		<?php elseif ('finish' === $step) :
 			// Paso RESUMEN (antes era el paso de limites): SOLO consultas de
 			// lectura, ya baratas (Registry, Llms_Faq, get_option...). NUNCA
-			// disparar aqui generacion/red -- este contenido se precalcula
-			// para TODOS los pasos disponibles en cada carga de la pagina del
-			// asistente (ver Admin::assets()), no solo al guardar.
+			// disparar aqui generacion/red.
 			?>
 			<?php echo self::render_assistant_summary(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado campo a campo dentro del propio metodo. ?>
 			<hr />
@@ -444,8 +456,8 @@ class Admin
 			// del asistente para este paso en concreto -- no tiene campos que enviar.
 			echo self::render_seed_controls(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			?>
-		<?php elseif ('success' === $step) : $state = get_option('aikb_setup_assistant', array()); $summary = Registry::summary(); $geo_prompt = self::build_geo_prompt(); ?>
-			<div class="wookb-assistant-summary"><p><strong><?php esc_html_e('Documentos registrados:', 'ai-knowledge'); ?></strong> <?php echo (int) $summary['total']; ?></p><p><strong><?php esc_html_e('Documentos pendientes:', 'ai-knowledge'); ?></strong> <?php echo (int) Registry::count(array('status' => 'queued')); ?></p><p><strong><?php esc_html_e('Pasos omitidos:', 'ai-knowledge'); ?></strong> <?php echo empty($state['skipped']) ? esc_html__('Ninguno', 'ai-knowledge') : esc_html(implode(', ', (array) $state['skipped'])); ?></p><p><a class="button button-primary" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(home_url('/llms.txt')); ?>"><?php esc_html_e('Ver llms.txt', 'ai-knowledge'); ?></a></p><p><?php esc_html_e('Recomendamos comprobar este prompt en un agente externo para verificar el funcionamiento del plugin y la visibilidad de tu web.', 'ai-knowledge'); ?></p><textarea id="wookb-assistant-geo-prompt" readonly rows="12" style="width:100%;max-width:100%;"><?php echo esc_textarea($geo_prompt); ?></textarea><p><button type="button" class="button" data-wookb-copy-target="wookb-assistant-geo-prompt"><?php esc_html_e('Copiar Prompt', 'ai-knowledge'); ?></button></p><div class="wookb-assistant-links"><?php foreach (array('registro' => __('Registro', 'ai-knowledge'), 'contenido' => __('Contenido', 'ai-knowledge'), 'negocio' => __('Negocio', 'ai-knowledge'), 'woocommerce' => __('WooCommerce', 'ai-knowledge'), 'visibilidad-ia' => __('Visibilidad IA', 'ai-knowledge'), 'ajustes' => __('Ajustes', 'ai-knowledge')) as $tab => $label) : if ('woocommerce' === $tab && !class_exists('WooCommerce')) continue; ?><a href="<?php echo esc_url(admin_url('admin.php?page=ai-knowledge' . ('registro' === $tab ? '' : '&tab=' . $tab))); ?>"><?php echo esc_html($label); ?></a><?php endforeach; ?></div></div>
+		<?php elseif ('success' === $step) : $state = get_option('aikb_setup_assistant', array()); $geo_prompt = self::build_geo_prompt(); ?>
+			<div class="wookb-assistant-summary"><?php echo self::render_generation_status(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?><p><strong><?php esc_html_e('Pasos omitidos:', 'ai-knowledge'); ?></strong> <?php echo empty($state['skipped']) ? esc_html__('Ninguno', 'ai-knowledge') : esc_html(implode(', ', (array) $state['skipped'])); ?></p><p><a class="button button-primary" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(home_url('/llms.txt')); ?>"><?php esc_html_e('Ver llms.txt', 'ai-knowledge'); ?></a></p><p><?php esc_html_e('Recomendamos comprobar este prompt en un agente externo para verificar el funcionamiento del plugin y la visibilidad de tu web.', 'ai-knowledge'); ?></p><textarea id="wookb-assistant-geo-prompt" readonly rows="12" style="width:100%;max-width:100%;"><?php echo esc_textarea($geo_prompt); ?></textarea><p><button type="button" class="button" data-wookb-copy-target="wookb-assistant-geo-prompt"><?php esc_html_e('Copiar Prompt', 'ai-knowledge'); ?></button></p><p><strong><?php esc_html_e('Salir del asistente y acceder a los ajustes del plugin', 'ai-knowledge'); ?></strong></p><div class="wookb-assistant-links"><?php foreach (array('registro' => __('Registro', 'ai-knowledge'), 'contenido' => __('Contenido', 'ai-knowledge'), 'negocio' => __('Negocio', 'ai-knowledge'), 'woocommerce' => __('WooCommerce', 'ai-knowledge'), 'visibilidad-ia' => __('Visibilidad IA', 'ai-knowledge'), 'ajustes' => __('Ajustes', 'ai-knowledge')) as $tab => $label) : if ('woocommerce' === $tab && !class_exists('WooCommerce')) continue; ?><a class="button button-primary" href="<?php echo esc_url(admin_url('admin.php?page=ai-knowledge' . ('registro' === $tab ? '' : '&tab=' . $tab))); ?>"><?php echo esc_html($label); ?></a><?php endforeach; ?></div></div>
 		<?php endif;
 		return ob_get_clean();
 	}
@@ -480,27 +492,107 @@ class Admin
 	}
 
 	/**
-	 * ¿Hay una conexión de IA real disponible ahora mismo? Es la
-	 * comprobación mas fuerte que existe hoy en el plugin (no hay ninguna
-	 * prueba de conexión con llamada de red real en todo el codigo): origen
-	 * Conectores de WordPress con al menos un modelo de texto configurado,
-	 * O origen Support Genix con su modulo cargado. Se usa tanto para
-	 * decidir si el paso "faqs" aparece como para decidir, dentro de
-	 * assistant_save_step(), si un paso puede generar contenido con IA de
-	 * inmediato o solo guardar sus datos con un aviso.
+	 * ¿Hay una conexión de IA utilizable ahora mismo? Misma condición que usa
+	 * el generador (AI_Client::config() !== null), sin hacer ninguna petición
+	 * de red. El motivo concreto cuando falla lo da AI_Client::status(). Se usa
+	 * para decidir si el paso "faqs" aparece y si un paso puede generar
+	 * contenido con IA al guardarse o solo guardar sus datos.
 	 */
 	protected static function assistant_ai_available()
 	{
-		if (!empty(AI_Client::available_models())) {
-			return true;
+		return null !== AI_Client::config();
+	}
+
+	/**
+	 * Bloque de estado de la conexión de IA (paso «Origen de IA» del asistente
+	 * y pestaña Ajustes): recalculado en cada render, sin red. Si hay conexión,
+	 * origen y modelo; con Genix, el modelo en solo lectura. El botón
+	 * «Probar conexión» hace una llamada mínima solo bajo demanda (AJAX).
+	 */
+	public static function ai_status_html()
+	{
+		$status = AI_Client::status();
+		$last   = get_transient('wookb_ai_test_result');
+		ob_start();
+		if ($status['ok']) :
+			$source_label = 'wp_connectors' === $status['source'] ? __('Conectores de WordPress', 'ai-knowledge') : __('Support Genix', 'ai-knowledge');
+			$model_label  = AI_Client::MODEL_AUTO === $status['model'] ? __('Automático', 'ai-knowledge') : $status['model'];
+			?>
+			<p class="notice notice-success inline"><?php echo esc_html(sprintf(
+				/* translators: 1: origen de IA, 2: modelo */
+				__('Conexión de IA disponible (origen: %1$s, modelo: %2$s): los pasos siguientes podrán generar contenido real.', 'ai-knowledge'),
+				$source_label,
+				$model_label
+			)); ?></p>
+			<?php if ('genix' === $status['source']) : ?>
+				<p class="description"><?php echo esc_html(sprintf(
+					/* translators: 1: modelo que usa Support Genix, 2: proveedor (OpenAI o Claude) */
+					__('Support Genix usa %1$s (%2$s) (solo lectura). Para cambiarlo, hazlo en los ajustes de Support Genix.', 'ai-knowledge'),
+					$status['model'],
+					'claude' === $status['provider'] ? 'Claude' : 'OpenAI'
+				)); ?></p>
+			<?php endif; ?>
+			<p>
+				<button type="button" class="button" data-wookb-ai-test data-nonce="<?php echo esc_attr(wp_create_nonce('wookb_test_ai_connection')); ?>"><?php esc_html_e('Probar conexión', 'ai-knowledge'); ?></button>
+				<span data-wookb-ai-test-result role="status" aria-live="polite"><?php
+				if (is_array($last) && isset($last['message'])) {
+					echo esc_html(($last['ok'] ? '✓ ' : '✗ ') . $last['message']);
+				}
+				?></span>
+			</p>
+			<p class="description"><?php esc_html_e('«Probar conexión» hace una llamada mínima a la IA (consume unos pocos tokens) y solo se ejecuta cuando pulsas el botón.', 'ai-knowledge'); ?></p>
+		<?php else : ?>
+			<p class="notice notice-warning inline"><strong><?php esc_html_e('No hay una conexión de IA utilizable.', 'ai-knowledge'); ?></strong> <?php echo esc_html($status['reason']); ?> <?php esc_html_e('Puedes continuar sin problema: los pasos que generan contenido guardarán tus datos igual, pero no generarán nada con IA hasta que conectes un origen (Conectores de WordPress o Support Genix) y vuelvas a guardar.', 'ai-knowledge'); ?></p>
+		<?php endif;
+		return ob_get_clean();
+	}
+
+	/**
+	 * Prueba de conexión bajo demanda (botón «Probar conexión»). Llamada mínima
+	 * a la IA; resultado en un transient corto. Nunca se lanza sola.
+	 */
+	public static function test_ai_connection()
+	{
+		if (!current_user_can(self::capability())) {
+			wp_send_json_error(array('message' => __('No tienes permisos suficientes.', 'ai-knowledge')), 403);
 		}
-		return Chatbot_Prompt::is_genix_ready();
+		check_ajax_referer('wookb_test_ai_connection', 'nonce');
+
+		$status = AI_Client::status();
+		if (!$status['ok']) {
+			$result = array('ok' => false, 'message' => $status['reason']);
+		} else {
+			$test = AI_Client::test_connection();
+			if (is_wp_error($test)) {
+				// Sin datos sensibles: se ocultan fragmentos de claves que algunos proveedores repiten en el error.
+				$message = preg_replace('/\b(?:sk|pk|key)-[A-Za-z0-9_\-\.\*]+/i', '[…]', $test->get_error_message());
+				$result  = array('ok' => false, 'message' => mb_substr((string) $message, 0, 300));
+			} else {
+				$result = array('ok' => true, 'message' => __('La IA ha respondido correctamente.', 'ai-knowledge'));
+			}
+		}
+		set_transient('wookb_ai_test_result', $result, 5 * MINUTE_IN_SECONDS);
+
+		if ($result['ok']) {
+			wp_send_json_success(array('message' => $result['message']));
+		}
+		wp_send_json_error(array('message' => $result['message']), 422);
 	}
 
 	public static function assistant_navigate()
 	{
 		if (!current_user_can(self::capability())) wp_send_json_error(array('message' => __('No tienes permisos suficientes.', 'ai-knowledge')), 403);
 		check_ajax_referer('aikb_assistant_ajax', 'nonce');
+		// El locale de admin-ajax.php puede diferir del de la pantalla cargada
+		// (WPML). Se usa el de la pantalla, si es valido, y se vuelve a cargar y
+		// fijar el textdomain del plugin (ver aikb_pin_textdomain(): evita que un
+		// cambio de idioma a mitad de la peticion lo recargue en otro idioma).
+		$screen_locale = isset($_POST['locale']) ? sanitize_text_field(wp_unslash($_POST['locale'])) : ''; // phpcs:ignore
+		if ('' !== $screen_locale && $screen_locale !== determine_locale() && ('en_US' === $screen_locale || in_array($screen_locale, get_available_languages(), true))) {
+			switch_to_locale($screen_locale);
+			unload_textdomain('ai-knowledge');
+		}
+		aikb_pin_textdomain();
 		$steps = self::assistant_available_steps();
 		$current = isset($_POST['step']) ? sanitize_key(wp_unslash($_POST['step'])) : 'welcome';
 		$action = isset($_POST['assistant_action']) ? sanitize_key(wp_unslash($_POST['assistant_action'])) : 'goto';
@@ -508,9 +600,7 @@ class Admin
 		$state = get_option('aikb_setup_assistant', array());
 		if (in_array($action, array('save', 'continue'), true) && 'welcome' !== $current) {
 			self::assistant_save_step($current);
-			// Releer por el mismo motivo que en render_assistant(): evitar
-			// que el update_option() de mas abajo sobrescriba el
-			// 'ai_connection' que assistant_save_step('ai') acaba de guardar.
+			// Releer por el mismo motivo que en render_assistant().
 			$state = get_option('aikb_setup_assistant', $state);
 		}
 		$state['initiated'] = true;
@@ -548,15 +638,6 @@ class Admin
 			if (!in_array($source, array('genix', 'wp_connectors'), true) || ('wp_connectors' === $source && !AI_Client::wordpress_available())) $source = 'genix';
 			if (AI_Client::MODEL_AUTO !== $model && !isset(AI_Client::available_models()[$model])) $model = AI_Client::MODEL_AUTO;
 			Scope::update_settings(array('ai_key_source' => $source, 'wp_ai_model' => $model));
-			// Estado de conexion real, guardado para que assistant_screen_content('ai')
-			// pueda avisar con claridad sin repetir la comprobacion en cada carga.
-			$state = get_option('aikb_setup_assistant', array());
-			$state['ai_connection'] = array(
-				'checked'   => true,
-				'source'    => $source,
-				'available' => self::assistant_ai_available(),
-			);
-			update_option('aikb_setup_assistant', $state, false);
 		} elseif ('limits' === $step) {
 			// Antes 'finish': mismos campos de siempre (largo de texto, tokens,
 			// limite diario, tamaño de lote, IndexNow), solo que ya no es el
@@ -586,16 +667,20 @@ class Admin
 			if ('business' === $step) {
 				self::save_language_fields_from_post();
 				// Ya era inmediato antes de este rediseño: no depende de IA,
-				// solo guarda las respuestas en wp-content/llm/info.md.
+				// solo guarda las respuestas en wp-content/ai-knowledge/info.md.
 				Chatbot_Prompt_Builder::write_info_doc();
+				// Resumen publico con IA si no existe uno propio (nunca bloquea).
+				self::assistant_business_summary();
 			}
 			if ('chatbot' === $step) {
 				Scope::update_settings(array('chatbot_docs_list_limit' => max(0, (int) ($_POST['chatbot_docs_list_limit'] ?? Chatbot_Relevance_Guard::DOCS_LIST_LIMIT_DEFAULT)))); // phpcs:ignore
-				// Mismo patron que Admin::sync_chatbot_prompt(): solo si hay
-				// conexion real (aqui: si Genix esta listo, que es lo que de
-				// verdad hace falta para sincronizar con el).
-				if (self::assistant_ai_available()) {
-					Chatbot_Prompt::sync(true);
+				// Sincronizar solo necesita Genix listo (no IA): con .md previo se
+				// sincroniza tal cual; sin .md se crea uno predeterminado a partir
+				// de las respuestas (con IA si hay conexion, si no con una
+				// plantilla) y se sincroniza. El resultado real se guarda para
+				// mostrarlo en el paso.
+				if (Chatbot_Prompt::is_genix_ready()) {
+					self::assistant_chatbot_sync();
 				}
 			}
 		} elseif ('woocommerce' === $step) {
@@ -609,15 +694,16 @@ class Admin
 				'wc_contact_hours' => isset($_POST['wc_contact_hours']) ? sanitize_textarea_field(wp_unslash($_POST['wc_contact_hours'])) : '', // phpcs:ignore
 				'wc_pickup_available' => !empty($_POST['wc_pickup_available']), // phpcs:ignore
 			));
-			// Mismo patron de manejo de errores que Admin::sync_store_docs():
-			// captura errores en un transient, nunca deja pasar un fatal.
-			if (self::assistant_ai_available()) {
-				$summary = Store_Info_Doc::generate_all();
-				if (!empty($summary['errores'])) {
-					set_transient('wookb_store_docs_error', implode(' | ', $summary['errores']), MINUTE_IN_SECONDS);
-				} else {
-					delete_transient('wookb_store_docs_error');
-				}
+			// La direccion de WooCommerce va al campo «Direccion» de Negocio solo si esta vacio.
+			self::maybe_store_woocommerce_address();
+			// Los documentos de tienda se componen de forma determinista (sin IA):
+			// se generan siempre. Mismo patron de manejo de errores que
+			// Admin::sync_store_docs(): captura errores en un transient.
+			$summary = Store_Info_Doc::generate_all();
+			if (!empty($summary['errores'])) {
+				set_transient('wookb_store_docs_error', implode(' | ', $summary['errores']), MINUTE_IN_SECONDS);
+			} else {
+				delete_transient('wookb_store_docs_error');
 			}
 		} elseif ('faqs' === $step) {
 			// Paso nuevo. Excepcion explicita, ya confirmada por el usuario, a
@@ -659,6 +745,234 @@ class Admin
 		}
 		// 'finish' ya no guarda nada aqui: es el paso de RESUMEN (solo lectura,
 		// ver assistant_screen_content('finish')), no un paso de datos.
+	}
+
+	/**
+	 * Valores en vivo de WooCommerce con comportamiento «snapshot», compartidos
+	 * por la pestaña WooCommerce y el paso del asistente: la primera vez se
+	 * muestra lo que hay en WooCommerce; al guardar queda como dato propio y
+	 * desde entonces se muestra lo guardado. Incluye la dirección de la tienda
+	 * (solo lectura: se guarda en «Dirección» de Negocio, ver
+	 * maybe_store_woocommerce_address()) y la recogida local detectable.
+	 */
+	public static function woocommerce_values()
+	{
+		$settings = Scope::settings();
+		$live = array(
+			'wc_store_name' => get_bloginfo('name'),
+			'wc_currency' => '',
+			'wc_base_country' => '',
+			'wc_terms_text' => '',
+			'wc_returns_text' => '',
+			'address' => '',
+			'pickup' => false,
+		);
+		$terms_page_id = 0;
+		$refund_page_id = 0;
+
+		if (class_exists('WooCommerce')) {
+			if (function_exists('get_woocommerce_currency')) {
+				$live['wc_currency'] = get_woocommerce_currency();
+				if (function_exists('get_woocommerce_currency_symbol')) {
+					$live['wc_currency'] .= ' (' . get_woocommerce_currency_symbol() . ')';
+				}
+			}
+			if (function_exists('WC') && WC()->countries) {
+				$code = WC()->countries->get_base_country();
+				$list = WC()->countries->get_countries();
+				$live['wc_base_country'] = isset($list[$code]) ? $list[$code] : $code;
+				$street = trim((string) WC()->countries->get_base_address());
+				if ('' !== $street) {
+					$parts = array(
+						$street,
+						trim((string) WC()->countries->get_base_address_2()),
+						trim(WC()->countries->get_base_postcode() . ' ' . WC()->countries->get_base_city()),
+						$live['wc_base_country'],
+					);
+					$live['address'] = implode(', ', array_filter($parts));
+				}
+			}
+
+			$terms_page_id = (int) get_option('woocommerce_terms_page_id');
+			$refund_page_id = function_exists('wc_get_page_id') ? (int) wc_get_page_id('refund_returns') : 0;
+			foreach (array('wc_terms_text' => $terms_page_id, 'wc_returns_text' => $refund_page_id) as $key => $page_id) {
+				if ($page_id > 0) {
+					$page = get_post($page_id);
+					if ($page && 'publish' === $page->post_status) {
+						$live[$key] = trim(preg_replace('/\s+/', ' ', wp_strip_all_tags($page->post_content)));
+					}
+				}
+			}
+
+			if (class_exists('WC_Shipping_Zones')) {
+				foreach (\WC_Shipping_Zones::get_zones() as $zone) {
+					foreach ((array) $zone['shipping_methods'] as $method) {
+						if ('local_pickup' === $method->id && 'no' !== $method->enabled) {
+							$live['pickup'] = true;
+						}
+					}
+				}
+			}
+		}
+
+		$values = array();
+		foreach (array('wc_store_name', 'wc_currency', 'wc_base_country', 'wc_terms_text', 'wc_returns_text') as $key) {
+			$values[$key] = '' !== $settings[$key] ? $settings[$key] : $live[$key];
+		}
+		$values['wc_pickup_available'] = !empty($settings['wc_pickup_available']) || $live['pickup'];
+		$values['address'] = $live['address'];
+		$values['terms_page_id'] = $terms_page_id;
+		$values['refund_page_id'] = $refund_page_id;
+		return $values;
+	}
+
+	/**
+	 * Guarda la dirección de WooCommerce en el campo «Dirección» de Negocio
+	 * SOLO si ese campo está vacío (nunca pisa un dato ya escrito).
+	 */
+	protected static function maybe_store_woocommerce_address()
+	{
+		$wc = self::woocommerce_values();
+		if ('' === $wc['address']) {
+			return;
+		}
+		$answers = Chatbot_Prompt_Builder::get_saved_answers();
+		if ('' !== trim((string) $answers['direccion'])) {
+			return;
+		}
+		Chatbot_Prompt_Builder::save_answers(array('direccion' => $wc['address']));
+		Chatbot_Prompt_Builder::write_info_doc();
+	}
+
+	/**
+	 * Paso «Chatbot» del asistente: con chatbot-system-prompt.md ya existente,
+	 * se sincroniza tal cual (sin sobrescribirlo). Sin él, se crea uno
+	 * predeterminado a partir de las respuestas rellenadas (con IA si hay
+	 * conexión: Chatbot_Prompt_Builder::generate_draft(); si no, plantilla
+	 * determinista), y se sincroniza con Genix y regenera info.md. El resultado
+	 * real se guarda en un transient para mostrarlo en el paso.
+	 */
+	protected static function assistant_chatbot_sync()
+	{
+		$result = array('created' => '', 'ai_error' => '', 'status' => '', 'message' => '');
+
+		if ('' === Chatbot_Prompt::read()) {
+			$answers = Chatbot_Prompt_Builder::get_saved_answers();
+			$draft = '';
+			if (self::assistant_ai_available()) {
+				$generated = Chatbot_Prompt_Builder::generate_draft($answers);
+				if (is_wp_error($generated)) {
+					$result['ai_error'] = $generated->get_error_message();
+				} elseif ('' !== trim($generated)) {
+					$draft = $generated;
+					$result['created'] = 'ai';
+				}
+			}
+			if ('' === $draft) {
+				$draft = Chatbot_Prompt_Builder::build_template_draft($answers);
+				if ('' !== $draft) {
+					$result['created'] = 'template';
+				}
+			}
+			if ('' !== $draft) {
+				wp_mkdir_p(dirname(Chatbot_Prompt::file_path()));
+				file_put_contents(Chatbot_Prompt::file_path(), $draft . "\n"); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_put_contents
+			}
+		}
+
+		$sync = Chatbot_Prompt::sync(true);
+		Chatbot_Prompt_Builder::write_info_doc();
+		$result['status'] = $sync['status'];
+		$result['message'] = $sync['message'];
+		set_transient('wookb_assistant_chatbot_result_' . get_current_user_id(), $result, 10 * MINUTE_IN_SECONDS);
+	}
+
+	/**
+	 * Paso «Negocio»: genera con IA el resumen público (cita de apertura de
+	 * llms.txt) solo si hay conexión y NO existe uno propio (sin contar el
+	 * fallback a «Enfoque del negocio»). Nunca pisa uno existente ni bloquea:
+	 * el resultado (o el error) queda en un transient para mostrarlo en el paso.
+	 */
+	protected static function assistant_business_summary()
+	{
+		$result = array('status' => '', 'message' => '');
+		$own = get_option(Chatbot_Prompt_Builder::BUSINESS_SUMMARY_OPTION, null);
+		if (null !== $own && '' !== trim((string) $own)) {
+			$result['status'] = 'existing';
+		} else {
+			$answers = Chatbot_Prompt_Builder::get_saved_answers();
+			$has_data = false;
+			foreach (array_keys(Chatbot_Prompt_Builder::questions_by_group('negocio')) as $key) {
+				if ('' !== trim((string) $answers[$key])) {
+					$has_data = true;
+					break;
+				}
+			}
+			if (!self::assistant_ai_available() || !$has_data) {
+				$result['status'] = 'pending';
+			} else {
+				$summary = Chatbot_Prompt_Builder::generate_business_summary($answers, '');
+				if (is_wp_error($summary)) {
+					$result['status'] = 'error';
+					$result['message'] = $summary->get_error_message();
+				} else {
+					Chatbot_Prompt_Builder::save_business_summary($summary);
+					Chatbot_Prompt_Builder::write_info_doc();
+					$result['status'] = 'generated';
+				}
+			}
+		}
+		set_transient('wookb_assistant_summary_result_' . get_current_user_id(), $result, 10 * MINUTE_IN_SECONDS);
+	}
+
+	/** HTML del estado del resumen público en el paso «Negocio». */
+	protected static function assistant_summary_result_html()
+	{
+		$result = get_transient('wookb_assistant_summary_result_' . get_current_user_id());
+		if (!is_array($result)) {
+			return '';
+		}
+		ob_start();
+		if ('generated' === $result['status']) : ?>
+			<p class="notice notice-success inline"><?php esc_html_e('Resumen público generado con IA y guardado. Puedes editarlo en la pestaña Negocio.', 'ai-knowledge'); ?></p>
+		<?php elseif ('existing' === $result['status']) : ?>
+			<p class="notice notice-info inline"><?php esc_html_e('Ya existía un resumen público: no se ha modificado.', 'ai-knowledge'); ?></p>
+		<?php elseif ('error' === $result['status']) : ?>
+			<p class="notice notice-warning inline"><?php echo esc_html(sprintf(
+				/* translators: %s: error de la IA */
+				__('No se pudo generar el resumen público (%s). Puedes reintentarlo desde la pestaña Negocio.', 'ai-knowledge'),
+				$result['message']
+			)); ?></p>
+		<?php else : ?>
+			<p class="notice notice-warning inline"><?php esc_html_e('Resumen pendiente de generar: hace falta una conexión de IA y algún dato del negocio. Puedes escribirlo o generarlo después en la pestaña Negocio.', 'ai-knowledge'); ?></p>
+		<?php endif;
+		return ob_get_clean();
+	}
+
+	/** HTML del resultado real de la última sincronización del paso «Chatbot». */
+	protected static function assistant_chatbot_result_html()
+	{
+		$result = get_transient('wookb_assistant_chatbot_result_' . get_current_user_id());
+		if (!is_array($result)) {
+			return '';
+		}
+		ob_start();
+		if ('ai' === $result['created']) : ?>
+			<p class="notice notice-info inline"><?php esc_html_e('Se ha creado un prompt predeterminado con IA a partir de tus respuestas. Puedes afinarlo después en la pestaña Genix.', 'ai-knowledge'); ?></p>
+		<?php elseif ('template' === $result['created']) : ?>
+			<p class="notice notice-info inline"><?php esc_html_e('Se ha creado un prompt predeterminado a partir de tus respuestas (sin IA). Puedes afinarlo después en la pestaña Genix.', 'ai-knowledge'); ?></p>
+		<?php endif;
+		if ('' !== $result['ai_error']) : ?>
+			<p class="notice notice-warning inline"><?php echo esc_html(sprintf(
+				/* translators: %s: error de la IA */
+				__('La IA no pudo redactar el prompt (%s); se ha usado la plantilla.', 'ai-knowledge'),
+				$result['ai_error']
+			)); ?></p>
+		<?php endif;
+		$class = in_array($result['status'], array('synced', 'skipped'), true) ? 'notice-success' : 'notice-warning'; ?>
+		<p class="notice <?php echo esc_attr($class); ?> inline"><?php echo esc_html($result['message']); ?></p>
+		<?php
+		return ob_get_clean();
 	}
 
 	public static function download_geo_prompt()
@@ -912,16 +1226,12 @@ GEO;
 		wp_enqueue_script('wookb-admin', AIKB_URL . 'assets/admin.js', array('jquery', 'wp-i18n'), AIKB_VERSION, true);
 		wp_set_script_translations('wookb-admin', 'ai-knowledge', AIKB_DIR . 'languages');
 		if (false !== strpos($hook, 'ai-knowledge-assistant')) {
-			$screen_content = array();
-			foreach (array_keys(self::assistant_available_steps()) as $step_key) {
-				$screen_content[$step_key] = self::assistant_screen_content($step_key);
-			}
 			wp_localize_script('wookb-admin', 'aikbAssistant', array(
 				'ajaxUrl' => admin_url('admin-ajax.php'),
 				'adminPostUrl' => admin_url('admin-post.php'),
 				'nonce' => wp_create_nonce('aikb_assistant_ajax'),
+				'locale' => determine_locale(),
 				'steps' => self::assistant_available_steps(),
-				'screenContent' => $screen_content,
 			));
 		}
 	}
@@ -1146,16 +1456,77 @@ GEO;
 			$parts_lang[] = esc_html(strtoupper($row->lang)) . ': ' . (int) $row->c;
 		}
 
-		$parts_status = array();
-		foreach ($summary['por_estado'] as $row) {
-			$parts_status[] = esc_html(Registry_Table::status_label($row->status)) . ': ' . (int) $row->c;
-		}
+		$parts_status = self::status_parts($summary);
 
 		echo '<p>';
 		echo '<strong>' . esc_html__('Total de documentos:', 'ai-knowledge') . '</strong> ' . (int) $summary['total'];
 		echo '&nbsp;&nbsp;·&nbsp;&nbsp;' . implode('&nbsp;&nbsp;&nbsp;', $parts_lang); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
 		echo '&nbsp;&nbsp;·&nbsp;&nbsp;' . implode('&nbsp;&nbsp;&nbsp;', $parts_status); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado arriba
 		echo '</p>';
+	}
+
+	/**
+	 * Piezas «Estado: n» (ya escapadas) del desglose por estado del Registro,
+	 * compartidas por la cabecera de todas las pestañas y las pantallas de
+	 * resumen del asistente. $always: estados que deben salir aunque valgan 0
+	 * (en ese orden, antes del resto).
+	 */
+	protected static function status_parts(array $summary, array $always = array())
+	{
+		require_once AIKB_DIR . 'admin/class-registry-table.php';
+		$counts = array();
+		foreach ($summary['por_estado'] as $row) {
+			$counts[$row->status] = (int) $row->c;
+		}
+		$ordered = array();
+		foreach ($always as $status) {
+			$ordered[$status] = isset($counts[$status]) ? $counts[$status] : 0;
+		}
+		foreach ($counts as $status => $count) {
+			if (!isset($ordered[$status])) {
+				$ordered[$status] = $count;
+			}
+		}
+		$parts = array();
+		foreach ($ordered as $status => $count) {
+			$parts[] = esc_html(Registry_Table::status_label($status)) . ': ' . (int) $count;
+		}
+		return $parts;
+	}
+
+	/**
+	 * Estado real de la generación de documentos (asistente: resumen y pantalla
+	 * final; pestaña Generación masiva): desglose por estado con el mismo helper
+	 * que la cabecera del Registro, enlace al Registro, aviso de segundo plano
+	 * y acceso a «Procesar ahora» (reset_queue, lotes de RESET_QUEUE_BATCH).
+	 */
+	public static function render_generation_status()
+	{
+		$summary = Registry::summary();
+		$parts = self::status_parts($summary, array('queued', 'generating', 'synced', 'error'));
+		$queued = (int) Registry::count(array('status' => 'queued'));
+		$runner = Queue::has_action_scheduler() ? __('Action Scheduler', 'ai-knowledge') : __('WP-Cron', 'ai-knowledge');
+		ob_start();
+		?>
+		<p><strong><?php esc_html_e('Documentos registrados:', 'ai-knowledge'); ?></strong> <?php echo (int) $summary['total']; ?></p>
+		<p><strong><?php esc_html_e('Por estado:', 'ai-knowledge'); ?></strong> <?php echo implode(' · ', $parts); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado en status_parts(). ?></p>
+		<p><a href="<?php echo esc_url(admin_url('admin.php?page=ai-knowledge')); ?>"><?php esc_html_e('Ver el Registro', 'ai-knowledge'); ?></a></p>
+		<p class="notice notice-info inline"><?php echo esc_html(sprintf(
+			/* translators: %s: Action Scheduler o WP-Cron */
+			__('La generación continúa en segundo plano (%s) y puede tardar. Que los documentos aparezcan «En cola» justo al terminar es normal.', 'ai-knowledge'),
+			$runner
+		)); ?></p>
+		<?php if (defined('DISABLE_WP_CRON') && \DISABLE_WP_CRON) : ?>
+			<p class="notice notice-warning inline"><?php esc_html_e('WP-Cron está desactivado en este sitio (DISABLE_WP_CRON): la cola solo avanza si el servidor tiene un cron real que lo ejecute. Si no, usa «Procesar ahora».', 'ai-knowledge'); ?></p>
+		<?php endif; ?>
+		<?php if ($queued > 0) : ?>
+			<p><button type="button" class="button" data-wookb-post-action="wookb_reset_queue" data-wookb-post-nonce="<?php echo esc_attr(wp_create_nonce('wookb_reset_queue')); ?>"><?php esc_html_e('Procesar ahora', 'ai-knowledge'); ?></button> <span class="description"><?php echo esc_html(sprintf(
+				/* translators: %d: documentos que se procesan por clic */
+				__('Procesa hasta %d documentos en cola por clic, sin esperar al proceso en segundo plano.', 'ai-knowledge'),
+				self::RESET_QUEUE_BATCH
+			)); ?></span></p>
+		<?php endif;
+		return ob_get_clean();
 	}
 
 	protected static function verify($action)
@@ -1321,8 +1692,22 @@ GEO;
 					? (isset($_POST['editor_button_post_types']) ? array_map('sanitize_key', (array) wp_unslash($_POST['editor_button_post_types'])) : array()) // phpcs:ignore
 					: Scope::settings()['editor_button_post_types'],
 				'indexnow_enabled' => ! empty($_POST['indexnow_enabled']), // phpcs:ignore
+				// Desinstalacion (ver uninstall.php): dos checks separados, desmarcados por defecto.
+				'uninstall_delete_data'  => ! empty($_POST['uninstall_delete_data']), // phpcs:ignore
+				'uninstall_delete_files' => ! empty($_POST['uninstall_delete_files']), // phpcs:ignore
 			)
 		);
+
+		// Estado de la conexion de IA recalculado tras guardar (respuesta AJAX).
+		if (wp_doing_ajax()) {
+			wp_send_json_success(
+				array(
+					'message' => __('Guardado.', 'ai-knowledge'),
+					'tab' => 'ajustes',
+					'ai_status_html' => self::ai_status_html(),
+				)
+			);
+		}
 
 		self::redirect('ajustes');
 	}
@@ -1335,6 +1720,7 @@ GEO;
 		Scope::update_settings(
 			array(
 				'chatbot_docs_list_limit' => max(0, (int) ($_POST['chatbot_docs_list_limit'] ?? Chatbot_Relevance_Guard::DOCS_LIST_LIMIT_DEFAULT)), // phpcs:ignore
+				'chatbot_relevance_filter' => ! empty($_POST['chatbot_relevance_filter']), // phpcs:ignore
 			)
 		);
 
@@ -1371,7 +1757,7 @@ GEO;
 					<span class="off"><?php esc_html_e('DESACTIVADO', 'ai-knowledge'); ?></span>
 				</strong>
 			</div>
-			<p class="description"><?php esc_html_e('Modelos desactivados = los bots que has marcado como Bloquear en la tabla de crawlers.', 'ai-knowledge'); ?></p>
+			<p class="description"><?php esc_html_e('Modelos desactivados = los bots que has marcado como Bloqueado en la tabla de crawlers.', 'ai-knowledge'); ?></p>
 			<ul class="wookb-visibility-effects">
 				<li><strong><?php esc_html_e('Activado:', 'ai-knowledge'); ?></strong> <?php esc_html_e('los bots bloqueados no pueden entrar en tu web, pero sí leen /llms.txt, el resumen que has preparado para ellos. Cualquier otra página les responde 404.', 'ai-knowledge'); ?></li>
 				<li><strong><?php esc_html_e('Desactivado:', 'ai-knowledge'); ?></strong> <?php esc_html_e('los bots bloqueados no pueden acceder a nada, ni siquiera a /llms.txt. Es un bloqueo total del sitio.', 'ai-knowledge'); ?></li>
@@ -1403,8 +1789,8 @@ GEO;
 		// Llms_Faq vía assistant_save_step('faqs')), no por cada idioma
 		// activo -- un solo bloque cada uno, sin foreach por idioma.
 		$default_lang = Languages::main_language();
-		$chatbot_synced = '' !== Chatbot_Prompt::read() && Chatbot_Prompt::is_genix_ready();
-		$doc_summary = Registry::summary();
+		// «Sincronizado» se basa en el hash guardado al sincronizar, no en que el .md exista.
+		$chatbot_synced = Chatbot_Prompt::is_synced();
 		ob_start();
 		?>
 		<div class="wookb-assistant-summary">
@@ -1420,8 +1806,7 @@ GEO;
 			<?php if (Chatbot_Prompt::is_genix_ready()) : ?>
 				<p><strong><?php esc_html_e('Chatbot:', 'ai-knowledge'); ?></strong> <?php echo $chatbot_synced ? esc_html__('Sincronizado con Genix.', 'ai-knowledge') : esc_html__('Todavía sin sincronizar.', 'ai-knowledge'); ?></p>
 			<?php endif; ?>
-			<p><strong><?php esc_html_e('Documentos registrados:', 'ai-knowledge'); ?></strong> <?php echo (int) $doc_summary['total']; ?></p>
-			<p><strong><?php esc_html_e('Documentos pendientes:', 'ai-knowledge'); ?></strong> <?php echo (int) Registry::count(array('status' => 'queued')); ?></p>
+			<?php echo self::render_generation_status(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?>
 		</div>
 		<?php
 		return ob_get_clean();
@@ -1578,7 +1963,7 @@ GEO;
 		ob_start();
 		if ($running) {
 			?>
-			<p><strong><?php esc_html_e('Generación en curso (procesando por lotes vía Action Scheduler).', 'ai-knowledge'); ?></strong></p>
+			<p><strong><?php echo esc_html(Queue::has_action_scheduler() ? __('Generación en curso (procesando por lotes vía Action Scheduler).', 'ai-knowledge') : __('Generación en curso (procesando por lotes vía WP-Cron).', 'ai-knowledge')); ?></strong></p>
 			<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
 				<input type="hidden" name="action" value="wookb_cancel_seed" />
 				<?php wp_nonce_field('wookb_cancel_seed'); ?>
@@ -1639,7 +2024,7 @@ GEO;
 			array(
 				'daily_limit'      => max(1, (int) ($_POST['daily_limit'] ?? 100)), // phpcs:ignore
 				'no_limit'         => ! empty($_POST['no_limit']), // phpcs:ignore
-				'batch_size'       => max(1, (int) ($_POST['batch_size'] ?? 20)), // phpcs:ignore
+				'batch_size'       => max(1, (int) ($_POST['batch_size'] ?? 50)), // phpcs:ignore
 				'debounce_seconds' => max(0, (int) ($_POST['debounce_seconds'] ?? 300)), // phpcs:ignore
 			)
 		);
@@ -2050,7 +2435,7 @@ GEO;
 	 * Guarda solo las respuestas del grupo "negocio" (pestaña Negocio):
 	 * datos validos con o sin WooCommerce, no especificos del chatbot.
 	 * save_answers() ya solo sobreescribe las keys presentes, asi que no
-	 * borra lo guardado en la pestaña Chatbot. Regenera llm/info.md porque
+	 * borra lo guardado en la pestaña Chatbot. Regenera ai-knowledge/info.md porque
 	 * estos datos tambien alimentan llms.txt, no solo el prompt del bot.
 	 */
 	public static function save_business_answers()
@@ -2363,6 +2748,9 @@ GEO;
 				'wc_contact_hours'      => isset($_POST['wc_contact_hours']) ? sanitize_textarea_field(wp_unslash($_POST['wc_contact_hours'])) : '', // phpcs:ignore
 			)
 		);
+
+		// La direccion de WooCommerce va al campo «Direccion» de Negocio solo si esta vacio.
+		self::maybe_store_woocommerce_address();
 
 		self::redirect('woocommerce');
 	}
@@ -2862,23 +3250,29 @@ GEO;
 
 	/**
 	 * Fase 11 (revision UX 2026-09-16): fuerza la descarga real de robots.txt
-	 * actual. Si no existe como archivo fisico (caso normal: WordPress sirve
-	 * una version virtual), descarga esa version virtual leyendola por HTTP,
-	 * igual que hace la pieza 1 de solo lectura de la propia pestaña.
+	 * actual: el archivo fisico o, si no existe (caso normal: WordPress sirve
+	 * una version virtual), esa version virtual capturada con do_robots() sin
+	 * peticion HTTP (Robots_Txt_Guard::read_current()).
 	 */
 	public static function download_robots_backup()
 	{
 		self::verify('wookb_download_robots_backup');
 
-		if (file_exists(Robots_Txt_Guard::path())) {
-			$content = (string) file_get_contents(Robots_Txt_Guard::path()); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_get_contents
-		} else {
-			$response = wp_remote_get(home_url('/robots.txt'));
-			if (is_wp_error($response)) {
-				wp_die(esc_html__('No se pudo leer el robots.txt actual (ni físico ni virtual) para generar la copia de seguridad.', 'ai-knowledge'));
+		$current = Robots_Txt_Guard::read_current();
+		if ('error' === $current['source']) {
+			$message = '' !== $current['error'] ? $current['error'] : __('No se pudo leer el robots.txt actual para generar la copia de seguridad.', 'ai-knowledge');
+			// Descarga por fetch (asistente): texto plano con el error real, sin
+			// llevar al usuario a una pantalla wp_die.
+			if (! empty($_POST['wookb_fetch'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce ya verificado en verify().
+				status_header(500);
+				nocache_headers();
+				header('Content-Type: text/plain; charset=utf-8');
+				echo esc_html($message);
+				exit;
 			}
-			$content = wp_remote_retrieve_body($response);
+			wp_die(esc_html($message), '', array('response' => 500));
 		}
+		$content = $current['content'];
 
 		Robots_Txt_Guard::mark_backup_confirmed();
 
@@ -2896,31 +3290,55 @@ GEO;
 	 * exige el transient de descarga confirmada, y los bots a bloquear salen
 	 * siempre de Crawler_Catalog::blocked_user_agents() (la tabla unica),
 	 * nunca de texto libre del POST.
+	 *
+	 * Sin robots.txt fisico no hay nada que respaldar (WordPress sirve uno
+	 * virtual): en su lugar se exige la casilla de aceptacion de riesgos
+	 * (wookb_robots_create_ack) y se crea el archivo con el virtual actual mas
+	 * el bloque de AI Knowledge.
 	 */
 	public static function apply_robots_block()
 	{
 		self::verify('wookb_apply_robots_block');
 
-		if (! Robots_Txt_Guard::backup_confirmed()) {
-			wp_die(esc_html__('Antes de aplicar el bloqueo tienes que descargar la copia actual de robots.txt. Pulsa "Descargar copia actual" y vuelve a intentarlo.', 'ai-knowledge'));
-		}
-
-		if (! Robots_Txt_Guard::is_available()) {
-			wp_die(esc_html__('robots.txt no es escribible en este servidor (permisos de la carpeta raíz).', 'ai-knowledge'));
-		}
+		$return_assistant = ! empty($_POST['wookb_return_assistant']); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce ya verificado en verify().
+		$fail = static function ($message) use ($return_assistant) {
+			if ($return_assistant) {
+				set_transient('wookb_robots_apply_error_' . get_current_user_id(), $message, MINUTE_IN_SECONDS);
+				wp_safe_redirect(admin_url('admin.php?page=ai-knowledge-assistant&step=server'));
+				exit;
+			}
+			wp_die(esc_html($message));
+		};
 
 		$actions = Crawler_Catalog::effective_actions();
 		$mode = Scope::settings()['crawler_visibility_mode'];
-		$written = Robots_Txt_Guard::apply_actions($actions, $mode);
 		$path = Robots_Txt_Guard::path();
+
+		if (! Robots_Txt_Guard::physical_exists()) {
+			if (empty($_POST['wookb_robots_create_ack'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				$fail(__('Para crear el robots.txt físico tienes que aceptar los riesgos indicados (casilla de aceptación).', 'ai-knowledge'));
+			}
+			if (! Robots_Txt_Guard::is_available()) {
+				$fail(__('robots.txt no es escribible en este servidor (permisos de la carpeta raíz).', 'ai-knowledge'));
+			}
+			$written = Robots_Txt_Guard::create_from_virtual($actions, $mode);
+		} else {
+			if (! Robots_Txt_Guard::backup_confirmed()) {
+				$fail(__('Antes de aplicar el bloqueo tienes que descargar la copia actual de robots.txt. Pulsa "Descargar copia actual" y vuelve a intentarlo.', 'ai-knowledge'));
+			}
+			if (! Robots_Txt_Guard::is_available()) {
+				$fail(__('robots.txt no es escribible en este servidor (permisos de la carpeta raíz).', 'ai-knowledge'));
+			}
+			$written = Robots_Txt_Guard::apply_actions($actions, $mode);
+		}
 		$verified = $written && file_exists($path) && Robots_Txt_Guard::managed_block_matches((string) file_get_contents($path), $actions, $mode); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		if (!$verified) {
-			wp_die(esc_html__('No se pudo verificar la actualización de robots.txt. Comprueba los permisos de escritura de la raíz del sitio y vuelve a intentarlo.', 'ai-knowledge'));
+			$fail(__('No se pudo verificar la actualización de robots.txt. Comprueba los permisos de escritura de la raíz del sitio y vuelve a intentarlo.', 'ai-knowledge'));
 		}
 		// Uso unico: la confirmacion de descarga solo vale para esta aplicacion.
 		Robots_Txt_Guard::clear_backup_confirmation();
 
-		if ( ! empty( $_POST['wookb_return_assistant'] ) ) {
+		if ($return_assistant) {
 			wp_safe_redirect( admin_url( 'admin.php?page=ai-knowledge-assistant&step=server&wookb_notice=1' ) );
 			exit;
 		}

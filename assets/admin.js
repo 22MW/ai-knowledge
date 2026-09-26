@@ -189,6 +189,43 @@
 		applyCrawlerFilters();
 	} );
 
+	// Acciones POST sencillas (p. ej. «Procesar ahora»): formulario oculto hacia
+	// admin-post.php con el nonce del propio botón. Delegado en document porque
+	// el asistente inyecta sus pasos por AJAX.
+	$( document ).on( 'click', '[data-wookb-post-action]', function ( e ) {
+		e.preventDefault();
+		var $btn = $( this );
+		var $form = $( '<form method="post"></form>' ).hide().attr( 'action', String( ( window.ajaxurl || '' ) ).replace( 'admin-ajax.php', 'admin-post.php' ) );
+		$form.append( $( '<input type="hidden" name="action" />' ).val( $btn.attr( 'data-wookb-post-action' ) ) );
+		$form.append( $( '<input type="hidden" name="_wpnonce" />' ).val( $btn.attr( 'data-wookb-post-nonce' ) ) );
+		$( 'body' ).append( $form );
+		$btn.prop( 'disabled', true );
+		$form[ 0 ].submit();
+	} );
+
+	// «Probar conexión» de la IA (Ajustes y paso «Origen de IA»): llamada mínima
+	// solo bajo demanda. Delegado en document (el asistente inyecta sus pasos).
+	$( document ).on( 'click', '[data-wookb-ai-test]', function () {
+		var $btn = $( this );
+		var $out = $btn.closest( 'p' ).find( '[data-wookb-ai-test-result]' );
+		$btn.prop( 'disabled', true );
+		$out.text( __( 'Probando…', 'ai-knowledge' ) );
+		$.post( window.ajaxurl, { action: 'wookb_test_ai_connection', nonce: $btn.attr( 'data-nonce' ) } ).done( function ( response ) {
+			$out.text( '✓ ' + ( response && response.data && response.data.message ? response.data.message : __( 'La IA ha respondido correctamente.', 'ai-knowledge' ) ) );
+		} ).fail( function ( xhr ) {
+			var message = xhr && xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message ? xhr.responseJSON.data.message : __( 'No se pudo probar la conexión.', 'ai-knowledge' );
+			$out.text( '✗ ' + message );
+		} ).always( function () {
+			$btn.prop( 'disabled', false );
+		} );
+	} );
+
+	// «Crear robots.txt» (sin archivo físico): el botón solo se habilita con la
+	// casilla de aceptación de riesgos marcada. El servidor vuelve a exigirla.
+	$( document ).on( 'change', '[data-wookb-robots-ack]', function () {
+		$( '[data-wookb-robots-create]' ).prop( 'disabled', ! this.checked );
+	} );
+
 	// Interruptor "Incluir llms.txt para los modelos desactivados" (pestaña
 	// Visibilidad IA y asistente): actualiza la etiqueta ACTIVADO/DESACTIVADO al
 	// momento; el guardado lo hacen los botones de cada pantalla. Delegado en
@@ -295,6 +332,10 @@
 				// ahí mismo (el HTML ya viene montado y escapado desde PHP).
 				if ( 'wookb_save_per_language' === action && result.data && 'string' === typeof result.data.notice_html ) {
 					$( '[data-wookb-regen-slot]' ).html( result.data.notice_html );
+				}
+				// Ajustes: estado de la conexión de IA recalculado tras guardar.
+				if ( 'wookb_save_settings' === action && result.data && 'string' === typeof result.data.ai_status_html ) {
+					$( '[data-wookb-ai-status-slot]' ).html( result.data.ai_status_html );
 				}
 				var value = result.data && (result.data.draft || result.data.polished);
 				if ( value ) {
@@ -565,17 +606,43 @@
 		e.preventDefault();
 		e.stopImmediatePropagation();
 		var button = this, action = button.getAttribute('data-server-action');
-		if ('wookb_apply_robots_block' === action && !window.confirm('Confirma que ya descargaste la copia y quieres actualizar robots.txt.')) return false;
+		var isRobotsCreate = 'wookb_apply_robots_block' === action && button.hasAttribute('data-robots-create');
+		if ('wookb_apply_robots_block' === action && !isRobotsCreate && !window.confirm(wp.i18n.__('Confirma que ya descargaste la copia y quieres actualizar robots.txt.', 'ai-knowledge'))) return false;
+		if (isRobotsCreate && !window.confirm(wp.i18n.__('Vas a crear un robots.txt físico en la raíz del sitio. Sustituirá al que genera WordPress: las reglas futuras de plugins SEO o WooCommerce no se aplicarán salvo que las edites a mano. Se puede deshacer borrando el archivo. ¿Quieres continuar?', 'ai-knowledge'))) return false;
 		if ('wookb_apply_htaccess_block' === action) {
-			if (!$('[data-wookb-htaccess-ack]').is(':checked') || !window.confirm('Confirma que ya descargaste la copia y quieres reemplazar el .htaccess.')) return false;
+			if (!$('[data-wookb-htaccess-ack]').is(':checked') || !window.confirm(wp.i18n.__('Confirma que ya descargaste la copia y quieres reemplazar el .htaccess.', 'ai-knowledge'))) return false;
 		}
 		if ('wookb_download_htaccess_backup' === action) { $('[data-wookb-htaccess-apply]').attr('data-backup-ready', '1'); window.wookbRefreshHtaccessApply(); }
-		if ('wookb_download_robots_backup' === action) $('[data-server-action="wookb_apply_robots_block"]').prop('disabled', false).removeAttr('disabled');
+		if ('wookb_download_robots_backup' === action) {
+			// Descarga por fetch: «Actualizar» solo se habilita cuando la descarga ha terminado bien y el error real se muestra en el propio paso.
+			var $feedback = $('[data-wookb-server-feedback]').removeClass('is-error').text('');
+			var body = new FormData();
+			body.append('action', action);
+			body.append('_wpnonce', button.getAttribute('data-server-nonce'));
+			body.append('wookb_fetch', '1');
+			fetch(data.adminPostUrl, { method: 'POST', body: body, credentials: 'same-origin' }).then(function (response) {
+				if (!response.ok) { return response.text().then(function (text) { throw new Error(text || ('HTTP ' + response.status)); }); }
+				var disposition = response.headers.get('Content-Disposition') || '';
+				var match = disposition.match(/filename="?([^"]+)"?/);
+				return response.blob().then(function (blob) { return { blob: blob, filename: match ? match[1] : 'robots-backup.txt' }; });
+			}).then(function (result) {
+				var url = window.URL.createObjectURL(result.blob);
+				var link = document.createElement('a');
+				link.href = url; link.download = result.filename; link.style.display = 'none';
+				document.body.appendChild(link); link.click(); link.remove();
+				window.URL.revokeObjectURL(url);
+				$('[data-server-action="wookb_apply_robots_block"]').prop('disabled', false).removeAttr('disabled');
+				$feedback.text(wp.i18n.__('Copia descargada. Ya puedes actualizar robots.txt.', 'ai-knowledge'));
+			}).catch(function (error) {
+				$feedback.addClass('is-error').text(wp.i18n.__('No se pudo descargar la copia de robots.txt:', 'ai-knowledge') + ' ' + error.message);
+			});
+			return false;
+		}
 		var detached = document.createElement('form');
 		detached.method = 'post';
 		detached.action = data.adminPostUrl;
 		detached.style.display = 'none';
-		[['action', action], ['_wpnonce', button.getAttribute('data-server-nonce')]].concat(button.getAttribute('data-return-assistant') ? [['wookb_return_assistant', '1']] : []).concat('wookb_apply_htaccess_block' === action ? [['wookb_htaccess_ack', '1']] : []).forEach(function (pair) { var input = document.createElement('input'); input.type = 'hidden'; input.name = pair[0]; input.value = pair[1]; detached.appendChild(input); });
+		[['action', action], ['_wpnonce', button.getAttribute('data-server-nonce')]].concat(button.getAttribute('data-return-assistant') ? [['wookb_return_assistant', '1']] : []).concat(isRobotsCreate ? [['wookb_robots_create_ack', '1']] : []).concat('wookb_apply_htaccess_block' === action ? [['wookb_htaccess_ack', '1']] : []).forEach(function (pair) { var input = document.createElement('input'); input.type = 'hidden'; input.name = pair[0]; input.value = pair[1]; detached.appendChild(input); });
 		document.body.appendChild(detached);
 		detached.submit();
 		return false;
@@ -585,7 +652,7 @@
 		$('.wookb-assistant').addClass('is-loading');
 		var $form=$(this), submitter=e.originalEvent && e.originalEvent.submitter, action=submitter ? submitter.value : 'continue';
 		var payload=$form.serializeArray();
-		payload.push({name:'action',value:'aikb_assistant_navigate'},{name:'nonce',value:data.nonce},{name:'step',value:$form.find('[name="assistant_step"]').val()},{name:'assistant_action',value:action});
+		payload.push({name:'action',value:'aikb_assistant_navigate'},{name:'nonce',value:data.nonce},{name:'locale',value:data.locale},{name:'step',value:$form.find('[name="assistant_step"]').val()},{name:'assistant_action',value:action});
 		$form.find('button').prop('disabled', true);
 		$.post(data.ajaxUrl, payload).done(function (response) { if (!showPanel(response)) { $('[data-assistant-feedback]').addClass('is-error').text(response.data && response.data.message ? response.data.message : wp.i18n.__('No se pudo guardar.', 'ai-knowledge')).addClass('is-visible'); } }).fail(function () { $('[data-assistant-feedback]').addClass('is-error').text(wp.i18n.__('No se pudo guardar.', 'ai-knowledge')).addClass('is-visible'); }).always(function () { $('[data-assistant-form] button').prop('disabled', false); $('.wookb-assistant').removeClass('is-loading'); });
 	});
@@ -593,11 +660,11 @@
 		e.preventDefault();
 		$('.wookb-assistant').addClass('is-loading');
 		var step=$(this).closest('li').data('assistant-step');
-		$.post(data.ajaxUrl,{action:'aikb_assistant_navigate',nonce:data.nonce,step:step,assistant_action:'goto'}).done(showPanel).always(function () { $('.wookb-assistant').removeClass('is-loading'); });
+		$.post(data.ajaxUrl,{action:'aikb_assistant_navigate',nonce:data.nonce,locale:data.locale,step:step,assistant_action:'goto'}).done(showPanel).always(function () { $('.wookb-assistant').removeClass('is-loading'); });
 	});
 	$(document).on('click', '[data-assistant-category]', function () {
 		var $form=$(this).closest('form'), category=$(this).data('assistant-category'), step=$form.find('[name="assistant_step"]').val();
-		$.post(data.ajaxUrl, $form.serializeArray().concat([{name:'action',value:'aikb_assistant_navigate'},{name:'nonce',value:data.nonce},{name:'step',value:step},{name:'assistant_action',value:'goto'},{name:'assistant_category',value:category}])).done(showPanel);
+		$.post(data.ajaxUrl, $form.serializeArray().concat([{name:'action',value:'aikb_assistant_navigate'},{name:'nonce',value:data.nonce},{name:'locale',value:data.locale},{name:'step',value:step},{name:'assistant_action',value:'goto'},{name:'assistant_category',value:category}])).done(showPanel);
 	});
 	$(document).on('click', '[data-crawler-bulk]', function () {
 		var value = $(this).data('crawler-bulk');
@@ -605,7 +672,7 @@
 	});
 	$(document).on('click', '[data-assistant-check-server]', function () {
 		$('.wookb-assistant').addClass('is-loading');
-		$.post(data.ajaxUrl, {action:'aikb_assistant_navigate', nonce:data.nonce, step:'server', assistant_action:'goto'}).done(showPanel).always(function () { $('.wookb-assistant').removeClass('is-loading'); });
+		$.post(data.ajaxUrl, {action:'aikb_assistant_navigate', nonce:data.nonce, locale:data.locale, step:'server', assistant_action:'goto'}).done(showPanel).always(function () { $('.wookb-assistant').removeClass('is-loading'); });
 	});
 	if ($('#wookb-assistant-geo-prompt').length && !$('#wookb-geo-prompt-notice').length) { $('#wookb-assistant-geo-prompt').attr('rows', 8).css('font-size', '13px'); $('<p id="wookb-geo-prompt-notice" style="color:#ff931e;font-size:13px;margin:10px 0 6px;">' + wp.i18n.__('Si hay documentos pendientes, la auditoría será más completa cuando terminen de generarse.', 'ai-knowledge') + '</p>').insertBefore($('#wookb-assistant-geo-prompt')); }
 })(jQuery);

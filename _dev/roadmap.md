@@ -20,6 +20,46 @@ No presentar este flujo como validado hasta realizar esas pruebas.
 2. Probar la pestaña WooCommerce: checkboxes, snapshot editable y «Pulir redacción con IA», especialmente la llamada a IA.
 3. Repetir la comprobación de feedback del botón del editor de documentos (Fase 1), que quedó sin evidencia suficiente en la primera prueba.
 
+## Pendiente de QA real — versión 1.4.1
+
+Implementada el 2026-09-26 (sin commit ni release). Probar:
+
+1. Migración `llm` → `ai-knowledge` con y sin permisos; `info.md`, `llms.txt` y
+   `.md` siguen accesibles; `/wp-content/llm/...` da 301; rutas con `..` o `//`, 404.
+2. Paso Negocio: con IA y sin resumen, se genera y desaparece el aviso; con
+   resumen existente no se pisa. Último paso: botones y «Salir» al Registro.
+3. Genix Lite: «Reinstalar filtros» en un servidor sin `php` en el PATH; casilla
+   de relevancia por título (desactivada por defecto); guardar el mismo prompt
+   dos veces sin error; con solo clave de Claude en Genix (sin probar contra la API).
+4. WPML: guardar el paso FAQs con perfil en español; el panel debe salir todo en
+   español (hipótesis sin reproducir).
+5. Desinstalación con «archivos»: borra `ai-knowledge` y `llm` si aún existe.
+
+Pendiente aparte: Genix no ofrece ganchos oficiales para resultados, lista de
+documentos ni prompt (Lite no lee `chatbot_custom_instructions`); los parches se
+pierden en cada actualización de Genix. Idea: pedirlos a Genix.
+
+## Pendiente de QA real — versión 1.4.0
+
+Implementada el 2026-09-25 (sin commit ni release). Detalle de cada punto en
+[`informe-pendientes-verificados.md`](informe-pendientes-verificados.md). Probar:
+
+1. Paso «Origen de IA» y Ajustes: aviso con motivo, lista de modelos, modelo de
+   Genix en solo lectura y «Probar conexión».
+2. Paso WooCommerce: precarga y dirección hacia Negocio solo si está vacía.
+3. robots.txt sin físico: «Crear robots.txt» (casilla + confirmación), con un
+   plugin SEO activo (`do_robots()`), y con físico: copia obligatoria.
+4. Cola con y sin Action Scheduler: lotes de 50 cada 15 s, fin de «Generación en
+   curso», «Cancelar» con WP-Cron, aviso de `DISABLE_WP_CRON`, «Procesar ahora».
+5. Paso Chatbot con Genix Lite: prompt creado o sincronizado.
+6. Aviso de Genix (solo pantallas del plugin y Plugins, silenciar 24 h).
+7. Desinstalación en un sitio de pruebas: sin checks, solo datos, solo archivos.
+8. Traducciones nuevas (75 textos): revisión de euskera y alemán; regenerar los
+   JSON de JavaScript.
+
+Pendiente aparte: el parche de Genix Lite sigue dependiendo de modificar
+archivos de un tercero; idea a medio plazo: pedir hooks oficiales a Genix.
+
 ## Pendiente de QA real — versión 1.3.0
 
 1. Documentos de producto: bloque «Datos de compra» con productos simples y

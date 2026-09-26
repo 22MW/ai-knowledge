@@ -321,3 +321,59 @@ contenido) — no se forzó una invalidación especial para este cambio de códi
   «Reiniciar todo» (y en el asistente). Se mantiene la carpeta `llm/{idioma}/`.
 - El botón del editor no añade el tipo al alcance: incluye el ID del original
   (y el propio con el check).
+
+## 2026-09-25 — Revisión de pendientes (1.4.0)
+- «Hay conexión de IA» se decide con `AI_Client::config()` (origen, modelo y
+  clave), la misma condición que usa el generador; nunca con «hay Genix». La
+  prueba real («Probar conexión») es solo bajo demanda.
+- Asistente y pestaña WooCommerce comparten un único helper de valores en vivo
+  y el comportamiento snapshot: primera vez lo de WooCommerce, al guardar queda
+  como dato propio. La dirección de la tienda va a «Dirección» de Negocio solo
+  si está vacía. Los documentos de tienda no dependen de la IA.
+- robots.txt: una sola lectura sin HTTP (físico o `do_robots()`). Sin físico, se
+  ofrece «Crear robots.txt» con confirmación de riesgos y contenido = virtual
+  actual + bloque propio. Con físico, copia obligatoria como antes.
+- Chatbot en el asistente: si no hay prompt se crea uno predeterminado (con IA o
+  plantilla) y se sincroniza; si existe, solo se sincroniza. Sin el parche de
+  Genix Lite, el prompt sincronizado no se aplica en el chatbot.
+- Cola: 50 por lote, 15 s entre lotes y sin espera inicial en las semillas; el
+  debounce de 300 s solo para ediciones sueltas. En el asistente «Sin límite
+  diario» viene marcado la primera vez, con aviso de gasto.
+- Aviso del resumen: solo si no existe resumen público propio. Aviso de Genix:
+  solo en pantallas del plugin y Plugins, con descarte real. Nombre del plugin
+  en los avisos: «AI Knowledge & Visibility».
+- Desinstalación: dos checks separados, desmarcados por defecto: datos de base
+  de datos, y archivos generados (`wp-content/llm/` y el `llms.txt` que creó el
+  plugin, marcado con un comentario al final). `robots.txt` y `.htaccess` nunca
+  se tocan.
+- Estados de crawler: «Permitido/Bloqueado»; los botones masivos siguen como
+  verbo.
+
+## 2026-09-26 — Idioma del plugin y presentación (1.4.2)
+- El textdomain `ai-knowledge` se fija para toda la petición (`aikb_pin_textdomain()`):
+  para usuarios en español no hay catálogo y, sin fijarlo, WordPress ≥ 6.5 lo
+  reintenta «al vuelo» y, si WPML cambia de idioma a mitad de petición, carga el
+  inglés y mezcla idiomas. No usar `switch_to_locale` como solución.
+- `/llms.txt`: el idioma principal no lleva sufijo «(XX)» en los encabezados; los
+  demás sí.
+- Excepción explícita a «sin bordes decorativos» (pedida por el usuario): el
+  bloque «Crear por idioma» lleva borde de 3 px con `--tblr-primary`
+  (`.wookb-per-language`, en `admin.css`).
+
+## 2026-09-26 — Carpeta, Genix y asistente (1.4.1)
+- La carpeta de documentos pasa a `wp-content/ai-knowledge/` (nombre definido solo
+  en `Markdown_Store::DIR_NAME`). Migración con `rename()`; si falla, se sigue
+  con `llm`. Redirect 301 de `/wp-content/llm/...` con lista blanca de rutas.
+- Support Genix: el plugin parchea archivos de un tercero porque Genix Lite no
+  ofrece ganchos para resultados, lista de documentos ni prompt. La comprobación
+  de sintaxis del parche se hace dentro de PHP (`token_get_all` con
+  `TOKEN_PARSE`); si no se puede verificar, no se escribe. La copia de seguridad
+  se crea solo tras pasar las comprobaciones.
+- El filtro de relevancia que vacía documentos por coincidencia de título queda
+  **desactivado por defecto** (ajuste `chatbot_relevance_filter`): ocultaba
+  documentos cuyo contenido respondía a la pregunta. Genix ya exige el 50 % de
+  los términos.
+- Con origen Genix, la IA usa el proveedor del chatbot de Genix (`chatbot_ai_tool`):
+  OpenAI o Claude, con el otro como respaldo si falta la clave.
+- El paso Negocio del asistente genera el resumen público con IA solo si no
+  existe uno propio; nunca lo pisa.

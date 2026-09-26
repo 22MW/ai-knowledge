@@ -17,6 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Markdown_Server {
 
 	const QUERY_VAR = 'wookb_md_doc';
+	/** Redirect 301 de las URL antiguas wp-content/llm/... a la carpeta nueva. */
+	const LEGACY_QUERY_VAR = 'wookb_legacy_llm';
 
 	public static function init() {
 		add_action( 'init', array( __CLASS__, 'add_rewrite_rule' ) );
@@ -26,14 +28,31 @@ class Markdown_Server {
 
 	public static function add_rewrite_rule() {
 		add_rewrite_rule( '^ai-knowledge-doc/(.+)\.md$', 'index.php?' . self::QUERY_VAR . '=$matches[1]', 'top' );
+		// Solo actua si el servidor ya no sirve el archivo antiguo (WordPress
+		// enruta unicamente lo que no existe como archivo real).
+		add_rewrite_rule( '^wp-content/' . Markdown_Store::LEGACY_DIR_NAME . '/(.+)$', 'index.php?' . self::LEGACY_QUERY_VAR . '=$matches[1]', 'top' );
+	}
+
+	/** 301 a la carpeta nueva con lista blanca estricta; 404 si la ruta no cumple. */
+	protected static function redirect_legacy( $path ) {
+		if ( ! preg_match( '#^[a-z0-9._-]+(?:/[a-z0-9._-]+)*$#', $path ) || false !== strpos( $path, '..' ) ) {
+			status_header( 404 );
+			exit;
+		}
+		wp_safe_redirect( content_url( '/' . Markdown_Store::DIR_NAME . '/' . $path ), 301 );
+		exit;
 	}
 
 	public static function register_query_var( $vars ) {
 		$vars[] = self::QUERY_VAR;
+		$vars[] = self::LEGACY_QUERY_VAR;
 		return $vars;
 	}
 
 	public static function maybe_serve( $wp ) {
+		if ( ! empty( $wp->query_vars[ self::LEGACY_QUERY_VAR ] ) ) {
+			self::redirect_legacy( (string) $wp->query_vars[ self::LEGACY_QUERY_VAR ] );
+		}
 		if ( empty( $wp->query_vars[ self::QUERY_VAR ] ) ) {
 			return;
 		}

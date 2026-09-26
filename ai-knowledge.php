@@ -3,7 +3,7 @@
  * Plugin Name: AI Knowledge & Visibility
  * Plugin URI: https://22mw.online/
  * Description: Genera documentos de base de conocimiento (.md + posts sgkb-docs de Support Genix) a partir de productos WooCommerce u otros CPTs, con cola, límite diario, WPML y publicación pública GEO vía llms.txt.
- * Version: 1.3.2
+ * Version: 1.4.2
  * Author: 22MW
  * Author URI: https://22mw.online/
  * Text Domain: ai-knowledge
@@ -18,19 +18,34 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'AIKB_VERSION', '1.3.2' );
+define( 'AIKB_VERSION', '1.4.2' );
 define( 'AIKB_FILE', __FILE__ );
 define( 'AIKB_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AIKB_URL', plugin_dir_url( __FILE__ ) );
 define( 'AIKB_TABLE_DOCUMENTS', 'wookb_documents' );
 
-add_action(
-	'init',
-	function () {
-		load_plugin_textdomain( 'ai-knowledge', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
-	},
-	1
-);
+/**
+ * Carga las traducciones del plugin y las FIJA para toda la petición.
+ *
+ * El español es el idioma base (los textos originales), así que para un
+ * usuario en español no existe catálogo y el dominio queda sin cargar. Desde
+ * WordPress 6.5 un dominio sin cargar se vuelve a intentar «al vuelo» en cada
+ * __() con el idioma de ESE momento: si a mitad de una petición el idioma
+ * cambia (WPML cambia de idioma al leer contenido traducido, y luego lo
+ * restaura), el catálogo inglés se carga de golpe y el resto de la pantalla
+ * sale en inglés, mezclado con lo ya pintado en español. Marcando el dominio
+ * como «descargado» cuando no hay catálogo, ese reintento no ocurre.
+ */
+function aikb_pin_textdomain() {
+	global $l10n_unloaded;
+	load_plugin_textdomain( 'ai-knowledge', false, dirname( plugin_basename( AIKB_FILE ) ) . '/languages' );
+	if ( ! is_textdomain_loaded( 'ai-knowledge' ) ) {
+		$l10n_unloaded                   = (array) $l10n_unloaded;
+		$l10n_unloaded['ai-knowledge']   = true;
+	}
+}
+
+add_action( 'init', 'aikb_pin_textdomain', 1 );
 
 /**
  * Autoload muy simple por convención de nombre de archivo (class-xxx.php).
@@ -61,7 +76,7 @@ spl_autoload_register(
 );
 
 /**
- * Activación: crea la tabla de registro y la carpeta wp-content/llm/.
+ * Activación: crea la tabla de registro y la carpeta wp-content/ai-knowledge/.
  */
 function wookb_activate() {
 	update_option( 'aikb_setup_assistant', array(
@@ -76,7 +91,8 @@ function wookb_activate() {
 	require_once AIKB_DIR . 'includes/class-registry.php';
 	\AIKB\Registry::create_table();
 
-	$llm_dir = WP_CONTENT_DIR . '/llm';
+	require_once AIKB_DIR . 'includes/class-markdown-store.php';
+	$llm_dir = \AIKB\Markdown_Store::base_dir(); // migra la carpeta antigua `llm` si existe.
 	if ( ! file_exists( $llm_dir ) ) {
 		wp_mkdir_p( $llm_dir );
 	}

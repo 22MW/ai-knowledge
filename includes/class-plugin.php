@@ -70,6 +70,8 @@ class Plugin {
 		Languages::maybe_migrate();
 		Languages::maybe_migrate_language_answer();
 
+		Markdown_Store::migrate();
+		add_action( 'init', array( __CLASS__, 'maybe_flush_after_migration' ), 99 );
 		Queue::init();
 		Sync::init();
 		Crawler_Log::init();
@@ -83,6 +85,7 @@ class Plugin {
 		Genix_Hooks_Guard::init();
 		add_action( 'admin_init', array( '\AIKB\Chatbot_Prompt', 'maybe_auto_sync' ), 999 );
 		add_action( 'admin_notices', array( '\AIKB\Chatbot_Prompt_Builder', 'maybe_short_summary_notice' ) );
+		Chatbot_Prompt_Builder::init_notice();
 
 		// sgkb-docs (y otros CPTs de plugins de terceros) se registran en 'init', no antes:
 		// el guard REST debe engancharse después de que el CPT exista.
@@ -98,6 +101,14 @@ class Plugin {
 
 			require_once AIKB_DIR . 'includes/class-editor-metabox.php';
 			Editor_Metabox::init();
+		}
+	}
+
+	/** Flush de rewrite rules una sola vez tras migrar la carpeta de documentos. */
+	public static function maybe_flush_after_migration() {
+		if ( get_option( Markdown_Store::FLUSH_OPTION ) ) {
+			flush_rewrite_rules();
+			delete_option( Markdown_Store::FLUSH_OPTION );
 		}
 	}
 

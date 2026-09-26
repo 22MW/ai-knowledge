@@ -6,16 +6,56 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Escritura/borrado de .md en wp-content/llm/{lang}/{slug}.md con front matter YAML.
+ * Escritura/borrado de .md en wp-content/ai-knowledge/{lang}/{slug}.md con front matter YAML.
+ * El nombre de la carpeta se define solo aqui (DIR_NAME); la antigua `llm` se
+ * migra con rename() la primera vez (migrate()).
  */
 class Markdown_Store {
 
+	/** Nombre de la carpeta de documentos dentro de wp-content. */
+	const DIR_NAME = 'ai-knowledge';
+	/** Nombre antiguo (hasta 1.3.x), solo para migrar/redirigir/desinstalar. */
+	const LEGACY_DIR_NAME = 'llm';
+	/** Opcion: pide un flush de rewrite rules tras migrar (lo hace Plugin). */
+	const FLUSH_OPTION = 'wookb_rewrite_flush_pending';
+
+	/** Ruta usada tras resolver la migracion (null = aun no resuelta en esta peticion). */
+	protected static $resolved = null;
+
+	public static function legacy_dir() {
+		return WP_CONTENT_DIR . '/' . self::LEGACY_DIR_NAME;
+	}
+
+	/**
+	 * Si existe la carpeta antigua y no la nueva, la renombra. Idempotente. Si
+	 * rename() falla (permisos), sigue usando la antigua sin romper nada.
+	 * Devuelve la ruta que debe usarse.
+	 */
+	public static function migrate() {
+		if ( null !== self::$resolved ) {
+			return self::$resolved;
+		}
+		$new = WP_CONTENT_DIR . '/' . self::DIR_NAME;
+		$old = self::legacy_dir();
+		if ( ! is_dir( $new ) && is_dir( $old ) && ! is_link( $old ) ) {
+			if ( @rename( $old, $new ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.rename_rename
+				update_option( self::FLUSH_OPTION, 1, false );
+				self::$resolved = $new;
+			} else {
+				self::$resolved = $old;
+			}
+			return self::$resolved;
+		}
+		self::$resolved = $new;
+		return $new;
+	}
+
 	public static function base_dir() {
-		return WP_CONTENT_DIR . '/llm';
+		return self::migrate();
 	}
 
 	public static function base_url() {
-		return content_url( '/llm' );
+		return content_url( '/' . basename( self::migrate() ) );
 	}
 
 	public static function relative_path( $lang, $slug ) {
@@ -71,9 +111,22 @@ class Markdown_Store {
 	}
 
 	public static function delete( $relative ) {
+		$relative = (string) $relative;
+		// Guard: filas sin md_path (p. ej. en cola) llegan aqui con ruta vacia y
+		// la ruta absoluta seria la propia carpeta base.
+		if ( '' === $relative || '.md' !== substr( $relative, -3 ) || false !== strpos( $relative, '..' ) ) {
+			return;
+		}
 		$absolute = self::absolute_path( $relative );
-		if ( file_exists( $absolute ) ) {
-			unlink( $absolute ); // phpcs:ignore
+		$base     = wp_normalize_path( self::base_dir() );
+		if ( 0 !== strpos( wp_normalize_path( $absolute ), trailingslashit( $base ) ) || ! is_file( $absolute ) ) {
+			return;
+		}
+		unlink( $absolute ); // phpcs:ignore
+		// Carpeta de idioma vacia: se elimina solo si es hija directa de la base.
+		$dir = dirname( $absolute );
+		if ( wp_normalize_path( dirname( $dir ) ) === $base && is_dir( $dir ) && 2 === count( scandir( $dir ) ) ) {
+			rmdir( $dir ); // phpcs:ignore WordPress.WP.AlternativeFunctions.rmdir_rmdir
 		}
 	}
 
