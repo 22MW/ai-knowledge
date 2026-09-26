@@ -20,90 +20,23 @@ No presentar este flujo como validado hasta realizar esas pruebas.
 2. Probar la pestaña WooCommerce: checkboxes, snapshot editable y «Pulir redacción con IA», especialmente la llamada a IA.
 3. Repetir la comprobación de feedback del botón del editor de documentos (Fase 1), que quedó sin evidencia suficiente en la primera prueba.
 
-## QUÉ FALTA PARA PUBLICAR (2026-09-26)
+## Pendiente tras la release 1.4.0
 
-Orden. Nada de esto se ha hecho todavía salvo lo marcado.
+Publicada el 2026-09-26. Probada por el usuario en docthinks (lista de pruebas de
+la release superada). Queda:
 
-### 1. Generar el ZIP de prueba y probarlo en docthinks
-- El último ZIP generado (1.4.3) no lleva lo último: falta el **idioma principal
-  sin carpeta**. Hay que generar uno nuevo (`ai-knowledge-prueba.zip`, sin número).
-- Probar, con copia de la base de datos:
-  1. Migración `llm` → `ai-knowledge`: los `.md` del idioma principal quedan en la
-     raíz de la carpeta; `/llms.txt`, Registro e `info.md` funcionan.
-  2. URLs: `/ai-knowledge-doc/es/x.md` → 301; `/ai-knowledge-doc/x.md` → 200;
-     `/ai-knowledge-doc/chatbot-system-prompt.md` e `info.md` → 404;
-     `/wp-content/llm/es/x.md` → 301 directo.
-  3. Genix: «Reinstalar filtros ahora», relevancia por título desactivada,
-     guardar el mismo prompt dos veces sin error.
-  4. Idioma del asistente con WPML: guardar FAQs y comprobar que sale todo en español.
-  5. Negocio (resumen público), último paso («Salir» junto a «Atrás»), «Crear por
-     idioma» (recuadro con interruptor).
-  6. Cambio de idioma principal + «Reiniciar todo» (solo revisado leyendo código).
-  7. Desinstalación con los dos checks (opcional).
-
-### 2. Decisiones que faltan
-- **Seguridad:** `chatbot-system-prompt.md` y `faq-fuente.md` son accesibles por URL
-  directa dentro de `wp-content/ai-knowledge/`. Opciones: bloquear la carpeta en
-  `.htaccess`/nginx o mover esos archivos fuera de la carpeta pública.
-- **Número de release** (propuesta: 1.4.0). Lo decide el usuario.
-- **Versiones ya subidas:** las cabeceras dicen 1.4.x sin haber release (rule
-  `10-git`: en desarrollo solo sube el cuarto número). Corregir a 1.3.2.x o dejarlo
-  hasta el release, que unifica el `CHANGELOG.md`.
-- **`_dev/visual.html`:** sigue mencionando la 1.3.2.
-
-### 3. Publicar (cuando la prueba salga bien)
-- El guardián nuevo bloquea `git commit` con un cambio de versión que no sea el
-  cuarto número, y el commit de la 1.4.3 lo es. Para el release, el usuario crea
-  `.claude/.version-ok` (vale 30 minutos) con `! touch .claude/.version-ok`.
-- El usuario dice «release» y el número. Se hace: número en `ai-knowledge.php`,
-  `readme.txt` (incluido `Stable tag`) y `CHANGELOG.md` (una sola entrada), memoria
-  `_dev`, commit, push a `knowBaseDev`, `deploy-release.sh --dry-run` y en real
-  (rama `release`, ZIP, GitHub release con tag, `main`).
-
-### 4. Pendientes menores
-- Regenerar los JSON de traducción de JavaScript (`make_i18n_json.py`) y revisar
-  euskera y alemán (los textos nuevos los escribió el subagente).
-- La clave de Claude de Genix no se ha probado contra la API real.
-
-## Pendiente de QA real — versión 1.4.1
-
-Implementada el 2026-09-26 (sin commit ni release). Probar:
-
-1. Migración `llm` → `ai-knowledge` con y sin permisos; `info.md`, `llms.txt` y
-   `.md` siguen accesibles; `/wp-content/llm/...` da 301; rutas con `..` o `//`, 404.
-2. Paso Negocio: con IA y sin resumen, se genera y desaparece el aviso; con
-   resumen existente no se pisa. Último paso: botones y «Salir» al Registro.
-3. Genix Lite: «Reinstalar filtros» en un servidor sin `php` en el PATH; casilla
-   de relevancia por título (desactivada por defecto); guardar el mismo prompt
-   dos veces sin error; con solo clave de Claude en Genix (sin probar contra la API).
-4. WPML: guardar el paso FAQs con perfil en español; el panel debe salir todo en
-   español (hipótesis sin reproducir).
-5. Desinstalación con «archivos»: borra `ai-knowledge` y `llm` si aún existe.
-
-Pendiente aparte: Genix no ofrece ganchos oficiales para resultados, lista de
-documentos ni prompt (Lite no lee `chatbot_custom_instructions`); los parches se
-pierden en cada actualización de Genix. Idea: pedirlos a Genix.
-
-## Pendiente de QA real — versión 1.4.0
-
-Implementada el 2026-09-25 (sin commit ni release). Detalle de cada punto en
-[`informe-pendientes-verificados.md`](informe-pendientes-verificados.md). Probar:
-
-1. Paso «Origen de IA» y Ajustes: aviso con motivo, lista de modelos, modelo de
-   Genix en solo lectura y «Probar conexión».
-2. Paso WooCommerce: precarga y dirección hacia Negocio solo si está vacía.
-3. robots.txt sin físico: «Crear robots.txt» (casilla + confirmación), con un
-   plugin SEO activo (`do_robots()`), y con físico: copia obligatoria.
-4. Cola con y sin Action Scheduler: lotes de 50 cada 15 s, fin de «Generación en
-   curso», «Cancelar» con WP-Cron, aviso de `DISABLE_WP_CRON`, «Procesar ahora».
-5. Paso Chatbot con Genix Lite: prompt creado o sincronizado.
-6. Aviso de Genix (solo pantallas del plugin y Plugins, silenciar 24 h).
-7. Desinstalación en un sitio de pruebas: sin checks, solo datos, solo archivos.
-8. Traducciones nuevas (75 textos): revisión de euskera y alemán; regenerar los
-   JSON de JavaScript.
-
-Pendiente aparte: el parche de Genix Lite sigue dependiendo de modificar
-archivos de un tercero; idea a medio plazo: pedir hooks oficiales a Genix.
+1. **Traducciones.** Revisión lingüística del euskera y del alemán nuevos (los
+   escribió un subagente). Aviso: `_dev/make_i18n_json.py` (WP-CLI `make-json`)
+   quita del `.po` las cadenas de JavaScript; ejecutarlo tal cual borra las
+   traducciones de JS que ya solo están en los JSON. Combinar, no sustituir.
+2. **Guardián (sistema).** Falsos positivos al mencionar un marcador con una
+   redirección; hueco de `git add` + `git commit` encadenados; bloqueo de commit y
+   push por marcador. Análisis en `sistema-claude/guardian-analisis.md`.
+3. **Copias de Genix** en `wp-content/db-backup/`: siguen en una carpeta pública y
+   se acumulan (decidir si moverlas a `privado/`).
+4. **Idioma principal.** Al cambiar el idioma principal, hasta pulsar «Reiniciar
+   todo» coexisten filas del idioma antiguo y del nuevo; los documentos de tienda
+   y el FAQ del idioma nuevo hay que regenerarlos con sus botones.
 
 ## Pendiente de QA real — versión 1.3.0
 

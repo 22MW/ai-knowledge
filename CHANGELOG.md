@@ -2,102 +2,62 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
-## [1.4.3] - 2026-09-26
+## [1.4.0] - 2026-09-26
 
-### Correcciones
-
-- «Crear por idioma» pasa a usar el mismo patrón que el interruptor «Incluir
-  llms.txt para los modelos desactivados» de Visibilidad IA: recuadro con
-  interruptor y etiqueta ACTIVADO/DESACTIVADO, y borde que se marca en el color
-  primario al activarlo. Sustituye al borde fijo de la 1.4.2.
-
-## [1.4.2] - 2026-09-26
-
-### Correcciones
-
-- **Idioma mezclado en el asistente (WPML).** Causa localizada en el código de
-  WordPress: para un usuario en español el plugin no tiene catálogo (el español
-  es el idioma base) y WordPress reintenta cargar las traducciones «al vuelo»
-  con el idioma de cada momento; si WPML cambia de idioma a mitad de la
-  petición, el catálogo inglés se cargaba de golpe y el resto de la pantalla
-  salía en inglés. El dominio de traducción se fija ahora para toda la petición.
-- `/llms.txt`: los encabezados del idioma principal ya no llevan el sufijo
-  «(ES)»; solo lo llevan los demás idiomas («(EN)»).
-- Último paso del asistente: «Salir» pasa a la fila de acciones, a la derecha y
-  con el mismo estilo que «Atrás».
-
-## [1.4.1] - 2026-09-26
-
-Correcciones a partir de las pruebas de la 1.4.0 en una web real y revisión
-completa de la integración con Support Genix.
-
-### Carpeta de documentos
-
-- La carpeta `wp-content/llm/` pasa a llamarse `wp-content/ai-knowledge/`. Al
-  actualizar se renombra sola (los datos guardados no cambian) y, si no hay
-  permisos, el plugin sigue usando la antigua sin romper nada.
-- Las URLs antiguas `/wp-content/llm/...` redirigen con un 301 a la nueva
-  ubicación cuando el archivo antiguo ya no existe. Las rutas no válidas dan 404.
-- La desinstalación con «Borrar archivos generados» elimina la carpeta nueva y
-  también la antigua si todavía existe.
-- Al borrar un documento sin archivo (en cola) ya no se intenta borrar la propia
-  carpeta (warning `unlink` en el log) y se elimina la carpeta de idioma que
-  queda vacía.
-
-### Asistente
-
-- El paso Negocio genera el resumen público con IA cuando hay conexión y no
-  existe uno propio; si ya existe no se pisa. Con él desaparece el aviso del
-  resumen corto y el texto aparece en la pestaña Negocio.
-- Último paso: los accesos son botones, con un botón «Salir» que lleva al
-  Registro; el título de la caja ahora es traducible.
-- Las respuestas AJAX del asistente usan el idioma de la pantalla (hipótesis
-  pendiente de confirmar con WPML: antes podían salir mezcladas en otro idioma).
-
-### Support Genix
-
-- «Reinstalar filtros ahora» funciona aunque el servidor no tenga `php` en el
-  PATH: la sintaxis se comprueba dentro de PHP. La copia de seguridad se hace
-  solo tras pasar las comprobaciones y justo antes de escribir.
-- El filtro de relevancia que vaciaba los documentos cuando ninguna palabra de la
-  pregunta coincidía con un título queda desactivado por defecto, con una
-  casilla en la pestaña Genix para reactivarlo. Idioma no soportado, límite de
-  documentos relacionados y contacto siguen activos.
-- Guardar de nuevo el mismo prompt ya no muestra «Genix rechazó guardar la
-  opción».
-- El plugin acepta también la clave de Claude de Genix (según el proveedor que
-  use su chatbot). Sin probar contra la API real de Anthropic.
-
-### Traducciones
-
-- 12 textos nuevos o cambiados en catalán, alemán, inglés, euskera y francés;
-  `.mo` recompilados (pendiente regenerar los JSON de JavaScript y revisión
-  lingüística).
-
-## [1.4.0] - 2026-09-25
-
-Revisión del asistente y de las pantallas de servidor, cola y desinstalación,
-a partir de un informe verificado con el código real.
+Revisión completa del asistente, del servidor (robots.txt, cola, carpeta de
+documentos), de la integración con Support Genix y de la desinstalación, a
+partir de pruebas en webs reales y de un informe verificado con el código.
 
 ### Asistente y Ajustes
 
 - **Conexión de IA.** El aviso usa la misma comprobación que el generador
-  (origen elegido, modelo y clave) y dice el motivo cuando falla. Con conexión
-  se muestra la lista de modelos (Conectores de WordPress) o, con Genix, el
+  (origen elegido, modelo y clave) y dice el motivo cuando falla. Con
+  Conectores de WordPress se muestra la lista de modelos; con Support Genix, el
   modelo que usa en solo lectura. Nuevo botón «Probar conexión», solo bajo
-  demanda. Mismo estado en el paso «Origen de IA» y en Ajustes, que se
-  refresca al guardar.
+  demanda. Mismo estado en el paso «Origen de IA» y en Ajustes, que se refresca
+  al guardar.
 - **WooCommerce.** El asistente precarga como la pestaña (nombre, moneda, país,
   condiciones, devoluciones, recogida local y dirección). La dirección de la
   tienda se guarda en «Dirección» de Negocio solo si estaba vacía. Los
   documentos de tienda ya no dependen de la IA para generarse.
+- **Negocio.** El paso genera el resumen público con IA cuando hay conexión y no
+  existe uno propio; si ya existe no se pisa. Desaparece así el aviso del
+  resumen corto y el texto aparece en la pestaña Negocio.
 - **Chatbot.** Si no existe el prompt, el paso lo crea a partir de los campos
   rellenados (con IA o con una plantilla) y lo sincroniza con Genix; si existe,
   lo sincroniza. El resumen final comprueba la sincronización real.
 - **Límites.** «Sin límite diario» viene marcado la primera vez, con aviso del
   gasto de IA.
-- Pantalla final y Generación masiva con desglose por estado (en cola,
-  generando, listo, error), enlace al Registro y «Procesar ahora».
+- **Pantalla final.** Desglose por estado (en cola, generando, listo, error),
+  enlace al Registro y «Procesar ahora». Los accesos son botones y «Salir» va
+  junto a «Atrás», a la derecha.
+- **Idioma mezclado con WPML.** Las traducciones del plugin se fijan para toda
+  la petición: para un usuario en español no hay catálogo y WordPress
+  reintentaba cargarlo «al vuelo»; si WPML cambiaba de idioma a mitad de la
+  petición, el resto de la pantalla salía en inglés.
+
+### Carpeta de documentos
+
+- La carpeta `wp-content/llm/` pasa a `wp-content/ai-knowledge/`. Al actualizar
+  se renombra sola (los datos guardados no cambian) y, si no hay permisos, el
+  plugin sigue usando la antigua sin romper nada.
+- Los documentos del **idioma principal van en la raíz** de esa carpeta y su URL
+  pública es `/ai-knowledge-doc/{slug}.md`; los demás idiomas (con «Crear por
+  idioma») siguen en `{idioma}/`. Los documentos ya generados se migran solos.
+- Redirecciones 301 desde las URLs antiguas (`/wp-content/llm/...` y
+  `/ai-knowledge-doc/{idioma-principal}/...`). Las rutas no válidas dan 404 y
+  los nombres reservados (prompt privado, FAQ de origen, índice) nunca se sirven.
+- «Reiniciar todo» tras cambiar el idioma principal deja limpio el estado del
+  idioma antiguo.
+- Al borrar un documento sin archivo (en cola) ya no se intenta borrar la propia
+  carpeta (warning `unlink` en el log) y se elimina la carpeta de idioma vacía.
+
+### Prompt del chatbot privado
+
+- El prompt del chatbot vive en `privado/` dentro del plugin (no en la carpeta
+  pública), con una copia en la base de datos que lo restaura si una
+  actualización borra la carpeta. Al actualizar se migra desde la ubicación
+  antigua y se borra el archivo público, que era descargable por URL.
 
 ### robots.txt
 
@@ -118,26 +78,45 @@ a partir de un informe verificado con el código real.
   Action Scheduler o WP-Cron. «Cancelar generación» también cancela con
   WP-Cron. Aviso si WP-Cron está desactivado.
 
+### Support Genix
+
+- «Reinstalar filtros ahora» funciona aunque el servidor no tenga `php` en el
+  PATH: la sintaxis se comprueba dentro de PHP. La copia de seguridad se hace
+  solo tras pasar las comprobaciones y justo antes de escribir.
+- El filtro de relevancia que vaciaba los documentos cuando ninguna palabra de la
+  pregunta coincidía con un título queda desactivado por defecto, con una
+  casilla en la pestaña Genix para reactivarlo. Idioma no soportado, límite de
+  documentos relacionados y contacto siguen activos.
+- Guardar de nuevo el mismo prompt ya no muestra «Genix rechazó guardar la
+  opción».
+- El plugin acepta también la clave de Claude de Genix, según el proveedor que
+  use su chatbot.
+- Aviso de filtros perdidos: solo en las pantallas del plugin y en Plugins, lista
+  qué filtros faltan y se puede silenciar 24 horas.
+
 ### Avisos
 
-- Aviso del resumen público: solo si no existe resumen propio, con descarte
-  por usuario y con el nombre correcto del plugin.
-- Aviso de Support Genix: solo en las pantallas del plugin y en Plugins, lista
-  qué filtros faltan, se puede silenciar 24 horas y «Reinstalar filtros» no
-  escribe si no puede comprobar la sintaxis.
+- Aviso del resumen público: solo si no existe resumen propio, con descarte por
+  usuario y con el nombre correcto del plugin.
 
 ### Desinstalación
 
 - Dos opciones en Ajustes, desmarcadas por defecto: borrar los datos de la base
-  de datos y borrar los archivos generados (carpeta `llm/` y el `llms.txt`
-  creado por el plugin). `robots.txt` y `.htaccess` no se tocan.
-- El `llms.txt` físico lleva ahora al final un comentario que lo identifica
-  como generado por el plugin.
+  de datos y borrar los archivos generados (carpeta de documentos y el
+  `llms.txt` creado por el plugin). `robots.txt` y `.htaccess` no se tocan.
+- El `llms.txt` físico lleva al final un comentario que lo identifica como
+  generado por el plugin.
 
-### Visibilidad IA
+### Visibilidad IA y presentación
 
-- Los estados de cada bot pasan a «Permitido» y «Bloqueado»; los botones
-  masivos siguen como acción.
+- Los estados de cada bot pasan a «Permitido» y «Bloqueado»; los botones masivos
+  siguen como acción.
+- «Crear por idioma» usa el patrón del interruptor de llms.txt: recuadro con
+  interruptor, etiqueta ACTIVADO/DESACTIVADO y borde que se marca al activarlo.
+- `/llms.txt`: los encabezados del idioma principal ya no llevan el sufijo «(ES)»;
+  solo lo llevan los demás idiomas.
+- Los contenidos que no son productos y llevan campos personalizados ya no
+  muestran «Datos de compra»: su bloque se llama «Datos adicionales».
 
 ### Rendimiento
 
@@ -145,8 +124,8 @@ a partir de un informe verificado con el código real.
 
 ### Traducciones y documentación
 
-- 75 textos nuevos en catalán, alemán, inglés, euskera y francés (pendiente de
-  revisión lingüística y de compilar los `.mo` y JSON). Guía de usuario al día.
+- Textos nuevos en catalán, alemán, inglés, euskera y francés; catálogos `.mo` y
+  JSON de JavaScript actualizados. Guía de usuario al día.
 
 ## [1.3.2] - 2026-09-25
 
