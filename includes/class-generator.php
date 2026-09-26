@@ -224,6 +224,8 @@ class Generator {
 	 */
 	const PURCHASE_LABELS = array(
 		'heading'          => 'Datos de compra',
+		// Encabezado de los contenidos que no son producto (solo llevan campos personalizados).
+		'heading_other'    => 'Datos adicionales',
 		'h_price'          => 'Precio y disponibilidad',
 		'h_shipping'       => 'Envío',
 		'h_tax'            => 'Impuestos',
@@ -430,6 +432,9 @@ class Generator {
 			return '';
 		}
 
-		return '## ' . $l['heading'] . "\n\n" . implode( "\n\n", $sections );
+		// «Datos de compra» solo si es un producto; el resto de tipos, «Datos adicionales».
+		$heading = $p ? $l['heading'] : $l['heading_other'];
+
+		return '## ' . $heading . "\n\n" . implode( "\n\n", $sections );
 	}
 }

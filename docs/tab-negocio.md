@@ -57,6 +57,11 @@ Puedes:
 > paso 1 — son dos cosas independientes. Si el resumen se queda corto,
 > amplía primero los datos de arriba, guárdalos, y genera de nuevo.
 
+> Si todavía no has escrito este resumen, en las pantallas del plugin aparece
+> una sugerencia (no un error) explicando que es la cita de apertura pública de
+> `/llms.txt`; mientras tanto se usa el campo «Enfoque del negocio». Puedes
+> descartarla con «No volver a mostrar» (se recuerda por usuario).
+
 ## Preguntas frecuentes
 
 **¿Qué pasa si no relleno ningún dato aquí?**

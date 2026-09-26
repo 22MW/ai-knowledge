@@ -15,6 +15,8 @@ class Queue {
 	const HOOK_GENERATE = 'wookb_generate_document';
 	const HOOK_SEED      = 'wookb_seed_batch';
 	const HOOK_INTEGRITY = 'wookb_integrity_check';
+	/** Segundos entre lotes de una carga masiva (semillas). */
+	const SEED_BATCH_INTERVAL = 15;
 
 	public static function has_action_scheduler() {
 		return function_exists( 'as_schedule_single_action' ) && function_exists( 'as_unschedule_action' );
@@ -39,10 +41,16 @@ class Queue {
 	 * $force: si true, Document_Pipeline::process() regenera aunque el hash
 	 * del origen no haya cambiado (usado por "Reiniciar todo" en Carga
 	 * inicial, ver Admin::start_seed_force()).
+	 * $delay: segundos de espera; null = debounce de los ajustes (ediciones
+	 * sueltas), 0 = inmediato (semillas, ver run_seed_batch()).
 	 */
-	public static function enqueue( $source_id, $lang, $force = false ) {
-		$settings = Scope::settings();
-		$delay    = max( 0, (int) $settings['debounce_seconds'] );
+	public static function enqueue( $source_id, $lang, $force = false, $delay = null ) {
+		if ( null === $delay ) {
+			$settings = Scope::settings();
+			$delay    = max( 0, (int) $settings['debounce_seconds'] );
+		} else {
+			$delay = max( 0, (int) $delay );
+		}
 
 		$args = array( 'source_id' => (int) $source_id, 'lang' => $lang, 'force' => (bool) $force );
 
@@ -54,8 +62,6 @@ class Queue {
 			as_unschedule_action( self::HOOK_GENERATE, $args, self::GROUP );
 			as_schedule_single_action( time() + $delay, self::HOOK_GENERATE, $args, self::GROUP );
 		} else {
-			$lock_key = 'wookb_lock_' . $source_id . '_' . $lang;
-			set_transient( $lock_key, time(), $delay + 60 );
 			wp_schedule_single_event( time() + $delay, self::HOOK_GENERATE, array( $source_id, $lang, $force ) );
 		}
 
@@ -107,12 +113,18 @@ class Queue {
 	}
 
 	public static function run_seed_batch( $offset = 0, $force = false ) {
+		// Carga cancelada (o ya terminada): no encadenar más lotes, aunque quede
+		// un evento programado que no se pudo retirar.
+		if ( ! get_option( 'wookb_seed_running' ) ) {
+			return;
+		}
 		$settings = Scope::settings();
 		$ids      = Scope::resolve_ids();
 		$batch    = array_slice( $ids, $offset, (int) $settings['batch_size'] );
 
 		if ( empty( $batch ) ) {
-			return; // fin de la carga inicial
+			delete_option( 'wookb_seed_running' ); // fin de la carga inicial
+			return;
 		}
 
 		$seen = array();
@@ -128,15 +140,20 @@ class Queue {
 					continue;
 				}
 				$seen[ $key ] = true;
-				self::enqueue( $target['id'], $target['lang'], $force );
+				self::enqueue( $target['id'], $target['lang'], $force, 0 );
 			}
 		}
 
 		$next_offset = $offset + (int) $settings['batch_size'];
+		if ( $next_offset >= count( $ids ) ) {
+			// Ultimo lote: la carga masiva termina aqui (no se programa otro vacio).
+			delete_option( 'wookb_seed_running' );
+			return;
+		}
 		if ( self::has_action_scheduler() ) {
-			as_schedule_single_action( time() + 60, self::HOOK_SEED, array( 'offset' => $next_offset, 'force' => (bool) $force ), self::GROUP );
+			as_schedule_single_action( time() + self::SEED_BATCH_INTERVAL, self::HOOK_SEED, array( 'offset' => $next_offset, 'force' => (bool) $force ), self::GROUP );
 		} else {
-			wp_schedule_single_event( time() + 60, self::HOOK_SEED, array( $next_offset, $force ) );
+			wp_schedule_single_event( time() + self::SEED_BATCH_INTERVAL, self::HOOK_SEED, array( $next_offset, $force ) );
 		}
 	}
 
@@ -161,6 +178,19 @@ class Queue {
 		delete_option( 'wookb_seed_running' );
 		if ( self::has_action_scheduler() ) {
 			as_unschedule_all_actions( self::HOOK_SEED, array(), self::GROUP );
+		}
+		// WP-Cron: solo el hook de semillas (wookb_generate_document también lo
+		// usan los guardados normales y no se toca).
+		$crons = _get_cron_array();
+		if ( is_array( $crons ) ) {
+			foreach ( $crons as $timestamp => $hooks ) {
+				if ( ! isset( $hooks[ self::HOOK_SEED ] ) ) {
+					continue;
+				}
+				foreach ( $hooks[ self::HOOK_SEED ] as $event ) {
+					wp_unschedule_event( $timestamp, self::HOOK_SEED, isset( $event['args'] ) ? $event['args'] : array() );
+				}
+			}
 		}
 	}
 

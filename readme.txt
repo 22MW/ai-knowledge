@@ -4,7 +4,7 @@ Tags: woocommerce, chatbot, ia, llms.txt, wpml, crawlers, robots.txt
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.3.2
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -117,6 +117,9 @@ Sí. En **Visibilidad IA** selecciona el modo que permite únicamente `/llms.txt
 == Changelog ==
 
 Ver `CHANGELOG.md` para el historial completo y detallado de cambios.
+
+= 1.4.0 =
+Revisión del asistente y del servidor: comprobación real de la conexión de IA con lista de modelos, WooCommerce y resumen de Negocio en el asistente, robots.txt sin peticiones HTTP y «Crear robots.txt» con confirmación de riesgos, cola más rápida, carpeta de documentos `wp-content/ai-knowledge/` con los documentos del idioma principal en la raíz (migración y redirecciones automáticas), prompt del chatbot en una carpeta privada del plugin, arreglos de Support Genix (reinstalar filtros sin `php`, clave de Claude), idioma del asistente con WPML corregido y dos opciones de borrado al desinstalar.
 
 = 1.3.2 =
 Estrategia de idiomas: funciona con WPML, Polylang y TranslatePress y también sin plugin de idiomas. Un solo documento por contenido en el idioma principal, casilla «Crear por idioma», idioma principal e idiomas de la web en Negocio y en el asistente, URLs por idioma corregidas y «Reiniciar todo» con confirmación y limpieza. Botón del editor corregido. Traducciones y guía de usuario al día.

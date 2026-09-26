@@ -49,11 +49,53 @@ class Genix_Hooks_Guard {
 
 	const DISMISSED_OPTION = 'wookb_genix_hooks_dismissed_at';
 	const REINSTALL_ACTION = 'wookb_reinstall_genix_hooks';
+	const DISMISS_ACTION   = 'wookb_dismiss_genix_hooks';
 
 	public static function init() {
 		add_action( 'admin_notices', array( __CLASS__, 'maybe_notice' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'maybe_result_notice' ) );
 		add_action( 'admin_post_' . self::REINSTALL_ACTION, array( __CLASS__, 'handle_reinstall' ) );
+		add_action( 'admin_post_' . self::DISMISS_ACTION, array( __CLASS__, 'handle_dismiss' ) );
+	}
+
+	/**
+	 * Silencia el aviso 24 h (opción DISMISSED_OPTION, leída en maybe_notice()).
+	 * Solo escribe una marca de tiempo; no toca Genix.
+	 */
+	public static function handle_dismiss() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'No autorizado.', 'ai-knowledge' ) );
+		}
+		check_admin_referer( self::DISMISS_ACTION );
+		update_option( self::DISMISSED_OPTION, time(), false );
+		$back = wp_get_referer();
+		wp_safe_redirect( $back ? $back : admin_url( 'admin.php?page=ai-knowledge' ) );
+		exit;
+	}
+
+	/**
+	 * El aviso solo se muestra en las pantallas del plugin (id de pantalla con
+	 * «ai-knowledge») y en Plugins, no en todo wp-admin.
+	 */
+	protected static function is_notice_screen() {
+		if ( ! function_exists( 'get_current_screen' ) ) {
+			return false;
+		}
+		$screen = get_current_screen();
+		if ( ! $screen ) {
+			return false;
+		}
+		return 'plugins' === $screen->id || false !== strpos( (string) $screen->id, 'ai-knowledge' );
+	}
+
+	/** Etiqueta legible de cada parche que puede faltar. */
+	protected static function missing_label( $code ) {
+		$labels = array(
+			'search-results'      => __( 'relevancia de las búsquedas e idiomas no soportados (filtro search-results)', 'ai-knowledge' ),
+			'docs-list'           => __( 'límite de documentos relacionados (filtro docs-list)', 'ai-knowledge' ),
+			'custom-instructions' => __( 'prompt personalizado del sitio (bloque custom-instructions)', 'ai-knowledge' ),
+		);
+		return isset( $labels[ $code ] ) ? $labels[ $code ] : $code;
 	}
 
 	/**
@@ -75,7 +117,7 @@ class Genix_Hooks_Guard {
 		if ( ! empty( $result['error'] ) ) {
 			printf(
 				'<div class="notice notice-error is-dismissible"><p><strong>%1$s</strong> %2$s</p></div>',
-				esc_html__( 'WOO Knowledge Base Generator:', 'ai-knowledge' ),
+				esc_html__( 'AI Knowledge & Visibility:', 'ai-knowledge' ),
 				esc_html( $result['error'] )
 			);
 			return;
@@ -83,7 +125,7 @@ class Genix_Hooks_Guard {
 
 		printf(
 			'<div class="notice notice-success is-dismissible"><p><strong>%1$s</strong> %2$s</p></div>',
-			esc_html__( 'WOO Knowledge Base Generator:', 'ai-knowledge' ),
+			esc_html__( 'AI Knowledge & Visibility:', 'ai-knowledge' ),
 			esc_html__( 'Filtros del chatbot reinstalados correctamente en Support Genix.', 'ai-knowledge' )
 		);
 	}
@@ -144,7 +186,7 @@ class Genix_Hooks_Guard {
 	}
 
 	public static function maybe_notice() {
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( 'manage_options' ) || ! self::is_notice_screen() ) {
 			return;
 		}
 		$missing = self::missing_filters();
@@ -173,21 +215,29 @@ class Genix_Hooks_Guard {
 			'lite' => __( 'Support Genix Lite', 'ai-knowledge' ),
 			'pro'  => __( 'Support Genix Pro', 'ai-knowledge' ),
 		);
-		$affected_names = array();
-		foreach ( array_keys( $affected ) as $label ) {
-			$affected_names[] = isset( $labels[ $label ] ) ? $labels[ $label ] : $label;
+		$list = '';
+		foreach ( $affected as $label => $codes ) {
+			$name = isset( $labels[ $label ] ) ? $labels[ $label ] : $label;
+			$items = array();
+			foreach ( $codes as $code ) {
+				$items[] = esc_html( self::missing_label( $code ) );
+			}
+			$list .= '<li><strong>' . esc_html( $name ) . ':</strong> ' . implode( '; ', $items ) . '.</li>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapado arriba.
 		}
 
+		$dismiss = '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="wookb-toolbar-form">'
+			. '<input type="hidden" name="action" value="' . esc_attr( self::DISMISS_ACTION ) . '" />'
+			. wp_nonce_field( self::DISMISS_ACTION, '_wpnonce', true, false )
+			. '<button type="submit" class="button">' . esc_html__( 'Silenciar 24 horas', 'ai-knowledge' ) . '</button></form>';
+
 		printf(
-			'<div class="notice notice-warning"><p><strong>%1$s</strong> %2$s</p><p><a href="%3$s" class="button button-primary">%4$s</a></p></div>',
-			esc_html__( 'WOO Knowledge Base Generator:', 'ai-knowledge' ),
-			sprintf(
-				/* translators: %s: nombres de los plugins afectados (Support Genix Lite y/o Pro) */
-				esc_html__( '%s ha perdido los filtros que conectan nuestras mejoras del chatbot (probablemente por una actualización del plugin). El chatbot sigue funcionando, pero sin relevancia mejorada, idiomas no soportados, límite de documentos relacionados, ni el prompt personalizado del sitio.', 'ai-knowledge' ),
-				esc_html( implode( ' / ', $affected_names ) )
-			),
+			'<div class="notice notice-warning"><p><strong>%1$s</strong> %2$s</p><ul>%3$s</ul><p><a href="%4$s" class="button button-primary">%5$s</a></p>%6$s</div>',
+			esc_html__( 'AI Knowledge & Visibility:', 'ai-knowledge' ),
+			esc_html__( 'Support Genix ha perdido los filtros que conectan nuestras mejoras del chatbot (probablemente por una actualización del plugin). El chatbot sigue funcionando, pero le faltan estas mejoras:', 'ai-knowledge' ),
+			$list, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapado arriba.
 			esc_url( $url ),
-			esc_html__( 'Reinstalar filtros ahora', 'ai-knowledge' )
+			esc_html__( 'Reinstalar filtros ahora', 'ai-knowledge' ),
+			$dismiss // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML propio escapado arriba.
 		);
 	}
 
@@ -226,14 +276,8 @@ class Genix_Hooks_Guard {
 
 		$content = file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 
-		$backup_dir = WP_CONTENT_DIR . '/db-backup';
-		if ( ! is_dir( $backup_dir ) ) {
-			wp_mkdir_p( $backup_dir );
-		}
-		$backup_path = $backup_dir . '/genix-chatquery-trait-backup-' . basename( dirname( dirname( $path ) ) ) . '-' . gmdate( 'Y-m-d_H-i' ) . '.php';
-		file_put_contents( $backup_path, $content ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_put_contents
-
-		$changed = false;
+		$original = $content;
+		$changed  = false;
 
 		if ( false === strpos( $content, self::FILTER_SEARCH_RESULTS ) ) {
 			$anchor = '$docs = $is_smalltalk ? [] : $this->search_chatbot_docs($query);';
@@ -293,6 +337,16 @@ class Genix_Hooks_Guard {
 			return $syntax_ok;
 		}
 
+		// Copia de seguridad SOLO tras pasar todas las comprobaciones y justo antes de escribir.
+		$backup_dir = WP_CONTENT_DIR . '/db-backup';
+		if ( ! is_dir( $backup_dir ) ) {
+			wp_mkdir_p( $backup_dir );
+		}
+		$backup_path = $backup_dir . '/genix-chatquery-trait-backup-' . basename( dirname( dirname( $path ) ) ) . '-' . gmdate( 'Y-m-d_H-i' ) . '.php';
+		if ( false === file_put_contents( $backup_path, $original ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_put_contents
+			return new \WP_Error( 'wookb_genix_backup_failed', __( 'No se pudo crear la copia de seguridad; no se ha escrito nada en Support Genix.', 'ai-knowledge' ) );
+		}
+
 		$ok = file_put_contents( $path, $content ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_put_contents
 		if ( false === $ok ) {
 			return new \WP_Error( 'wookb_genix_write_failed', __( 'No se pudo escribir el archivo de Support Genix.', 'ai-knowledge' ) . ' (' . $path . ')' );
@@ -308,27 +362,42 @@ class Genix_Hooks_Guard {
 	 * una comprobacion real de sintaxis se usa php -l si esta disponible.
 	 */
 	protected static function check_syntax( $content ) {
+		// 1) Dentro de PHP, sin shell: el tokenizer analiza el codigo completo.
+		if ( function_exists( 'token_get_all' ) && defined( 'TOKEN_PARSE' ) ) {
+			try {
+				token_get_all( $content, TOKEN_PARSE );
+				return true;
+			} catch ( \ParseError $e ) {
+				return new \WP_Error( 'wookb_genix_syntax_error', __( 'La comprobación de sintaxis PHP falló tras insertar los filtros. No se ha escrito nada.', 'ai-knowledge' ) . ' ' . $e->getMessage() . ' (' . (int) $e->getLine() . ')' );
+			}
+		}
+
+		// 2) Sin tokenizer: php -l por shell; 3) si tampoco, error controlado sin escribir.
+		$unverifiable = new \WP_Error( 'wookb_genix_syntax_unverifiable', __( 'No se puede comprobar la sintaxis PHP en este servidor (shell_exec o php no disponibles). Por seguridad no se ha escrito nada en Support Genix; aplica el parche a mano.', 'ai-knowledge' ) );
 		if ( ! function_exists( 'shell_exec' ) || ! function_exists( 'escapeshellarg' ) ) {
-			return true; // No se puede verificar; se confia en el reemplazo por anclaje textual.
+			return $unverifiable; // No se puede verificar: no se escribe.
 		}
 		$tmp = wp_tempnam( 'wookb-genix-check' );
 		file_put_contents( $tmp, $content ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_put_contents
 		$output = shell_exec( 'php -l ' . escapeshellarg( $tmp ) . ' 2>&1' );
 		unlink( $tmp ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
 
+		if ( null === $output || '' === trim( (string) $output ) || false !== stripos( (string) $output, 'not found' ) ) {
+			return $unverifiable;
+		}
+		if ( false !== strpos( $output, 'No syntax errors detected' ) ) {
+			return true;
+		}
+
 		// La CLI de "php" del servidor puede ser una version distinta e
 		// incompatible con la que sirve el sitio real (confirmado en este
 		// mismo proyecto): si el error es justo el de "arrays en constantes
 		// de clase" de PHP<5.6, es un falso positivo del binario CLI, no del
 		// archivo. Cualquier otro error de sintaxis SI bloquea la escritura.
-		if ( $output && false === strpos( $output, 'No syntax errors detected' ) ) {
-			if ( false !== strpos( $output, 'Arrays are not allowed in class constants' ) ) {
-				return true;
-			}
-			return new \WP_Error( 'wookb_genix_syntax_error', __( 'La comprobación de sintaxis PHP falló tras insertar los filtros. No se ha escrito nada.', 'ai-knowledge' ) . ' ' . $output );
+		if ( false !== strpos( $output, 'Arrays are not allowed in class constants' ) ) {
+			return true;
 		}
-
-		return true;
+		return new \WP_Error( 'wookb_genix_syntax_error', __( 'La comprobación de sintaxis PHP falló tras insertar los filtros. No se ha escrito nada.', 'ai-knowledge' ) . ' ' . $output );
 	}
 
 	public static function handle_reinstall() {

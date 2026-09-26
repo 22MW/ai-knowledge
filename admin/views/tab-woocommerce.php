@@ -20,47 +20,20 @@ $store_docs_err = get_transient( 'wookb_store_docs_error' );
 // Los documentos de tienda solo se generan en el idioma principal (ver Store_Info_Doc::generate_all()).
 $langs        = array( Languages::main_language() );
 
-$base_country_code = WC()->countries ? WC()->countries->get_base_country() : '';
-$countries_list     = WC()->countries ? WC()->countries->get_countries() : array();
-$base_country_label = isset( $countries_list[ $base_country_code ] ) ? $countries_list[ $base_country_code ] : $base_country_code;
-
-$terms_page_id  = (int) get_option( 'woocommerce_terms_page_id' );
-$refund_page_id = function_exists( 'wc_get_page_id' ) ? wc_get_page_id( 'refund_returns' ) : 0;
+// Valores con comportamiento «snapshot» (guardado -> si no, en vivo de WooCommerce),
+// compartidos con el paso del asistente: ver Admin::woocommerce_values().
+$wc_values      = Admin::woocommerce_values();
+$terms_page_id  = (int) $wc_values['terms_page_id'];
+$refund_page_id = (int) $wc_values['refund_page_id'];
 
 $contact_answers = class_exists( '\AIKB\Chatbot_Prompt_Builder' ) ? Chatbot_Prompt_Builder::get_saved_answers() : array();
 $contact_text     = isset( $contact_answers['contacto'] ) ? trim( (string) $contact_answers['contacto'] ) : '';
 
-// Valores en vivo de WooCommerce, usados solo como precarga de los campos
-// editables de abajo cuando todavia no hay nada guardado -- ver Scope::settings()
-// (wc_store_name/wc_currency/wc_base_country/wc_terms_text/wc_returns_text):
-// una vez guardado, el campo ya no vuelve a leer esto, vive con lo guardado.
-$live_currency = '';
-if ( function_exists( 'get_woocommerce_currency' ) ) {
-	$live_currency = get_woocommerce_currency();
-	if ( function_exists( 'get_woocommerce_currency_symbol' ) ) {
-		$live_currency .= ' (' . get_woocommerce_currency_symbol() . ')';
-	}
-}
-$live_terms_text = '';
-if ( $terms_page_id > 0 ) {
-	$terms_post = get_post( $terms_page_id );
-	if ( $terms_post && 'publish' === $terms_post->post_status ) {
-		$live_terms_text = trim( preg_replace( '/\s+/', ' ', wp_strip_all_tags( $terms_post->post_content ) ) );
-	}
-}
-$live_returns_text = '';
-if ( $refund_page_id > 0 ) {
-	$refund_post = get_post( $refund_page_id );
-	if ( $refund_post && 'publish' === $refund_post->post_status ) {
-		$live_returns_text = trim( preg_replace( '/\s+/', ' ', wp_strip_all_tags( $refund_post->post_content ) ) );
-	}
-}
-
-$store_name_value = '' !== $settings['wc_store_name'] ? $settings['wc_store_name'] : get_bloginfo( 'name' );
-$currency_value    = '' !== $settings['wc_currency'] ? $settings['wc_currency'] : $live_currency;
-$country_value     = '' !== $settings['wc_base_country'] ? $settings['wc_base_country'] : $base_country_label;
-$terms_value       = '' !== $settings['wc_terms_text'] ? $settings['wc_terms_text'] : $live_terms_text;
-$returns_value     = '' !== $settings['wc_returns_text'] ? $settings['wc_returns_text'] : $live_returns_text;
+$store_name_value = $wc_values['wc_store_name'];
+$currency_value   = $wc_values['wc_currency'];
+$country_value    = $wc_values['wc_base_country'];
+$terms_value      = $wc_values['wc_terms_text'];
+$returns_value    = $wc_values['wc_returns_text'];
 ?>
 
 <p class="description">
@@ -246,7 +219,7 @@ $returns_value     = '' !== $settings['wc_returns_text'] ? $settings['wc_returns
 			<th><?php esc_html_e( 'Recogida en tienda', 'ai-knowledge' ); ?></th>
 			<td>
 				<label class="wookb-chip">
-					<input type="checkbox" name="wc_pickup_available" value="1" <?php checked( ! empty( $settings['wc_pickup_available'] ) ); ?> />
+					<input type="checkbox" name="wc_pickup_available" value="1" <?php checked( ! empty( $wc_values['wc_pickup_available'] ) ); ?> />
 					<?php esc_html_e( 'Disponible', 'ai-knowledge' ); ?>
 				</label>
 				<p class="description"><?php esc_html_e( 'Solo se usa si ningún método de envío marcado arriba es de tipo "Recogida local" de WooCommerce (si lo es, se detecta solo).', 'ai-knowledge' ); ?></p>

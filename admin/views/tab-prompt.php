@@ -46,6 +46,13 @@ if ( false === $draft ) {
 				<p class="description"><?php esc_html_e( 'Máximo de enlaces mostrados bajo la respuesta del chatbot. 0 = sin límite.', 'ai-knowledge' ); ?></p>
 			</td>
 		</tr>
+		<tr>
+			<th><?php esc_html_e( 'Filtro de relevancia por título', 'ai-knowledge' ); ?></th>
+			<td>
+				<label><input type="checkbox" name="chatbot_relevance_filter" value="1" <?php checked( ! empty( $settings['chatbot_relevance_filter'] ) ); ?> /> <?php esc_html_e( 'Ocultar los documentos cuando ninguna palabra de la pregunta coincide con un título', 'ai-knowledge' ); ?></label>
+				<p class="description"><?php esc_html_e( 'Desactivado por defecto. Al activarlo, puede ocultar documentos cuyo contenido responde a la pregunta pero cuyo título no coincide (por ejemplo, «envíos a Canarias» con un documento titulado «Información de tienda»). Genix ya filtra por su cuenta los resultados poco relacionados.', 'ai-knowledge' ); ?></p>
+			</td>
+		</tr>
 	</table>
 	<?php submit_button( __( 'Guardar ajustes del chat', 'ai-knowledge' ) ); ?>
 </form>

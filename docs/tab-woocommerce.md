@@ -11,8 +11,12 @@ propios (cómo comprar, condiciones, envío y pago, catálogo) para que el
 chatbot y los buscadores de IA la conozcan de verdad.
 
 WooCommerce te lo **detecta todo solo** la primera vez que abres esta
-pantalla, pero cada campo es editable: una vez que guardas algo, ese
-valor se queda fijo aunque después cambies o borres algo en WooCommerce.
+pantalla (nombre, moneda, país, condiciones, devoluciones y la recogida local
+si la tienes), pero cada campo es editable: una vez que guardas algo, ese
+valor se queda fijo aunque después cambies o borres algo en WooCommerce. El
+asistente de configuración funciona igual (mismos valores, mismo criterio).
+La **dirección** de la tienda de WooCommerce se copia al campo «Dirección» de
+[Negocio](tab-negocio.md) al guardar, solo si ese campo está vacío.
 
 [SCREENSHOT: pestaña WooCommerce con los datos generales precargados]
 

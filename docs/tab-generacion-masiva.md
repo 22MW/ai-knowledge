@@ -16,6 +16,8 @@ Antes de generar nada, esta pantalla te dice:
 - Cuántos ya están sincronizados.
 - Tu límite diario actual (o un aviso bien visible si lo tienes
   desactivado).
+- El estado de la generación: documentos por estado (En cola, Generando,
+  Listo, Error), enlace al Registro y el botón «Procesar ahora».
 
 [SCREENSHOT: resumen de alcance con el contador de documentos posibles]
 
@@ -58,20 +60,29 @@ forzar una regeneración completa (por ejemplo, tras cambiar el largo del
 texto en [Ajustes](tab-ajustes.md) y querer que todo el catálogo se
 adapte al nuevo tamaño).
 
-> Mientras hay una generación en curso, verás un aviso y un botón para
-> **cancelarla** en cualquier momento.
+> Mientras hay una generación en curso, verás un aviso (que indica si se
+> procesa con Action Scheduler o con WP-Cron) y un botón para **cancelarla**
+> en cualquier momento. Al terminar el último lote, la generación deja de
+> figurar «en curso» sola. Cancelar también retira los lotes pendientes de
+> WP-Cron.
 
 ## Cómo funciona por dentro (para que no te asustes si tarda)
 
 La generación no ocurre toda de golpe: se procesa **por lotes**, en
 segundo plano, usando el sistema de tareas programadas de WordPress
-(Action Scheduler). Puedes seguir el progreso en detalle desde
+(Action Scheduler si lo tienes, por ejemplo con WooCommerce; si no, WP-Cron).
+WP-Cron solo avanza cuando alguien visita la web, así que en un sitio sin
+visitas (o con `DISABLE_WP_CRON`, sobre lo que el plugin avisa) puede quedarse
+«En cola»: el botón **«Procesar ahora»** procesa hasta 20 documentos por clic.
+Puedes seguir el progreso en detalle desde
 **Herramientas → Scheduled Actions** (grupo `woo-kb`), aunque para el uso
 normal te basta con mirar la pestaña [Registro](tab-registro.md).
 
 ## Ajustes de la cola
 
-Tres valores que controlan el ritmo de generación:
+Valores que controlan el ritmo de generación. Por defecto: 50 documentos por
+lote, un lote cada 15 segundos y la carga masiva empieza sin espera (los
+valores que ya tuvieras guardados no cambian):
 
 - **Límite diario de generaciones** — el techo de documentos que se
   generan por día. Puedes marcar "Sin límite" para cargas manuales
@@ -79,8 +90,17 @@ Tres valores que controlan el ritmo de generación:
   desactivarlo al terminar, o seguirá sin límite indefinidamente.
 - **Tamaño de lote** — cuántos documentos se procesan juntos en cada
   ejecución.
-- **Retraso de debounce** — un pequeño margen de espera para no saturar
-  el servidor con peticiones seguidas.
+- **Retraso de debounce** — un margen de espera (300 s por defecto) que solo
+  se aplica a las ediciones sueltas, para no saturar el servidor con guardados
+  seguidos. La carga masiva no espera.
+
+## Dónde se guardan los documentos
+
+Los `.md` del **idioma principal** viven directamente en `wp-content/ai-knowledge/` (URL `/ai-knowledge-doc/{nombre}.md`); los de otros idiomas (solo con «Crear por idioma») van en `wp-content/ai-knowledge/{idioma}/`. La carpeta antes se llamaba `wp-content/llm/` y el idioma principal iba en su propia subcarpeta: al actualizar, el plugin lo migra solo y las URL antiguas redirigen (301). Si cambias el idioma principal, pulsa **Reiniciar todo** para recolocar los documentos (los de idiomas que dejan de corresponder se borran). Al
+actualizar, el plugin renombra la carpeta antigua automáticamente; si el
+servidor no lo permite, sigue usando la antigua sin romper nada. Las URL
+antiguas `wp-content/llm/...` redirigen (301) a la nueva cuando el archivo ya
+no existe en la ruta vieja.
 
 ## Preguntas frecuentes
 

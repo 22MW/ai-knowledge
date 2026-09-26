@@ -65,7 +65,7 @@ tradicionales, servicios de archivado y scanners automatizados. Puedes filtrar
 la lista por tipo y por estado sin recargar la página, y combinar ambos filtros.
 
 Un catálogo de crawlers de IA conocidos, agrupados por su propósito, con
-una acción por cada uno: **permitir** o **bloquear**. Esta configuración
+una acción por cada uno: **Permitido** o **Bloqueado**. Esta configuración
 es la que alimenta tanto el bloqueo por `robots.txt` como el bloqueo real
 por `.htaccess` de más abajo.
 
@@ -73,8 +73,11 @@ por `.htaccess` de más abajo.
 
 `robots.txt` es una petición educada: la mayoría de bots serios la
 respetan, pero técnicamente un bot puede ignorarla. El plugin muestra el
-archivo actual y una propuesta completa antes de guardar. Antes de aplicar
-el cambio, **te obliga a descargar una copia de seguridad**. Esa copia vale 10
+archivo actual y una propuesta completa antes de guardar. El «actual» es el
+archivo físico si existe o, si no, el `robots.txt` virtual que genera
+WordPress (se indica cuál es; se lee sin hacer ninguna petición HTTP). Con un
+archivo físico, antes de aplicar el cambio **te obliga a descargar una copia de
+seguridad**. Esa copia vale 10
 minutos y solo para la pantalla en la que la descargaste: si recargas la página
 o vuelves desde otra, hay que descargarla otra vez. Lo mismo ocurre con
 `.htaccess`.
@@ -86,7 +89,7 @@ un bloque propio. En cada actualización sustituye entero solo ese bloque.
 ### Bloqueo real por .htaccess
 
 Esto sí es un bloqueo de verdad a nivel de servidor: si un bot marcado
-como "Bloquear" en la tabla intenta acceder, el servidor rechaza la
+como "Bloqueado" en la tabla intenta acceder, el servidor rechaza la
 petición directamente, la respete o no.
 
 El interruptor **«Incluir llms.txt para los modelos desactivados»** decide
@@ -140,14 +143,24 @@ cuando cambian los documentos o los datos que alimentan el archivo.
 No siempre — algunos bots lo ignoran. Si quieres una garantía real, usa
 también el bloqueo por `.htaccess`, que actúa a nivel de servidor.
 
+**¿Y si no hay un robots.txt físico?**
+Es lo normal: WordPress genera uno virtual. No hace falta copia. El botón
+**«Crear robots.txt»** (con la casilla de aceptación de riesgos y una
+confirmación) guarda un archivo real en la raíz con el contenido actual de
+WordPress más el bloque de AI Knowledge. Ese archivo **sustituye** al que genera
+WordPress: las reglas que añadan en el futuro plugins SEO o WooCommerce dejarán
+de aplicarse salvo que las edites a mano. Se deshace borrando el archivo.
+Conviene probarlo antes en un entorno de pruebas (staging) o tener una copia del
+sitio.
+
 **¿Por qué me pide descargar una copia antes de cambiar robots.txt?**
-Porque es un archivo real del sitio. La copia te permite restaurar la
+(Solo cuando ya existe un archivo físico.) Porque es un archivo real del sitio. La copia te permite restaurar la
 versión anterior si algo sale mal. Para `.htaccess`, además, el plugin te
 entrega el archivo completo para que lo revises y lo sustituyas manualmente.
 
 **¿Este bloqueo afecta también a Google?**
 No de forma especial: solo afecta a los bots que tú marques como
-"Bloquear" en el catálogo. Los buscadores clásicos que quieras seguir
+«Bloqueado» en el catálogo. Los buscadores clásicos que quieras seguir
 permitiendo, simplemente no los marques.
 
 ---

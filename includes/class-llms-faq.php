@@ -154,6 +154,7 @@ class Llms_Faq {
 		// FAQ ya solo se publica en el idioma principal (ver los llamadores
 		// de este metodo), no en cada idioma activo -- el apartado "Idiomas" dice
 		// en que idioma esta y donde encontrar los demas.
+		$old_md_path = $existing ? $existing->md_path : '';
 		$title      = self::title();
 		$section    = Languages::site_section( $lang );
 		$markdown   = "# {$title}\n\n" . $content . ( '' === $section ? '' : "\n\n" . $section );
@@ -185,6 +186,8 @@ class Llms_Faq {
 			}
 		}
 
+		// Si la ruta cambio (p. ej. otro idioma principal), no dejar el .md antiguo huerfano.
+		Markdown_Store::delete_if_moved( $old_md_path, $relative );
 		Registry::upsert(
 			array(
 				'source_id'    => self::SOURCE_ID,

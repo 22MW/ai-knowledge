@@ -2534,3 +2534,361 @@ msgstr ""
 #: assets/admin.js:610
 msgid "Si hay documentos pendientes, la auditoría será más completa cuando terminen de generarse."
 msgstr ""
+
+#: admin/class-admin.php
+msgid "Revisa los datos generales de la tienda, el país, la moneda, las condiciones de compra, la recogida, los plazos y el contacto. Los datos se precargan con lo que ya tiene WooCommerce. Al guardar, se generan los documentos de información de tienda (se componen sin IA). Los envíos, impuestos, pagos, categorías y otras opciones avanzadas pueden completarse después en una ventana nueva sin perder el progreso."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Configura cómo Support Genix utilizará la base de conocimiento, cuántos documentos relacionados podrá consultar y qué información adicional debe tener en cuenta. Al guardar, si todavía no existe el prompt del chatbot se crea uno predeterminado a partir de tus respuestas (con IA si hay conexión; si no, con una plantilla), y se sincroniza con Genix. Este paso solo aparece cuando la integración está disponible."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Comprueba si robots.txt y .htaccess difieren de la configuración guardada. Muestra el robots.txt actual (archivo físico o el generado por WordPress). Con un robots.txt físico exige descargar antes una copia; sin él puedes crearlo tras aceptar los riesgos. Reemplazar .htaccess exige copia descargada y una casilla de responsabilidad."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "robots.txt actual"
+msgstr ""
+
+#: admin/class-admin.php
+msgid "No hay un robots.txt físico: WordPress genera uno virtual."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "No hace falta copia de seguridad. Al crearlo se guarda un archivo real en la raíz del sitio con el contenido actual de WordPress más el bloque de AI Knowledge. Ese archivo sustituye al que genera WordPress: las reglas que añadan en el futuro plugins SEO o WooCommerce dejarán de aplicarse salvo que las edites a mano en el archivo. Se puede deshacer borrando el archivo. Es recomendable probarlo antes en un entorno de pruebas (staging) o tener una copia del sitio."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "He leído los riesgos y quiero crear el robots.txt físico."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Crear robots.txt"
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Modelo (Conectores de WordPress)"
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Solo se usa con el origen «Conectores de WordPress». Con Support Genix el modelo se elige en Genix."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Aviso: con «Sin límite diario» marcado, el gasto de IA no tiene tope."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "La generación masiva puede hacer muchas llamadas a tu proveedor de IA y costar dinero. Desmárcalo y fija un límite diario si quieres controlar el gasto."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Los campos se precargan con lo que ya tiene WooCommerce. Al guardar quedan como datos propios del plugin y a partir de entonces se muestra lo guardado. Si el campo «Dirección» de Negocio está vacío, se rellena con la dirección de la tienda."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Permitido"
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Bloqueado"
+msgstr ""
+
+#: admin/class-admin.php
+#, php-format
+msgid "Conexión de IA disponible (origen: %1$s, modelo: %2$s): los pasos siguientes podrán generar contenido real."
+msgstr ""
+
+#: admin/class-admin.php
+#, php-format
+msgid "Support Genix usa el modelo %s (solo lectura). Para cambiarlo, hazlo en los ajustes de Support Genix."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Probar conexión"
+msgstr ""
+
+#: admin/class-admin.php
+msgid "«Probar conexión» hace una llamada mínima a la IA (consume unos pocos tokens) y solo se ejecuta cuando pulsas el botón."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "No hay una conexión de IA utilizable."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Puedes continuar sin problema: los pasos que generan contenido guardarán tus datos igual, pero no generarán nada con IA hasta que conectes un origen (Conectores de WordPress o Support Genix) y vuelvas a guardar."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "La IA ha respondido correctamente."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Se ha creado un prompt predeterminado con IA a partir de tus respuestas. Puedes afinarlo después en la pestaña Genix."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Se ha creado un prompt predeterminado a partir de tus respuestas (sin IA). Puedes afinarlo después en la pestaña Genix."
+msgstr ""
+
+#: admin/class-admin.php
+#, php-format
+msgid "La IA no pudo redactar el prompt (%s); se ha usado la plantilla."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Action Scheduler"
+msgstr ""
+
+#: admin/class-admin.php
+msgid "WP-Cron"
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Por estado:"
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Ver el Registro"
+msgstr ""
+
+#: admin/class-admin.php
+#, php-format
+msgid "La generación continúa en segundo plano (%s) y puede tardar. Que los documentos aparezcan «En cola» justo al terminar es normal."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "WP-Cron está desactivado en este sitio (DISABLE_WP_CRON): la cola solo avanza si el servidor tiene un cron real que lo ejecute. Si no, usa «Procesar ahora»."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Procesar ahora"
+msgstr ""
+
+#: admin/class-admin.php
+#, php-format
+msgid "Procesa hasta %d documentos en cola por clic, sin esperar al proceso en segundo plano."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Modelos desactivados = los bots que has marcado como Bloqueado en la tabla de crawlers."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Generación en curso (procesando por lotes vía WP-Cron)."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "No se pudo leer el robots.txt actual para generar la copia de seguridad."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Para crear el robots.txt físico tienes que aceptar los riesgos indicados (casilla de aceptación)."
+msgstr ""
+
+#: admin/views/tab-visibilidad-ia.php
+msgid "No hace falta copia de seguridad. Si pulsas «Crear robots.txt», se crea un archivo real en la raíz del sitio con el contenido actual de WordPress más el bloque de AI Knowledge. Ese archivo sustituye al que genera WordPress: las reglas que añadan en el futuro plugins SEO o WooCommerce dejarán de aplicarse salvo que las edites a mano en el archivo. Se puede deshacer borrando el archivo. Es recomendable probarlo antes en un entorno de pruebas (staging) o tener una copia del sitio."
+msgstr ""
+
+#: admin/views/tab-visibilidad-ia.php
+msgid "Vas a crear un robots.txt físico en la raíz del sitio. Sustituirá al que genera WordPress: las reglas futuras de plugins SEO o WooCommerce no se aplicarán salvo que las edites a mano. Se puede deshacer borrando el archivo. ¿Quieres continuar?"
+msgstr ""
+
+#: admin/views/tab-visibilidad-ia.php
+msgid "Vas a modificar el robots.txt real del sitio con los bots marcados como Bloqueado en la tabla de arriba. ¿Confirmas que ya descargaste la copia y quieres continuar?"
+msgstr ""
+
+#: admin/views/tab-visibilidad-ia.php
+msgid "robots.txt comunica preferencias de rastreo, pero un bot puede ignorarlas. Estas reglas rechazan en el servidor las solicitudes que se identifican como alguno de los bots marcados como Bloqueado."
+msgstr ""
+
+#: admin/views/tab-carga-inicial.php
+#, php-format
+msgid "Solo se aplica a las ediciones sueltas. La carga masiva empieza sin espera y encadena un lote cada %d segundos."
+msgstr ""
+
+#: admin/views/tab-ajustes.php
+msgid "Al eliminar el plugin"
+msgstr ""
+
+#: admin/views/tab-ajustes.php
+msgid "Por defecto, al eliminar el plugin se conserva todo salvo la tabla de documentos y los ajustes principales. Puedes marcar cualquiera de estas dos opciones (ambas desmarcadas por defecto). Son irreversibles: haz una copia de seguridad antes."
+msgstr ""
+
+#: admin/views/tab-ajustes.php
+msgid "Borrar datos de la base de datos"
+msgstr ""
+
+#: admin/views/tab-ajustes.php
+msgid "Borra las tablas de documentos y de registro de crawlers, todos los ajustes y opciones del plugin (respuestas de Negocio y chatbot, resumen público, idiomas, estado del asistente…), los datos temporales, las acciones pendientes de la cola y los eventos programados, y las copias «sgkb-docs» de Support Genix que tengan una fila en el Registro. No borra los artículos exclusivos de Genix ni el ajuste «chatbot_custom_instructions» de Genix."
+msgstr ""
+
+#: admin/views/tab-ajustes.php
+msgid "Borrar archivos generados"
+msgstr ""
+
+#: admin/views/tab-ajustes.php
+msgid "Borra la carpeta wp-content/llm/ (documentos .md, FAQ e info.md) y el llms.txt de la raíz solo si lo creó este plugin (uno propio tuyo se respeta). NO toca robots.txt ni .htaccess: las reglas de bloqueo de AI Knowledge seguirán activas tras desinstalar, hasta que las quites a mano."
+msgstr ""
+
+#: includes/class-genix-hooks-guard.php
+msgid "relevancia de las búsquedas e idiomas no soportados (filtro search-results)"
+msgstr ""
+
+#: includes/class-genix-hooks-guard.php
+msgid "límite de documentos relacionados (filtro docs-list)"
+msgstr ""
+
+#: includes/class-genix-hooks-guard.php
+msgid "prompt personalizado del sitio (bloque custom-instructions)"
+msgstr ""
+
+#: includes/class-genix-hooks-guard.php
+msgid "AI Knowledge & Visibility:"
+msgstr ""
+
+#: includes/class-genix-hooks-guard.php
+msgid "Silenciar 24 horas"
+msgstr ""
+
+#: includes/class-genix-hooks-guard.php
+msgid "Support Genix ha perdido los filtros que conectan nuestras mejoras del chatbot (probablemente por una actualización del plugin). El chatbot sigue funcionando, pero le faltan estas mejoras:"
+msgstr ""
+
+#: includes/class-genix-hooks-guard.php
+msgid "No se puede comprobar la sintaxis PHP en este servidor (shell_exec o php no disponibles). Por seguridad no se ha escrito nada en Support Genix; aplica el parche a mano."
+msgstr ""
+
+#: includes/class-robots-txt-guard.php
+msgid "No se pudo leer el archivo robots.txt físico de la raíz del sitio."
+msgstr ""
+
+#: includes/class-robots-txt-guard.php
+msgid "WordPress no ha podido generar el robots.txt virtual en este momento."
+msgstr ""
+
+#: includes/class-robots-txt-guard.php
+msgid "Archivo físico"
+msgstr ""
+
+#: includes/class-robots-txt-guard.php
+msgid "Generado por WordPress (no hay archivo físico)"
+msgstr ""
+
+#: includes/class-chatbot-prompt-builder.php
+#, php-format
+msgid "Identidad: eres el asistente virtual de %s. Responde solo con la información de su base de conocimiento."
+msgstr ""
+
+#: includes/class-chatbot-prompt-builder.php
+msgid "Precisión: no inventes datos, precios ni políticas que no estén en la información disponible."
+msgstr ""
+
+#: includes/class-chatbot-prompt-builder.php
+#, php-format
+msgid "Todavía no has escrito el resumen público de tu negocio. Es la cita de apertura pública de /llms.txt: lo primero que leen las IA sobre ti. Mientras no lo escribas se usa el campo «Enfoque del negocio», que puede ser muy breve. Es solo una sugerencia: no rompe nada si lo ignoras. %s"
+msgstr ""
+
+#: includes/class-chatbot-prompt-builder.php
+msgid "No volver a mostrar"
+msgstr ""
+
+#: includes/class-ai-client.php
+msgid "Los Conectores de WordPress requieren WordPress 7.0 o superior."
+msgstr ""
+
+#: includes/class-ai-client.php
+msgid "Los Conectores de WordPress no están disponibles o la IA está desactivada en este sitio."
+msgstr ""
+
+#: includes/class-ai-client.php
+msgid "No hay modelos de texto conectados en Conectores de WordPress."
+msgstr ""
+
+#: includes/class-ai-client.php
+msgid "El modelo elegido ya no está disponible en Conectores de WordPress."
+msgstr ""
+
+#: includes/class-ai-client.php
+msgid "Support Genix no está activo."
+msgstr ""
+
+#: includes/class-ai-client.php
+msgid "Support Genix no tiene una clave de OpenAI configurada."
+msgstr ""
+
+#: assets/admin.js
+msgid "Probando…"
+msgstr ""
+
+#: assets/admin.js
+msgid "No se pudo probar la conexión."
+msgstr ""
+
+#: assets/admin.js
+msgid "Confirma que ya descargaste la copia y quieres actualizar robots.txt."
+msgstr ""
+
+#: assets/admin.js
+msgid "Confirma que ya descargaste la copia y quieres reemplazar el .htaccess."
+msgstr ""
+
+#: assets/admin.js
+msgid "Copia descargada. Ya puedes actualizar robots.txt."
+msgstr ""
+
+#: assets/admin.js
+msgid "No se pudo descargar la copia de robots.txt:"
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Salir del asistente y acceder a los ajustes del plugin"
+msgstr ""
+
+#: admin/class-admin.php
+#, php-format
+msgid "Support Genix usa %1$s (%2$s) (solo lectura). Para cambiarlo, hazlo en los ajustes de Support Genix."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Resumen público generado con IA y guardado. Puedes editarlo en la pestaña Negocio."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Ya existía un resumen público: no se ha modificado."
+msgstr ""
+
+#: admin/class-admin.php
+#, php-format
+msgid "No se pudo generar el resumen público (%s). Puedes reintentarlo desde la pestaña Negocio."
+msgstr ""
+
+#: admin/class-admin.php
+msgid "Resumen pendiente de generar: hace falta una conexión de IA y algún dato del negocio. Puedes escribirlo o generarlo después en la pestaña Negocio."
+msgstr ""
+
+#: admin/views/tab-prompt.php
+msgid "Filtro de relevancia por título"
+msgstr ""
+
+#: admin/views/tab-prompt.php
+msgid "Ocultar los documentos cuando ninguna palabra de la pregunta coincide con un título"
+msgstr ""
+
+#: admin/views/tab-prompt.php
+msgid "Desactivado por defecto. Al activarlo, puede ocultar documentos cuyo contenido responde a la pregunta pero cuyo título no coincide (por ejemplo, «envíos a Canarias» con un documento titulado «Información de tienda»). Genix ya filtra por su cuenta los resultados poco relacionados."
+msgstr ""
+
+#: admin/views/tab-ajustes.php
+msgid "Borra la carpeta wp-content/ai-knowledge/ (y la antigua wp-content/llm/ si aún existe) (documentos .md, FAQ e info.md) y el llms.txt de la raíz solo si lo creó este plugin (uno propio tuyo se respeta). NO toca robots.txt ni .htaccess: las reglas de bloqueo de AI Knowledge seguirán activas tras desinstalar, hasta que las quites a mano."
+msgstr ""
+
+#: includes/class-genix-hooks-guard.php
+msgid "No se pudo crear la copia de seguridad; no se ha escrito nada en Support Genix."
+msgstr ""
+
+#: includes/class-ai-client.php
+msgid "Support Genix no tiene una clave de OpenAI ni de Claude configurada."
+msgstr ""

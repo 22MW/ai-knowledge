@@ -6,20 +6,139 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Escritura/borrado de .md en wp-content/llm/{lang}/{slug}.md con front matter YAML.
+ * Escritura/borrado de .md en wp-content/ai-knowledge/{lang}/{slug}.md con front matter YAML.
+ * El nombre de la carpeta se define solo aqui (DIR_NAME); la antigua `llm` se
+ * migra con rename() la primera vez (migrate()).
  */
 class Markdown_Store {
 
+	/** Nombre de la carpeta de documentos dentro de wp-content. */
+	const DIR_NAME = 'ai-knowledge';
+	/** Nombre antiguo (hasta 1.3.x), solo para migrar/redirigir/desinstalar. */
+	const LEGACY_DIR_NAME = 'llm';
+	/** Opcion: pide un flush de rewrite rules tras migrar (lo hace Plugin). */
+	const FLUSH_OPTION = 'wookb_rewrite_flush_pending';
+
+	/** Ruta usada tras resolver la migracion (null = aun no resuelta en esta peticion). */
+	protected static $resolved = null;
+
+	public static function legacy_dir() {
+		return WP_CONTENT_DIR . '/' . self::LEGACY_DIR_NAME;
+	}
+
+	/**
+	 * Si existe la carpeta antigua y no la nueva, la renombra. Idempotente. Si
+	 * rename() falla (permisos), sigue usando la antigua sin romper nada.
+	 * Devuelve la ruta que debe usarse.
+	 */
+	public static function migrate() {
+		if ( null !== self::$resolved ) {
+			return self::$resolved;
+		}
+		$new = WP_CONTENT_DIR . '/' . self::DIR_NAME;
+		$old = self::legacy_dir();
+		if ( ! is_dir( $new ) && is_dir( $old ) && ! is_link( $old ) ) {
+			if ( @rename( $old, $new ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.rename_rename
+				update_option( self::FLUSH_OPTION, 1, false );
+				self::$resolved = $new;
+			} else {
+				self::$resolved = $old;
+			}
+			return self::$resolved;
+		}
+		self::$resolved = $new;
+		return $new;
+	}
+
 	public static function base_dir() {
-		return WP_CONTENT_DIR . '/llm';
+		return self::migrate();
 	}
 
 	public static function base_url() {
-		return content_url( '/llm' );
+		return content_url( '/' . basename( self::migrate() ) );
 	}
 
+	/**
+	 * Nombres (sin .md) que NO son documentos del Registro: info.md,
+	 * chatbot-system-prompt.md (privado), faq-fuente.md (origen editable del FAQ)
+	 * e index.php. Ni se sirven por la ruta publica ni puede llamarse asi un slug.
+	 */
+	const RESERVED = array( 'chatbot-system-prompt', 'faq-fuente', 'index', 'info' );
+
+	public static function is_reserved( $name ) {
+		return in_array( strtolower( (string) $name ), self::RESERVED, true );
+	}
+
+	/** ¿Es $lang el idioma principal? (comparacion sin distinguir mayusculas). */
+	public static function is_main_language( $lang ) {
+		return class_exists( '\AIKB\Languages' ) && '' !== (string) $lang && strtolower( (string) $lang ) === strtolower( (string) Languages::main_language() );
+	}
+
+	/**
+	 * Unico punto que define la ruta relativa de un documento: idioma principal
+	 * -> «{slug}.md» (raiz de la carpeta); resto -> «{lang}/{slug}.md».
+	 */
 	public static function relative_path( $lang, $slug ) {
+		if ( self::is_reserved( $slug ) ) {
+			$slug .= '-doc';
+		}
+		if ( self::is_main_language( $lang ) ) {
+			return $slug . '.md';
+		}
 		return $lang . '/' . $slug . '.md';
+	}
+
+	/** Borra el .md anterior si la ruta ha cambiado (p. ej. tras cambiar el idioma principal). */
+	public static function delete_if_moved( $old, $new ) {
+		if ( '' !== (string) $old && (string) $old !== (string) $new ) {
+			self::delete( $old );
+		}
+	}
+
+	/**
+	 * Migracion unica (opcion wookb_main_flat_migrated): mueve los .md del
+	 * idioma principal de «{lang}/x.md» a «x.md» y actualiza md_path. Si el
+	 * destino existe, no hay archivo o rename() falla, esa fila no se toca.
+	 * Elimina {lang}/ solo si queda vacia. Idempotente. Devuelve filas movidas.
+	 */
+	public static function migrate_main_flat() {
+		global $wpdb;
+		if ( get_option( 'wookb_main_flat_migrated' ) || ! class_exists( '\AIKB\Languages' ) || ! class_exists( '\AIKB\Registry' ) ) {
+			return 0;
+		}
+		$lang = strtolower( (string) Languages::main_language() );
+		if ( '' === $lang || ! preg_match( '/^[a-z]{2}(-[a-z]{2})?$/', $lang ) ) {
+			return 0;
+		}
+		$base  = self::base_dir();
+		$table = Registry::table();
+		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT id, md_path FROM {$table} WHERE LOWER(lang) = %s AND md_path LIKE %s", $lang, $wpdb->esc_like( $lang . '/' ) . '%' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$moved = 0;
+		foreach ( (array) $rows as $row ) {
+			$new = substr( (string) $row->md_path, strlen( $lang ) + 1 );
+			if ( '' === $new || false !== strpos( $new, '/' ) || false !== strpos( $new, '..' ) || '.md' !== substr( $new, -3 ) || self::is_reserved( substr( $new, 0, -3 ) ) ) {
+				continue;
+			}
+			$src = $base . '/' . $row->md_path;
+			$dst = $base . '/' . $new;
+			if ( ! is_file( $src ) || file_exists( $dst ) ) {
+				continue;
+			}
+			if ( ! @rename( $src, $dst ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.rename_rename
+				continue;
+			}
+			$wpdb->update( $table, array( 'md_path' => $new ), array( 'id' => (int) $row->id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$moved++;
+		}
+		$dir = $base . '/' . $lang;
+		if ( is_dir( $dir ) && ! is_link( $dir ) && 2 === count( scandir( $dir ) ) ) {
+			rmdir( $dir ); // phpcs:ignore WordPress.WP.AlternativeFunctions.rmdir_rmdir
+		}
+		update_option( 'wookb_main_flat_migrated', 1, false );
+		if ( $moved && class_exists( '\AIKB\Llms_Txt' ) ) {
+			Llms_Txt::invalidate();
+		}
+		return $moved;
 	}
 
 	public static function absolute_path( $relative ) {
@@ -71,9 +190,22 @@ class Markdown_Store {
 	}
 
 	public static function delete( $relative ) {
+		$relative = (string) $relative;
+		// Guard: filas sin md_path (p. ej. en cola) llegan aqui con ruta vacia y
+		// la ruta absoluta seria la propia carpeta base.
+		if ( '' === $relative || '.md' !== substr( $relative, -3 ) || false !== strpos( $relative, '..' ) ) {
+			return;
+		}
 		$absolute = self::absolute_path( $relative );
-		if ( file_exists( $absolute ) ) {
-			unlink( $absolute ); // phpcs:ignore
+		$base     = wp_normalize_path( self::base_dir() );
+		if ( 0 !== strpos( wp_normalize_path( $absolute ), trailingslashit( $base ) ) || ! is_file( $absolute ) ) {
+			return;
+		}
+		unlink( $absolute ); // phpcs:ignore
+		// Carpeta de idioma vacia: se elimina solo si es hija directa de la base.
+		$dir = dirname( $absolute );
+		if ( wp_normalize_path( dirname( $dir ) ) === $base && is_dir( $dir ) && 2 === count( scandir( $dir ) ) ) {
+			rmdir( $dir ); // phpcs:ignore WordPress.WP.AlternativeFunctions.rmdir_rmdir
 		}
 	}
 

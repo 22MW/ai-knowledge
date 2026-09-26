@@ -80,7 +80,10 @@ echo Admin::render_per_language_block(); // phpcs:ignore WordPress.Security.Esca
 		</tr>
 		<tr>
 			<th><?php esc_html_e( 'Retraso de debounce (segundos)', 'ai-knowledge' ); ?></th>
-			<td><input type="number" min="0" name="debounce_seconds" value="<?php echo esc_attr( $settings['debounce_seconds'] ); ?>" /></td>
+			<td>
+				<input type="number" min="0" name="debounce_seconds" value="<?php echo esc_attr( $settings['debounce_seconds'] ); ?>" />
+				<p class="description"><?php echo esc_html( sprintf( /* translators: %d: segundos entre lotes de una carga masiva */ __( 'Solo se aplica a las ediciones sueltas. La carga masiva empieza sin espera y encadena un lote cada %d segundos.', 'ai-knowledge' ), Queue::SEED_BATCH_INTERVAL ) ); ?></p>
+			</td>
 		</tr>
 	</table>
 	<?php submit_button( __( 'Guardar', 'ai-knowledge' ) ); ?>

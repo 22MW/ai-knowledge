@@ -49,17 +49,14 @@ $accessibility_error  = get_transient( 'wookb_accessibility_error' );
 delete_transient( 'wookb_accessibility_result' );
 delete_transient( 'wookb_accessibility_error' );
 
-// Fase 11: lectura en vivo de robots.txt actual (pieza 1, solo lectura).
-$robots_txt_content = '';
-$robots_txt_error   = '';
-$robots_response     = wp_remote_get( home_url( '/robots.txt' ) );
-if ( file_exists( Robots_Txt_Guard::path() ) ) {
-	$robots_txt_content = (string) file_get_contents( Robots_Txt_Guard::path() ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-} elseif ( is_wp_error( $robots_response ) ) {
-	$robots_txt_error = $robots_response->get_error_message();
-} else {
-	$robots_txt_content = wp_remote_retrieve_body( $robots_response );
-}
+// Fase 11: lectura de robots.txt actual (pieza 1, solo lectura). Una unica
+// logica compartida con el asistente y la descarga de copia: archivo fisico o,
+// si no existe, el virtual de WordPress sin peticion HTTP.
+$robots_current      = Robots_Txt_Guard::read_current();
+$robots_txt_content  = $robots_current['content'];
+$robots_txt_error    = $robots_current['error'];
+$robots_source       = $robots_current['source'];
+$robots_is_physical  = 'physical' === $robots_source;
 
 // Fase 11 (revision UX 2026-09-16): disponibilidad real de robots.txt/.htaccess
 // y confirmacion de descarga vigente, comprobadas en cada render (doble
@@ -335,8 +332,8 @@ $category_labels = array(
 					<td><?php echo esc_html( $entry['description'] ); ?></td>
 					<td>
 						<select name="crawler_action[<?php echo esc_attr( $ua ); ?>]">
-							<option value="allow" <?php selected( 'allow', $current ); ?>><?php esc_html_e( 'Permitir', 'ai-knowledge' ); ?></option>
-							<option value="block" <?php selected( 'block', $current ); ?>><?php esc_html_e( 'Bloquear', 'ai-knowledge' ); ?></option>
+							<option value="allow" <?php selected( 'allow', $current ); ?>><?php esc_html_e( 'Permitido', 'ai-knowledge' ); ?></option>
+							<option value="block" <?php selected( 'block', $current ); ?>><?php esc_html_e( 'Bloqueado', 'ai-knowledge' ); ?></option>
 						</select>
 					</td>
 				</tr>
@@ -368,13 +365,25 @@ $category_labels = array(
 	</div>
 </div>
 
+<?php if ( $robots_is_physical ) : ?>
 <p><strong><?php esc_html_e( '⚠ Esta acción modifica el archivo robots.txt del sitio. Descarga una copia antes de continuar.', 'ai-knowledge' ); ?></strong></p>
+<?php endif; ?>
 
 <div class="wookb-replace-box wookb-replace-box--robots">
 <?php if ( ! $robots_available ) : ?>
 	<div class="notice notice-warning inline">
 		<p><?php esc_html_e( 'robots.txt no es escribible en este servidor (permisos de la carpeta raíz).', 'ai-knowledge' ); ?></p>
 	</div>
+<?php elseif ( ! $robots_is_physical ) : ?>
+	<div class="notice notice-warning inline">
+		<p><strong><?php esc_html_e( 'No hay un robots.txt físico: WordPress genera uno virtual.', 'ai-knowledge' ); ?></strong> <?php esc_html_e( 'No hace falta copia de seguridad. Si pulsas «Crear robots.txt», se crea un archivo real en la raíz del sitio con el contenido actual de WordPress más el bloque de AI Knowledge. Ese archivo sustituye al que genera WordPress: las reglas que añadan en el futuro plugins SEO o WooCommerce dejarán de aplicarse salvo que las edites a mano en el archivo. Se puede deshacer borrando el archivo. Es recomendable probarlo antes en un entorno de pruebas (staging) o tener una copia del sitio.', 'ai-knowledge' ); ?></p>
+	</div>
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" onsubmit="return confirm('<?php echo esc_js( __( 'Vas a crear un robots.txt físico en la raíz del sitio. Sustituirá al que genera WordPress: las reglas futuras de plugins SEO o WooCommerce no se aplicarán salvo que las edites a mano. Se puede deshacer borrando el archivo. ¿Quieres continuar?', 'ai-knowledge' ) ); ?>');">
+		<input type="hidden" name="action" value="wookb_apply_robots_block" />
+		<?php wp_nonce_field( 'wookb_apply_robots_block' ); ?>
+		<p><label><input type="checkbox" name="wookb_robots_create_ack" value="1" data-wookb-robots-ack /> <?php esc_html_e( 'He leído los riesgos y quiero crear el robots.txt físico.', 'ai-knowledge' ); ?></label></p>
+		<?php submit_button( __( 'Crear robots.txt', 'ai-knowledge' ), 'delete', 'submit', false, array( 'disabled' => 'disabled', 'data-wookb-robots-create' => '1' ) ); ?>
+	</form>
 <?php else : ?>
 	<p class="description" data-wookb-unlock-notice="robots" <?php echo $robots_confirmed ? 'style="display:none;"' : ''; ?>><?php esc_html_e( 'Descarga la copia actual primero (botón de la izquierda); se habilitará automáticamente al terminar.', 'ai-knowledge' ); ?></p>
 	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wookb-download-form" data-wookb-unlock="robots" style="display:inline-block;margin-right:10px;">
@@ -383,7 +392,7 @@ $category_labels = array(
 		<?php submit_button( __( 'Descargar copia actual de robots.txt', 'ai-knowledge' ), 'secondary', 'submit', false ); ?>
 	</form>
 
-	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;" onsubmit="return confirm('<?php echo esc_js( __( 'Vas a modificar el robots.txt real del sitio con los bots marcados como Bloquear en la tabla de arriba. ¿Confirmas que ya descargaste la copia y quieres continuar?', 'ai-knowledge' ) ); ?>');">
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;" onsubmit="return confirm('<?php echo esc_js( __( 'Vas a modificar el robots.txt real del sitio con los bots marcados como Bloqueado en la tabla de arriba. ¿Confirmas que ya descargaste la copia y quieres continuar?', 'ai-knowledge' ) ); ?>');">
 		<input type="hidden" name="action" value="wookb_apply_robots_block" />
 		<?php wp_nonce_field( 'wookb_apply_robots_block' ); ?>
 		<?php submit_button( __( 'Aplicar bloqueo a robots.txt', 'ai-knowledge' ), 'delete', 'submit', false, $robots_confirmed ? array( 'data-wookb-apply' => 'robots' ) : array( 'disabled' => 'disabled', 'data-wookb-apply' => 'robots' ) ); ?>
@@ -395,7 +404,7 @@ $category_labels = array(
 
 <h3><?php esc_html_e( 'Bloqueo en el servidor mediante .htaccess', 'ai-knowledge' ); ?></h3>
 <p class="description">
-	<?php esc_html_e( 'robots.txt comunica preferencias de rastreo, pero un bot puede ignorarlas. Estas reglas rechazan en el servidor las solicitudes que se identifican como alguno de los bots marcados como Bloquear.', 'ai-knowledge' ); ?>
+	<?php esc_html_e( 'robots.txt comunica preferencias de rastreo, pero un bot puede ignorarlas. Estas reglas rechazan en el servidor las solicitudes que se identifican como alguno de los bots marcados como Bloqueado.', 'ai-knowledge' ); ?>
 </p>
 <p><strong><?php esc_html_e( '⚠ Modifica un archivo fuera de este plugin que puede afectar a todo el sitio si algo sale mal. Descarga la copia actual antes de continuar.', 'ai-knowledge' ); ?></strong></p>
 

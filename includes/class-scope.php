@@ -27,12 +27,14 @@ class Scope {
 			'custom_fields'    => array(), // [ post_type => [field keys] ]
 			'daily_limit'      => 100,
 			'no_limit'         => false,
-			'batch_size'       => 20,
+			'batch_size'       => 50,
 			'debounce_seconds' => 300,
 			'output_tokens'    => 2500,
 			'body_char_limit'  => 1000, // Generator::BODY_CHAR_LIMIT es solo el respaldo si esta clave faltara.
 			'ai_key_source'    => 'genix', // genix|wp_connectors
 			'wp_ai_model'      => AI_Client::MODEL_AUTO,
+			// Pieza 1 del Chatbot_Relevance_Guard (vaciar documentos por titulo): desactivada por defecto.
+			'chatbot_relevance_filter' => false,
 			'chatbot_docs_list_limit' => Chatbot_Relevance_Guard::DOCS_LIST_LIMIT_DEFAULT,
 			// Fase 1: post_types donde aparece el meta box "Base de conocimiento
 			// IA" en el editor. Null = no guardado todavia -> default real
@@ -86,6 +88,9 @@ class Scope {
 			// Visibilidad especial: los bots bloqueados pueden seguir leyendo
 			// /llms.txt sin rastrear el resto del sitio.
 			'crawler_visibility_mode' => 'site',
+			// Desinstalación (ver uninstall.php): ambos desmarcados por defecto.
+			'uninstall_delete_data'  => false,
+			'uninstall_delete_files' => false,
 		);
 		$saved = get_option( 'wookb_settings', array() );
 

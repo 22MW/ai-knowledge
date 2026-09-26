@@ -56,8 +56,9 @@ plugins de campos avanzados), aquí puedes elegir cuáles se envían a la IA
 como contexto adicional al redactar cada documento — útil si tienes datos
 relevantes que no están en el contenido principal del producto o página.
 Además, los campos que elijas se añaden tal cual, sin pasar por la IA, en el
-bloque «Datos de compra» del final del documento (también en tipos de
-contenido que no son productos).
+bloque «Datos de compra» del final del documento; en los tipos de contenido
+que no son productos, el bloque se llama «Datos adicionales» y solo lleva estos
+campos.
 
 ## Preguntas frecuentes
 

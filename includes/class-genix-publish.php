@@ -82,6 +82,9 @@ class Genix_Publish {
 			)
 		);
 
+		$previous = Registry::find( $post->ID, $lang );
+		Markdown_Store::delete_if_moved( $previous ? $previous->md_path : '', $relative );
+
 		// Registry::find()/upsert() no están filtrados por source_type (solo
 		// query()/count()/query_all_ids() lo están, ver
 		// Registry::apply_registry_scope()), así que esta escritura SI

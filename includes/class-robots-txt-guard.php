@@ -40,6 +40,73 @@ class Robots_Txt_Guard {
 		return is_writable( ABSPATH );
 	}
 
+	public static function physical_exists() {
+		return file_exists( self::path() );
+	}
+
+	/**
+	 * Lee el robots.txt actual con una única lógica (pestaña Visibilidad IA,
+	 * paso «Archivos del servidor» del asistente y descarga de copia): el
+	 * archivo físico si existe; si no, el virtual que genera WordPress,
+	 * capturando do_robots() con un buffer (sin petición HTTP). Devuelve
+	 * [ content, source (physical|virtual|error), error ].
+	 */
+	public static function read_current() {
+		$path = self::path();
+		if ( file_exists( $path ) ) {
+			$content = file_get_contents( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			if ( false === $content ) {
+				return array( 'content' => '', 'source' => 'error', 'error' => __( 'No se pudo leer el archivo robots.txt físico de la raíz del sitio.', 'ai-knowledge' ) );
+			}
+			return array( 'content' => (string) $content, 'source' => 'physical', 'error' => '' );
+		}
+
+		if ( ! function_exists( 'do_robots' ) ) {
+			return array( 'content' => '', 'source' => 'error', 'error' => __( 'WordPress no ha podido generar el robots.txt virtual en este momento.', 'ai-knowledge' ) );
+		}
+
+		$level = ob_get_level();
+		ob_start();
+		try {
+			// do_robots() envía la cabecera Content-Type: en una pantalla de
+			// administración las cabeceras ya pueden estar enviadas y PHP
+			// avisaría; el aviso es inocuo (el contenido se captura igual).
+			@do_robots(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			$content = ob_get_clean();
+		} catch ( \Throwable $e ) {
+			while ( ob_get_level() > $level ) {
+				ob_end_clean();
+			}
+			return array( 'content' => '', 'source' => 'error', 'error' => $e->getMessage() );
+		}
+
+		return array( 'content' => (string) $content, 'source' => 'virtual', 'error' => '' );
+	}
+
+	/** Texto del origen del robots.txt actual (para mostrarlo junto al contenido). */
+	public static function source_label( $source ) {
+		if ( 'physical' === $source ) {
+			return __( 'Archivo físico', 'ai-knowledge' );
+		}
+		if ( 'virtual' === $source ) {
+			return __( 'Generado por WordPress (no hay archivo físico)', 'ai-knowledge' );
+		}
+		return '';
+	}
+
+	/**
+	 * Crea el robots.txt físico cuando todavía no existe: robots virtual actual
+	 * de WordPress + bloque de AI Knowledge. Nunca sobrescribe un archivo que
+	 * ya exista.
+	 */
+	public static function create_from_virtual( array $actions, $visibility_mode = 'site' ) {
+		if ( file_exists( self::path() ) || ! is_writable( ABSPATH ) ) {
+			return false;
+		}
+		$content = self::generate_full_file( $actions, $visibility_mode );
+		return false !== file_put_contents( self::path(), $content, LOCK_EX ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+	}
+
 	protected static function transient_key() {
 		return self::TRANSIENT_PREFIX . get_current_user_id();
 	}
@@ -207,8 +274,9 @@ class Robots_Txt_Guard {
 	}
 
 	public static function generate_full_file( array $bot_user_agents, $visibility_mode = 'site' ) {
-		$path = self::path();
-		$original = file_exists( $path ) ? (string) file_get_contents( $path ) : ''; // phpcs:ignore
+		// Base: el robots.txt actual (físico o, si no existe, el virtual de WordPress).
+		$current  = self::read_current();
+		$original = $current['content'];
 		$original = preg_replace( '/\R?# BEGIN ' . preg_quote( self::MARKER, '/' ) . '.*?# END ' . preg_quote( self::MARKER, '/' ) . '\R?/s', "\n", $original );
 		foreach ( $bot_user_agents as $ua => $action ) {
 			$quoted_ua = preg_quote( $ua, '/' );

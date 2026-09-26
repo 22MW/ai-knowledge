@@ -381,13 +381,15 @@ body.toplevel_page_ai-knowledge #wpcontent {
   border: none;
 }
 .wookb-wrap .notice p {
-  color: #fff;
+  color: #1a1a1a;
 }
+.wookb-wrap .notice-info,
 .wookb-wrap .notice-success {
-  background: #3858e9;
+  background: #6cd9b6;
   width: fit-content;
   display: flex;
-  padding: 5px 22px 0px;
+  /* padding: 5px 22px; */
+  color: #1a1a1a;
 }
 .wookb-wrap .notice-warning,
 .wookb-wrap .notice-warning p {
@@ -395,16 +397,13 @@ body.toplevel_page_ai-knowledge #wpcontent {
   color: #1a1a1a;
   width: fit-content;
   display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 .wookb-wrap .notice-error {
   width: fit-content;
   display: flex;
   background: var(--tblr-danger, #d63939);
-}
-.wookb-wrap .notice-info {
-  width: fit-content;
-  display: flex;
-  background: var(--tblr-azure, #4299e1);
 }
 
 /* Toasts flotantes de guardado AJAX (showToast() en admin.js), pedido
@@ -435,7 +434,7 @@ body.toplevel_page_ai-knowledge #wpcontent {
   gap: 10px;
   padding: 10px 14px;
   border-radius: 6px;
-  color: #fff;
+  color: #1a1a1a;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
   animation: wookb-toast-in 0.15s ease-out;
 }
@@ -446,10 +445,10 @@ body.toplevel_page_ai-knowledge #wpcontent {
   line-height: 1.4;
 }
 .wookb-wrap .wookb-toast-success {
-  background: var(--tblr-success, #2fb344);
+  background: var(--tblr-success, #6cd9b6);
 }
 .wookb-wrap .wookb-toast-error {
-  background: var(--tblr-danger, #d63939);
+  background: var(--tblr-danger, #f45f5f);
 }
 .wookb-wrap .wookb-toast-close {
   background: transparent;
