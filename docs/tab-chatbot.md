@@ -20,6 +20,12 @@ No hace falta acertar a la primera: puedes responder lo que sepas, generar
 un primer borrador, editarlo a mano, pulirlo con IA, o añadir más
 respuestas al cuestionario y volver a generar para mejorarlo.
 
+> El prompt del chatbot es **privado**: se guarda en la carpeta `privado/` del
+> propio plugin (nunca en una carpeta accesible por URL) y, como copia de
+> seguridad, en la base de datos, porque WordPress borra la carpeta del plugin
+> al actualizarlo. Si encuentra uno antiguo en `wp-content/ai-knowledge/` (o
+> `llm/`), lo importa y borra ese archivo público.
+
 ## 1. Ajustes del chat
 
 Un único ajuste por ahora: cuántos "Documentos relacionados" muestra el

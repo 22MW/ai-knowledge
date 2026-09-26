@@ -756,7 +756,7 @@ class Languages {
 	 * ---------------------------------------------------------------- */
 
 	/**
-	 * Filas de documentos que ya no corresponden: siempre los documentos
+	 * Filas de documentos que ya no corresponden (tambien las de un idioma que ya no es el principal, sin «Crear por idioma»): siempre los documentos
 	 * puente; los de tipos de contenido que ya no están en el alcance; y, sin
 	 * «Crear por idioma», los de traducciones (queda uno por contenido, el del
 	 * original). No incluye documentos propios del plugin (FAQ, tienda,
@@ -771,6 +771,11 @@ class Languages {
 		$out   = array();
 
 		foreach ( (array) $rows as $row ) {
+			// Documentos propios (FAQ, tienda) de un idioma que ya no es el principal: solo se generan en el principal.
+			if ( 0 === strpos( (string) $row->source_type, 'wookb-' ) && $row->lang && strtolower( $row->lang ) !== strtolower( self::main_language() ) && 'manual' !== $row->override_mode ) {
+				$out[] = $row;
+				continue;
+			}
 			if ( ! post_type_exists( $row->source_type ) || 'sgkb-docs' === $row->source_type ) {
 				continue;
 			}
@@ -780,6 +785,11 @@ class Languages {
 			$obsolete = ! empty( $row->is_bridge ) || ! Scope::has_post_type_in_scope( $row->source_type );
 			if ( ! $obsolete && ! $per ) {
 				$obsolete = self::original_id( (int) $row->source_id ) !== (int) $row->source_id;
+				// Tras cambiar el idioma principal: filas de otro idioma. Su .md
+				// (antes en la raiz) chocaria con el del nuevo idioma principal.
+				if ( ! $obsolete && $row->lang && strtolower( $row->lang ) !== strtolower( self::main_language() ) ) {
+					$obsolete = true;
+				}
 			}
 			if ( $obsolete ) {
 				$out[] = $row;
@@ -795,10 +805,24 @@ class Languages {
 
 	/** Borra los documentos de obsolete_rows() (.md, post de Genix y fila). Devuelve cuántos. */
 	public static function cleanup_obsolete_documents() {
-		$deleted = 0;
-		foreach ( self::obsolete_rows() as $row ) {
+		global $wpdb;
+		$deleted  = 0;
+		$obsolete = self::obsolete_rows();
+		$ids      = array_map( 'intval', wp_list_pluck( $obsolete, 'id' ) );
+		$table    = Registry::table();
+		foreach ( $obsolete as $row ) {
 			if ( $row->md_path ) {
-				Markdown_Store::delete( $row->md_path );
+				// No borrar el archivo si otra fila que se conserva apunta a la misma ruta (idioma principal en la raiz).
+				$others = $wpdb->get_results( $wpdb->prepare( "SELECT id FROM {$table} WHERE md_path = %s", $row->md_path ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$shared = false;
+				foreach ( (array) $others as $other ) {
+					if ( ! in_array( (int) $other->id, $ids, true ) ) {
+						$shared = true;
+					}
+				}
+				if ( ! $shared ) {
+					Markdown_Store::delete( $row->md_path );
+				}
 			}
 			if ( $row->doc_post_id ) {
 				Genix_Bridge::delete_document( $row->doc_post_id );

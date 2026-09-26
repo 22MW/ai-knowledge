@@ -138,7 +138,7 @@ $wp_ai_models    = $wp_ai_available ? AI_Client::available_models() : array();
 						<?php esc_html_e( 'Borrar archivos generados', 'ai-knowledge' ); ?>
 					</label>
 				</p>
-				<p class="description"><?php esc_html_e( 'Borra la carpeta wp-content/ai-knowledge/ (y la antigua wp-content/llm/ si aún existe) (documentos .md, FAQ, info.md y el prompt del chatbot) y el llms.txt de la raíz solo si lo creó este plugin (uno propio tuyo se respeta). NO toca robots.txt ni .htaccess: las reglas de bloqueo de AI Knowledge seguirán activas tras desinstalar, hasta que las quites a mano.', 'ai-knowledge' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Borra la carpeta wp-content/ai-knowledge/ (y la antigua wp-content/llm/ si aún existe) (documentos .md, FAQ e info.md) y el llms.txt de la raíz solo si lo creó este plugin (uno propio tuyo se respeta). NO toca robots.txt ni .htaccess: las reglas de bloqueo de AI Knowledge seguirán activas tras desinstalar, hasta que las quites a mano.', 'ai-knowledge' ); ?></p>
 			</td>
 		</tr>
 	</table>

@@ -39,6 +39,10 @@ class Markdown_Server {
 			status_header( 404 );
 			exit;
 		}
+		// Los .md del idioma principal ya no van en {lang}/: si el archivo esta en la raiz, ir directo alli (sin doble salto).
+		if ( preg_match( '#^([a-z]{2}(?:-[a-z]{2})?)/([a-z0-9._-]+)$#', $path, $m ) && Markdown_Store::is_main_language( $m[1] ) && ! is_file( Markdown_Store::absolute_path( $path ) ) && is_file( Markdown_Store::absolute_path( $m[2] ) ) ) {
+			$path = $m[2];
+		}
 		wp_safe_redirect( content_url( '/' . Markdown_Store::DIR_NAME . '/' . $path ), 301 );
 		exit;
 	}
@@ -59,18 +63,26 @@ class Markdown_Server {
 
 		$relative = sanitize_text_field( wp_unslash( $wp->query_vars[ self::QUERY_VAR ] ) ) . '.md';
 
-		// Blindaje contra path traversal: solo permite el patrón exacto que
-		// generamos nosotros (lang/slug.md, sin .. ni barras sueltas al inicio).
-		if ( ! preg_match( '#^[a-z]{2}(-[a-z]{2})?/[a-z0-9\-]+\.md$#i', $relative ) ) {
+		// Blindaje contra path traversal: solo «{slug}.md» o «{lang}/{slug}.md»
+		// (sin .., sin //, sin barras sueltas) y nunca un nombre reservado
+		// (chatbot-system-prompt, faq-fuente, index, info).
+		if ( ! preg_match( '#^(?:([a-z]{2}(?:-[a-z]{2})?)/)?([a-z0-9\-]+)\.md$#i', $relative, $m ) || false !== strpos( $relative, '..' ) || Markdown_Store::is_reserved( $m[2] ) ) {
 			status_header( 404 );
 			exit;
 		}
 
 		$absolute = Markdown_Store::absolute_path( $relative );
-		$base_dir = wp_normalize_path( Markdown_Store::base_dir() );
+		$base_dir = trailingslashit( wp_normalize_path( Markdown_Store::base_dir() ) );
 		$real     = wp_normalize_path( $absolute );
 
-		if ( 0 !== strpos( $real, $base_dir ) || ! file_exists( $real ) ) {
+		// URL antigua del idioma principal (antes iba en {lang}/): si ya no existe
+		// alli y el archivo esta en la raiz, 301 a la URL nueva.
+		if ( ! is_file( $real ) && '' !== $m[1] && Markdown_Store::is_main_language( $m[1] ) && is_file( Markdown_Store::absolute_path( $m[2] . '.md' ) ) ) {
+			wp_safe_redirect( Markdown_Store::public_url( $m[2] . '.md' ), 301 );
+			exit;
+		}
+
+		if ( 0 !== strpos( $real, $base_dir ) || ! is_file( $real ) ) {
 			status_header( 404 );
 			exit;
 		}

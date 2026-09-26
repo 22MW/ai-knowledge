@@ -20,6 +20,51 @@ No presentar este flujo como validado hasta realizar esas pruebas.
 2. Probar la pestaña WooCommerce: checkboxes, snapshot editable y «Pulir redacción con IA», especialmente la llamada a IA.
 3. Repetir la comprobación de feedback del botón del editor de documentos (Fase 1), que quedó sin evidencia suficiente en la primera prueba.
 
+## QUÉ FALTA PARA PUBLICAR (2026-09-26)
+
+Orden. Nada de esto se ha hecho todavía salvo lo marcado.
+
+### 1. Generar el ZIP de prueba y probarlo en docthinks
+- El último ZIP generado (1.4.3) no lleva lo último: falta el **idioma principal
+  sin carpeta**. Hay que generar uno nuevo (`ai-knowledge-prueba.zip`, sin número).
+- Probar, con copia de la base de datos:
+  1. Migración `llm` → `ai-knowledge`: los `.md` del idioma principal quedan en la
+     raíz de la carpeta; `/llms.txt`, Registro e `info.md` funcionan.
+  2. URLs: `/ai-knowledge-doc/es/x.md` → 301; `/ai-knowledge-doc/x.md` → 200;
+     `/ai-knowledge-doc/chatbot-system-prompt.md` e `info.md` → 404;
+     `/wp-content/llm/es/x.md` → 301 directo.
+  3. Genix: «Reinstalar filtros ahora», relevancia por título desactivada,
+     guardar el mismo prompt dos veces sin error.
+  4. Idioma del asistente con WPML: guardar FAQs y comprobar que sale todo en español.
+  5. Negocio (resumen público), último paso («Salir» junto a «Atrás»), «Crear por
+     idioma» (recuadro con interruptor).
+  6. Cambio de idioma principal + «Reiniciar todo» (solo revisado leyendo código).
+  7. Desinstalación con los dos checks (opcional).
+
+### 2. Decisiones que faltan
+- **Seguridad:** `chatbot-system-prompt.md` y `faq-fuente.md` son accesibles por URL
+  directa dentro de `wp-content/ai-knowledge/`. Opciones: bloquear la carpeta en
+  `.htaccess`/nginx o mover esos archivos fuera de la carpeta pública.
+- **Número de release** (propuesta: 1.4.0). Lo decide el usuario.
+- **Versiones ya subidas:** las cabeceras dicen 1.4.x sin haber release (rule
+  `10-git`: en desarrollo solo sube el cuarto número). Corregir a 1.3.2.x o dejarlo
+  hasta el release, que unifica el `CHANGELOG.md`.
+- **`_dev/visual.html`:** sigue mencionando la 1.3.2.
+
+### 3. Publicar (cuando la prueba salga bien)
+- El guardián nuevo bloquea `git commit` con un cambio de versión que no sea el
+  cuarto número, y el commit de la 1.4.3 lo es. Para el release, el usuario crea
+  `.claude/.version-ok` (vale 30 minutos) con `! touch .claude/.version-ok`.
+- El usuario dice «release» y el número. Se hace: número en `ai-knowledge.php`,
+  `readme.txt` (incluido `Stable tag`) y `CHANGELOG.md` (una sola entrada), memoria
+  `_dev`, commit, push a `knowBaseDev`, `deploy-release.sh --dry-run` y en real
+  (rama `release`, ZIP, GitHub release con tag, `main`).
+
+### 4. Pendientes menores
+- Regenerar los JSON de traducción de JavaScript (`make_i18n_json.py`) y revisar
+  euskera y alemán (los textos nuevos los escribió el subagente).
+- La clave de Claude de Genix no se ha probado contra la API real.
+
 ## Pendiente de QA real — versión 1.4.1
 
 Implementada el 2026-09-26 (sin commit ni release). Probar:

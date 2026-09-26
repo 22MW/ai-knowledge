@@ -2,6 +2,15 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [1.4.3] - 2026-09-26
+
+### Correcciones
+
+- «Crear por idioma» pasa a usar el mismo patrón que el interruptor «Incluir
+  llms.txt para los modelos desactivados» de Visibilidad IA: recuadro con
+  interruptor y etiqueta ACTIVADO/DESACTIVADO, y borde que se marca en el color
+  primario al activarlo. Sustituye al borde fijo de la 1.4.2.
+
 ## [1.4.2] - 2026-09-26
 
 ### Correcciones
@@ -16,8 +25,6 @@ Todas las modificaciones relevantes de este plugin se documentan en este archivo
   «(ES)»; solo lo llevan los demás idiomas («(EN)»).
 - Último paso del asistente: «Salir» pasa a la fila de acciones, a la derecha y
   con el mismo estilo que «Atrás».
-- «Crear por idioma» se muestra en un recuadro con borde del color primario y
-  separado del contenido que le sigue (antes se solapaba con los campos).
 
 ## [1.4.1] - 2026-09-26
 

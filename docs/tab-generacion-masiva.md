@@ -96,7 +96,7 @@ valores que ya tuvieras guardados no cambian):
 
 ## Dónde se guardan los documentos
 
-Los `.md` viven en `wp-content/ai-knowledge/` (antes `wp-content/llm/`). Al
+Los `.md` del **idioma principal** viven directamente en `wp-content/ai-knowledge/` (URL `/ai-knowledge-doc/{nombre}.md`); los de otros idiomas (solo con «Crear por idioma») van en `wp-content/ai-knowledge/{idioma}/`. La carpeta antes se llamaba `wp-content/llm/` y el idioma principal iba en su propia subcarpeta: al actualizar, el plugin lo migra solo y las URL antiguas redirigen (301). Si cambias el idioma principal, pulsa **Reiniciar todo** para recolocar los documentos (los de idiomas que dejan de corresponder se borran). Al
 actualizar, el plugin renombra la carpeta antigua automáticamente; si el
 servidor no lo permite, sigue usando la antigua sin romper nada. Las URL
 antiguas `wp-content/llm/...` redirigen (301) a la nueva cuando el archivo ya

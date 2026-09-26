@@ -81,7 +81,3 @@
 .wookb-replace-box{border:2px solid var(--tblr-border-color,#c9ced6);border-radius:10px;padding:16px 20px;margin:14px 0 22px;max-width:1000px}
 .wookb-replace-box--robots{border-color:var(--tblr-primary,#007cab)}
 .wookb-replace-box--htaccess{border-color:var(--tblr-warning,#f76707)}
-
-/* «Crear por idioma»: recuadro destacado con el color primario de Tabler (pedido explicito del usuario, 2026-09-26) y separado del contenido que le sigue. */
-.wookb-per-language{border:3px solid var(--tblr-primary);border-radius:8px;padding:16px 20px;margin:0 0 24px}
-.wookb-per-language>h3{margin-top:0}

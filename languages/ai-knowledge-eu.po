@@ -2695,8 +2695,8 @@ msgid "Borrar archivos generados"
 msgstr "Ezabatu sortutako fitxategiak"
 
 #: admin/views/tab-ajustes.php
-msgid "Borra la carpeta wp-content/llm/ (documentos .md, FAQ, info.md y el prompt del chatbot) y el llms.txt de la raíz solo si lo creó este plugin (uno propio tuyo se respeta). NO toca robots.txt ni .htaccess: las reglas de bloqueo de AI Knowledge seguirán activas tras desinstalar, hasta que las quites a mano."
-msgstr "wp-content/llm/ karpeta (.md dokumentuak, FAQ, info.md eta txatbotaren prompt-a) eta erroko llms.txt ezabatzen ditu, plugin honek sortu badu bakarrik (zure fitxategi propioa errespetatzen da). EZ ditu ukitzen robots.txt eta .htaccess: AI Knowledgeren blokeo-arauek aktibo jarraituko dute desinstalatu ondoren, eskuz kendu arte."
+msgid "Borra la carpeta wp-content/llm/ (documentos .md, FAQ e info.md) y el llms.txt de la raíz solo si lo creó este plugin (uno propio tuyo se respeta). NO toca robots.txt ni .htaccess: las reglas de bloqueo de AI Knowledge seguirán activas tras desinstalar, hasta que las quites a mano."
+msgstr "wp-content/llm/ karpeta (.md dokumentuak, FAQ eta info.md) eta erroko llms.txt ezabatzen ditu, plugin honek sortu badu bakarrik (zure fitxategi propioa errespetatzen da). EZ ditu ukitzen robots.txt eta .htaccess: AI Knowledgeren blokeo-arauek aktibo jarraituko dute desinstalatu ondoren, eskuz kendu arte."
 
 #: includes/class-genix-hooks-guard.php
 msgid "relevancia de las búsquedas e idiomas no soportados (filtro search-results)"
@@ -2847,8 +2847,8 @@ msgid "Desactivado por defecto. Al activarlo, puede ocultar documentos cuyo cont
 msgstr "Lehenespenez desgaituta. Gaituz gero, galderari edukiaz erantzuten dioten baina izenburua bat ez datorren dokumentuak ezkutatu ditzake (adibidez, «Kanarietarako bidalketak» galderak «Dendaren informazioa» izeneko dokumentu batekin). Genixek berak iragazten ditu dagoeneko lotura gutxiko emaitzak."
 
 #: admin/views/tab-ajustes.php
-msgid "Borra la carpeta wp-content/ai-knowledge/ (y la antigua wp-content/llm/ si aún existe) (documentos .md, FAQ, info.md y el prompt del chatbot) y el llms.txt de la raíz solo si lo creó este plugin (uno propio tuyo se respeta). NO toca robots.txt ni .htaccess: las reglas de bloqueo de AI Knowledge seguirán activas tras desinstalar, hasta que las quites a mano."
-msgstr "wp-content/ai-knowledge/ karpeta (eta zaharra den wp-content/llm/, oraindik badago) (.md dokumentuak, FAQ, info.md eta txatbotaren prompt-a) eta erroko llms.txt ezabatzen ditu, plugin honek sortu badu bakarrik (zure fitxategi propioa errespetatzen da). EZ ditu ukitzen robots.txt eta .htaccess: AI Knowledgeren blokeo-arauek aktibo jarraituko dute desinstalatu ondoren, eskuz kendu arte."
+msgid "Borra la carpeta wp-content/ai-knowledge/ (y la antigua wp-content/llm/ si aún existe) (documentos .md, FAQ e info.md) y el llms.txt de la raíz solo si lo creó este plugin (uno propio tuyo se respeta). NO toca robots.txt ni .htaccess: las reglas de bloqueo de AI Knowledge seguirán activas tras desinstalar, hasta que las quites a mano."
+msgstr "wp-content/ai-knowledge/ karpeta (eta zaharra den wp-content/llm/, oraindik badago) (.md dokumentuak, FAQ eta info.md) eta erroko llms.txt ezabatzen ditu, plugin honek sortu badu bakarrik (zure fitxategi propioa errespetatzen da). EZ ditu ukitzen robots.txt eta .htaccess: AI Knowledgeren blokeo-arauek aktibo jarraituko dute desinstalatu ondoren, eskuz kendu arte."
 
 #: includes/class-genix-hooks-guard.php
 msgid "No se pudo crear la copia de seguridad; no se ha escrito nada en Support Genix."

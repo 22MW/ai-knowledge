@@ -58,8 +58,87 @@ class Markdown_Store {
 		return content_url( '/' . basename( self::migrate() ) );
 	}
 
+	/**
+	 * Nombres (sin .md) que NO son documentos del Registro: info.md,
+	 * chatbot-system-prompt.md (privado), faq-fuente.md (origen editable del FAQ)
+	 * e index.php. Ni se sirven por la ruta publica ni puede llamarse asi un slug.
+	 */
+	const RESERVED = array( 'chatbot-system-prompt', 'faq-fuente', 'index', 'info' );
+
+	public static function is_reserved( $name ) {
+		return in_array( strtolower( (string) $name ), self::RESERVED, true );
+	}
+
+	/** ¿Es $lang el idioma principal? (comparacion sin distinguir mayusculas). */
+	public static function is_main_language( $lang ) {
+		return class_exists( '\AIKB\Languages' ) && '' !== (string) $lang && strtolower( (string) $lang ) === strtolower( (string) Languages::main_language() );
+	}
+
+	/**
+	 * Unico punto que define la ruta relativa de un documento: idioma principal
+	 * -> «{slug}.md» (raiz de la carpeta); resto -> «{lang}/{slug}.md».
+	 */
 	public static function relative_path( $lang, $slug ) {
+		if ( self::is_reserved( $slug ) ) {
+			$slug .= '-doc';
+		}
+		if ( self::is_main_language( $lang ) ) {
+			return $slug . '.md';
+		}
 		return $lang . '/' . $slug . '.md';
+	}
+
+	/** Borra el .md anterior si la ruta ha cambiado (p. ej. tras cambiar el idioma principal). */
+	public static function delete_if_moved( $old, $new ) {
+		if ( '' !== (string) $old && (string) $old !== (string) $new ) {
+			self::delete( $old );
+		}
+	}
+
+	/**
+	 * Migracion unica (opcion wookb_main_flat_migrated): mueve los .md del
+	 * idioma principal de «{lang}/x.md» a «x.md» y actualiza md_path. Si el
+	 * destino existe, no hay archivo o rename() falla, esa fila no se toca.
+	 * Elimina {lang}/ solo si queda vacia. Idempotente. Devuelve filas movidas.
+	 */
+	public static function migrate_main_flat() {
+		global $wpdb;
+		if ( get_option( 'wookb_main_flat_migrated' ) || ! class_exists( '\AIKB\Languages' ) || ! class_exists( '\AIKB\Registry' ) ) {
+			return 0;
+		}
+		$lang = strtolower( (string) Languages::main_language() );
+		if ( '' === $lang || ! preg_match( '/^[a-z]{2}(-[a-z]{2})?$/', $lang ) ) {
+			return 0;
+		}
+		$base  = self::base_dir();
+		$table = Registry::table();
+		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT id, md_path FROM {$table} WHERE LOWER(lang) = %s AND md_path LIKE %s", $lang, $wpdb->esc_like( $lang . '/' ) . '%' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$moved = 0;
+		foreach ( (array) $rows as $row ) {
+			$new = substr( (string) $row->md_path, strlen( $lang ) + 1 );
+			if ( '' === $new || false !== strpos( $new, '/' ) || false !== strpos( $new, '..' ) || '.md' !== substr( $new, -3 ) || self::is_reserved( substr( $new, 0, -3 ) ) ) {
+				continue;
+			}
+			$src = $base . '/' . $row->md_path;
+			$dst = $base . '/' . $new;
+			if ( ! is_file( $src ) || file_exists( $dst ) ) {
+				continue;
+			}
+			if ( ! @rename( $src, $dst ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.rename_rename
+				continue;
+			}
+			$wpdb->update( $table, array( 'md_path' => $new ), array( 'id' => (int) $row->id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$moved++;
+		}
+		$dir = $base . '/' . $lang;
+		if ( is_dir( $dir ) && ! is_link( $dir ) && 2 === count( scandir( $dir ) ) ) {
+			rmdir( $dir ); // phpcs:ignore WordPress.WP.AlternativeFunctions.rmdir_rmdir
+		}
+		update_option( 'wookb_main_flat_migrated', 1, false );
+		if ( $moved && class_exists( '\AIKB\Llms_Txt' ) ) {
+			Llms_Txt::invalidate();
+		}
+		return $moved;
 	}
 
 	public static function absolute_path( $relative ) {

@@ -169,6 +169,7 @@ class Store_Info_Doc {
 
 		$markdown = "# {$title}\n\n" . $body;
 
+		$old_md_path = $existing ? $existing->md_path : '';
 		$slug     = 'store-info' === self::type_slug( $source_type ) ? 'informacion-tienda' : 'catalogo-tienda';
 		$relative = Markdown_Store::write(
 			$lang,
@@ -205,6 +206,8 @@ class Store_Info_Doc {
 			$doc_post_id = $result;
 		}
 
+		// Si la ruta cambio (p. ej. otro idioma principal), no dejar el .md antiguo huerfano.
+		Markdown_Store::delete_if_moved( $old_md_path, $relative );
 		Registry::upsert(
 			array(
 				'source_id'   => $source_id,

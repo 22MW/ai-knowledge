@@ -4,7 +4,7 @@ Tags: woocommerce, chatbot, ia, llms.txt, wpml, crawlers, robots.txt
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.4.2
+Stable tag: 1.4.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -118,8 +118,11 @@ Sí. En **Visibilidad IA** selecciona el modo que permite únicamente `/llms.txt
 
 Ver `CHANGELOG.md` para el historial completo y detallado de cambios.
 
+= 1.4.3 =
+El bloque «Crear por idioma» usa el mismo patrón que el interruptor de llms.txt de Visibilidad IA: recuadro con interruptor, etiqueta ACTIVADO/DESACTIVADO y borde que se marca al activarlo.
+
 = 1.4.2 =
-Corrige el idioma mezclado en las respuestas del asistente con WPML, quita el sufijo de idioma «(ES)» de los encabezados del idioma principal en `/llms.txt`, coloca «Salir» junto a «Atrás» en el último paso y destaca el bloque «Crear por idioma».
+Corrige el idioma mezclado en las respuestas del asistente con WPML, quita el sufijo de idioma «(ES)» de los encabezados del idioma principal en `/llms.txt`, coloca «Salir» junto a «Atrás» en el último paso.
 
 = 1.4.1 =
 La carpeta de documentos pasa de `wp-content/llm/` a `wp-content/ai-knowledge/` (migración automática y redirección de las URLs antiguas). El asistente genera el resumen público del negocio. «Reinstalar filtros» de Support Genix ya funciona sin `php` en el servidor, el filtro de relevancia por título queda desactivado por defecto (con interruptor) y se acepta también la clave de Claude de Genix. Correcciones en el borrado de documentos y en el idioma de las respuestas del asistente.

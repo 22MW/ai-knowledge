@@ -84,7 +84,7 @@ el plugin desde la lista de plugins. Son irreversibles: haz una copia antes.
   Registro. No borra los artículos exclusivos de Genix ni el ajuste
   `chatbot_custom_instructions` de Genix.
 - **Borrar archivos generados** — la carpeta `wp-content/ai-knowledge/` (y la antigua `wp-content/llm/` si aún existe) (documentos
-  `.md`, FAQ, `info.md` y el prompt del chatbot) y el `llms.txt` de la raíz,
+  `.md`, FAQ e `info.md`) y el `llms.txt` de la raíz,
   solo si lo creó este plugin (uno propio tuyo se respeta). **No toca
   `robots.txt` ni `.htaccess`:** las reglas de bloqueo de AI Knowledge siguen
   activas tras desinstalar hasta que las quites a mano.

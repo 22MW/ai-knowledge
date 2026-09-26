@@ -72,6 +72,10 @@ class Plugin {
 
 		Markdown_Store::migrate();
 		add_action( 'init', array( __CLASS__, 'maybe_flush_after_migration' ), 99 );
+		// Idioma principal en la raiz de la carpeta: migracion unica (tras cargar el plugin de idiomas).
+		add_action( 'init', array( '\\AIKB\\Markdown_Store', 'migrate_main_flat' ), 20 );
+		// El prompt privado del chatbot sale de la carpeta publica a privado/ (dentro del plugin).
+		add_action( 'init', array( 'AIKB\\Chatbot_Prompt', 'migrate' ), 21 );
 		Queue::init();
 		Sync::init();
 		Crawler_Log::init();

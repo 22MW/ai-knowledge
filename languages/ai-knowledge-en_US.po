@@ -2695,8 +2695,8 @@ msgid "Borrar archivos generados"
 msgstr "Delete generated files"
 
 #: admin/views/tab-ajustes.php
-msgid "Borra la carpeta wp-content/llm/ (documentos .md, FAQ, info.md y el prompt del chatbot) y el llms.txt de la raíz solo si lo creó este plugin (uno propio tuyo se respeta). NO toca robots.txt ni .htaccess: las reglas de bloqueo de AI Knowledge seguirán activas tras desinstalar, hasta que las quites a mano."
-msgstr "Deletes the wp-content/llm/ folder (.md documents, FAQ, info.md and the chatbot prompt) and the root llms.txt only if this plugin created it (your own file is respected). It does NOT touch robots.txt or .htaccess: the AI Knowledge blocking rules will remain active after uninstalling, until you remove them by hand."
+msgid "Borra la carpeta wp-content/llm/ (documentos .md, FAQ e info.md) y el llms.txt de la raíz solo si lo creó este plugin (uno propio tuyo se respeta). NO toca robots.txt ni .htaccess: las reglas de bloqueo de AI Knowledge seguirán activas tras desinstalar, hasta que las quites a mano."
+msgstr "Deletes the wp-content/llm/ folder (.md documents, FAQ and info.md) and the root llms.txt only if this plugin created it (your own file is respected). It does NOT touch robots.txt or .htaccess: the AI Knowledge blocking rules will remain active after uninstalling, until you remove them by hand."
 
 #: includes/class-genix-hooks-guard.php
 msgid "relevancia de las búsquedas e idiomas no soportados (filtro search-results)"
@@ -2847,8 +2847,8 @@ msgid "Desactivado por defecto. Al activarlo, puede ocultar documentos cuyo cont
 msgstr "Disabled by default. When enabled, it may hide documents whose content answers the question but whose title does not match (for example, “shipping to the Canary Islands” with a document titled “Store information”). Genix already filters poorly related results on its own."
 
 #: admin/views/tab-ajustes.php
-msgid "Borra la carpeta wp-content/ai-knowledge/ (y la antigua wp-content/llm/ si aún existe) (documentos .md, FAQ, info.md y el prompt del chatbot) y el llms.txt de la raíz solo si lo creó este plugin (uno propio tuyo se respeta). NO toca robots.txt ni .htaccess: las reglas de bloqueo de AI Knowledge seguirán activas tras desinstalar, hasta que las quites a mano."
-msgstr "Deletes the wp-content/ai-knowledge/ folder (and the old wp-content/llm/ if it still exists) (.md documents, FAQ, info.md and the chatbot prompt) and the root llms.txt only if this plugin created it (your own file is respected). It does NOT touch robots.txt or .htaccess: the AI Knowledge blocking rules will remain active after uninstalling, until you remove them by hand."
+msgid "Borra la carpeta wp-content/ai-knowledge/ (y la antigua wp-content/llm/ si aún existe) (documentos .md, FAQ e info.md) y el llms.txt de la raíz solo si lo creó este plugin (uno propio tuyo se respeta). NO toca robots.txt ni .htaccess: las reglas de bloqueo de AI Knowledge seguirán activas tras desinstalar, hasta que las quites a mano."
+msgstr "Deletes the wp-content/ai-knowledge/ folder (and the old wp-content/llm/ if it still exists) (.md documents, FAQ and info.md) and the root llms.txt only if this plugin created it (your own file is respected). It does NOT touch robots.txt or .htaccess: the AI Knowledge blocking rules will remain active after uninstalling, until you remove them by hand."
 
 #: includes/class-genix-hooks-guard.php
 msgid "No se pudo crear la copia de seguridad; no se ha escrito nada en Support Genix."

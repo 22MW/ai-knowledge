@@ -36,20 +36,77 @@ class Chatbot_Prompt {
 	const GENIX_OPTION = 'chatbot_custom_instructions';
 	const SYNCED_HASH_OPTION = 'wookb_chatbot_prompt_synced_hash';
 
+	/** Espejo en base de datos: la carpeta del plugin se borra al actualizarlo. */
+	const TEXT_OPTION = 'wookb_chatbot_prompt_text';
+
 	/**
-	 * Origen editable (no publico, nunca servido por URL): guardado del
-	 * textarea de la pestaña Chatbot. Vive en wp-content/ai-knowledge/ junto al
-	 * resto de contenido del plugin (documentos publicos, info.md, FAQ),
-	 * en vez de suelto en la carpeta del plugin -- consolidado a partir
-	 * del 2026-09-16 (antes: AIKB_DIR . 'chatbot-system-prompt.md').
+	 * Carpeta PRIVADA dentro del plugin (con index.php): el prompt del chatbot
+	 * nunca vive en una carpeta servida por URL (antes: wp-content/ai-knowledge/
+	 * y wp-content/llm/, accesibles directamente).
 	 */
-	public static function file_path() {
-		return Markdown_Store::base_dir() . '/chatbot-system-prompt.md';
+	public static function private_dir() {
+		return AIKB_DIR . 'privado';
 	}
 
-	/** Ruta antigua (pre-consolidacion), solo para migrar una vez. */
-	protected static function legacy_file_path() {
-		return AIKB_DIR . 'chatbot-system-prompt.md';
+	public static function file_path() {
+		return self::private_dir() . '/chatbot-system-prompt.md';
+	}
+
+	/** Rutas antiguas (publica y la mas antigua en la raiz del plugin), solo para migrar. */
+	protected static function old_file_paths() {
+		$paths = array(
+			Markdown_Store::base_dir() . '/chatbot-system-prompt.md',
+			Markdown_Store::legacy_dir() . '/chatbot-system-prompt.md',
+			AIKB_DIR . 'chatbot-system-prompt.md',
+		);
+		return array_unique( $paths );
+	}
+
+	/** Escribe el archivo privado (crea la carpeta y su index.php). false si no se puede. */
+	protected static function write_file( $text ) {
+		$dir = self::private_dir();
+		if ( ! is_dir( $dir ) && ! @wp_mkdir_p( $dir ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			return false;
+		}
+		if ( ! file_exists( $dir . '/index.php' ) ) {
+			@file_put_contents( $dir . '/index.php', "<?php\n// Silence is golden.\n" ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_get_contents_file_put_contents
+		}
+		return false !== @file_put_contents( self::file_path(), trim( (string) $text ) . "\n" ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_get_contents_file_put_contents
+	}
+
+	/**
+	 * Unico punto de escritura del prompt: archivo privado + espejo en la
+	 * base de datos. Devuelve true si el archivo se pudo escribir (la opcion
+	 * se guarda siempre).
+	 */
+	public static function save( $text ) {
+		update_option( self::TEXT_OPTION, trim( (string) $text ), false );
+		return self::write_file( $text );
+	}
+
+	/**
+	 * Importa el prompt desde las ubicaciones antiguas (idempotente) y BORRA el
+	 * archivo antiguo, que es el que estaba expuesto. Si no se puede escribir
+	 * en privado/, no borra nada y queda solo la opcion como respaldo.
+	 */
+	public static function migrate() {
+		foreach ( self::old_file_paths() as $old ) {
+			if ( ! is_file( $old ) || is_link( $old ) ) {
+				continue;
+			}
+			$content = trim( (string) file_get_contents( $old ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			if ( '' !== $content ) {
+				if ( '' === trim( (string) get_option( self::TEXT_OPTION, '' ) ) ) {
+					update_option( self::TEXT_OPTION, $content, false );
+				}
+				if ( ! file_exists( self::file_path() ) && ! self::write_file( $content ) ) {
+					continue; // sin permisos: se conserva el antiguo, la opcion sirve de respaldo.
+				}
+			} elseif ( ! is_writable( $old ) ) {
+				continue;
+			}
+			unlink( $old ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
+		}
 	}
 
 	public static function read() {
@@ -58,13 +115,19 @@ class Chatbot_Prompt {
 			return trim( (string) file_get_contents( $path ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		}
 
-		// Migracion lazy: si existe el archivo en la ruta antigua y no en la
-		// nueva, se lee de ahi (sin borrarlo, por si acaso) hasta el proximo save().
-		if ( file_exists( self::legacy_file_path() ) ) {
-			return trim( (string) file_get_contents( self::legacy_file_path() ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		// Sin archivo (p. ej. tras actualizar el plugin): espejo de la BD, y se recrea el archivo.
+		$mirror = trim( (string) get_option( self::TEXT_OPTION, '' ) );
+		if ( '' !== $mirror ) {
+			self::write_file( $mirror );
+			return $mirror;
 		}
 
-		return '';
+		// Ubicaciones antiguas.
+		self::migrate();
+		if ( file_exists( $path ) ) {
+			return trim( (string) file_get_contents( $path ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		}
+		return trim( (string) get_option( self::TEXT_OPTION, '' ) );
 	}
 
 	/**

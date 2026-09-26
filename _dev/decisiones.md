@@ -356,9 +356,10 @@ contenido) — no se forzó una invalidación especial para este cambio de códi
   inglés y mezcla idiomas. No usar `switch_to_locale` como solución.
 - `/llms.txt`: el idioma principal no lleva sufijo «(XX)» en los encabezados; los
   demás sí.
-- Excepción explícita a «sin bordes decorativos» (pedida por el usuario): el
-  bloque «Crear por idioma» lleva borde de 3 px con `--tblr-primary`
-  (`.wookb-per-language`, en `admin.css`).
+- «Crear por idioma» reutiliza el patrón del interruptor de llms.txt de
+  Visibilidad IA (`.wookb-visibility-switch`, borde que pasa a `--tblr-primary`
+  con `.is-on`); no hay estilo propio nuevo. (Una primera versión, 1.4.2, puso un
+  borde fijo por malinterpretar una captura dibujada a mano.)
 
 ## 2026-09-26 — Carpeta, Genix y asistente (1.4.1)
 - La carpeta de documentos pasa a `wp-content/ai-knowledge/` (nombre definido solo

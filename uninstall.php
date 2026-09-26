@@ -82,6 +82,8 @@ function aikb_uninstall_site() {
 			'wookb_chatbot_prompt_synced_hash',
 			'wookb_genix_hooks_dismissed_at',
 			'wookb_rewrite_flush_pending',
+			'wookb_main_flat_migrated',
+			'wookb_chatbot_prompt_text',
 		);
 		foreach ( $options as $option ) {
 			delete_option( $option );

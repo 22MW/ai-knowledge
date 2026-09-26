@@ -875,8 +875,7 @@ class Admin
 				}
 			}
 			if ('' !== $draft) {
-				wp_mkdir_p(dirname(Chatbot_Prompt::file_path()));
-				file_put_contents(Chatbot_Prompt::file_path(), $draft . "\n"); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_put_contents
+				Chatbot_Prompt::save($draft);
 			}
 		}
 
@@ -1872,7 +1871,7 @@ GEO;
 		}
 		ob_start();
 		?>
-		<div class="wookb-per-language" id="wookb-per-language">
+		<div class="wookb-per-language wookb-visibility-switch<?php echo Languages::per_language_enabled() ? ' is-on' : ''; ?>" id="wookb-per-language">
 			<h3><?php esc_html_e('Crear por idioma', 'ai-knowledge'); ?></h3>
 			<p class="description">
 				<?php
@@ -1887,13 +1886,17 @@ GEO;
 			<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
 				<input type="hidden" name="action" value="wookb_save_per_language" />
 				<?php wp_nonce_field('wookb_save_per_language'); ?>
-				<p>
-					<label>
+				<div class="wookb-visibility-head">
+					<label class="wookb-assistant-toggle">
 						<input type="checkbox" name="per_language" value="1" <?php checked(Languages::per_language_enabled()); ?> />
-						<?php esc_html_e('Crear un .md por cada traducción que exista', 'ai-knowledge'); ?>
+						<span><?php esc_html_e('Crear un .md por cada traducción que exista', 'ai-knowledge'); ?></span>
 					</label>
-				</p>
-				<?php submit_button(__('Guardar', 'ai-knowledge'), 'secondary', 'submit', false); ?>
+					<strong class="wookb-visibility-state">
+						<span class="on"><?php esc_html_e('ACTIVADO', 'ai-knowledge'); ?></span>
+						<span class="off"><?php esc_html_e('DESACTIVADO', 'ai-knowledge'); ?></span>
+					</strong>
+				</div>
+				<p><?php submit_button(__('Guardar', 'ai-knowledge'), 'secondary', 'submit', false); ?></p>
 			</form>
 		</div>
 		<?php
@@ -2627,8 +2630,7 @@ GEO;
 			exit;
 		}
 
-		wp_mkdir_p(dirname(Chatbot_Prompt::file_path()));
-		file_put_contents(Chatbot_Prompt::file_path(), $draft . "\n"); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_put_contents
+		Chatbot_Prompt::save($draft);
 		Chatbot_Prompt::sync(true);
 		Chatbot_Prompt_Builder::write_info_doc();
 		delete_transient('wookb_prompt_draft');

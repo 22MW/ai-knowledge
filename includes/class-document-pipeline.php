@@ -126,6 +126,7 @@ class Document_Pipeline {
 		}
 
 		$slug = Markdown_Store::slug_for( $real_source_id, $lang );
+		$old_md_path = $existing ? $existing->md_path : '';
 		$relative = Markdown_Store::write(
 			$lang,
 			$slug,
@@ -181,6 +182,8 @@ class Document_Pipeline {
 			}
 		}
 
+		$row_id = // Si la ruta cambio (p. ej. otro idioma principal), no dejar el .md antiguo huerfano.
+		$row_id = Markdown_Store::delete_if_moved( $old_md_path, $relative );
 		$row_id = Registry::upsert(
 			array(
 				'source_id'    => $real_source_id,
