@@ -1577,6 +1577,17 @@ GEO;
 		check_admin_referer($action);
 	}
 
+	/**
+	 * Dominio del sitio para los nombres de los archivos descargados
+	 * (copias de seguridad y preparados de robots.txt/.htaccess/llms.txt):
+	 * con varios sitios en marcha, saber de cual es cada descarga sin abrirla.
+	 */
+	protected static function download_domain_slug()
+	{
+		$host = (string) wp_parse_url(home_url(), PHP_URL_HOST);
+		return sanitize_file_name($host);
+	}
+
 	protected static function redirect($tab)
 	{
 		if (wp_doing_ajax()) {
@@ -1790,7 +1801,7 @@ GEO;
 			<div class="wookb-visibility-head">
 				<label class="wookb-assistant-toggle">
 					<input type="checkbox" name="crawler_visibility_mode" value="llms_only" <?php checked($on); ?> />
-					<span><?php esc_html_e('Incluir llms.txt para los modelos desactivados', 'ai-knowledge'); ?></span>
+					<span><?php esc_html_e('Incluir llms.txt y los documentos .md para los modelos desactivados', 'ai-knowledge'); ?></span>
 				</label>
 				<strong class="wookb-visibility-state">
 					<span class="on"><?php esc_html_e('ACTIVADO', 'ai-knowledge'); ?></span>
@@ -1799,8 +1810,8 @@ GEO;
 			</div>
 			<p class="description"><?php esc_html_e('Modelos desactivados = los bots que has marcado como Bloqueado en la tabla de crawlers.', 'ai-knowledge'); ?></p>
 			<ul class="wookb-visibility-effects">
-				<li><strong><?php esc_html_e('Activado:', 'ai-knowledge'); ?></strong> <?php esc_html_e('los bots bloqueados no pueden entrar en tu web, pero sí leen /llms.txt, el resumen que has preparado para ellos. Cualquier otra página les responde 404.', 'ai-knowledge'); ?></li>
-				<li><strong><?php esc_html_e('Desactivado:', 'ai-knowledge'); ?></strong> <?php esc_html_e('los bots bloqueados no pueden acceder a nada, ni siquiera a /llms.txt. Es un bloqueo total del sitio.', 'ai-knowledge'); ?></li>
+				<li><strong><?php esc_html_e('Activado:', 'ai-knowledge'); ?></strong> <?php esc_html_e('los bots bloqueados no pueden entrar en tu web (ninguna página HTML real), pero sí leen /llms.txt y los documentos .md de cada contenido: pueden saber de qué trata tu web y citarla sin generarte tráfico de rastreo. Cualquier otra ruta les responde 404.', 'ai-knowledge'); ?></li>
+				<li><strong><?php esc_html_e('Desactivado:', 'ai-knowledge'); ?></strong> <?php esc_html_e('los bots bloqueados no pueden acceder a nada, ni siquiera a /llms.txt ni a los documentos .md. Es un bloqueo total del sitio.', 'ai-knowledge'); ?></li>
 			</ul>
 			<p class="description"><?php esc_html_e('Este ajuste solo cambia las reglas propuestas para robots.txt y .htaccess. Nada se modifica en tu servidor hasta que tú lo apliques.', 'ai-knowledge'); ?></p>
 		</div>
@@ -3240,7 +3251,7 @@ GEO;
 		set_transient('wookb_llms_backup_confirmed_' . get_current_user_id(), 1, 10 * MINUTE_IN_SECONDS);
 		nocache_headers();
 		header('Content-Type: application/octet-stream');
-		header('Content-Disposition: attachment; filename="llms-backup-' . gmdate('Ymd-His') . '.txt"');
+		header('Content-Disposition: attachment; filename="llms-backup-' . self::download_domain_slug() . '-' . gmdate('Ymd-His') . '.txt"');
 		echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		exit;
 	}
@@ -3330,7 +3341,7 @@ GEO;
 
 		nocache_headers();
 		header('Content-Type: application/octet-stream');
-		header('Content-Disposition: attachment; filename="robots-backup-' . gmdate('Ymd-His') . '.txt"');
+		header('Content-Disposition: attachment; filename="robots-backup-' . self::download_domain_slug() . '-' . gmdate('Ymd-His') . '.txt"');
 		header('Content-Length: ' . strlen($content));
 		echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- descarga de archivo, no HTML.
 		exit;
@@ -3417,7 +3428,7 @@ GEO;
 
 		nocache_headers();
 		header('Content-Type: application/octet-stream');
-		header('Content-Disposition: attachment; filename="htaccess-backup-' . gmdate('Ymd-His') . '.txt"');
+		header('Content-Disposition: attachment; filename="htaccess-backup-' . self::download_domain_slug() . '-' . gmdate('Ymd-His') . '.txt"');
 		header('Content-Length: ' . filesize($path));
 		readfile($path); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_readfile
 		exit;
@@ -3470,7 +3481,7 @@ GEO;
 		$content = Htaccess_Guard::generate_full_file(Crawler_Catalog::effective_actions(), Scope::settings()['crawler_visibility_mode']);
 		nocache_headers();
 		header('Content-Type: application/octet-stream');
-		header('Content-Disposition: attachment; filename="htaccess-ai-knowledge-' . gmdate('Ymd-His') . '.txt"');
+		header('Content-Disposition: attachment; filename="htaccess-ai-knowledge-' . self::download_domain_slug() . '-' . gmdate('Ymd-His') . '.txt"');
 		echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		exit;
 	}

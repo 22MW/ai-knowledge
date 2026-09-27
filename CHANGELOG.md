@@ -2,6 +2,38 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [1.4.2] - 2026-09-28
+
+### Añadido
+
+- El interruptor «Incluir llms.txt y los documentos .md para los modelos
+  desactivados» (pestaña Visibilidad IA y asistente) ahora también exime
+  `/ai-knowledge-doc/` (los documentos `.md`), no solo `/llms.txt`: los bots
+  bloqueados en modo «solo llms.txt» pueden leer el contenido preparado para
+  IA sin poder rastrear el resto del sitio. Traducido a los 5 idiomas.
+- Los archivos descargados (copia de llms.txt, copia de robots.txt, copia de
+  .htaccess y el .htaccess preparado) llevan ahora el dominio del sitio en el
+  nombre, para identificar de qué web es cada descarga cuando se gestionan
+  varios sitios.
+
+### Corregido
+
+- **`.htaccess` y `robots.txt` — bloqueo real de crawlers:** al aplicar los
+  cambios, el aviso de reglas de terceros en conflicto no se aplicaba de
+  verdad (seguía apareciendo el mismo aviso siempre) y, en `.htaccess`, en
+  bloques largos de terceros encadenados con `[NC,OR]` (por ejemplo un
+  anti-scanner con muchos bots), podía comentar por error la línea de un bot
+  vecino no relacionado. Además, cada archivo tenía varias lógicas distintas
+  para detectar/comentar conflictos (aviso, vista previa/descarga y botón
+  real de aplicar) que podían no coincidir entre sí, y ninguna sabía detectar
+  el caso más habitual: un bot «Bloqueado» en modo «solo llms.txt y .md»
+  al que un tercero ya bloqueaba del todo sin dejar esa excepción. Ahora cada
+  archivo tiene una sola función para detectar y comentar conflictos, usada
+  por el aviso, la vista previa, la descarga y el botón real, para los dos
+  casos (bot «Permitido» bloqueado por un tercero, y bot «Bloqueado» ya
+  bloqueado del todo por un tercero cuando se quiere dejar pasar solo a
+  `/llms.txt` y `/ai-knowledge-doc/`).
+
 ## [1.4.1] - 2026-09-27
 
 ### Correcciones

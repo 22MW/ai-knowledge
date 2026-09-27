@@ -2857,3 +2857,12 @@ msgstr "Ezin izan da babeskopia sortu; ez da ezer idatzi Support Genixen."
 #: includes/class-ai-client.php
 msgid "Support Genix no tiene una clave de OpenAI ni de Claude configurada."
 msgstr "Support Genixek ez du OpenAI ez Claude gakorik konfiguratuta."
+
+msgid "Incluir llms.txt y los documentos .md para los modelos desactivados"
+msgstr "llms.txt eta .md dokumentuak sartu desgaitutako modeloentzat"
+
+msgid "los bots bloqueados no pueden entrar en tu web (ninguna página HTML real), pero sí leen /llms.txt y los documentos .md de cada contenido: pueden saber de qué trata tu web y citarla sin generarte tráfico de rastreo. Cualquier otra ruta les responde 404."
+msgstr "blokeatutako botek ezin dute zure webgunean sartu (benetako HTML orririk ez), baina /llms.txt eta eduki bakoitzaren .md dokumentuak irakurtzen dituzte: zure webguneak zertaz dihardun jakin dezakete eta aipatu, arakatze-trafikorik sortu gabe. Beste edozein bideok 404 erantzuten du."
+
+msgid "los bots bloqueados no pueden acceder a nada, ni siquiera a /llms.txt ni a los documentos .md. Es un bloqueo total del sitio."
+msgstr "blokeatutako botek ezin dute ezertara sartu, ez baita /llms.txt-era ez eta .md dokumentuetara ere. Guneen erabateko blokeoa da."
