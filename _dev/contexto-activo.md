@@ -7,15 +7,13 @@
 
 ## Estado — 2026-09-27
 
-- **Última release publicada: 1.4.0** (2026-09-26). Versión dev actual:
-  **1.4.0.1**, subida a `knowBaseDev` tras probar la 1.4.0 en un sitio real
-  (`docthinks`/`plugins.local`) y corregir lo que falló.
-- Corregido: página de Visibilidad IA servida como texto plano (bug real de
-  `do_robots()`), botones «Copiar Prompt» del asistente que no copiaban
-  (enganche de clic no delegado), recuadro con borde para los prompts y para
-  el resumen de Generación masiva, «Datos de compra» → «Datos adicionales» en
-  contenidos que no son productos.
-- Sin tarea de código abierta. Pendiente real en `roadmap.md`.
+- **Última release publicada: 1.4.1** (2026-09-27). Sin tarea de código
+  abierta.
+- La 1.4.1 recoge lo probado y corregido de la 1.4.0 (Visibilidad IA como
+  texto plano, botones de copiar, recuadros de estilo, Generación masiva
+  reordenada, «Datos adicionales») más un hallazgo de una auditoría GEO
+  externa: documentos con guion bajo en el slug de origen daban 404 en
+  `llms.txt` (lista blanca del servidor de documentos sin `_`).
 
 ## Siguiente paso
 

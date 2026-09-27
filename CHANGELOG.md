@@ -2,7 +2,7 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
-## [1.4.0.1] - 2026-09-27 (dev)
+## [1.4.1] - 2026-09-27
 
 ### Correcciones
 
@@ -29,6 +29,10 @@ Todas las modificaciones relevantes de este plugin se documentan en este archivo
   destacado.
 - Contenidos que no son productos, con campos personalizados: el bloque ya no
   se titula «Datos de compra», sino «Datos adicionales».
+- Los documentos `/ai-knowledge-doc/...` de contenidos cuyo slug de WordPress
+  lleva guion bajo (`_`) daban 404 aunque `llms.txt` enlazara bien y el archivo
+  existiera: la lista blanca de caracteres del servidor de documentos no
+  incluía `_`. Encontrado con una auditoría GEO externa.
 
 ## [1.4.0] - 2026-09-26
 

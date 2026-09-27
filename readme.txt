@@ -4,7 +4,7 @@ Tags: woocommerce, chatbot, ia, llms.txt, wpml, crawlers, robots.txt
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -118,8 +118,8 @@ Sí. En **Visibilidad IA** selecciona el modo que permite únicamente `/llms.txt
 
 Ver `CHANGELOG.md` para el historial completo y detallado de cambios.
 
-= 1.4.0.1 (dev) =
-Corrige que Visibilidad IA (y el asistente) sirviera la página como texto plano, que los botones «Copiar Prompt» del asistente no copiaran de verdad, añade el aviso de copiado junto al botón, recuadro destacado para los prompts y el resumen de Generación masiva, y cambia «Datos de compra» por «Datos adicionales» en contenidos que no son productos.
+= 1.4.1 =
+Corrige que Visibilidad IA (y el asistente) sirviera la página como texto plano, que los botones «Copiar Prompt» del asistente no copiaran de verdad y que los documentos con guion bajo en su slug dieran 404 en llms.txt. Añade el aviso de copiado junto al botón, recuadro destacado para los prompts y el resumen de Generación masiva, y cambia «Datos de compra» por «Datos adicionales» en contenidos que no son productos.
 
 = 1.4.0 =
 Revisión del asistente y del servidor: comprobación real de la conexión de IA con lista de modelos, WooCommerce y resumen de Negocio en el asistente, robots.txt sin peticiones HTTP y «Crear robots.txt» con confirmación de riesgos, cola más rápida, carpeta de documentos `wp-content/ai-knowledge/` con los documentos del idioma principal en la raíz (migración y redirecciones automáticas), prompt del chatbot en una carpeta privada del plugin, arreglos de Support Genix (reinstalar filtros sin `php`, clave de Claude), idioma del asistente con WPML corregido y dos opciones de borrado al desinstalar.

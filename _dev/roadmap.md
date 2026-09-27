@@ -20,10 +20,13 @@ No presentar este flujo como validado hasta realizar esas pruebas.
 2. Probar la pestaña WooCommerce: checkboxes, snapshot editable y «Pulir redacción con IA», especialmente la llamada a IA.
 3. Repetir la comprobación de feedback del botón del editor de documentos (Fase 1), que quedó sin evidencia suficiente en la primera prueba.
 
-## Pendiente tras la release 1.4.0
+## Pendiente tras la release 1.4.1
 
-Publicada el 2026-09-26. Probada por el usuario en docthinks (lista de pruebas de
-la release superada). Queda:
+Publicada el 2026-09-27. Incluye lo probado de la 1.4.0 (Visibilidad IA, botones
+de copiar, estilo, Generación masiva, «Datos adicionales») y el guion bajo en
+slugs de `llms.txt` (auditoría GEO externa). Confirmado por el usuario que el
+feed `products.xml` vacío era un filtro de alcance en el sitio, no un bug.
+Queda:
 
 1. **Traducciones.** Revisión lingüística del euskera y del alemán nuevos (los
    escribió un subagente). Aviso: `_dev/make_i18n_json.py` (WP-CLI `make-json`)
