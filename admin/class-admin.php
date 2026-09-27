@@ -1577,6 +1577,17 @@ GEO;
 		check_admin_referer($action);
 	}
 
+	/**
+	 * Dominio del sitio para los nombres de los archivos descargados
+	 * (copias de seguridad y preparados de robots.txt/.htaccess/llms.txt):
+	 * con varios sitios en marcha, saber de cual es cada descarga sin abrirla.
+	 */
+	protected static function download_domain_slug()
+	{
+		$host = (string) wp_parse_url(home_url(), PHP_URL_HOST);
+		return sanitize_file_name($host);
+	}
+
 	protected static function redirect($tab)
 	{
 		if (wp_doing_ajax()) {
@@ -3240,7 +3251,7 @@ GEO;
 		set_transient('wookb_llms_backup_confirmed_' . get_current_user_id(), 1, 10 * MINUTE_IN_SECONDS);
 		nocache_headers();
 		header('Content-Type: application/octet-stream');
-		header('Content-Disposition: attachment; filename="llms-backup-' . gmdate('Ymd-His') . '.txt"');
+		header('Content-Disposition: attachment; filename="llms-backup-' . self::download_domain_slug() . '-' . gmdate('Ymd-His') . '.txt"');
 		echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		exit;
 	}
@@ -3330,7 +3341,7 @@ GEO;
 
 		nocache_headers();
 		header('Content-Type: application/octet-stream');
-		header('Content-Disposition: attachment; filename="robots-backup-' . gmdate('Ymd-His') . '.txt"');
+		header('Content-Disposition: attachment; filename="robots-backup-' . self::download_domain_slug() . '-' . gmdate('Ymd-His') . '.txt"');
 		header('Content-Length: ' . strlen($content));
 		echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- descarga de archivo, no HTML.
 		exit;
@@ -3417,7 +3428,7 @@ GEO;
 
 		nocache_headers();
 		header('Content-Type: application/octet-stream');
-		header('Content-Disposition: attachment; filename="htaccess-backup-' . gmdate('Ymd-His') . '.txt"');
+		header('Content-Disposition: attachment; filename="htaccess-backup-' . self::download_domain_slug() . '-' . gmdate('Ymd-His') . '.txt"');
 		header('Content-Length: ' . filesize($path));
 		readfile($path); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_readfile
 		exit;
@@ -3470,7 +3481,7 @@ GEO;
 		$content = Htaccess_Guard::generate_full_file(Crawler_Catalog::effective_actions(), Scope::settings()['crawler_visibility_mode']);
 		nocache_headers();
 		header('Content-Type: application/octet-stream');
-		header('Content-Disposition: attachment; filename="htaccess-ai-knowledge-' . gmdate('Ymd-His') . '.txt"');
+		header('Content-Disposition: attachment; filename="htaccess-ai-knowledge-' . self::download_domain_slug() . '-' . gmdate('Ymd-His') . '.txt"');
 		echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		exit;
 	}

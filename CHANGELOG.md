@@ -2,7 +2,7 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
-## [1.4.1.1] - 2026-09-28
+## [1.4.2] - 2026-09-28
 
 ### Añadido
 
@@ -11,6 +11,10 @@ Todas las modificaciones relevantes de este plugin se documentan en este archivo
   `/ai-knowledge-doc/` (los documentos `.md`), no solo `/llms.txt`: los bots
   bloqueados en modo «solo llms.txt» pueden leer el contenido preparado para
   IA sin poder rastrear el resto del sitio. Traducido a los 5 idiomas.
+- Los archivos descargados (copia de llms.txt, copia de robots.txt, copia de
+  .htaccess y el .htaccess preparado) llevan ahora el dominio del sitio en el
+  nombre, para identificar de qué web es cada descarga cuando se gestionan
+  varios sitios.
 
 ### Corregido
 
