@@ -118,6 +118,9 @@ Sí. En **Visibilidad IA** selecciona el modo que permite únicamente `/llms.txt
 
 Ver `CHANGELOG.md` para el historial completo y detallado de cambios.
 
+= 1.4.1.1 =
+El interruptor de Visibilidad IA también exime los documentos `.md`, no solo llms.txt. Arregla que «Reemplazar .htaccess» y la aplicación de robots.txt no comentaran de verdad las reglas de terceros en conflicto (en .htaccess podía comentar por error un bot vecino no relacionado, y en robots.txt no se detectaba el caso más habitual) y unifica en cada archivo el aviso, la vista previa, la descarga y el botón real en una sola lógica.
+
 = 1.4.1 =
 Corrige que Visibilidad IA (y el asistente) sirviera la página como texto plano, que los botones «Copiar Prompt» del asistente no copiaran de verdad y que los documentos con guion bajo en su slug dieran 404 en llms.txt. Añade el aviso de copiado junto al botón, recuadro destacado para los prompts y el resumen de Generación masiva, y cambia «Datos de compra» por «Datos adicionales» en contenidos que no son productos.
 

@@ -24,6 +24,16 @@ class Robots_Txt_Guard {
 	const TRANSIENT_PREFIX = 'wookb_robots_backup_confirmed_';
 	const MARKER           = 'AI Knowledge crawlers';
 
+	/**
+	 * Rutas que quedan abiertas para los bots bloqueados en modo "llms_only"
+	 * (pedido explicito del usuario, 2026-09-27): no solo el resumen de
+	 * llms.txt, tambien los documentos .md que sirve el plugin -- el objetivo
+	 * no es impedir que lean sobre la web, es que no rastreen el sitio real
+	 * (paginas HTML completas). "Allow" en robots.txt hace match de prefijo,
+	 * asi que la ruta del servidor de documentos cubre cualquier .md debajo.
+	 */
+	const LLMS_ONLY_ALLOWED_PATHS = array( '/llms.txt', '/ai-knowledge-doc/' );
+
 	public static function path() {
 		return ABSPATH . 'robots.txt';
 	}
@@ -126,44 +136,33 @@ class Robots_Txt_Guard {
 		delete_transient( self::transient_key() );
 	}
 
-	/**
-	 * Un bloque `User-agent: X` + `Disallow: /` por bot, con linea en blanco
-	 * entre bloques -- formato estandar de robots.txt.
-	 *
-	 * @param string[] $bot_user_agents Tokens de user_agent del catalogo.
-	 */
-	public static function build_rules( array $bot_user_agents, $visibility_mode = 'site' ) {
-		$lines = array();
-		foreach ( $bot_user_agents as $ua ) {
-			$ua = trim( (string) $ua );
-			if ( '' === $ua ) {
-				continue;
-			}
-			if ( ! empty( $lines ) ) {
-				$lines[] = '';
-			}
-			$lines[] = 'User-agent: ' . $ua;
-			$lines[] = 'Disallow: /';
-			if ( 'llms_only' === $visibility_mode ) {
-				$lines[] = 'Allow: /llms.txt';
-			}
-		}
-		return $lines;
-	}
-
 	public static function build_action_rules( array $actions, $visibility_mode = 'site' ) {
 		$lines = array();
 		foreach ( $actions as $ua => $action ) {
 			if ( ! empty( $lines ) ) { $lines[] = ''; }
 			$lines[] = 'User-agent: ' . trim( (string) $ua );
 			if ( 'allow' === $action ) { $lines[] = 'Allow: /'; }
-			else { $lines[] = 'Disallow: /'; if ( 'llms_only' === $visibility_mode ) { $lines[] = 'Allow: /llms.txt'; } }
+			else {
+				$lines[] = 'Disallow: /';
+				if ( 'llms_only' === $visibility_mode ) {
+					foreach ( self::LLMS_ONLY_ALLOWED_PATHS as $allowed_path ) {
+						$lines[] = 'Allow: ' . $allowed_path;
+					}
+				}
+			}
 		}
 		return $lines;
 	}
 
 	public static function apply_actions( array $actions, $visibility_mode = 'site' ) {
-		self::comment_action_conflicts( $actions );
+		$path = self::path();
+		if ( file_exists( $path ) && is_writable( $path ) ) { // phpcs:ignore
+			$raw = (string) file_get_contents( $path ); // phpcs:ignore
+			list( , $updated ) = self::scan_conflicts( $raw, $actions, $visibility_mode, true );
+			if ( $updated !== $raw ) {
+				file_put_contents( $path, $updated, LOCK_EX ); // phpcs:ignore
+			}
+		}
 		return insert_with_markers( self::path(), self::MARKER, self::build_action_rules( $actions, $visibility_mode ) );
 	}
 
@@ -178,102 +177,130 @@ class Robots_Txt_Guard {
 		return hash_equals( $expected, $current );
 	}
 
-	public static function action_conflicts( array $actions ) {
-		$path = self::path();
-		if ( ! file_exists( $path ) ) { return array(); }
-		$lines = preg_split( '/\r\n|\r|\n/', (string) file_get_contents( $path ) ); // phpcs:ignore
-		$found = array(); $inside = false; $ua = '';
-		foreach ( $lines as $line ) {
-			if ( 0 === strpos( trim( $line ), '# BEGIN ' . self::MARKER ) ) { $inside = true; continue; }
-			if ( 0 === strpos( trim( $line ), '# END ' . self::MARKER ) ) { $inside = false; $ua = ''; continue; }
-			if ( $inside ) { continue; }
-			if ( preg_match( '/^\s*User-agent:\s*(.+)$/i', $line, $m ) ) { $ua = trim( $m[1] ); continue; }
-			$matched = null;
-			foreach ( $actions as $known_ua => $action ) { if ( 0 === strcasecmp( $known_ua, $ua ) ) { $matched = $action; break; } }
-			if ( null === $matched ) { continue; }
-			if ( 'allow' === $matched && preg_match( '/^\s*Disallow:\s*\/\s*$/i', $line ) ) { $found[] = $ua . ': ' . trim( $line ); }
-			if ( 'block' === $matched && preg_match( '/^\s*Allow:\s*\/\s*$/i', $line ) ) { $found[] = $ua . ': ' . trim( $line ); }
-		}
-		return array_values( array_unique( $found ) );
-	}
-
-	protected static function comment_action_conflicts( array $actions ) {
-		$path = self::path();
-		if ( ! file_exists( $path ) || ! is_writable( $path ) ) { return; }
-		$lines = preg_split( '/\r\n|\r|\n/', (string) file_get_contents( $path ) ); // phpcs:ignore
-		$out = array(); $inside = false; $group = array(); $ua = '';
-		$flush = function () use ( &$out, &$group, &$ua, $actions ) {
-			if ( empty( $group ) ) { return; }
+	/**
+	 * Unica logica de deteccion + comentado de conflictos con grupos de
+	 * terceros, para los dos casos posibles (bug real confirmado 2026-09-28,
+	 * mismo hallazgo que en Htaccess_Guard: existian 3 copias distintas --
+	 * esta, la de generate_full_file() y la de comment_action_conflicts() --
+	 * y ninguna sabia detectar el caso mas habitual, un bot "Bloqueado" en
+	 * modo "solo llms.txt y .md" al que un tercero ya bloquea del todo sin
+	 * dejar la excepcion):
+	 *
+	 * - Bot "Permitido" (`allow`) que un grupo de terceros ya bloquea del
+	 *   todo (`Disallow: /` sin ningun `Allow`).
+	 * - Bot "Bloqueado" (`block`) en modo `llms_only` al que un grupo de
+	 *   terceros bloquea sin dejar pasar `/llms.txt` ni `/ai-knowledge-doc/`.
+	 * - Bot "Bloqueado" en modo `site` al que un grupo de terceros permite
+	 *   del todo (`Allow: /`).
+	 *
+	 * Devuelve [ conflictos (array de "User-agent: linea"), contenido (con o
+	 * sin comentar segun $apply) ]. La usan action_conflicts() (aviso, solo
+	 * detecta), generate_full_file() (vista previa) y apply_actions() (boton
+	 * real): las tres ven exactamente el mismo resultado.
+	 */
+	protected static function scan_conflicts( $content, array $actions, $visibility_mode, $apply = false ) {
+		$lines  = preg_split( '/\r\n|\r|\n/', (string) $content );
+		$out    = array();
+		$found  = array();
+		$inside = false;
+		$group  = array();
+		$ua     = '';
+		$flush  = function () use ( &$out, &$found, &$group, &$ua, $actions, $visibility_mode, $apply ) {
+			if ( empty( $group ) ) {
+				return;
+			}
 			$action = null;
-			foreach ( $actions as $known_ua => $known_action ) { if ( 0 === strcasecmp( $known_ua, $ua ) ) { $action = $known_action; break; } }
-			$body = implode( "\n", $group );
-			$conflict = ( 'allow' === $action && preg_match( '/^\s*Disallow:\s*\/\s*$/mi', $body ) ) || ( 'block' === $action && preg_match( '/^\s*Allow:\s*\/\s*$/mi', $body ) );
-			if ( $conflict ) { $out[] = '# AI Knowledge conflict: grupo original conservado y desactivado'; foreach ( $group as $item ) { $out[] = '# ' . $item; } }
-			else { foreach ( $group as $item ) { $out[] = $item; } }
-			$group = array(); $ua = '';
+			foreach ( $actions as $known_ua => $known_action ) {
+				if ( 0 === strcasecmp( $known_ua, $ua ) ) {
+					$action = $known_action;
+					break;
+				}
+			}
+			$body     = implode( "\n", $group );
+			$conflict = false;
+			if ( 'allow' === $action ) {
+				$conflict = (bool) preg_match( '/^\s*Disallow:\s*\/\s*$/mi', $body );
+			} elseif ( 'block' === $action ) {
+				if ( 'llms_only' === $visibility_mode ) {
+					$has_disallow_all = (bool) preg_match( '/^\s*Disallow:\s*\/\s*$/mi', $body );
+					$has_all_allowed  = true;
+					foreach ( self::LLMS_ONLY_ALLOWED_PATHS as $allowed_path ) {
+						if ( ! preg_match( '/^\s*Allow:\s*' . preg_quote( $allowed_path, '/' ) . '\s*$/mi', $body ) ) {
+							$has_all_allowed = false;
+							break;
+						}
+					}
+					$conflict = $has_disallow_all && ! $has_all_allowed;
+				} else {
+					$conflict = (bool) preg_match( '/^\s*Allow:\s*\/\s*$/mi', $body );
+				}
+			}
+			if ( $conflict ) {
+				$found[] = $ua . ': ' . trim( $group[ count( $group ) - 1 ] );
+				if ( $apply ) {
+					$out[] = '# AI Knowledge conflict: grupo original conservado y desactivado por contradicción';
+					foreach ( $group as $item ) {
+						$out[] = '# ' . $item;
+					}
+					$group = array();
+					$ua    = '';
+					return;
+				}
+			}
+			foreach ( $group as $item ) {
+				$out[] = $item;
+			}
+			$group = array();
+			$ua    = '';
 		};
 		foreach ( $lines as $line ) {
-			if ( 0 === strpos( trim( $line ), '# BEGIN ' . self::MARKER ) ) { $flush(); $inside = true; $out[] = $line; continue; }
-			if ( 0 === strpos( trim( $line ), '# END ' . self::MARKER ) ) { $inside = false; $out[] = $line; continue; }
-			if ( $inside ) { $out[] = $line; continue; }
-			if ( preg_match( '/^\s*User-agent:\s*(.+)$/i', $line, $m ) ) { $flush(); $ua = trim( $m[1] ); $group[] = $line; continue; }
-			if ( '' !== $ua && '' !== trim( $line ) ) { $group[] = $line; continue; }
-			$flush(); $out[] = $line;
+			if ( 0 === strpos( trim( $line ), '# BEGIN ' . self::MARKER ) ) {
+				$flush();
+				$inside = true;
+				$out[]  = $line;
+				continue;
+			}
+			if ( 0 === strpos( trim( $line ), '# END ' . self::MARKER ) ) {
+				$inside = false;
+				$out[]  = $line;
+				continue;
+			}
+			if ( $inside ) {
+				$out[] = $line;
+				continue;
+			}
+			if ( 0 === strpos( ltrim( $line ), '#' ) ) {
+				// Bug real confirmado (2026-09-27, mismo hallazgo que en
+				// Htaccess_Guard): un grupo ya comentado no debe volver a
+				// contarse como conflicto ni volver a comentarse.
+				$flush();
+				$out[] = $line;
+				continue;
+			}
+			if ( preg_match( '/^\s*User-agent:\s*(.+)$/i', $line, $m ) ) {
+				$flush();
+				$ua      = trim( $m[1] );
+				$group[] = $line;
+				continue;
+			}
+			if ( '' !== $ua && '' !== trim( $line ) ) {
+				$group[] = $line;
+				continue;
+			}
+			$flush();
+			$out[] = $line;
 		}
 		$flush();
-		file_put_contents( $path, implode( "\n", $out ), LOCK_EX ); // phpcs:ignore
+		return array( array_values( array_unique( $found ) ), implode( "\n", $out ) );
 	}
 
-	/**
-	 * Aplica el bloque via insert_with_markers() (nativa de WordPress). Si el
-	 * archivo fisico no existe todavia, insert_with_markers() lo crea. El
-	 * marcador propio evita pisar reglas de otros plugins, y permite quitar
-	 * el bloque limpiamente si se desactiva.
-	 */
-	public static function apply_block( array $bot_user_agents, $visibility_mode = 'site' ) {
-		$rules = self::build_rules( $bot_user_agents, $visibility_mode );
-		self::comment_conflicts( $bot_user_agents, $visibility_mode );
-		// Un bloque vacio elimina solo el bloque del plugin y conserva el resto.
-		return insert_with_markers( self::path(), self::MARKER, $rules );
-	}
-
-	public static function conflicts( array $bot_user_agents, $visibility_mode = 'site' ) {
+	public static function action_conflicts( array $actions, $visibility_mode = 'site' ) {
 		$path = self::path();
 		if ( ! file_exists( $path ) ) {
 			return array();
 		}
-		$lines = preg_split( '/\r\n|\r|\n/', (string) file_get_contents( $path ) ); // phpcs:ignore
-		$found = array();
-		$current = '';
-		$inside_plugin_block = false;
-		foreach ( $lines as $line ) {
-			if ( preg_match( '/^# BEGIN ' . preg_quote( self::MARKER, '/' ) . '\s*$/', trim( $line ) ) ) {
-				$inside_plugin_block = true;
-				continue;
-			}
-			if ( preg_match( '/^# END ' . preg_quote( self::MARKER, '/' ) . '\s*$/', trim( $line ) ) ) {
-				$inside_plugin_block = false;
-				$current = '';
-				continue;
-			}
-			if ( $inside_plugin_block ) {
-				continue;
-			}
-			if ( preg_match( '/^\s*User-agent:\s*(.+)$/i', $line, $m ) ) {
-				$current = trim( $m[1] );
-				continue;
-			}
-			if ( ! in_array( $current, $bot_user_agents, true ) || preg_match( '/AI Knowledge crawlers/i', $line ) ) {
-				continue;
-			}
-			if ( preg_match( '/^\s*(Allow|Disallow):\s*(.*)$/i', $line, $m ) ) {
-				$expected = ( 'llms_only' === $visibility_mode && 'Allow' === ucfirst( strtolower( $m[1] ) ) && '/llms.txt' === trim( $m[2] ) ) || ( 'site' === $visibility_mode && 'Disallow' === ucfirst( strtolower( $m[1] ) ) && '/' === trim( $m[2] ) );
-				if ( ! $expected ) {
-					$found[] = trim( $line );
-				}
-			}
-		}
-		return array_values( array_unique( $found ) );
+		list( $found ) = self::scan_conflicts( (string) file_get_contents( $path ), $actions, $visibility_mode, false ); // phpcs:ignore
+		return $found;
 	}
 
 	public static function generate_full_file( array $bot_user_agents, $visibility_mode = 'site' ) {
@@ -281,36 +308,12 @@ class Robots_Txt_Guard {
 		$current  = self::read_current();
 		$original = $current['content'];
 		$original = preg_replace( '/\R?# BEGIN ' . preg_quote( self::MARKER, '/' ) . '.*?# END ' . preg_quote( self::MARKER, '/' ) . '\R?/s', "\n", $original );
-		foreach ( $bot_user_agents as $ua => $action ) {
-			$quoted_ua = preg_quote( $ua, '/' );
-			if ( 'allow' === $action ) {
-				$original = preg_replace( '/^(User-agent:\s*' . $quoted_ua . '\s*)\R(Disallow:\s*\/\s*)$/mi', '# AI Knowledge conflict: grupo original conservado y desactivado' . "\n" . '# $1' . "\n" . '# $2', $original );
-			} elseif ( 'block' === $action ) {
-				$original = preg_replace( '/^(User-agent:\s*' . $quoted_ua . '\s*)\R(Allow:\s*\/\s*)$/mi', '# AI Knowledge conflict: grupo original conservado y desactivado' . "\n" . '# $1' . "\n" . '# $2', $original );
-			}
-		}
+		list( , $original ) = self::scan_conflicts( $original, $bot_user_agents, $visibility_mode, true );
 		$rules = self::build_action_rules( $bot_user_agents, $visibility_mode );
 		if ( empty( $rules ) ) {
 			return rtrim( $original ) . "\n";
 		}
 		$block = "# BEGIN " . self::MARKER . "\n" . implode( "\n", $rules ) . "\n# END " . self::MARKER;
 		return rtrim( $original ) . "\n\n" . $block . "\n";
-	}
-
-	protected static function comment_conflicts( array $bot_user_agents, $visibility_mode ) {
-		$path = self::path();
-		if ( ! file_exists( $path ) || ! is_writable( $path ) ) {
-			return;
-		}
-		$conflicts = self::conflicts( $bot_user_agents, $visibility_mode );
-		if ( empty( $conflicts ) ) {
-			return;
-		}
-		$raw = (string) file_get_contents( $path ); // phpcs:ignore
-		foreach ( $conflicts as $line ) {
-			$quoted = preg_quote( $line, '/' );
-			$raw = preg_replace( '/^(' . $quoted . ')$/m', '# AI Knowledge conflict: regla original conservada y desactivada por contradicción\n# $1', $raw, 1 );
-		}
-		file_put_contents( $path, $raw, LOCK_EX ); // phpcs:ignore
 	}
 }

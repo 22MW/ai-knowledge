@@ -2857,3 +2857,12 @@ msgstr "La sauvegarde n’a pas pu être créée ; rien n’a été écrit dans 
 #: includes/class-ai-client.php
 msgid "Support Genix no tiene una clave de OpenAI ni de Claude configurada."
 msgstr "Support Genix n’a pas de clé OpenAI ni Claude configurée."
+
+msgid "Incluir llms.txt y los documentos .md para los modelos desactivados"
+msgstr "Inclure llms.txt et les documents .md pour les modèles désactivés"
+
+msgid "los bots bloqueados no pueden entrar en tu web (ninguna página HTML real), pero sí leen /llms.txt y los documentos .md de cada contenido: pueden saber de qué trata tu web y citarla sin generarte tráfico de rastreo. Cualquier otra ruta les responde 404."
+msgstr "les bots bloqués ne peuvent pas entrer sur votre site (aucune vraie page HTML), mais ils lisent /llms.txt et les documents .md de chaque contenu : ils peuvent savoir de quoi parle votre site et le citer sans générer de trafic d'exploration. Toute autre route leur répond 404."
+
+msgid "los bots bloqueados no pueden acceder a nada, ni siquiera a /llms.txt ni a los documentos .md. Es un bloqueo total del sitio."
+msgstr "les bots bloqués ne peuvent rien consulter, pas même /llms.txt ni les documents .md. C'est un blocage total du site."

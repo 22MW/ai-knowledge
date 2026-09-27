@@ -92,14 +92,21 @@ Esto sí es un bloqueo de verdad a nivel de servidor: si un bot marcado
 como "Bloqueado" en la tabla intenta acceder, el servidor rechaza la
 petición directamente, la respete o no.
 
-El interruptor **«Incluir llms.txt para los modelos desactivados»** decide
-qué pasa con esos bots bloqueados:
+El interruptor **«Incluir llms.txt y los documentos .md para los modelos
+desactivados»** decide qué pasa con esos bots bloqueados:
 
-- **Activado:** no pueden entrar en tu web, pero sí leen `/llms.txt`, el
-  resumen que has preparado para ellos. Cualquier otra página les responde
-  `404`.
-- **Desactivado:** no pueden acceder a nada, ni siquiera a `/llms.txt`. Es un
-  bloqueo total del sitio.
+- **Activado:** no pueden entrar en tu web (ninguna página HTML real), pero sí
+  leen `/llms.txt` y los documentos `.md` de cada contenido
+  (`/ai-knowledge-doc/...`). Pueden saber de qué trata tu web y citarla, sin
+  generarte tráfico de rastreo real. Cualquier otra ruta les responde `404`.
+- **Desactivado:** no pueden acceder a nada, ni siquiera a `/llms.txt` ni a
+  los documentos `.md`. Es un bloqueo total del sitio.
+
+Este interruptor es para bots a los que no quieres que te generen tráfico
+rastreando el sitio real, pero no te importa que lean el resumen y los
+documentos preparados para IA. Si a un bot en concreto (por ejemplo, uno de
+búsqueda o citas) le quieres dar acceso completo al sitio, no lo marques como
+«Bloqueado» en la tabla de crawlers: márcalo como «Permitido».
 
 Este ajuste solo cambia las reglas propuestas para `robots.txt` y
 `.htaccess`; nada se modifica en tu servidor hasta que tú lo apliques. Está

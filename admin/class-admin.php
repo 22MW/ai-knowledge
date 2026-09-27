@@ -1790,7 +1790,7 @@ GEO;
 			<div class="wookb-visibility-head">
 				<label class="wookb-assistant-toggle">
 					<input type="checkbox" name="crawler_visibility_mode" value="llms_only" <?php checked($on); ?> />
-					<span><?php esc_html_e('Incluir llms.txt para los modelos desactivados', 'ai-knowledge'); ?></span>
+					<span><?php esc_html_e('Incluir llms.txt y los documentos .md para los modelos desactivados', 'ai-knowledge'); ?></span>
 				</label>
 				<strong class="wookb-visibility-state">
 					<span class="on"><?php esc_html_e('ACTIVADO', 'ai-knowledge'); ?></span>
@@ -1799,8 +1799,8 @@ GEO;
 			</div>
 			<p class="description"><?php esc_html_e('Modelos desactivados = los bots que has marcado como Bloqueado en la tabla de crawlers.', 'ai-knowledge'); ?></p>
 			<ul class="wookb-visibility-effects">
-				<li><strong><?php esc_html_e('Activado:', 'ai-knowledge'); ?></strong> <?php esc_html_e('los bots bloqueados no pueden entrar en tu web, pero sí leen /llms.txt, el resumen que has preparado para ellos. Cualquier otra página les responde 404.', 'ai-knowledge'); ?></li>
-				<li><strong><?php esc_html_e('Desactivado:', 'ai-knowledge'); ?></strong> <?php esc_html_e('los bots bloqueados no pueden acceder a nada, ni siquiera a /llms.txt. Es un bloqueo total del sitio.', 'ai-knowledge'); ?></li>
+				<li><strong><?php esc_html_e('Activado:', 'ai-knowledge'); ?></strong> <?php esc_html_e('los bots bloqueados no pueden entrar en tu web (ninguna página HTML real), pero sí leen /llms.txt y los documentos .md de cada contenido: pueden saber de qué trata tu web y citarla sin generarte tráfico de rastreo. Cualquier otra ruta les responde 404.', 'ai-knowledge'); ?></li>
+				<li><strong><?php esc_html_e('Desactivado:', 'ai-knowledge'); ?></strong> <?php esc_html_e('los bots bloqueados no pueden acceder a nada, ni siquiera a /llms.txt ni a los documentos .md. Es un bloqueo total del sitio.', 'ai-knowledge'); ?></li>
 			</ul>
 			<p class="description"><?php esc_html_e('Este ajuste solo cambia las reglas propuestas para robots.txt y .htaccess. Nada se modifica en tu servidor hasta que tú lo apliques.', 'ai-knowledge'); ?></p>
 		</div>

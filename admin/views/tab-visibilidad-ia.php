@@ -97,7 +97,7 @@ $htaccess_full_preview = Htaccess_Guard::generate_full_file( $crawler_actions, $
 $htaccess_current_content = Htaccess_Guard::is_available() ? (string) file_get_contents( Htaccess_Guard::path() ) : ''; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 $robots_managed_matches = Robots_Txt_Guard::managed_block_matches( $robots_txt_content, $crawler_actions, $crawler_visibility_mode );
 $htaccess_managed_matches = Htaccess_Guard::managed_block_matches( $htaccess_current_content, $crawler_actions, $crawler_visibility_mode );
-$robots_conflicts = Robots_Txt_Guard::action_conflicts( $crawler_actions );
+$robots_conflicts = Robots_Txt_Guard::action_conflicts( $crawler_actions, $crawler_visibility_mode );
 $htaccess_conflicts = Htaccess_Guard::conflicts( $crawler_blocked_bots, $crawler_visibility_mode );
 ?>
 
