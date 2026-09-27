@@ -5,19 +5,23 @@
 `ai-knowledge`, rama `knowBaseDev`, repo `github.com/22MW/ai-knowledge`. Ruta:
 `app/public/wp-content/plugins/ai-knowledge/`.
 
-## Estado — 2026-09-27
+## Estado — 2026-09-28
 
-- **Última release publicada: 1.4.1** (2026-09-27). Sin tarea de código
+- **Última release publicada: 1.4.2** (2026-09-28). Sin tarea de código
   abierta.
-- La 1.4.1 recoge lo probado y corregido de la 1.4.0 (Visibilidad IA como
-  texto plano, botones de copiar, recuadros de estilo, Generación masiva
-  reordenada, «Datos adicionales») más un hallazgo de una auditoría GEO
-  externa: documentos con guion bajo en el slug de origen daban 404 en
-  `llms.txt` (lista blanca del servidor de documentos sin `_`).
+- Incluye: el interruptor de Visibilidad IA exime también `/ai-knowledge-doc/`
+  (no solo `/llms.txt`); en `.htaccess` y `robots.txt` se unificó en una sola
+  función la detección/comentado de conflictos con reglas de terceros (aviso,
+  vista previa, descarga y botón real, antes con 3-4 lógicas distintas por
+  archivo que podían no coincidir); los archivos descargados (llms.txt,
+  robots.txt, .htaccess) llevan el dominio del sitio en el nombre.
+- Sin probar aún en la web real por el usuario (queda pendiente de QA real).
 
 ## Siguiente paso
 
-A elegir por el usuario a partir del roadmap.
+A elegir por el usuario a partir del roadmap. Pendiente concreto: probar en
+real el arreglo de conflictos de `.htaccess`/`robots.txt` con las reglas de
+terceros del sitio.
 
 ## Notas de proceso
 
