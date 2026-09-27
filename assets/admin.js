@@ -524,13 +524,42 @@
 	$( document ).on( 'change', '[data-wookb-htaccess-ack]', window.wookbRefreshHtaccessApply );
 
 	$( function () {
-		$( '[data-wookb-copy-target]' ).on( 'click', function () {
-			var target = document.getElementById( $( this ).data( 'wookb-copy-target' ) );
+		// Delegado en document (no enganchado solo a los botones que ya
+		// existan al cargar la página): el asistente de configuración
+		// reemplaza su panel entero por HTML nuevo en cada paso (showPanel(),
+		// segunda IIFE de este archivo, más abajo) -- un enganche directo
+		// solo cubría el paso "Bienvenida" (ya presente al cargar) y dejaba
+		// sin funcionar el mismo botón "Copiar Prompt" del paso "Resumen
+		// final", que siempre llega por AJAX. Bug real confirmado: en
+		// Visibilidad IA (pagina normal, sin este reemplazo) el mismo botón
+		// de copiar ya funcionaba.
+		//
+		// Aviso: SOLO para estos botones de copiar, pegado al lado del propio
+		// botón (no el aviso flotante centralizado que usa el resto del
+		// plugin, pedido explícito del usuario) -- un <span> insertado justo
+		// después del botón, que desaparece solo a los pocos segundos.
+		function wookbCopyFeedback( $button, message ) {
+			var $feedback = $button.next( '.wookb-copy-feedback' );
+			if ( ! $feedback.length ) {
+				$feedback = $( '<span class="wookb-copy-feedback" role="status"></span>' ).insertAfter( $button );
+			}
+			$feedback.stop( true ).text( message ).css( 'opacity', 1 );
+			window.clearTimeout( $feedback.data( 'wookb-copy-timer' ) );
+			var timer = window.setTimeout( function () {
+				$feedback.css( 'opacity', 0 );
+			}, 4000 );
+			$feedback.data( 'wookb-copy-timer', timer );
+		}
+		$( document ).on( 'click', '[data-wookb-copy-target]', function () {
+			var $button = $( this );
+			var target = document.getElementById( $button.data( 'wookb-copy-target' ) );
 			if ( ! target ) {
 				return;
 			}
 			navigator.clipboard.writeText( target.value ).then( function () {
-				window.alert( __( 'Código copiado.', 'ai-knowledge' ) );
+				wookbCopyFeedback( $button, __( 'Código copiado.', 'ai-knowledge' ) );
+			} ).catch( function () {
+				wookbCopyFeedback( $button, __( 'No se pudo copiar.', 'ai-knowledge' ) );
 			} );
 		} );
 

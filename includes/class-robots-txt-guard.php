@@ -47,9 +47,21 @@ class Robots_Txt_Guard {
 	/**
 	 * Lee el robots.txt actual con una única lógica (pestaña Visibilidad IA,
 	 * paso «Archivos del servidor» del asistente y descarga de copia): el
-	 * archivo físico si existe; si no, el virtual que genera WordPress,
-	 * capturando do_robots() con un buffer (sin petición HTTP). Devuelve
-	 * [ content, source (physical|virtual|error), error ].
+	 * archivo físico si existe; si no, el virtual que genera WordPress.
+	 * Devuelve [ content, source (physical|virtual|error), error ].
+	 *
+	 * NO se llama a do_robots() (bug real confirmado, 2026-09-27): esa función
+	 * del núcleo envía una cabecera real `Content-Type: text/plain` con
+	 * header() -- una llamada real, no algo que un ob_start() pueda capturar
+	 * ni deshacer -- y aquí se ejecutaba desde dentro de una pantalla de
+	 * administración ya en curso: esa cabecera se quedaba puesta para TODA la
+	 * respuesta, sirviendo la pantalla entera como texto plano en vez de HTML.
+	 * En su lugar se reproduce el mismo contenido por defecto de do_robots()
+	 * (wp-includes/functions.php) y se le aplica el mismo filtro oficial
+	 * `robots_txt` que ya usan los plugins SEO -- sin cabeceras y sin disparar
+	 * la acción `do_robotstxt` (algunos plugins la usan para hacer echo directo
+	 * y terminar la petición con exit/die, pensada solo para la petición real
+	 * de /robots.txt; dispararla aquí podría cortar a mitad la carga del admin).
 	 */
 	public static function read_current() {
 		$path = self::path();
@@ -61,26 +73,17 @@ class Robots_Txt_Guard {
 			return array( 'content' => (string) $content, 'source' => 'physical', 'error' => '' );
 		}
 
-		if ( ! function_exists( 'do_robots' ) ) {
-			return array( 'content' => '', 'source' => 'error', 'error' => __( 'WordPress no ha podido generar el robots.txt virtual en este momento.', 'ai-knowledge' ) );
-		}
-
-		$level = ob_get_level();
-		ob_start();
 		try {
-			// do_robots() envía la cabecera Content-Type: en una pantalla de
-			// administración las cabeceras ya pueden estar enviadas y PHP
-			// avisaría; el aviso es inocuo (el contenido se captura igual).
-			@do_robots(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-			$content = ob_get_clean();
+			$public  = (bool) get_option( 'blog_public' );
+			$content = "User-agent: *\n";
+			$content .= 'Disallow: ' . wp_parse_url( admin_url(), PHP_URL_PATH ) . "\n";
+			$content .= 'Allow: ' . wp_parse_url( admin_url( 'admin-ajax.php' ), PHP_URL_PATH ) . "\n";
+			$content  = (string) apply_filters( 'robots_txt', $content, $public );
 		} catch ( \Throwable $e ) {
-			while ( ob_get_level() > $level ) {
-				ob_end_clean();
-			}
 			return array( 'content' => '', 'source' => 'error', 'error' => $e->getMessage() );
 		}
 
-		return array( 'content' => (string) $content, 'source' => 'virtual', 'error' => '' );
+		return array( 'content' => $content, 'source' => 'virtual', 'error' => '' );
 	}
 
 	/** Texto del origen del robots.txt actual (para mostrarlo junto al contenido). */

@@ -6,9 +6,26 @@ Genera de golpe todos los documentos pendientes de tu alcance configurado
 en [Contenido](tab-contenido.md), y controla la velocidad a la que se
 generan para no disparar tu gasto de IA.
 
-## El resumen de arriba
+## Ajustes de la cola
 
-Antes de generar nada, esta pantalla te dice:
+Es lo primero que ves en la pestaña. Valores que controlan el ritmo de
+generación. Por defecto: 50 documentos por lote, un lote cada 15 segundos y
+la carga masiva empieza sin espera (los valores que ya tuvieras guardados no
+cambian):
+
+- **Límite diario de generaciones** — el techo de documentos que se
+  generan por día. Puedes marcar "Sin límite" para cargas manuales
+  puntuales que estés supervisando en directo — pero acuérdate de
+  desactivarlo al terminar, o seguirá sin límite indefinidamente.
+- **Tamaño de lote** — cuántos documentos se procesan juntos en cada
+  ejecución.
+- **Retraso de debounce** — un margen de espera (300 s por defecto) que solo
+  se aplica a las ediciones sueltas, para no saturar el servidor con guardados
+  seguidos. La carga masiva no espera.
+
+## El resumen destacado
+
+Justo debajo, en un recuadro con borde azul, esta pantalla te dice:
 
 - Cuántos documentos posibles entran en tu alcance actual. Por defecto es
   uno por contenido; si marcas «Crear por idioma» (ver más abajo), uno por cada
@@ -16,10 +33,14 @@ Antes de generar nada, esta pantalla te dice:
 - Cuántos ya están sincronizados.
 - Tu límite diario actual (o un aviso bien visible si lo tienes
   desactivado).
-- El estado de la generación: documentos por estado (En cola, Generando,
-  Listo, Error), enlace al Registro y el botón «Procesar ahora».
+- El estado de Negocio, WooCommerce, FAQ y Chatbot (si aplica): si ya tienen
+  datos o contenido generado.
+- El total de documentos registrados y su desglose por estado (En cola,
+  Generando, Listo, Error).
+- Un enlace al Registro, un aviso de que la generación sigue en segundo
+  plano, y el botón **«Procesar ahora»** (solo si hay documentos en cola).
 
-[SCREENSHOT: resumen de alcance con el contador de documentos posibles]
+[SCREENSHOT: recuadro de resumen con el contador de documentos posibles]
 
 ## Generar pendientes
 
@@ -73,26 +94,11 @@ segundo plano, usando el sistema de tareas programadas de WordPress
 (Action Scheduler si lo tienes, por ejemplo con WooCommerce; si no, WP-Cron).
 WP-Cron solo avanza cuando alguien visita la web, así que en un sitio sin
 visitas (o con `DISABLE_WP_CRON`, sobre lo que el plugin avisa) puede quedarse
-«En cola»: el botón **«Procesar ahora»** procesa hasta 20 documentos por clic.
-Puedes seguir el progreso en detalle desde
+«En cola»: el botón **«Procesar ahora»**, dentro del recuadro de resumen,
+procesa hasta 20 documentos por clic, sin esperar al proceso en segundo plano
+y sin mirar el límite diario. Puedes seguir el progreso en detalle desde
 **Herramientas → Scheduled Actions** (grupo `woo-kb`), aunque para el uso
 normal te basta con mirar la pestaña [Registro](tab-registro.md).
-
-## Ajustes de la cola
-
-Valores que controlan el ritmo de generación. Por defecto: 50 documentos por
-lote, un lote cada 15 segundos y la carga masiva empieza sin espera (los
-valores que ya tuvieras guardados no cambian):
-
-- **Límite diario de generaciones** — el techo de documentos que se
-  generan por día. Puedes marcar "Sin límite" para cargas manuales
-  puntuales que estés supervisando en directo — pero acuérdate de
-  desactivarlo al terminar, o seguirá sin límite indefinidamente.
-- **Tamaño de lote** — cuántos documentos se procesan juntos en cada
-  ejecución.
-- **Retraso de debounce** — un margen de espera (300 s por defecto) que solo
-  se aplica a las ediciones sueltas, para no saturar el servidor con guardados
-  seguidos. La carga masiva no espera.
 
 ## Dónde se guardan los documentos
 
@@ -121,6 +127,13 @@ está sincronizado, usa "Reiniciar todo" (con su aviso correspondiente).
 Es una protección para que no gastes tu presupuesto de IA de golpe sin
 darte cuenta. Puedes subirlo o desactivarlo temporalmente si necesitas
 una carga grande puntual.
+
+**¿"Procesar ahora" y "Generar pendientes" son lo mismo?**
+No. "Generar pendientes" decide qué hay que generar de todo tu alcance y lo
+deja programado en la cola de fondo. "Procesar ahora" (dentro del recuadro
+de resumen, solo visible si hay documentos en cola) acelera lo que ya está
+en esa cola: procesa hasta 20 de golpe, sin esperar al proceso en segundo
+plano ni mirar el límite diario.
 
 ---
 [Ver también: [Contenido](tab-contenido.md) · [Registro](tab-registro.md) · [Ajustes](tab-ajustes.md)]
