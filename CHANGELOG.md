@@ -2,6 +2,38 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [1.4.1] - 2026-09-27
+
+### Correcciones
+
+- **Fallo real corregido:** la pestaña Visibilidad IA (y el paso «Servidor»
+  del asistente) servían la página entera como texto plano en vez de HTML.
+  Causa: `do_robots()` del núcleo envía una cabecera `Content-Type: text/plain`
+  real al llamarla, y esa cabecera se quedaba puesta para toda la respuesta de
+  administración. Se sustituyó por una réplica del mismo contenido sin tocar
+  cabeceras ni disparar la acción `do_robotstxt` (que algunos plugins SEO usan
+  para terminar la petición con `exit`).
+- Los botones «Copiar Prompt» del asistente (pasos «Bienvenida» y «Resumen
+  final») no copiaban de verdad: el clic solo se enganchaba a los botones ya
+  presentes al cargar la página, y el asistente reemplaza su panel por HTML
+  nuevo en cada paso. Ahora el clic va delegado y funciona en cualquier paso.
+- Aviso de copiado: pegado al lado de cada botón de copiar (asistente y
+  Visibilidad IA), en vez de la ventana emergente del navegador; el aviso
+  flotante general del resto de botones no cambia.
+- Recuadro con borde (mismo estilo azul que los avisos de llms.txt) alrededor
+  del prompt de auditoría GEO en el asistente, y del mismo prompt añadido al
+  final de la pestaña Ajustes.
+- Generación masiva: «Ajustes de la cola» pasa a la parte de arriba de la
+  pestaña; el resumen de alcance, sincronizados, límite diario y estado
+  (Negocio/WooCommerce/FAQ/Chatbot/documentos) se agrupa en un único recuadro
+  destacado.
+- Contenidos que no son productos, con campos personalizados: el bloque ya no
+  se titula «Datos de compra», sino «Datos adicionales».
+- Los documentos `/ai-knowledge-doc/...` de contenidos cuyo slug de WordPress
+  lleva guion bajo (`_`) daban 404 aunque `llms.txt` enlazara bien y el archivo
+  existiera: la lista blanca de caracteres del servidor de documentos no
+  incluía `_`. Encontrado con una auditoría GEO externa.
+
 ## [1.4.0] - 2026-09-26
 
 Revisión completa del asistente, del servidor (robots.txt, cola, carpeta de

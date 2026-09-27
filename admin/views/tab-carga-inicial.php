@@ -16,45 +16,6 @@ $counted   = Registry::count( array( 'status' => 'synced' ) );
 	<?php esc_html_e( 'Genera de golpe los documentos de todo el contenido dentro del alcance, y ajusta aquí el límite diario, el tamaño de lote y el debounce de la cola.', 'ai-knowledge' ); ?>
 </p>
 <?php Admin::documentation_link( 'carga-inicial' ); ?>
-<?php if ( ! Languages::creates_post_per_language() ) { Admin::render_language_regen_notice(); } ?>
-<p>
-	<?php
-	printf(
-		/* translators: %d: total de documentos posibles */
-		esc_html( _n( 'Alcance actual: %d documento posible.', 'Alcance actual: %d documentos posibles.', $total, 'ai-knowledge' ) ),
-		$total
-	);
-	?>
-</p>
-<p><?php printf( esc_html__( 'Documentos ya sincronizados: %d.', 'ai-knowledge' ), (int) $counted ); ?></p>
-<?php if ( ! empty( $settings['no_limit'] ) ) : ?>
-	<p style="color:#b32d2e;font-weight:600;"><?php esc_html_e( 'El límite diario está desactivado — la generación avanzará sin tope.', 'ai-knowledge' ); ?></p>
-<?php else : ?>
-	<p><?php printf( esc_html__( 'Límite diario actual: %d generaciones/día.', 'ai-knowledge' ), (int) $settings['daily_limit'] ); ?></p>
-<?php endif; ?>
-
-<?php
-// Resumen de estado (Negocio/WooCommerce/FAQ/Chatbot/documentos), extraido a
-// Admin::render_assistant_summary() para reutilizarlo tambien aqui -- mismo
-// resumen que ya se ve en el paso "finish" del asistente.
-echo Admin::render_assistant_summary(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado campo a campo dentro del propio metodo.
-?>
-
-<?php
-// Botones "Generar pendientes"/"Reiniciar todo" (o "Cancelar generación"),
-// extraidos a Admin::render_seed_controls() para reutilizarlos tambien en
-// el paso "finish" del asistente de configuracion -- misma logica, mismo
-// marcado, un solo sitio de mantenimiento.
-echo Admin::render_seed_controls(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado campo a campo dentro del propio metodo.
-// «Crear por idioma» (solo WPML/Polylang): modo de generación, junto a «Reiniciar todo».
-echo Admin::render_per_language_block(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo.
-?>
-
-<p class="description">
-	<?php esc_html_e( 'Revisa la pestaña Registro para ver el progreso, o Herramientas → Scheduled Actions (grupo woo-kb) para el detalle técnico.', 'ai-knowledge' ); ?>
-</p>
-
-<hr />
 
 <h2><?php esc_html_e( 'Ajustes de la cola', 'ai-knowledge' ); ?></h2>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
@@ -88,3 +49,47 @@ echo Admin::render_per_language_block(); // phpcs:ignore WordPress.Security.Esca
 	</table>
 	<?php submit_button( __( 'Guardar', 'ai-knowledge' ) ); ?>
 </form>
+
+<hr />
+
+<?php if ( ! Languages::creates_post_per_language() ) { Admin::render_language_regen_notice(); } ?>
+
+<div class="wookb-replace-box wookb-replace-box--prompt">
+	<p>
+		<?php
+		printf(
+			/* translators: %d: total de documentos posibles */
+			esc_html( _n( 'Alcance actual: %d documento posible.', 'Alcance actual: %d documentos posibles.', $total, 'ai-knowledge' ) ),
+			$total
+		);
+		?>
+	</p>
+	<p><?php printf( esc_html__( 'Documentos ya sincronizados: %d.', 'ai-knowledge' ), (int) $counted ); ?></p>
+	<?php if ( ! empty( $settings['no_limit'] ) ) : ?>
+		<p style="color:#b32d2e;font-weight:600;"><?php esc_html_e( 'El límite diario está desactivado — la generación avanzará sin tope.', 'ai-knowledge' ); ?></p>
+	<?php else : ?>
+		<p><?php printf( esc_html__( 'Límite diario actual: %d generaciones/día.', 'ai-knowledge' ), (int) $settings['daily_limit'] ); ?></p>
+	<?php endif; ?>
+	<?php
+	// Resumen de estado (Negocio/WooCommerce/FAQ/Chatbot/documentos) + recuento
+	// de documentos + enlace al Registro/aviso de segundo plano/"Procesar
+	// ahora", extraido a Admin::render_assistant_summary() para reutilizarlo
+	// tambien aqui -- mismo resumen que ya se ve en el paso "finish" del
+	// asistente. Todo dentro del recuadro (pedido explicito del usuario).
+	echo Admin::render_assistant_summary(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado campo a campo dentro del propio metodo.
+	?>
+</div>
+
+<?php
+// Botones "Generar pendientes"/"Reiniciar todo" (o "Cancelar generación"),
+// extraidos a Admin::render_seed_controls() para reutilizarlos tambien en
+// el paso "finish" del asistente de configuracion -- misma logica, mismo
+// marcado, un solo sitio de mantenimiento.
+echo Admin::render_seed_controls(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado campo a campo dentro del propio metodo.
+// «Crear por idioma» (solo WPML/Polylang): modo de generación, junto a «Reiniciar todo».
+echo Admin::render_per_language_block(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo.
+?>
+
+<p class="description">
+	<?php esc_html_e( 'Revisa la pestaña Registro para ver el progreso, o Herramientas → Scheduled Actions (grupo woo-kb) para el detalle técnico.', 'ai-knowledge' ); ?>
+</p>

@@ -66,7 +66,13 @@ class Markdown_Server {
 		// Blindaje contra path traversal: solo «{slug}.md» o «{lang}/{slug}.md»
 		// (sin .., sin //, sin barras sueltas) y nunca un nombre reservado
 		// (chatbot-system-prompt, faq-fuente, index, info).
-		if ( ! preg_match( '#^(?:([a-z]{2}(?:-[a-z]{2})?)/)?([a-z0-9\-]+)\.md$#i', $relative, $m ) || false !== strpos( $relative, '..' ) || Markdown_Store::is_reserved( $m[2] ) ) {
+		// Bug real confirmado (2026-09-27): esta lista blanca no permitia guion
+		// bajo, pero sanitize_title() (usado por Markdown_Store::slug_for())
+		// SI lo conserva si el slug de origen en WordPress lo lleva -- un
+		// documento asi quedaba enlazado correctamente desde llms.txt (y el
+		// archivo existia en disco) pero esta ruta lo servia siempre con 404.
+		// Alineado con la lista blanca mas permisiva que ya usa redirect_legacy().
+		if ( ! preg_match( '#^(?:([a-z]{2}(?:-[a-z]{2})?)/)?([a-z0-9_\-]+)\.md$#i', $relative, $m ) || false !== strpos( $relative, '..' ) || Markdown_Store::is_reserved( $m[2] ) ) {
 			status_header( 404 );
 			exit;
 		}

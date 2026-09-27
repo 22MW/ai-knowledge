@@ -389,8 +389,8 @@ class Admin
 			return ob_get_clean();
 		}
 		if ('welcome' === $step) : $geo_prompt = self::build_geo_prompt(); ?>
-			<p><?php esc_html_e('Comprueba tu sitio en un agente externo antes de configurar el plugin. Después de completar la configuración, repite la comprobación con este mismo prompt para comparar el resultado.', 'ai-knowledge'); ?></p><textarea id="wookb-welcome-geo-prompt" readonly rows="8" style="width:100%;max-width:100%;font-size:13px;"><?php echo esc_textarea($geo_prompt); ?></textarea><p><button type="button" class="button" data-wookb-copy-target="wookb-welcome-geo-prompt"><?php esc_html_e('Copiar Prompt', 'ai-knowledge'); ?></button></p>
 			<div class="wookb-assistant-welcome-copy"><h3><?php esc_html_e('Qué revisaremos', 'ai-knowledge'); ?></h3><ul><li><?php esc_html_e('El origen de IA y el contenido que formará la base de conocimiento.', 'ai-knowledge'); ?></li><li><?php esc_html_e('Los datos del negocio y las integraciones disponibles.', 'ai-knowledge'); ?></li><li><?php esc_html_e('La visibilidad para IA y los límites de generación.', 'ai-knowledge'); ?></li></ul></div>
+			<div class="wookb-replace-box wookb-replace-box--prompt"><p><?php esc_html_e('Comprueba tu sitio en un agente externo antes de configurar el plugin. Después de completar la configuración, repite la comprobación con este mismo prompt para comparar el resultado.', 'ai-knowledge'); ?></p><textarea id="wookb-welcome-geo-prompt" readonly rows="8" style="width:100%;max-width:100%;font-size:13px;"><?php echo esc_textarea($geo_prompt); ?></textarea><p><button type="button" class="button" data-wookb-copy-target="wookb-welcome-geo-prompt"><?php esc_html_e('Copiar Prompt', 'ai-knowledge'); ?></button></p></div>
 		<?php elseif ('ai' === $step) : $available = AI_Client::wordpress_available(); $models = $available ? AI_Client::available_models() : array(); ?>
 			<div data-wookb-ai-status-slot><?php echo self::ai_status_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?></div>
 			<div class="wookb-assistant-fields"><label class="wookb-assistant-field"><span><?php esc_html_e('Origen de IA', 'ai-knowledge'); ?></span><select name="ai_key_source"><option value="genix" <?php selected('genix', $settings['ai_key_source']); ?>><?php esc_html_e('Support Genix', 'ai-knowledge'); ?></option><?php if ($available) : ?><option value="wp_connectors" <?php selected('wp_connectors', $settings['ai_key_source']); ?>><?php esc_html_e('Conectores de WordPress', 'ai-knowledge'); ?></option><?php endif; ?></select></label>
@@ -457,7 +457,7 @@ class Admin
 			echo self::render_seed_controls(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			?>
 		<?php elseif ('success' === $step) : $state = get_option('aikb_setup_assistant', array()); $geo_prompt = self::build_geo_prompt(); ?>
-			<div class="wookb-assistant-summary"><?php echo self::render_generation_status(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?><p><strong><?php esc_html_e('Pasos omitidos:', 'ai-knowledge'); ?></strong> <?php echo empty($state['skipped']) ? esc_html__('Ninguno', 'ai-knowledge') : esc_html(implode(', ', (array) $state['skipped'])); ?></p><p><a class="button button-primary" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(home_url('/llms.txt')); ?>"><?php esc_html_e('Ver llms.txt', 'ai-knowledge'); ?></a></p><p><?php esc_html_e('Recomendamos comprobar este prompt en un agente externo para verificar el funcionamiento del plugin y la visibilidad de tu web.', 'ai-knowledge'); ?></p><textarea id="wookb-assistant-geo-prompt" readonly rows="12" style="width:100%;max-width:100%;"><?php echo esc_textarea($geo_prompt); ?></textarea><p><button type="button" class="button" data-wookb-copy-target="wookb-assistant-geo-prompt"><?php esc_html_e('Copiar Prompt', 'ai-knowledge'); ?></button></p><p><strong><?php esc_html_e('Salir del asistente y acceder a los ajustes del plugin', 'ai-knowledge'); ?></strong></p><div class="wookb-assistant-links"><?php foreach (array('registro' => __('Registro', 'ai-knowledge'), 'contenido' => __('Contenido', 'ai-knowledge'), 'negocio' => __('Negocio', 'ai-knowledge'), 'woocommerce' => __('WooCommerce', 'ai-knowledge'), 'visibilidad-ia' => __('Visibilidad IA', 'ai-knowledge'), 'ajustes' => __('Ajustes', 'ai-knowledge')) as $tab => $label) : if ('woocommerce' === $tab && !class_exists('WooCommerce')) continue; ?><a class="button button-primary" href="<?php echo esc_url(admin_url('admin.php?page=ai-knowledge' . ('registro' === $tab ? '' : '&tab=' . $tab))); ?>"><?php echo esc_html($label); ?></a><?php endforeach; ?></div></div>
+			<div class="wookb-assistant-summary"><?php echo self::render_generation_status(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?><p><strong><?php esc_html_e('Pasos omitidos:', 'ai-knowledge'); ?></strong> <?php echo empty($state['skipped']) ? esc_html__('Ninguno', 'ai-knowledge') : esc_html(implode(', ', (array) $state['skipped'])); ?></p><p><a class="button button-primary" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(home_url('/llms.txt')); ?>"><?php esc_html_e('Ver llms.txt', 'ai-knowledge'); ?></a></p><div class="wookb-replace-box wookb-replace-box--prompt"><p><?php esc_html_e('Recomendamos comprobar este prompt en un agente externo para verificar el funcionamiento del plugin y la visibilidad de tu web.', 'ai-knowledge'); ?></p><textarea id="wookb-assistant-geo-prompt" readonly rows="12" style="width:100%;max-width:100%;"><?php echo esc_textarea($geo_prompt); ?></textarea><p><button type="button" class="button" data-wookb-copy-target="wookb-assistant-geo-prompt"><?php esc_html_e('Copiar Prompt', 'ai-knowledge'); ?></button></p></div><p><strong><?php esc_html_e('Salir del asistente y acceder a los ajustes del plugin', 'ai-knowledge'); ?></strong></p><div class="wookb-assistant-links"><?php foreach (array('registro' => __('Registro', 'ai-knowledge'), 'contenido' => __('Contenido', 'ai-knowledge'), 'negocio' => __('Negocio', 'ai-knowledge'), 'woocommerce' => __('WooCommerce', 'ai-knowledge'), 'visibilidad-ia' => __('Visibilidad IA', 'ai-knowledge'), 'ajustes' => __('Ajustes', 'ai-knowledge')) as $tab => $label) : if ('woocommerce' === $tab && !class_exists('WooCommerce')) continue; ?><a class="button button-primary" href="<?php echo esc_url(admin_url('admin.php?page=ai-knowledge' . ('registro' === $tab ? '' : '&tab=' . $tab))); ?>"><?php echo esc_html($label); ?></a><?php endforeach; ?></div></div>
 		<?php endif;
 		return ob_get_clean();
 	}
@@ -986,6 +986,25 @@ class Admin
 		exit;
 	}
 
+	/**
+	 * Bloque del prompt de auditoría GEO (recuadro con borde + textarea +
+	 * botón "Copiar Prompt"), reutilizable fuera del asistente -- pedido
+	 * explícito del usuario: el mismo bloque también al final de Ajustes.
+	 */
+	public static function render_geo_prompt_block($id, $description)
+	{
+		$geo_prompt = self::build_geo_prompt();
+		ob_start();
+		?>
+		<div class="wookb-replace-box wookb-replace-box--prompt">
+			<p><?php echo esc_html($description); ?></p>
+			<textarea id="<?php echo esc_attr($id); ?>" readonly rows="12" style="width:100%;max-width:100%;"><?php echo esc_textarea($geo_prompt); ?></textarea>
+			<p><button type="button" class="button" data-wookb-copy-target="<?php echo esc_attr($id); ?>"><?php esc_html_e('Copiar Prompt', 'ai-knowledge'); ?></button></p>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
 	protected static function build_geo_prompt()
 	{
 		$content = <<<'GEO'
@@ -1499,16 +1518,26 @@ GEO;
 	 * que la cabecera del Registro, enlace al Registro, aviso de segundo plano
 	 * y acceso a «Procesar ahora» (reset_queue, lotes de RESET_QUEUE_BATCH).
 	 */
-	public static function render_generation_status()
+	/** Solo las dos líneas de recuento ("Documentos registrados"/"Por estado"). */
+	public static function render_generation_status_summary()
 	{
 		$summary = Registry::summary();
 		$parts = self::status_parts($summary, array('queued', 'generating', 'synced', 'error'));
-		$queued = (int) Registry::count(array('status' => 'queued'));
-		$runner = Queue::has_action_scheduler() ? __('Action Scheduler', 'ai-knowledge') : __('WP-Cron', 'ai-knowledge');
 		ob_start();
 		?>
 		<p><strong><?php esc_html_e('Documentos registrados:', 'ai-knowledge'); ?></strong> <?php echo (int) $summary['total']; ?></p>
 		<p><strong><?php esc_html_e('Por estado:', 'ai-knowledge'); ?></strong> <?php echo implode(' · ', $parts); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ya escapado en status_parts(). ?></p>
+		<?php
+		return ob_get_clean();
+	}
+
+	/** Enlace al Registro, aviso de segundo plano y "Procesar ahora". */
+	public static function render_generation_status_extra()
+	{
+		$queued = (int) Registry::count(array('status' => 'queued'));
+		$runner = Queue::has_action_scheduler() ? __('Action Scheduler', 'ai-knowledge') : __('WP-Cron', 'ai-knowledge');
+		ob_start();
+		?>
 		<p><a href="<?php echo esc_url(admin_url('admin.php?page=ai-knowledge')); ?>"><?php esc_html_e('Ver el Registro', 'ai-knowledge'); ?></a></p>
 		<p class="notice notice-info inline"><?php echo esc_html(sprintf(
 			/* translators: %s: Action Scheduler o WP-Cron */
@@ -1526,6 +1555,18 @@ GEO;
 			)); ?></span></p>
 		<?php endif;
 		return ob_get_clean();
+	}
+
+	/**
+	 * Se mantiene tal cual para quien ya la llamaba (misma salida de siempre,
+	 * las dos líneas de recuento seguidas del enlace/aviso/botón): junta las
+	 * dos partes de arriba, separadas para poder colocarlas en sitios
+	 * distintos (pedido explícito del usuario en Generación masiva: el
+	 * recuento dentro del recuadro del resumen, el resto fuera).
+	 */
+	public static function render_generation_status()
+	{
+		return self::render_generation_status_summary() . self::render_generation_status_extra();
 	}
 
 	protected static function verify($action)
@@ -1772,8 +1813,14 @@ GEO;
 	 * del paso "finish" del asistente para reutilizarlo tambien en
 	 * admin/views/tab-carga-inicial.php -- SOLO consultas de lectura, ya
 	 * baratas (Registry, Llms_Faq, get_option...), nunca dispara generacion.
+	 *
+	 * $generation_extra = false: omite el enlace al Registro, el aviso de
+	 * segundo plano y "Procesar ahora" (solo el recuento) -- pedido explícito
+	 * del usuario en Generación masiva, para colocar esa parte fuera del
+	 * recuadro que envuelve este resumen. El asistente sigue llamando a esta
+	 * función sin argumento (por defecto true, todo junto, como siempre).
 	 */
-	public static function render_assistant_summary()
+	public static function render_assistant_summary($generation_extra = true)
 	{
 		$business_answers = Chatbot_Prompt_Builder::get_saved_answers();
 		$business_has_data = false;
@@ -1805,7 +1852,10 @@ GEO;
 			<?php if (Chatbot_Prompt::is_genix_ready()) : ?>
 				<p><strong><?php esc_html_e('Chatbot:', 'ai-knowledge'); ?></strong> <?php echo $chatbot_synced ? esc_html__('Sincronizado con Genix.', 'ai-knowledge') : esc_html__('Todavía sin sincronizar.', 'ai-knowledge'); ?></p>
 			<?php endif; ?>
-			<?php echo self::render_generation_status(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?>
+			<?php echo self::render_generation_status_summary(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?>
+			<?php if ($generation_extra) : ?>
+				<?php echo self::render_generation_status_extra(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado y escapado dentro del propio metodo. ?>
+			<?php endif; ?>
 		</div>
 		<?php
 		return ob_get_clean();

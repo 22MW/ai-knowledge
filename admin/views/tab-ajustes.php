@@ -144,3 +144,4 @@ $wp_ai_models    = $wp_ai_available ? AI_Client::available_models() : array();
 	</table>
 	<?php submit_button( __( 'Guardar ajustes', 'ai-knowledge' ) ); ?>
 </form>
+<?php echo Admin::render_geo_prompt_block( 'wookb-ajustes-geo-prompt', __( 'Recomendamos comprobar este prompt en un agente externo para verificar el funcionamiento del plugin y la visibilidad de tu web.', 'ai-knowledge' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapado dentro del propio metodo. ?>
