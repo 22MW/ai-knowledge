@@ -17,6 +17,26 @@ class AI_Client {
 		return array( 'anthropic', 'openai', 'google' );
 	}
 
+	/**
+	 * Bug real confirmado (2026-09-29, sitio real bodegasvirei.com): el
+	 * mensaje de error de una API externa (Anthropic/OpenAI) se metia tal
+	 * cual en el WP_Error. Si esos bytes no son UTF-8 valido (pasa con
+	 * ciertos errores de proxies/gateways intermedios), wp_send_json_error()
+	 * -- que hace echo wp_json_encode($mensaje) -- fallaba en SILENCIO: sin
+	 * ningun aviso ni log, cabecera application/json ya puesta pero cuerpo
+	 * vacio (confirmado con SSH: sin rastro en ningun log del servidor).
+	 * Saneado aqui, en el unico punto donde se construye ese mensaje a partir
+	 * de texto externo, para que un WP_Error de este cliente nunca pueda
+	 * volver a producir una respuesta JSON vacia.
+	 */
+	protected static function safe_error_message( $message ) {
+		$message = (string) $message;
+		if ( function_exists( 'wp_check_invalid_utf8' ) ) {
+			$message = wp_check_invalid_utf8( $message, true );
+		}
+		return '' !== $message ? $message : __( 'Error de la IA (respuesta no legible).', 'ai-knowledge' );
+	}
+
 	public static function wordpress_available() {
 		return version_compare( get_bloginfo( 'version' ), '7.0', '>=' )
 			&& function_exists( 'wp_ai_client_prompt' )
@@ -208,11 +228,18 @@ class AI_Client {
 			return new \WP_Error( 'wookb_no_ai_connection', __( 'El origen de IA seleccionado no está conectado o el modelo ya no está disponible.', 'ai-knowledge' ) );
 		}
 
-		if ( 'wp_connectors' === $config['source'] ) {
-			return self::generate_with_wordpress( $config, $system, $prompt, $max_tokens, $temperature, $timeout );
-		}
+		$result = ( 'wp_connectors' === $config['source'] )
+			? self::generate_with_wordpress( $config, $system, $prompt, $max_tokens, $temperature, $timeout )
+			: self::generate_with_genix( $config, $system, $prompt, $max_tokens, $temperature, $timeout );
 
-		return self::generate_with_genix( $config, $system, $prompt, $max_tokens, $temperature, $timeout );
+		// Punto unico de salida de las 3 rutas (Conectores de WordPress,
+		// Genix/OpenAI, Genix/Claude): saneamos aqui, no en cada una, para
+		// que ninguna llamada a la IA -- presente o futura -- pueda volver a
+		// producir un WP_Error con bytes no UTF-8 (ver safe_error_message()).
+		if ( is_wp_error( $result ) ) {
+			return new \WP_Error( $result->get_error_code(), self::safe_error_message( $result->get_error_message() ), $result->get_error_data() );
+		}
+		return $result;
 	}
 
 	protected static function generate_with_wordpress( array $config, $system, $prompt, $max_tokens, $temperature, $timeout ) {

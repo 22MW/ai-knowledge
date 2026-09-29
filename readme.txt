@@ -4,7 +4,7 @@ Tags: woocommerce, chatbot, ia, llms.txt, wpml, crawlers, robots.txt
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.4.2
+Stable tag: 1.4.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -117,6 +117,9 @@ Sí. En **Visibilidad IA** selecciona el modo que permite únicamente `/llms.txt
 == Changelog ==
 
 Ver `CHANGELOG.md` para el historial completo y detallado de cambios.
+
+= 1.4.3 =
+Corrige que un error real de la IA (Anthropic/OpenAI) con texto no UTF-8 válido se mostrara como una pantalla en blanco con un aviso genérico de "sesión" en vez del motivo real. Ahora el mensaje de cualquier llamada a la IA se sanea antes de mostrarse.
 
 = 1.4.2 =
 El interruptor de Visibilidad IA también exime los documentos `.md`, no solo llms.txt. Arregla que «Reemplazar .htaccess» y la aplicación de robots.txt no comentaran de verdad las reglas de terceros en conflicto (en .htaccess podía comentar por error un bot vecino no relacionado, y en robots.txt no se detectaba el caso más habitual) y unifica en cada archivo el aviso, la vista previa, la descarga y el botón real en una sola lógica. Los archivos descargados (copias de llms.txt, robots.txt y .htaccess) llevan ahora el dominio del sitio en el nombre.

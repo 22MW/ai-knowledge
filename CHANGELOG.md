@@ -2,6 +2,20 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [1.4.3] - 2026-09-29
+
+### Corregido
+
+- **Llamadas a la IA — error vacío y silencioso (`HTTP 422` sin mensaje):**
+  cuando la API externa (Anthropic/OpenAI) devolvía un error con texto que no
+  era UTF-8 válido, `wp_send_json_error()` fallaba en silencio (sin ningún
+  aviso ni log) y la pantalla mostraba un mensaje genérico de "sesión" sin
+  relación con la causa real. Encontrado y confirmado en un sitio real
+  (bodegasvirei.com) con acceso SSH de solo lectura al servidor. Ahora el
+  mensaje de error de cualquier llamada a la IA (Conectores de WordPress,
+  Genix/OpenAI, Genix/Claude) se sanea antes de mandarlo, así que un error
+  real de la IA siempre se ve con su motivo, nunca en blanco.
+
 ## [1.4.2] - 2026-09-28
 
 ### Añadido
