@@ -1,5 +1,0 @@
-# Configuración manual para generar JSON de traducciones JavaScript.
-# No se ejecuta automáticamente y no genera archivos .mo.
-wp_cli: /usr/local/bin/wp
-php: auto
-languages_dir: languages
