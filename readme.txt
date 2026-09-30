@@ -4,7 +4,7 @@ Tags: woocommerce, chatbot, ia, llms.txt, wpml, crawlers, robots.txt
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.4.4
+Stable tag: 1.4.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -117,6 +117,9 @@ Sí. En **Visibilidad IA** selecciona el modo que permite únicamente `/llms.txt
 == Changelog ==
 
 Ver `CHANGELOG.md` para el historial completo y detallado de cambios.
+
+= 1.4.5 =
+Cada documento muestra ahora su fecha de última actualización, visible bajo el título. Corrige que el feed products.xml pudiera salir inválido ("Entity 'nbsp' not defined") cuando la descripción de un producto tenía entidades HTML como &nbsp;.
 
 = 1.4.4 =
 Los términos de taxonomía marcados en Contenido ahora se añaden al documento (bloque "Categorías y características", directo desde la base de datos, sin pasar por la IA), con botón "Seleccionar todos". Corrige que /llms.txt agrupara por categoría de producto en vez de por tipo de contenido, duplicando la organización del catálogo de tienda.
