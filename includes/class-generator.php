@@ -72,6 +72,18 @@ class Generator {
 		$response = trim( $response );
 		$response = self::enforce_body_char_limit( $response, $char_limit );
 
+		// Fecha de actualizacion visible (pedido explicito del usuario,
+		// 2026-09-30): ya existia en la cabecera tecnica YAML (generated_at),
+		// pero no en el texto legible del documento -- igual que ya hace
+		// /llms.txt con "> Ultima actualizacion:" bajo el titulo. Se inserta
+		// DESPUES de aplicar el limite de caracteres del cuerpo, para que no
+		// cuente contra ese limite ni pueda quedar cortada -- mismo criterio
+		// que "Datos de compra" y el resto de bloques mecanicos de abajo.
+		$lines = explode( "\n", $response, 2 );
+		if ( isset( $lines[1] ) ) {
+			$response = $lines[0] . "\n\n> " . __( 'Última actualización:', 'ai-knowledge' ) . ' ' . wp_date( 'c' ) . "\n\n" . ltrim( $lines[1], "\n" );
+		}
+
 		// "Datos de compra": precio, envio, impuestos, variaciones y campos
 		// personalizados los anexa el CODIGO (sin IA, desde la BD), igual que
 		// el bloque "Disponible tambien en" de abajo: asi estan si o si, sin

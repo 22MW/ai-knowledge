@@ -384,6 +384,23 @@ class Rest_Content {
 	}
 
 	/**
+	 * Bug real confirmado (2026-09-30, sitio real solodevino.com): el
+	 * feed products.xml podia salir invalido ("Entity 'nbsp' not defined").
+	 * Causa: la descripcion sale de wp_strip_all_tags() (Extractor_Woo),
+	 * que quita etiquetas HTML pero NO decodifica entidades -- un "&nbsp;"
+	 * del HTML original quedaba como texto literal. esc_html() de WordPress
+	 * evita re-escapar entidades que ya parecen validas (para no convertir
+	 * "&amp;" en "&amp;amp;"), asi que dejaba pasar "&nbsp;" tal cual: valido
+	 * en HTML, pero XML solo reconoce lt/gt/amp/apos/quot -- el lector de
+	 * XML se rompia ahi. Se decodifican las entidades HTML a su caracter
+	 * real ANTES de escapar para XML, asi cualquier "&" que quede de verdad
+	 * si se escapa a "&amp;".
+	 */
+	protected static function esc_xml_text( $text ) {
+		return esc_html( html_entity_decode( (string) $text, ENT_QUOTES, 'UTF-8' ) );
+	}
+
+	/**
 	 * Fase 9: GET /ai-knowledge/v1/feeds/products.xml -- feed en formato
 	 * Google Merchant/comparadores (RSS 2.0 + espacio de nombres "g:"),
 	 * reutilizando Extractor_Woo (mismo dato que ya extrae Fase 3, sin
@@ -423,8 +440,8 @@ class Rest_Content {
 			}
 			$item = $channel->addChild( 'item' );
 			$item->addChild( 'g:id', esc_html( $data['sku'] ? $data['sku'] : (string) $id ), 'http://base.google.com/ns/1.0' );
-			$item->addChild( 'title', esc_html( $data['title'] ) );
-			$item->addChild( 'description', esc_html( $data['short_description'] ? $data['short_description'] : $data['excerpt'] ) );
+			$item->addChild( 'title', self::esc_xml_text( $data['title'] ) );
+			$item->addChild( 'description', self::esc_xml_text( $data['short_description'] ? $data['short_description'] : $data['excerpt'] ) );
 			$item->addChild( 'link', esc_url( $data['url'] ) );
 			$image = get_the_post_thumbnail_url( $id, 'full' );
 			if ( $image ) {

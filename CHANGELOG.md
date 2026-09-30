@@ -2,6 +2,23 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [1.4.5] - 2026-09-30
+
+### Añadido
+
+- Cada `.md` incluye ahora, justo debajo del título, la fecha de última
+  actualización visible ("> Última actualización: ..."), igual formato que
+  ya usa `/llms.txt`. Antes solo estaba en la cabecera técnica YAML
+  (`generated_at`), no en el texto legible.
+
+### Corregido
+
+- `products.xml` podía salir inválido ("Entity 'nbsp' not defined") cuando
+  la descripción de un producto tenía `&nbsp;` u otra entidad HTML: se
+  quitaban las etiquetas pero no se decodificaban las entidades, y XML no
+  reconoce `&nbsp;` (solo `&lt; &gt; &amp; &apos; &quot;`). Ahora se
+  decodifican las entidades antes de escapar para XML.
+
 ## [1.4.4] - 2026-09-30
 
 ### Añadido
