@@ -40,13 +40,43 @@ class Extractor_Base {
 		return $data;
 	}
 
+	/**
+	 * Mismo criterio que el filtro de alcance, taxonomia por taxonomia
+	 * (pedido explicito del usuario, 2026-09-30, para que "nada marcado"
+	 * signifique lo mismo en los dos sitios y no sea un lio): sin ningun
+	 * termino marcado para una taxonomia, esta devuelve TODOS sus terminos
+	 * (igual que Scope::is_included() no filtra nada); en cuanto se marca
+	 * uno o mas terminos de esa taxonomia, pasa a devolver SOLO los
+	 * marcados. Es coherente con que marcar convierte el ajuste en un
+	 * filtro activo, tanto para que posts generan documento como para que
+	 * terminos aparecen dentro de el.
+	 */
 	protected function taxonomy_terms( $post_id, $post_type ) {
-		$out = array();
-		$taxonomies = get_object_taxonomies( $post_type, 'names' );
+		$out          = array();
+		$taxonomies   = get_object_taxonomies( $post_type, 'names' );
+		$term_actions = \AIKB\Scope::settings()['term_actions'];
 		foreach ( $taxonomies as $taxonomy ) {
 			$terms = get_the_terms( $post_id, $taxonomy );
-			if ( is_array( $terms ) ) {
-				$out[ $taxonomy ] = wp_list_pluck( $terms, 'name' );
+			if ( ! is_array( $terms ) ) {
+				continue;
+			}
+			$selected = isset( $term_actions[ $taxonomy ] ) ? $term_actions[ $taxonomy ] : array();
+			$has_selection = false;
+			foreach ( $selected as $action ) {
+				if ( 'include' === $action ) {
+					$has_selection = true;
+					break;
+				}
+			}
+			$names = array();
+			foreach ( $terms as $term ) {
+				$is_selected = isset( $selected[ $term->term_id ] ) && 'include' === $selected[ $term->term_id ];
+				if ( ! $has_selection || $is_selected ) {
+					$names[] = $term->name;
+				}
+			}
+			if ( $names ) {
+				$out[ $taxonomy ] = $names;
 			}
 		}
 		return $out;

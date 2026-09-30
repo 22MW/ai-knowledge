@@ -203,6 +203,14 @@
 		$form[ 0 ].submit();
 	} );
 
+	// Botón "Seleccionar todos" de un grupo de términos (pestaña Contenido):
+	// marca todas las casillas del grupo de chips justo debajo del botón.
+	// Solo cambia checkboxes en pantalla, no guarda nada hasta "Guardar".
+	$( document ).on( 'click', '.wookb-select-all-chips', function ( e ) {
+		e.preventDefault();
+		$( this ).closest( 'p' ).next( '.wookb-chip-group' ).find( 'input[type="checkbox"]' ).prop( 'checked', true );
+	} );
+
 	// «Probar conexión» de la IA (Ajustes y paso «Origen de IA»): llamada mínima
 	// solo bajo demanda. Delegado en document (el asistente inyecta sus pasos).
 	$( document ).on( 'click', '[data-wookb-ai-test]', function () {

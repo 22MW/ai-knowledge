@@ -102,10 +102,10 @@ class Llms_Txt {
 		$lines[] = '- [' . __( 'Feed de contenido (JSON)', 'ai-knowledge' ) . '](' . rest_url( 'ai-knowledge/v1/feeds/content.json' ) . '): ' . __( 'el resto del contenido del alcance, sin paginar.', 'ai-knowledge' );
 		$lines[] = '';
 
-		// Categoria+idioma combinados (pedido explicito): "## Vinos (ES)",
-		// "## Enoturismo (EN)", etc. -- mas cercano al formato de la spec de
-		// llms.txt (secciones tematicas con descripcion corta por enlace) que
-		// la lista plana anterior, solo agrupada por idioma sin contexto.
+		// CPT+idioma combinados: "## Productos (ES)", "## Páginas (EN)", etc.
+		// -- mas cercano al formato de la spec de llms.txt (secciones
+		// tematicas con descripcion corta por enlace) que la lista plana
+		// anterior, solo agrupada por idioma sin contexto.
 		// Sufijo "(EN)" solo si los documentos publicados estan de verdad en mas
 		// de un idioma (con "Crear por idioma") y SOLO en los idiomas distintos
 		// del principal: el principal va sin sufijo (un «(ES)» en todos los
@@ -142,19 +142,15 @@ class Llms_Txt {
 	}
 
 	/**
-	 * Categoria real del documento: para productos, el nombre de la primera
-	 * taxonomia (product_cat -- Vino, Enoturismo...) del producto de origen;
-	 * para el resto (paginas), "Páginas". Se usa la taxonomia real en vez
-	 * del post_type crudo porque "product" agruparia vinos y experiencias de
-	 * enoturismo juntos, que es justo la distincion que se pidio separar.
-	 *
-	 * SIEMPRE se devuelve el nombre del termino en el idioma principal (via
-	 * Languages::term_id_in_language()), nunca el del idioma de $row -- confirmado
-	 * en real: agrupar "por idioma del row" dejaba categorias mezcladas
-	 * (ej. "Weinprobe (ES)": el termino de esa fila ES no tenia traduccion
-	 * WPML propia y WPML devolvia el nombre en aleman tal cual). La seccion
-	 * ya indica el idioma aparte con "(ES)"/"(EN)"/"(DE)", asi que el nombre
-	 * de categoria no necesita traducirse el mismo -- solo ser consistente.
+	 * Categoria real del documento: el nombre del tipo de contenido (CPT),
+	 * no su categoria/taxonomia (pedido explicito del usuario, 2026-09-30).
+	 * Antes, los productos se agrupaban por su primera categoria de
+	 * WooCommerce (product_cat -- "Vino", "Enoturismo"...); eso duplicaba la
+	 * organizacion por categoria que ya hace el catalogo de tienda
+	 * (Store_Info_Doc): la misma categorizacion aparecia dos veces, en el
+	 * catalogo y como estructura de /llms.txt. Ahora agrupa por CPT ("Productos",
+	 * "Páginas", o el nombre de cualquier otro CPT), y la categorizacion
+	 * vive solo en el catalogo.
 	 */
 	protected static function category_label( $row ) {
 		// Documentos compuestos (Store_Info_Doc): no tienen taxonomía real que
@@ -178,27 +174,12 @@ class Llms_Txt {
 			return __( 'Documentación', 'ai-knowledge' );
 		}
 
-		if ( 'product' !== $row->source_type || ! function_exists( 'wc_get_product' ) ) {
-			return 'Páginas';
+		$post_type_object = get_post_type_object( $row->source_type );
+		if ( $post_type_object && ! empty( $post_type_object->labels->name ) ) {
+			return $post_type_object->labels->name;
 		}
 
-		$terms = get_the_terms( $row->source_id, 'product_cat' );
-		if ( ! $terms || is_wp_error( $terms ) ) {
-			return 'Páginas';
-		}
-
-		$term = $terms[0];
-		// Nombre de la categoria en el idioma principal (via el servicio de
-		// idiomas); sin plugin de idiomas devuelve el mismo termino.
-		$canonical_id = Languages::term_id_in_language( $term->term_id, 'product_cat', Languages::main_language() );
-		if ( $canonical_id && (int) $canonical_id !== (int) $term->term_id ) {
-			$canonical_term = get_term( $canonical_id, 'product_cat' );
-			if ( $canonical_term && ! is_wp_error( $canonical_term ) ) {
-				return $canonical_term->name;
-			}
-		}
-
-		return $term->name;
+		return __( 'Páginas', 'ai-knowledge' );
 	}
 
 	/**

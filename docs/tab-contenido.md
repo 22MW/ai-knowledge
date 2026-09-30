@@ -34,9 +34,26 @@ Eliges entre dos modos:
 
 ## Categorías y etiquetas
 
-Para cada tipo de contenido incluido, puedes afinar por sus categorías o
-etiquetas: si no marcas ninguna, entran todos los términos; si marcas
-alguna, solo entra el contenido que tenga ese término.
+Para cada tipo de contenido incluido, puedes afinar por sus categorías,
+etiquetas u otras taxonomías propias del tipo de contenido (incluidos los
+atributos de producto de WooCommerce, como Denominación o Variedad).
+
+Mismo criterio en las dos taxonomías a la vez, para no tener que recordar
+comportamientos distintos:
+
+- **Nada marcado** (por defecto): no filtra nada (entran todos los posts) y
+  el documento incluye todos los términos que tenga ese post en esa
+  taxonomía.
+- **Uno o más términos marcados**: pasa a ser un filtro activo para las dos
+  cosas — solo entra el contenido que tenga alguno de esos términos, y el
+  documento solo incluye esos términos marcados.
+
+Los términos que entran se añaden al `.md` en un bloque propio ("Categorías
+y características") directo desde la base de datos, sin pasar por la IA —
+igual que "Datos de compra": no dependen de que la IA decida mencionarlos.
+
+El botón «Seleccionar todos» marca de golpe todos los términos de una
+taxonomía.
 
 ## IDs sueltos
 
