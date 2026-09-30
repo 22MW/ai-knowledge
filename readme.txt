@@ -4,7 +4,7 @@ Tags: woocommerce, chatbot, ia, llms.txt, wpml, crawlers, robots.txt
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.4.3
+Stable tag: 1.4.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -117,6 +117,9 @@ Sí. En **Visibilidad IA** selecciona el modo que permite únicamente `/llms.txt
 == Changelog ==
 
 Ver `CHANGELOG.md` para el historial completo y detallado de cambios.
+
+= 1.4.4 =
+Los términos de taxonomía marcados en Contenido ahora se añaden al documento (bloque "Categorías y características", directo desde la base de datos, sin pasar por la IA), con botón "Seleccionar todos". Corrige que /llms.txt agrupara por categoría de producto en vez de por tipo de contenido, duplicando la organización del catálogo de tienda.
 
 = 1.4.3 =
 Corrige que un error real de la IA (Anthropic/OpenAI) con texto no UTF-8 válido se mostrara como una pantalla en blanco con un aviso genérico de "sesión" en vez del motivo real. Ahora el mensaje de cualquier llamada a la IA se sanea antes de mostrarse.

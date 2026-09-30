@@ -81,6 +81,7 @@ $effective_post_types = Scope::effective_post_types();
 						}
 						?>
 						<h2><?php echo esc_html( $tax->label ); ?></h2>
+						<p><button type="button" class="button wookb-btn-success wookb-select-all-chips"><?php esc_html_e( 'Seleccionar todos', 'ai-knowledge' ); ?></button></p>
 						<div class="wookb-chip-group">
 							<?php
 							$selected = isset( $settings['term_actions'][ $tax->name ] ) ? $settings['term_actions'][ $tax->name ] : array();
@@ -93,7 +94,7 @@ $effective_post_types = Scope::effective_post_types();
 								</label>
 							<?php endforeach; ?>
 						</div>
-						<p class="description"><?php esc_html_e( 'Nada marcado = todos los términos. Marcado = solo entran posts con ese término.', 'ai-knowledge' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Nada marcado = entran todos los posts y el documento incluye todos los términos de esta taxonomía. En cuanto marcas uno o más términos, se convierte en filtro para los dos sitios a la vez: solo entran posts con alguno de esos términos, y el documento solo incluye esos términos (bloque «Categorías y características»).', 'ai-knowledge' ); ?></p>
 					<?php endforeach; ?>
 				<?php endforeach; ?>
 			</td>

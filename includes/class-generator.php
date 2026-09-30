@@ -83,6 +83,16 @@ class Generator {
 			$response .= "\n\n" . $purchase_block;
 		}
 
+		// Taxonomias marcadas (pedido explicito del usuario, 2026-09-30):
+		// igual que "Datos de compra", se anexan directo desde la BD sin pasar
+		// por la IA -- asi no dependen de que el modelo decida mencionarlas
+		// (no lo hacia: estaban en el prompt como contexto, no como dato a
+		// reproducir obligatoriamente) y no gastan tokens.
+		$taxonomy_block = self::build_taxonomy_block( $data );
+		if ( '' !== $taxonomy_block ) {
+			$response .= "\n\n" . $taxonomy_block;
+		}
+
 		$section = Languages::build_section( $data['lang'], $versions );
 		if ( '' !== $section ) {
 			$response .= "\n\n" . $section;
@@ -172,13 +182,11 @@ class Generator {
 			}
 			$datos[] = 'Variantes: ' . implode( '; ', $variantes );
 		}
-		if ( ! empty( $data['taxonomies'] ) ) {
-			foreach ( $data['taxonomies'] as $tax => $terms ) {
-				if ( $terms ) {
-					$datos[] = ucfirst( $tax ) . ': ' . implode( ', ', $terms );
-				}
-			}
-		}
+		// Las taxonomias marcadas NO se mandan a la IA (pedido explicito del
+		// usuario, 2026-09-30): se anexan directo desde la BD en
+		// build_taxonomy_block(), igual que "Datos de compra". Antes estaban
+		// aqui como contexto de fondo, pero el prompt nunca le pedia a la IA
+		// que las mencionara, asi que no aparecian nunca en el resultado.
 		if ( ! empty( $data['custom_fields'] ) ) {
 			foreach ( $data['custom_fields'] as $key => $value ) {
 				$datos[] = $key . ': ' . $value;
@@ -436,5 +444,34 @@ class Generator {
 		$heading = $p ? $l['heading'] : $l['heading_other'];
 
 		return '## ' . $heading . "\n\n" . implode( "\n\n", $sections );
+	}
+
+	/**
+	 * Taxonomias marcadas en Contenido -> "Taxonomías / términos" (pedido
+	 * explicito del usuario, 2026-09-30): un bloque mecanico mas, igual que
+	 * build_purchase_data_block() -- directo desde la BD, sin pasar por la
+	 * IA. $data['taxonomies'] ya viene filtrado por Extractor_Base::
+	 * taxonomy_terms() a solo los terminos marcados; aqui solo se formatea.
+	 * Cualquier tipo de contenido, no solo productos.
+	 */
+	public static function build_taxonomy_block( array $data ) {
+		if ( empty( $data['taxonomies'] ) || ! is_array( $data['taxonomies'] ) ) {
+			return '';
+		}
+		$rows = array();
+		foreach ( $data['taxonomies'] as $taxonomy => $terms ) {
+			if ( empty( $terms ) ) {
+				continue;
+			}
+			$tax_object = get_taxonomy( $taxonomy );
+			$label      = ( $tax_object && ! empty( $tax_object->labels->singular_name ) )
+				? $tax_object->labels->singular_name
+				: ucfirst( $taxonomy );
+			$rows[]     = '- ' . $label . ': ' . implode( ', ', (array) $terms );
+		}
+		if ( ! $rows ) {
+			return '';
+		}
+		return '## ' . __( 'Categorías y características', 'ai-knowledge' ) . "\n\n" . implode( "\n", $rows );
 	}
 }

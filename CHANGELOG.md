@@ -2,6 +2,26 @@
 
 Todas las modificaciones relevantes de este plugin se documentan en este archivo.
 
+## [1.4.4] - 2026-09-30
+
+### Añadido
+
+- Los términos de taxonomía marcados en Contenido → "Taxonomías / términos"
+  se añaden al `.md` en un bloque propio ("Categorías y características"),
+  directo desde la base de datos, sin pasar por la IA (no gasta tokens y no
+  depende de que el modelo decida mencionarlos). Mismo criterio en los dos
+  sitios a la vez, taxonomía por taxonomía: nada marcado = entran todos los
+  posts y todos los términos; en cuanto marcas alguno, filtra las dos cosas
+  a la vez. Botón «Seleccionar todos» por taxonomía.
+
+### Corregido
+
+- `/llms.txt` agrupaba sus secciones por categoría de producto (WooCommerce),
+  duplicando la organización que ya hace el documento "Catálogo de tienda".
+  Ahora agrupa por tipo de contenido (CPT): "Productos", "Páginas", o el
+  nombre de cualquier otro CPT propio (antes cualquier CPT que no fuera
+  producto caía genéricamente en "Páginas").
+
 ## [1.4.3] - 2026-09-29
 
 ### Corregido
