@@ -5,27 +5,30 @@
 `ai-knowledge`, rama `knowBaseDev`, repo `github.com/22MW/ai-knowledge`. Ruta:
 `app/public/wp-content/plugins/ai-knowledge/`.
 
-## Estado — 2026-09-29
+## Estado — 2026-09-30
 
-- **Última release publicada: 1.4.3** (2026-09-29). Sin tarea de código
+- **Última release publicada: 1.4.4** (2026-09-30). Sin tarea de código
   abierta.
-- Corrige un fallo real detectado en un sitio en producción
-  (bodegasvirei.com, diagnosticado con acceso SSH de solo lectura): cuando
-  la API externa de IA (Anthropic/OpenAI) devolvía un error con texto no
-  UTF-8 válido, `wp_send_json_error()` fallaba en silencio (HTTP 422, cuerpo
-  vacío, sin ningún log) y la pantalla mostraba un aviso genérico de
-  "sesión" que no tenía nada que ver con la causa real. Saneado centralizado
-  en `AI_Client::generate()` para las 3 rutas (Conectores de WordPress,
-  Genix/OpenAI, Genix/Claude).
-- Release 1.4.2 (2026-09-28) incluida también: interruptor de Visibilidad IA
-  exime `/ai-knowledge-doc/`; `.htaccess`/`robots.txt` con una sola lógica de
-  conflictos; dominio en los nombres de archivo descargados.
+- Incluye:
+  - Términos de taxonomía marcados en Contenido → se añaden al `.md` en un
+    bloque propio ("Categorías y características"), directo desde la BD sin
+    pasar por la IA. Mismo criterio en los dos sitios (filtro de alcance y
+    contenido del documento), taxonomía por taxonomía: nada marcado = todo
+    entra; algo marcado = filtra las dos cosas. Botón «Seleccionar todos».
+  - `/llms.txt` agrupa por tipo de contenido (CPT: Productos, Páginas...),
+    no por categoría de producto — evita duplicar la organización que ya
+    hace el catálogo de tienda.
+  - Release 1.4.3 (2026-09-29) incluida también: saneado UTF-8 de mensajes
+    de error de IA (evita respuestas 422 vacías y silenciosas).
+- Confirmado por el usuario en real (plugins.local) tras regenerar: `/llms.txt`
+  ya no muestra categorías, solo CPTs. Un aviso de "categoría vieja" que vio
+  después era caché del navegador, no del servidor (confirmado con curl y
+  con la fecha del archivo físico en disco).
 
 ## Siguiente paso
 
-Pendiente de confirmar en real (bodegasvirei.com u otro sitio) que, la
-próxima vez que falle una llamada a la IA, el mensaje de error se ve de
-verdad en vez de la pantalla en blanco.
+A elegir por el usuario a partir del roadmap. Pendiente concreto: probar en
+real (bodegasvirei.com) que, si vuelve a fallar la IA, el mensaje se ve.
 
 ## Notas de proceso
 
